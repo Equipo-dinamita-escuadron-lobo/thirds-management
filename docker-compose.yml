@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db_thirds:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_USER: springuser
+      MYSQL_PASSWORD: ThePassword
+      MYSQL_DATABASE: db_thirds
+      MYSQL_ROOT_PASSWORD: ThePassword
+    #volumes:
+    #  - ./data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    container_name: db_thirds
+    labels:
+      - "traefik.enable=false"
+
+    networks:
+      - softcont-network
+
+  thirds_management:
+    image: jeserna/thirds_management:latest
+    #ports:
+    #  - "8081:8080"
+    environment:
+      - DB_USERNAME=springuser
+      - DB_PASSWORD=ThePassword
+      - DB_URL=jdbc:mysql://db_thirds:3306/db_thirds
+      - SECURITY_USER=root
+      - SECURITY_PASSWORD=
+    depends_on:
+      - db_thirds
+    container_name: thirds_management
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.thirds_management.rule=PathPrefix(`/api/thirds`)"
+      - "traefik.http.services.thirds_management.loadbalancer.server.port=8080"
+    networks:
+      - softcont-network
+
+networks:
+  softcont-network:
+    external: true

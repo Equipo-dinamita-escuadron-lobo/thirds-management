@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("/th_api")
+@RequestMapping("/api/thirds")
 @RequiredArgsConstructor
 
 public class ThirdRestAdapter {
@@ -41,7 +41,7 @@ public class ThirdRestAdapter {
 
     private final ThirdRestMapper thirdRestMapper;
 
-    @PostMapping("/thirds")
+    @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
         System.out.println("\n");
@@ -55,7 +55,7 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
-    @GetMapping("/thirds")
+    @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(@RequestBody @Valid ListThirdsRequest listThirdsRequest) {
         System.out.println("\n");
         System.out.println("Entrando a petición get thirds");
