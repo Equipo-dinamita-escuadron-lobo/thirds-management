@@ -76,7 +76,13 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.baeldung.demo.DemoApplication</mainClass>
+					<mainClass>com.thirdsmanagement.thirds.ThirdsManagementApplication</mainClass>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
 					<layout>JAR</layout>
 				</configuration>
 			</plugin>
