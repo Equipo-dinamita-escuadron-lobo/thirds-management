@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   db_thirds:
-    image: mysql
+    image: mariadb:11.2.3
     restart: always
     environment:
       MARIADB_USER: springuser
@@ -27,7 +27,7 @@ services:
     environment:
       - DB_USERNAME=springuser
       - DB_PASSWORD=ThePassword
-      - DB_URL=jdbc:mysql://db_thirds:3306/db_thirds
+      - DB_URL=jdbc:mariadb://db_thirds:3306/db_thirds
       - SECURITY_USER=root
       - SECURITY_PASSWORD=
     depends_on:
