@@ -7,5 +7,6 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 
 public interface ListThirdsUseCase {
     Page<Third> getAllThirdsBy(Long entId,Pageable pageable);
+    Page<Third> getAllInactiveThirdsBy(Long entId,Pageable pageable);
     Page<Third> getAllThirdsFilterBy(String[] filters);
 }
