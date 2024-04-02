@@ -13,4 +13,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity,Long>{
 
     @Query("SELECT t FROM ThirdEntity t INNER JOIN t.thirdTypes tt WHERE t.entId = :entId")
     Page<ThirdEntity> getThirdsBy(Long entId, Pageable page);
+
+    @Query("SELECT t FROM ThirdEntity t INNER JOIN t.thirdTypes tt WHERE t.entId = :entId AND t.state = 'false'")
+    Page<ThirdEntity> getInactiveThirdsBy(Long entId, Pageable page);
 }

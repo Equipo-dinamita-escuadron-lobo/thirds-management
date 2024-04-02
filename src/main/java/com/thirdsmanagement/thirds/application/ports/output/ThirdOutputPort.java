@@ -17,4 +17,5 @@ public interface ThirdOutputPort {
     boolean changeThirdState(Third third);
 
     Page<Third> getAllThirdsBy(Long entId, Pageable page);
+    Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page);
 }

@@ -95,6 +95,19 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    @Override
+    public Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page) {
+        System.out.println("\n Entrando a getAllInactiveThirdsBy \n");
+        Page<ThirdEntity> pageEntities = thirdRepository.getInactiveThirdsBy(entId, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        for(Third obj : pageThirds.getContent()){
+            System.out.println(obj.toString());
+        }
+
+        return pageThirds;
+    }
+
     private Third convertToThird(ThirdEntity thirdEntity) {
 
         System.out.println("\n Entrando a convertToThird \n");
