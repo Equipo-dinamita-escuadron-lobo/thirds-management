@@ -71,5 +71,22 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(page, HttpStatus.FOUND);
 
     }
+
+    @GetMapping("/inactive")
+    public ResponseEntity<Page<Third>> getInactiveThirdsList(@RequestBody @Valid ListThirdsRequest listThirdsRequest) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición get inactive thirds");
+        System.out.println("\n");
+
+        Long entId = listThirdsRequest.getEntId();
+        int numPage = listThirdsRequest.getNumPage();
+
+        Pageable pageable = PageRequest.of(numPage, 10);
+
+        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId,pageable);
+
+        return new ResponseEntity<>(page, HttpStatus.FOUND);
+
+    }
     
 }
