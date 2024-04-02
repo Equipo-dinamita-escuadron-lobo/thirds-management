@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,14 +19,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Entity
 @Getter
@@ -48,8 +52,14 @@ public class ThirdEntity {
     @Enumerated(EnumType.STRING)
     private TypeIdEntity typeId;
 
-    @OneToMany(mappedBy = "third")
-    private Set<ThirdsAndTypeEntity> thirdsAndTypes;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+        name = "thirds_and_types",
+        joinColumns = @JoinColumn(name = "th_id"),
+        inverseJoinColumns = @JoinColumn(name = "tt_id")
+    )
+    @Default
+    private Set<ThirdTypeEntity> thirdTypes = new HashSet<>();
 
     @Column(name = "th_ruth_path")
     private String rutPath; 
@@ -101,10 +111,10 @@ public class ThirdEntity {
 
     @Column(name = "th_created_at")
     @CreationTimestamp
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "th_updated_at")
     @UpdateTimestamp
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 
 }

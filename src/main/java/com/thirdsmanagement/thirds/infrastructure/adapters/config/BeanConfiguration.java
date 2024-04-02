@@ -11,15 +11,14 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.Th
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.ThirdPersistenceMapper;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 
 @Configuration
 public class BeanConfiguration {
     
     @Bean
-    public ThirdPersistenceAdapter thirdPersistenceAdapter(ThirdRepository thirdRepository,ThirdTypeRepository thirdTypeRepository, TypeIdRepository typeIdRepository, ThirdsAndTypeRepository thirdsAndTypeRepository,ThirdPersistenceMapper thirdPersistenceMapper){
-        return new ThirdPersistenceAdapter(thirdRepository, thirdTypeRepository, typeIdRepository, thirdsAndTypeRepository,thirdPersistenceMapper);
+    public ThirdPersistenceAdapter thirdPersistenceAdapter(ThirdRepository thirdRepository,ThirdTypeRepository thirdTypeRepository, TypeIdRepository typeIdRepository,ThirdPersistenceMapper thirdPersistenceMapper){
+        return new ThirdPersistenceAdapter(thirdRepository, thirdTypeRepository, typeIdRepository, thirdPersistenceMapper);
     }
 
     @Bean
