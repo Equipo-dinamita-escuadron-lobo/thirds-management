@@ -5,10 +5,10 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_USER: springuser
-      MYSQL_PASSWORD: ThePassword
-      MYSQL_DATABASE: db_thirds
-      MYSQL_ROOT_PASSWORD: ThePassword
+      MARIADB_USER: springuser
+      MARIADB_PASSWORD: ThePassword
+      MARIADB_DATABASE: db_thirds
+      MARIADB_ROOT_PASSWORD: ThePassword
     #volumes:
     #  - ./data:/var/lib/mysql
     ports:

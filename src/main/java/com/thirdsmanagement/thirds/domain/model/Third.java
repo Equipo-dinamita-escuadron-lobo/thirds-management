@@ -1,12 +1,14 @@
 package com.thirdsmanagement.thirds.domain.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +26,8 @@ public class Third {
     @Enumerated(EnumType.STRING)
     private eTypeId typeId;
     
-    private Set<eThirdType> thirdTypes;
+    @Default
+    private Set<eThirdType> thirdTypes = new HashSet<>();
 
     private String rutPath; 
     private ePersonType personType; 

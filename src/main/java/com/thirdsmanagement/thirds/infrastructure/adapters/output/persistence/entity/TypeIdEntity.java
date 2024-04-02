@@ -1,6 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -32,9 +32,9 @@ public class TypeIdEntity {
 
     @Column(name = "ti_created_at")
     @CreationTimestamp
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 
     @Column(name = "ti_updated_at")
     @UpdateTimestamp
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 }

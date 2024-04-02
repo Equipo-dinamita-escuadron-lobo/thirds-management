@@ -11,6 +11,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 @Repository
 public interface ThirdRepository extends JpaRepository<ThirdEntity,Long>{
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
+    @Query("SELECT t FROM ThirdEntity t INNER JOIN t.thirdTypes tt WHERE t.entId = :entId")
     Page<ThirdEntity> getThirdsBy(Long entId, Pageable page);
 }
