@@ -8,7 +8,6 @@ import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 //import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 //import com.thirdsmanagement.thirds.application.ports.input.InactivateThirdUseCase;
 import com.thirdsmanagement.thirds.domain.model.Third;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ListThirdsRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
