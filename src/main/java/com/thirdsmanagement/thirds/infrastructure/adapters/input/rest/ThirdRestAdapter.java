@@ -8,12 +8,12 @@ import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 //import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 //import com.thirdsmanagement.thirds.application.ports.input.InactivateThirdUseCase;
 import com.thirdsmanagement.thirds.domain.model.Third;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ListThirdsRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 //import org.springframework.web.bind.annotation.RequestMethod;
 //import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@CrossOrigin("http://localhost:4200")
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
@@ -57,14 +58,13 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
-    @PostMapping("/listThird")
-    public ResponseEntity<Page<Third>> getThirdsList(@RequestBody @Valid ListThirdsRequest listThirdsRequest) {
+    @GetMapping("/")
+    public ResponseEntity<Page<Third>> getThirdsList(
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get thirds");
         System.out.println("\n");
-
-        Long entId = listThirdsRequest.getEntId();
-        int numPage = listThirdsRequest.getNumPage();
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
@@ -75,13 +75,12 @@ public class ThirdRestAdapter {
     }
 
     @GetMapping("/inactive")
-    public ResponseEntity<Page<Third>> getInactiveThirdsList(@RequestBody @Valid ListThirdsRequest listThirdsRequest) {
+    public ResponseEntity<Page<Third>> getInactiveThirdsList(
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get inactive thirds");
         System.out.println("\n");
-
-        Long entId = listThirdsRequest.getEntId();
-        int numPage = listThirdsRequest.getNumPage();
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
