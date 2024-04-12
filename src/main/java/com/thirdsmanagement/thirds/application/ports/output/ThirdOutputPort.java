@@ -11,10 +11,8 @@ public interface ThirdOutputPort {
     Third saveThird(Third third);
 
     Optional<Third> getThirdById(Long id);
-    Optional<Third> getThirdByName(String name);
-    Optional<Third> getThirdByNIT(Long NIT);
 
-    boolean changeThirdState(Third third);
+    boolean changeThirdState(Long thId);
 
     Page<Third> getAllThirdsBy(Long entId, Pageable page);
     Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page);

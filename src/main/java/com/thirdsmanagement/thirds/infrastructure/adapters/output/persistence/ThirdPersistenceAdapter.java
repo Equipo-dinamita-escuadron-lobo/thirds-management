@@ -60,26 +60,39 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
     @Override
     public Optional<Third> getThirdById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdById'");
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
+
+        if(thirdEntity.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Third third = convertToThird(thirdEntity.get());
+        return Optional.of(third);
     }
 
     @Override
-    public Optional<Third> getThirdByName(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdByName'");
-    }
+    public boolean changeThirdState(Long thId) {
+        System.out.println("\n Entrando a changeThirdState \n");
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(thId);
 
-    @Override
-    public Optional<Third> getThirdByNIT(Long NIT) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdByNIT'");
-    }
+        if(thirdEntity.isEmpty()) {
+            return false;
+        }
 
-    @Override
-    public boolean changeThirdState(Third third) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'changeThirdState'");
+        ThirdEntity entity = thirdEntity.get();
+        String state = "";
+
+        if(entity.getState().equals("true")){
+            state="false";
+        }else{
+            state="true";
+        }
+
+        entity.setState(state);
+
+        thirdRepository.save(entity);
+
+        return true;
     }
 
     @Override
