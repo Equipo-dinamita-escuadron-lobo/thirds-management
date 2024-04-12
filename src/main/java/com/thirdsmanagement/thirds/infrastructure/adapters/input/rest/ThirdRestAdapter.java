@@ -26,9 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
@@ -90,7 +92,7 @@ public class ThirdRestAdapter {
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId,pageable);
 
-        return new ResponseEntity<>(page, HttpStatus.FOUND);
+        return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
