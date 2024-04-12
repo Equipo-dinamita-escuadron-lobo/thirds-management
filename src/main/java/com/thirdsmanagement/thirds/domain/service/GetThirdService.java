@@ -16,15 +16,4 @@ public class GetThirdService implements GetThirdUseCase{
     public Third getThirdById(Long id) {
         return thirdOutputPort.getThirdById(id).orElseThrow(()-> new ThirdNotFound("Third not found with id " + id));
     }
-
-    @Override
-    public Third getThirdByName(String name) {
-        return thirdOutputPort.getThirdByName(name).orElseThrow(()-> new ThirdNotFound("Third not found with name " + name));
-    }
-
-    @Override
-    public Third getThirdByNIT(Long NIT) {
-        return thirdOutputPort.getThirdByNIT(NIT).orElseThrow(() -> new ThirdNotFound("Third not found with NIT " + NIT));
-    }
-    
 }

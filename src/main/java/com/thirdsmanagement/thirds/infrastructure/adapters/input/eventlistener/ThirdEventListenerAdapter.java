@@ -19,6 +19,6 @@ public class ThirdEventListenerAdapter {
 
     @EventListener
     public void handleChangeState(ThirdStateUpdateEvent event){
-        log.info("The third with id "+event.getThId() +" has had its status changed to " + event.getThState() + " at "+event.getDate());
+        log.info("The third with id "+event.getThId() +" has had its status changed at "+event.getDate());
     }
 }

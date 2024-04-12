@@ -29,17 +29,33 @@ public class ListThirdsService implements ListThirdsUseCase{
     }
 
     @Override
-    public Page<Third> getAllThirdsFilterBy(String[] filters) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllThirdsFilterBy'");
-    }
-
-    @Override
     public Page<Third> getAllInactiveThirdsBy(Long entId, Pageable pageable) {
         Page<Third> result = thirdOutputPort.getAllInactiveThirdsBy(entId, pageable);
 
         if(result.isEmpty()){
             throw new ThirdsNotFound("No inactive thirds found for enterprise id "+ entId);            
+        }
+
+        return result;
+    }
+
+    @Override
+    public Page<Third> getAllProvidersBy(Long entId, Pageable pageable) {
+        Page<Third> result = thirdOutputPort.getAllProvidersBy(entId, pageable);
+
+        if(result.isEmpty()){
+            throw new ThirdsNotFound("No providers found for enterprise id "+ entId);            
+        }
+
+        return result;
+    }
+
+    @Override
+    public Page<Third> getAllCustomersBy(Long entId, Pageable pageable) {
+        Page<Third> result = thirdOutputPort.getAllCustomersBy(entId, pageable);
+
+        if(result.isEmpty()){
+            throw new ThirdsNotFound("No customers found for enterprise id "+ entId);            
         }
 
         return result;

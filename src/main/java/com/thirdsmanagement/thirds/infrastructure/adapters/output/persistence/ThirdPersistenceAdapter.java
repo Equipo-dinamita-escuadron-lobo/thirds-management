@@ -60,26 +60,39 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
     @Override
     public Optional<Third> getThirdById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdById'");
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
+
+        if(thirdEntity.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Third third = convertToThird(thirdEntity.get());
+        return Optional.of(third);
     }
 
     @Override
-    public Optional<Third> getThirdByName(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdByName'");
-    }
+    public boolean changeThirdState(Long thId) {
+        System.out.println("\n Entrando a changeThirdState \n");
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(thId);
 
-    @Override
-    public Optional<Third> getThirdByNIT(Long NIT) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getThirdByNIT'");
-    }
+        if(thirdEntity.isEmpty()) {
+            return false;
+        }
 
-    @Override
-    public boolean changeThirdState(Third third) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'changeThirdState'");
+        ThirdEntity entity = thirdEntity.get();
+        String state = "";
+
+        if(entity.getState().equals("true")){
+            state="false";
+        }else{
+            state="true";
+        }
+
+        entity.setState(state);
+
+        thirdRepository.save(entity);
+
+        return true;
     }
 
     @Override
@@ -87,10 +100,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         System.out.println("\n Entrando a getAllThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        for(Third obj : pageThirds.getContent()){
-            System.out.println(obj.toString());
-        }
 
         return pageThirds;
     }
@@ -101,9 +110,23 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Page<ThirdEntity> pageEntities = thirdRepository.getInactiveThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
-        for(Third obj : pageThirds.getContent()){
-            System.out.println(obj.toString());
-        }
+        return pageThirds;
+    }
+
+    @Override
+    public Page<Third> getAllProvidersBy(Long entId, Pageable page) {
+        System.out.println("\n Entrando a getAllProvidersBy \n");
+        Page<ThirdEntity> pageEntities = thirdRepository.getProvidersBy(entId, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    @Override
+    public Page<Third> getAllCustomersBy(Long entId, Pageable page) {
+        System.out.println("\n Entrando a getAllCustomersBy \n");
+        Page<ThirdEntity> pageEntities = thirdRepository.getCustomersBy(entId, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
         return pageThirds;
     }

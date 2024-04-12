@@ -16,12 +16,10 @@ import lombok.Setter;
 public class ThirdStateUpdateEvent {
 
     private Long thId;
-    private Boolean thState;
     private LocalDateTime date;
 
-    public ThirdStateUpdateEvent(Long thId, boolean thState){
+    public ThirdStateUpdateEvent(Long thId){
         this.thId = thId;
-        this.thState = thState;
         this.date = LocalDateTime.now();
     }
 }
