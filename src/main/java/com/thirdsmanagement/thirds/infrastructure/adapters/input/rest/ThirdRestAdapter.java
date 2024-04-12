@@ -87,5 +87,34 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(page, HttpStatus.FOUND);
 
     }
-    
+
+    @GetMapping("/providers")
+    public ResponseEntity<Page<Third>> getProvidersList(
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición get providers");
+        System.out.println("\n");
+
+        Pageable pageable = PageRequest.of(numPage, 10);
+
+        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId,pageable);
+
+        return new ResponseEntity<>(page, HttpStatus.FOUND);
+    }
+
+    @GetMapping("/customers")
+    public ResponseEntity<Page<Third>> getCustomersList(
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición get customers");
+        System.out.println("\n");
+
+        Pageable pageable = PageRequest.of(numPage, 10);
+
+        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
+
+        return new ResponseEntity<>(page, HttpStatus.FOUND);
+    }    
 }

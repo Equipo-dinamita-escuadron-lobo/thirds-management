@@ -18,4 +18,6 @@ public interface ThirdOutputPort {
 
     Page<Third> getAllThirdsBy(Long entId, Pageable page);
     Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page);
+    Page<Third> getAllProvidersBy(Long entId,Pageable page);
+    Page<Third> getAllCustomersBy(Long entId,Pageable page);
 }
