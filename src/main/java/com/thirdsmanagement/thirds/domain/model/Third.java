@@ -21,7 +21,7 @@ import lombok.Setter;
 public class Third {
 
     private Long thId; 
-    private Long entId;
+    private String entId;
 
     @Enumerated(EnumType.STRING)
     private eTypeId typeId;

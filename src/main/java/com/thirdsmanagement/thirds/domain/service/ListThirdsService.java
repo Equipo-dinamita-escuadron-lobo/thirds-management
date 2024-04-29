@@ -17,7 +17,7 @@ public class ListThirdsService implements ListThirdsUseCase{
     private final ThirdOutputPort thirdOutputPort;
 
     @Override
-    public Page<Third> getAllThirdsBy(Long entId, Pageable pageable) {
+    public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
 
         Page<Third> result = thirdOutputPort.getAllThirdsBy(entId, pageable);
 
@@ -29,7 +29,7 @@ public class ListThirdsService implements ListThirdsUseCase{
     }
 
     @Override
-    public Page<Third> getAllInactiveThirdsBy(Long entId, Pageable pageable) {
+    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable pageable) {
         Page<Third> result = thirdOutputPort.getAllInactiveThirdsBy(entId, pageable);
 
         if(result.isEmpty()){
@@ -40,7 +40,7 @@ public class ListThirdsService implements ListThirdsUseCase{
     }
 
     @Override
-    public Page<Third> getAllProvidersBy(Long entId, Pageable pageable) {
+    public Page<Third> getAllProvidersBy(String entId, Pageable pageable) {
         Page<Third> result = thirdOutputPort.getAllProvidersBy(entId, pageable);
 
         if(result.isEmpty()){
@@ -51,7 +51,7 @@ public class ListThirdsService implements ListThirdsUseCase{
     }
 
     @Override
-    public Page<Third> getAllCustomersBy(Long entId, Pageable pageable) {
+    public Page<Third> getAllCustomersBy(String entId, Pageable pageable) {
         Page<Third> result = thirdOutputPort.getAllCustomersBy(entId, pageable);
 
         if(result.isEmpty()){
