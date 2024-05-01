@@ -96,7 +96,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllThirdsBy(Long entId, Pageable page) {
+    public Page<Third> getAllThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -105,7 +105,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page) {
+    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllInactiveThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getInactiveThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -114,7 +114,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllProvidersBy(Long entId, Pageable page) {
+    public Page<Third> getAllProvidersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllProvidersBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getProvidersBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -123,7 +123,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllCustomersBy(Long entId, Pageable page) {
+    public Page<Third> getAllCustomersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllCustomersBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getCustomersBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);

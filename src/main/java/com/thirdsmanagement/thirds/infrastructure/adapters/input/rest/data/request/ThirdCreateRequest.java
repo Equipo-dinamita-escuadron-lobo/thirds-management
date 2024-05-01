@@ -27,7 +27,7 @@ public class ThirdCreateRequest {
     private Long thId;
 
     @NotNull(message = "Enterprise ID not be empty") 
-    private Long entId;
+    private String entId;
 
     @NotNull(message = "The id type not be empty") 
     @Enumerated(EnumType.STRING)

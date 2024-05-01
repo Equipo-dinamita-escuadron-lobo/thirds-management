@@ -76,13 +76,13 @@ public class ThirdRestAdapter {
         Third third = getThirdUseCase.getThirdById(thId);
 
 
-        return new ResponseEntity<>(third,HttpStatus.FOUND);
+        return new ResponseEntity<>(third,HttpStatus.OK);
     }
     
 
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
         @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get thirds");
@@ -98,7 +98,7 @@ public class ThirdRestAdapter {
 
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getInactiveThirdsList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
         @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get inactive thirds");
@@ -108,13 +108,13 @@ public class ThirdRestAdapter {
 
         Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId,pageable);
 
-        return new ResponseEntity<>(page, HttpStatus.FOUND);
+        return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
     @GetMapping("/providers")
     public ResponseEntity<Page<Third>> getProvidersList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
         @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get providers");
@@ -124,12 +124,12 @@ public class ThirdRestAdapter {
 
         Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId,pageable);
 
-        return new ResponseEntity<>(page, HttpStatus.FOUND);
+        return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
     @GetMapping("/customers")
     public ResponseEntity<Page<Third>> getCustomersList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") Long entId, 
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
         @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get customers");
@@ -139,6 +139,6 @@ public class ThirdRestAdapter {
 
         Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
 
-        return new ResponseEntity<>(page, HttpStatus.FOUND);
+        return new ResponseEntity<>(page, HttpStatus.OK);
     }    
 } 
