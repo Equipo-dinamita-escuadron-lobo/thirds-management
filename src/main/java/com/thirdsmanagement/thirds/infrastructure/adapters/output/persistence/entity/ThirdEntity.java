@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
@@ -116,5 +117,8 @@ public class ThirdEntity {
     @Column(name = "th_updated_at")
     @UpdateTimestamp
     private LocalDateTime updateDate;
+
+    @TenantId
+    private String tenantId;
 
 }
