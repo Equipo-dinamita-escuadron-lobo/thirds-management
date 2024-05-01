@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.Third;
-import com.thirdsmanagement.thirds.domain.model.eThirdType;
+import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
@@ -38,14 +38,14 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
         ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
 
-        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().name());
+        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeIdname());
 
         List<ThirdTypeEntity> thirdTypeEntities = thirdTypeRepository.findAll();
 
         if(typeIdEntity != null){
-            for(eThirdType tt : third.getThirdTypes()){
+            for(ThirdType tt : third.getThirdTypes()){
                 for(ThirdTypeEntity tte : thirdTypeEntities){
-                    if(tte.getTtName().equals(tt.name())){
+                    if(tte.getTtName().equals(tt.getThirdTypeName())){
                         thirdEntity.getThirdTypes().add(tte);
                     }
                 }
@@ -138,7 +138,10 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Third obj = this.thirdPersistenceMapper.toThird(thirdEntity);
 
         for(ThirdTypeEntity tt : thirdEntity.getThirdTypes()){
-            obj.getThirdTypes().add(eThirdType.valueOf(tt.getTtName()));
+            ThirdType thirdType = new ThirdType();
+            thirdType.setThirdTypeName(tt.getTtName());
+            thirdType.setThirdTypeId(tt.getTtId());
+            obj.getThirdTypes().add(thirdType);
         }
 
         return obj;

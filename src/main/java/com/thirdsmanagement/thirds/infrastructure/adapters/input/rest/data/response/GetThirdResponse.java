@@ -5,8 +5,8 @@ import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 import com.thirdsmanagement.thirds.domain.model.eThirdGender;
-import com.thirdsmanagement.thirds.domain.model.eThirdType;
-import com.thirdsmanagement.thirds.domain.model.eTypeId;
+import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,10 +25,9 @@ public class GetThirdResponse {
         private Long thId; 
     private Long entId;
 
-    @Enumerated(EnumType.STRING)
-    private eTypeId typeId;
+    private TypeId typeId;
     
-    private Set<eThirdType> thirdTypes;
+    private Set<ThirdType> thirdTypes;
 
     private String rutPath; 
     private ePersonType personType; 

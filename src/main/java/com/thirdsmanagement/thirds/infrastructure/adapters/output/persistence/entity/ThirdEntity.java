@@ -50,7 +50,6 @@ public class ThirdEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ti_id", referencedColumnName = "ti_id")
-    @Enumerated(EnumType.STRING)
     private TypeIdEntity typeId;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

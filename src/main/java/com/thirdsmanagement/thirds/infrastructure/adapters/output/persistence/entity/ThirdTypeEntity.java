@@ -28,6 +28,9 @@ public class ThirdTypeEntity {
     @Column(name = "tt_name")
     private String ttName;
 
+    @Column(name = "tt_entid")
+    private Long ttentId;
+
     @ManyToMany(mappedBy = "thirdTypes")
     private Set<ThirdEntity> thirds;
 }

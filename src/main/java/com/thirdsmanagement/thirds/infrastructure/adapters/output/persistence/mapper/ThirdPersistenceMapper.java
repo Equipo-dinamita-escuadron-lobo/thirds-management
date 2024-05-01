@@ -9,12 +9,12 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 @Mapper(componentModel = "spring")
 public interface ThirdPersistenceMapper {
 
-    @Mapping(source = "typeId", target = "typeId.tiId")
+    @Mapping(source = "typeId.typeId", target = "typeId.tiId")
     @Mapping(target = "thirdTypes", ignore = true)
     @Mapping(target = "thId", ignore = true)
     ThirdEntity toThirdEntity(Third third);
 
-    @Mapping(source = "typeId.tiId", target = "typeId")
+    @Mapping(source = "typeId.tiId", target = "typeId.typeId")
     @Mapping(target = "thirdTypes", ignore = true)
     Third toThird(ThirdEntity thirdEntity);
 }

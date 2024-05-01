@@ -30,6 +30,9 @@ public class TypeIdEntity {
     @Column(name = "ti_name")
     private String tiName;
 
+    @Column(name = "ti_entid")
+    private Long tientId;
+
     @Column(name = "ti_created_at")
     @CreationTimestamp
     private LocalDateTime creationDate;

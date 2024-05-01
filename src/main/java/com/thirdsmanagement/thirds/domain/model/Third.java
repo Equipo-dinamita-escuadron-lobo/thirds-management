@@ -22,12 +22,10 @@ public class Third {
 
     private Long thId; 
     private Long entId;
-
-    @Enumerated(EnumType.STRING)
-    private eTypeId typeId;
+    private TypeId typeId;
     
     @Default
-    private Set<eThirdType> thirdTypes = new HashSet<>();
+    private Set<ThirdType> thirdTypes = new HashSet<>();
 
     private String rutPath; 
     private ePersonType personType; 

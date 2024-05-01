@@ -5,8 +5,8 @@ import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 import com.thirdsmanagement.thirds.domain.model.eThirdGender;
-import com.thirdsmanagement.thirds.domain.model.eThirdType;
-import com.thirdsmanagement.thirds.domain.model.eTypeId;
+import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,15 +30,14 @@ public class ThirdCreateRequest {
     private Long entId;
 
     @NotNull(message = "The id type not be empty") 
-    @Enumerated(EnumType.STRING)
-    private eTypeId typeId;
+    private TypeId typeId;
 
     
     @NotNull(message = "The person type not be empty")  
     private ePersonType personType; 
     
     @NotNull(message = "The third type cannot be empty") 
-    private Set<eThirdType> thirdTypes;
+    private Set<ThirdType> thirdTypes;
 
     private String rutPath;
     private String names; 
