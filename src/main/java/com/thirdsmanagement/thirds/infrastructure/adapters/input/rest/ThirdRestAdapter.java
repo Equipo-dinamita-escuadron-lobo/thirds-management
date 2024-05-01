@@ -30,7 +30,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
-@CrossOrigin("*")
+//@CrossOrigin("*")
+@CrossOrigin("http://localhost:4200")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
