@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
+import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +21,11 @@ public class ThirdEventPublisherAdapter implements ThirdEventPublisher {
 
     @Override
     public void publishThirdStateUpdateEvent(ThirdStateUpdateEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void publishThirdUpdateEvent(ThirdUpdateEvent event) {
         applicationEventPublisher.publishEvent(event);
     }
 }

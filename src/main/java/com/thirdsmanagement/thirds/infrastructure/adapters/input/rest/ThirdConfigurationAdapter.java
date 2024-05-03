@@ -4,6 +4,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,11 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.domain.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
 import jakarta.validation.Valid;
@@ -31,10 +36,12 @@ public class ThirdConfigurationAdapter {
 
     private final CreateThirdTypeUseCase createThirdTypeUseCase;
     private final ListThirdTypeUseCase listThirdTypeUseCase;
+    private final CreateTypeIdUseCase createTypeIdUseCase;
+    private final ListTypeIdUseCase listTypeIdUseCase;
     
     private final IdRestMapper idRestMapper;
 
-     @PostMapping("/")
+     @PostMapping("/thirdtype")
     public ResponseEntity<ThirdType> createThirdType(@RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest){
 
         System.out.println("\n");
@@ -48,15 +55,30 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(thirdType,HttpStatus.CREATED);
     }
 
-    public ResponseEntity<List<ThirdType>> getThirdType(@NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId){
+    @GetMapping("/thirdtype")
+    public ResponseEntity<List<ThirdType>> getThirdType(@NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId){
         System.out.println("\n");
         System.out.println("Entrando a petición post Listar");
         System.out.println("\n");
 
-        List<ThirdType> thirdTypes = listThirdTypeUseCase.getAllThirdTypes(thId);
+        List<ThirdType> thirdTypes = listThirdTypeUseCase.getAllThirdTypes(entId);
 
         return new ResponseEntity<>(thirdTypes,HttpStatus.OK);
 
+    }
+
+    @PostMapping("/typeid")
+    public ResponseEntity<TypeId> createTypeId(@RequestBody @Valid TypeIdCreateRequest typeIdCreateRequest){
+        TypeId typeId = idRestMapper.toTypeId(typeIdCreateRequest);
+        typeId = createTypeIdUseCase.createTypeId(typeId);
+
+        return new ResponseEntity<>(typeId,HttpStatus.CREATED);
+    }
+
+    @GetMapping("/typeid")
+    public ResponseEntity<List<TypeId>> ListTypeId(@NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId){
+        List<TypeId> typeIds = listTypeIdUseCase.getAllTypeId(entId);
+        return new ResponseEntity<>(typeIds,HttpStatus.OK);
     }
     
 }

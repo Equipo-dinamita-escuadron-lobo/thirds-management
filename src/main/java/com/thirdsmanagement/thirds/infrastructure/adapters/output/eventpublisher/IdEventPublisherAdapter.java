@@ -3,12 +3,14 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.eventpublishe
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdTypeEventPublisher;
+import com.thirdsmanagement.thirds.application.ports.output.TypeIdEventPublisher;
 import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
+import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class IdEventPublisherAdapter implements ThirdTypeEventPublisher {
+public class IdEventPublisherAdapter implements ThirdTypeEventPublisher{
     
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -16,5 +18,7 @@ public class IdEventPublisherAdapter implements ThirdTypeEventPublisher {
     public void publishThirdTypeCreatedEvent(ThirdTypeCreatedEvent event){
         applicationEventPublisher.publishEvent(event);
     }
+
+   
     
 }

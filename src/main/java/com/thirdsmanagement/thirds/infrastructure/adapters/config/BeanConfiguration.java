@@ -7,9 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import com.thirdsmanagement.thirds.domain.service.ChangeThirdStateService;
 import com.thirdsmanagement.thirds.domain.service.CreateThirdService;
 import com.thirdsmanagement.thirds.domain.service.CreateThirdTypeService;
+import com.thirdsmanagement.thirds.domain.service.CreateTypeIdService;
 import com.thirdsmanagement.thirds.domain.service.GetThirdService;
 import com.thirdsmanagement.thirds.domain.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.domain.service.ListThirdsService;
+import com.thirdsmanagement.thirds.domain.service.ListTypeIdService;
+import com.thirdsmanagement.thirds.domain.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.eventpublisher.IdEventPublisherAdapter;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.eventpublisher.ThirdEventPublisherAdapter;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.IdPersistenceAdapter;
@@ -42,10 +45,22 @@ public class BeanConfiguration {
     public IdEventPublisherAdapter idEventPublisherAdapter(ApplicationEventPublisher applicationEventPublisher){
         return new IdEventPublisherAdapter(applicationEventPublisher);
     }
+    @Bean
+    public CreateTypeIdService createTypeIdService(IdPersistenceAdapter idPersistenceAdapter){
+        return new  CreateTypeIdService(idPersistenceAdapter);
+    }
+
+    @Bean 
+    public ListTypeIdService listTypeIdService(IdPersistenceAdapter idPersistenceAdapter){
+        return new ListTypeIdService(idPersistenceAdapter);
+
+    }
+    
+
 
     @Bean
-    public CreateThirdTypeService createThirdTypeService(IdPersistenceAdapter idPersistenceAdapter, IdEventPublisherAdapter idEventPublisherAdapter){
-        return new CreateThirdTypeService(idPersistenceAdapter, idEventPublisherAdapter);
+    public CreateThirdTypeService createThirdTypeService(IdPersistenceAdapter idPersistenceAdapter){
+        return new CreateThirdTypeService(idPersistenceAdapter);
     }
 
     @Bean 
@@ -53,11 +68,15 @@ public class BeanConfiguration {
         return new ListThirdTypeService(idPersistenceAdapter);
 
     }
-  
-
+    
     @Bean
     public CreateThirdService createThirdService(ThirdPersistenceAdapter thirdPersistenceAdapter, ThirdEventPublisherAdapter thirdEventPublisherAdapter) {
         return new CreateThirdService(thirdPersistenceAdapter, thirdEventPublisherAdapter);
+    }
+
+    @Bean
+    public UpdateThirdService updateThirdService(ThirdPersistenceAdapter thirdPersistenceAdapter, ThirdEventPublisherAdapter thirdEventPublisherAdapter){
+        return new UpdateThirdService(thirdPersistenceAdapter,thirdEventPublisherAdapter);
     }
 
     @Bean

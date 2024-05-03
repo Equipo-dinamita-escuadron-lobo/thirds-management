@@ -12,13 +12,10 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ThirdTypeCreateRequest {
+public class TypeIdCreateRequest {
     @NotNull(message = "Enterprise ID not be empty") 
     private String entId;
-
-    private long thirdTypeId;
-
-    @NotNull(message = "Enterprise ThirdTypeName not be empty") 
-    private String thirdTypeName;
-    
+    private String typeId;
+    @NotNull(message = "TypeIdName not be empty") 
+    private String typeIdname;
 }

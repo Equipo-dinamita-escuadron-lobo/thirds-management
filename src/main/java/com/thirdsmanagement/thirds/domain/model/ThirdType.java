@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThirdType {
-    private Long entId;
+    private String entId;
     private long thirdTypeId;
     private String thirdTypeName;
 }

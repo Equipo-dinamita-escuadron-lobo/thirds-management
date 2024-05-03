@@ -12,11 +12,11 @@ import lombok.AllArgsConstructor;
 public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     
     private final IdOutputPort idOutputPort;
-    private final ThirdTypeEventPublisher thirdTypeEventPublisher;
+    //private final ThirdTypeEventPublisher thirdTypeEventPublisher;
     @Override
     public ThirdType createThirdType(ThirdType thirdType) {
         thirdType = idOutputPort.saveThirdType(thirdType);
-        thirdTypeEventPublisher.publishThirdTypeCreatedEvent(new ThirdTypeCreatedEvent(thirdType.getThirdTypeId()));
+        //thirdTypeEventPublisher.publishThirdTypeCreatedEvent(new ThirdTypeCreatedEvent(thirdType.getThirdTypeId()));
         return thirdType;
     }
     

@@ -1,4 +1,5 @@
 package com.thirdsmanagement.thirds.domain.event;
+
 import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
@@ -12,13 +13,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TypeIdCreatedEvent {
-     
-    private String typeId;
+public class ThirdUpdateEvent {
+  private Long thId;
     private LocalDateTime date;
 
-    public TypeIdCreatedEvent(String id) {
-        this.typeId = id;
+    public ThirdUpdateEvent(Long thId){
+        this.thId = thId;
         this.date = LocalDateTime.now();
     }
+    
 }

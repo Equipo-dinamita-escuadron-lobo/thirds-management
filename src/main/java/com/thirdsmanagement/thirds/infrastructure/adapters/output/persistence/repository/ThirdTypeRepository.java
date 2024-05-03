@@ -12,4 +12,8 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
     List<ThirdTypeEntity> findByName(String name);
 
     List<ThirdTypeEntity> findByTtNameContaining(String name);
+
+    List<ThirdTypeEntity> findAllByTtentId(String ttentId);
+
+    
 }

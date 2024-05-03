@@ -14,7 +14,7 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     private final IdOutputPort idOutputPort;
     
     @Override
-    public List<ThirdType> getAllThirdTypes(Long entId) {
+    public List<ThirdType> getAllThirdTypes(String entId) {
        
         List<ThirdType> result = idOutputPort.getALLThirdTypes(entId);
         return result;

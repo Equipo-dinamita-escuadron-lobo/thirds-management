@@ -96,7 +96,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllThirdsBy(Long entId, Pageable page) {
+    public Page<Third> getAllThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -105,7 +105,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page) {
+    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllInactiveThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getInactiveThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -114,7 +114,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllProvidersBy(Long entId, Pageable page) {
+    public Page<Third> getAllProvidersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllProvidersBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getProvidersBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -123,7 +123,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public Page<Third> getAllCustomersBy(Long entId, Pageable page) {
+    public Page<Third> getAllCustomersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllCustomersBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getCustomersBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
@@ -145,5 +145,29 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         return obj;
+    }
+
+    @Override
+    public Third updateThird(Third third) {
+        
+        System.out.println("Entrando A Actualizar");
+        ThirdEntity thirdEntity = thirdRepository.findById(third.getThId()).orElse(null);
+        System.out.println(thirdEntity.toString());
+        System.out.println(thirdEntity.getNames());
+
+        if(thirdEntity != null){
+            thirdEntity.setNames(third.getNames());
+            thirdEntity.setLastNames(third.getLastNames());
+            thirdEntity.setIdNumber(third.getIdNumber());
+            thirdEntity.setSocialReason(third.getSocialReason());
+            thirdEntity.setAddress(third.getAddress());
+            thirdEntity.setCity(third.getCity());
+            thirdEntity.setCountry(third.getCountry());
+            thirdEntity.setProvince(third.getProvince());
+            thirdEntity.setPhotoPath(third.getPhotoPath());
+            thirdEntity.setPhoneNumber(third.getPhoneNumber());
+            thirdEntity = thirdRepository.save(thirdEntity);
+        }
+        return thirdPersistenceMapper.toThird(thirdEntity);
     }
 }

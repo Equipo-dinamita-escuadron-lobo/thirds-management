@@ -4,6 +4,8 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
@@ -29,7 +31,7 @@ public class ThirdTypeEntity {
     private String ttName;
 
     @Column(name = "tt_entid")
-    private Long ttentId;
+    private String ttentId;
 
     @ManyToMany(mappedBy = "thirdTypes")
     private Set<ThirdEntity> thirds;

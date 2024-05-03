@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 public interface ListThirdsUseCase {
-    Page<Third> getAllThirdsBy(Long entId,Pageable pageable);
-    Page<Third> getAllInactiveThirdsBy(Long entId,Pageable pageable);
-    Page<Third> getAllProvidersBy(Long entId,Pageable pageable);
-    Page<Third> getAllCustomersBy(Long entId,Pageable pageable);
+    Page<Third> getAllThirdsBy(String entId,Pageable pageable);
+    Page<Third> getAllInactiveThirdsBy(String entId,Pageable pageable);
+    Page<Third> getAllProvidersBy(String entId,Pageable pageable);
+    Page<Third> getAllCustomersBy(String entId,Pageable pageable);
 }

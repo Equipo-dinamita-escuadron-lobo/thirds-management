@@ -9,13 +9,13 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 
 public interface ThirdOutputPort {
     Third saveThird(Third third);
-
+    Third updateThird(Third third);
     Optional<Third> getThirdById(Long id);
 
     boolean changeThirdState(Long thId);
 
-    Page<Third> getAllThirdsBy(Long entId, Pageable page);
-    Page<Third> getAllInactiveThirdsBy(Long entId, Pageable page);
-    Page<Third> getAllProvidersBy(Long entId,Pageable page);
-    Page<Third> getAllCustomersBy(Long entId,Pageable page);
+    Page<Third> getAllThirdsBy(String entId, Pageable page);
+    Page<Third> getAllInactiveThirdsBy(String entId, Pageable page);
+    Page<Third> getAllProvidersBy(String entId,Pageable page);
+    Page<Third> getAllCustomersBy(String entId,Pageable page);
 }

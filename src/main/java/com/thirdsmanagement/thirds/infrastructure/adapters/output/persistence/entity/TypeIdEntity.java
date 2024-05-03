@@ -31,7 +31,7 @@ public class TypeIdEntity {
     private String tiName;
 
     @Column(name = "ti_entid")
-    private Long tientId;
+    private String tientId;
 
     @Column(name = "ti_created_at")
     @CreationTimestamp

@@ -13,7 +13,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TypeId {
-    private Long entId;
-    private long typeId;
+    private String entId;
+    private String typeId;
     private String typeIdname;
+
+    
 }

@@ -7,6 +7,6 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
 public interface ListThirdTypeUseCase {
 
-    List<ThirdType> getAllThirdTypes(Long entId);
+    List<ThirdType> getAllThirdTypes(String entId);
     
 } 
