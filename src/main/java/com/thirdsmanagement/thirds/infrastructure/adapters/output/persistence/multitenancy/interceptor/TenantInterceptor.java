@@ -2,6 +2,9 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.m
 
 
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.util.TenantContext;
+import com.thirdsmanagement.thirds.infrastructure.adapters.security.IJwtUtils;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
@@ -9,18 +12,13 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 
 @Component
 public class TenantInterceptor implements WebRequestInterceptor {
+
+    @Autowired
+    private IJwtUtils jwtUtils;
+
     @Override
     public void preHandle(WebRequest request) throws Exception {
-//        UsernamePasswordAuthenticationToken tokenAuth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-//        //Validate the tokenAuth
-//        if(tokenAuth != null){
-//            String tenantId = tokenAuth.getCredentials().toString();
-//            TenantContext.setTenantId(tenantId);
-//        }
-
-        TenantContext.setTenantId("1");
-
-
+        TenantContext.setTenantId(jwtUtils.getId());
     }
 
     @Override
