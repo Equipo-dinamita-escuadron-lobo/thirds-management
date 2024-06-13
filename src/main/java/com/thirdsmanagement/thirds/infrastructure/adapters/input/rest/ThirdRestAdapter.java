@@ -13,6 +13,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,8 @@ public class ThirdRestAdapter {
 
     private final ThirdRestMapper thirdRestMapper;
 
+    @Operation(summary = "Crear Tercero",
+       description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -61,6 +64,8 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Actualiza Un Tercero",
+       description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -75,6 +80,7 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
     }
 
+    @Operation(summary = "Cambia El Estado De Un Tercero")
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(@NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
         System.out.println("\n Entrando a petición put cambiar estado \n");
@@ -84,6 +90,8 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result),HttpStatus.OK);
     }
 
+    @Operation(summary = "Obtiene Un Tercero",
+       description = "Obtiene Un Tercero Por El Id De Este")
     @GetMapping("/third")
     public ResponseEntity<Third> getThirdById(@NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
         System.out.println("\n");
@@ -97,6 +105,8 @@ public class ThirdRestAdapter {
     }
     
 
+    @Operation(summary = "Obtiene Una Lista de Terceros",
+    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
         @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
@@ -113,6 +123,8 @@ public class ThirdRestAdapter {
 
     }
 
+    @Operation(summary = "Inactiva Un Tercero",
+    description = "Inactiva Un Tercero Dandole el Id Del Tercero")
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getInactiveThirdsList(
         @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
@@ -129,6 +141,8 @@ public class ThirdRestAdapter {
 
     }
 
+    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores",
+    description = "Obtiene Una Lista de Terceros que son proveedores, dando como parametros en Id de la empresa y el numero de pagina")
     @GetMapping("/providers")
     public ResponseEntity<Page<Third>> getProvidersList(
         @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
@@ -144,6 +158,8 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
+    @Operation(summary = "Obtiene Una Lista de Clientes",
+    description = "Obtiene Una Lista de Terceros que son Clientes, dando como parametros en Id de la empresa y el numero de pagina")
     @GetMapping("/customers")
     public ResponseEntity<Page<Third>> getCustomersList(
         @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 

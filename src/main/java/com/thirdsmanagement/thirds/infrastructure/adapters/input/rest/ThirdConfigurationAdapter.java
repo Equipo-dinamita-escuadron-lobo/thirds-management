@@ -23,6 +23,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,8 @@ public class ThirdConfigurationAdapter {
     
     private final IdRestMapper idRestMapper;
 
+    @Operation(summary = "Crear un Tipo De Tercero",
+       description = "Crea Un Tipo de Tercero con los parametros obligatorios")
      @PostMapping("/thirdtype")
     public ResponseEntity<ThirdType> createThirdType(@RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest){
 
@@ -55,6 +58,8 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(thirdType,HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Obtiene los Tipos De Terceros",
+       description = "Devuelve Los Tipos de Terceros Asociados a una Empresa")
     @GetMapping("/thirdtype")
     public ResponseEntity<List<ThirdType>> getThirdType(@NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId){
         System.out.println("\n");
@@ -67,6 +72,8 @@ public class ThirdConfigurationAdapter {
 
     }
 
+    @Operation(summary = "Crear un Tipo De Identificación",
+       description = "Crea Un Tipo de Identificación con los parametros obligatorios")
     @PostMapping("/typeid")
     public ResponseEntity<TypeId> createTypeId(@RequestBody @Valid TypeIdCreateRequest typeIdCreateRequest){
         TypeId typeId = idRestMapper.toTypeId(typeIdCreateRequest);
@@ -75,6 +82,8 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(typeId,HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Obtiene los Tipos De Identificación",
+    description = "Devuelve Los Tipos de Identificación Asociados a una Empresa")
     @GetMapping("/typeid")
     public ResponseEntity<List<TypeId>> ListTypeId(@NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId){
         List<TypeId> typeIds = listTypeIdUseCase.getAllTypeId(entId);
