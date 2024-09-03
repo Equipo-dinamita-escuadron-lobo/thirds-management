@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.service;
+package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;

@@ -15,9 +15,9 @@ import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCas
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
+import com.thirdsmanagement.thirds.application.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
-import com.thirdsmanagement.thirds.domain.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
