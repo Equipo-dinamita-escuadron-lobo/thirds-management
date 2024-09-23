@@ -5,6 +5,7 @@ INSERT INTO third_type (tt_id, tt_name, tt_entid) VALUES
 (4, 'Otro',"0");
 INSERT INTO type_id (ti_id, ti_name, ti_entid) VALUES
 ('CC', 'Cédula de Ciudadanía',"0"),
+('CC', 'Cédula de Ciudadanía 12345',"0"),
 ('CE', 'Cédula de Extranjería',"0"),
 ('NIT', 'Número de Identificación Tributaria',"0"),
 ('Pasaporte', 'Pasaporte',"0"),
