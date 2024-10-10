@@ -58,7 +58,7 @@ public class ThirdRestAdapter {
         System.out.println("\n");
 
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
-
+        System.out.println("///////////////////////////////////////////////////////"+third);
         third = createThirdUseCase.createThird(third);
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);

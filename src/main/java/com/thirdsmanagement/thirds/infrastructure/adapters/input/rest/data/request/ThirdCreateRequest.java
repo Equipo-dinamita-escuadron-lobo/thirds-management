@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,18 +29,17 @@ public class ThirdCreateRequest {
     
     private Long thId;
 
-    @NotNull(message = "Enterprise ID not be empty") 
+    @NotNull(message = "Enterprise ID cannot be empty") 
     private String entId;
 
     @JsonDeserialize(using = TypeIdDeserializer.class)
-    @NotNull(message = "The id type not be empty") 
+    @NotNull(message = "The id type cannot be empty") 
     private TypeId typeId;
 
-    
-    @NotNull(message = "The person type not be empty")  
+    @NotNull(message = "The person type cannot be empty")  
     private ePersonType personType; 
     
-    @JsonDeserialize(using =  ThirdTypeDeserializer.class)
+    @JsonDeserialize(using = ThirdTypeDeserializer.class)
     @NotNull(message = "The third type cannot be empty") 
     private Set<ThirdType> thirdTypes;
 
@@ -56,10 +55,18 @@ public class ThirdCreateRequest {
     private String country;
     private String province;
     private String city; 
+
+    @NotBlank(message = "Address cannot be empty")  // Validación para address
     private String address;
+
+    @NotBlank(message = "Phone number cannot be empty") // Validación para phoneNumber
     private String phoneNumber; 
+
+    @NotBlank(message = "Email cannot be empty") // Validación para email
+    @Email(message = "Email should be valid") // Validación adicional para el formato del email
     private String email; 
 
     private LocalDate creationDate;
     private LocalDate updateDate;
 }
+
