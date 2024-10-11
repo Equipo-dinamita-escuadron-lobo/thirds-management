@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.domain.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;

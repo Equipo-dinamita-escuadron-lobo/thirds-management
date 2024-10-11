@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.domain.service;
 
 import java.util.List;
 
