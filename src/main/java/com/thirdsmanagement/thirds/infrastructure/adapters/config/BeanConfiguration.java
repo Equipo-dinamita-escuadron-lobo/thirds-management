@@ -8,6 +8,7 @@ import com.thirdsmanagement.thirds.application.service.ChangeThirdStateService;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.CreateThirdTypeService;
 import com.thirdsmanagement.thirds.application.service.CreateTypeIdService;
+import com.thirdsmanagement.thirds.application.service.DeleteThirdService;
 import com.thirdsmanagement.thirds.application.service.GetThirdService;
 import com.thirdsmanagement.thirds.application.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.application.service.ListThirdsService;
@@ -77,6 +78,10 @@ public class BeanConfiguration {
     @Bean
     public UpdateThirdService updateThirdService(ThirdPersistenceAdapter thirdPersistenceAdapter, ThirdEventPublisherAdapter thirdEventPublisherAdapter){
         return new UpdateThirdService(thirdPersistenceAdapter,thirdEventPublisherAdapter);
+    }
+    @Bean
+    public  DeleteThirdService deleteThirdService(ThirdPersistenceAdapter thirdPersistenceAdapter, ThirdEventPublisherAdapter thirdEventPublisherAdapter){
+        return new DeleteThirdService(thirdPersistenceAdapter,thirdEventPublisherAdapter);
     }
 
     @Bean

@@ -11,6 +11,8 @@ public interface ThirdOutputPort {
     Third saveThird(Third third);
     Third updateThird(Third third);
     Optional<Third> getThirdById(Long id);
+    boolean existThirdById(long id);
+    void deleteThirdById(Long id);
 
     boolean changeThirdState(Long thId);
 
@@ -18,4 +20,5 @@ public interface ThirdOutputPort {
     Page<Third> getAllInactiveThirdsBy(String entId, Pageable page);
     Page<Third> getAllProvidersBy(String entId,Pageable page);
     Page<Third> getAllCustomersBy(String entId,Pageable page);
+    
 }

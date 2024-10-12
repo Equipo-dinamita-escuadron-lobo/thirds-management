@@ -4,6 +4,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
+import com.thirdsmanagement.thirds.domain.event.ThirdDeleteEvent;
 import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
 import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 
@@ -27,5 +28,10 @@ public class ThirdEventPublisherAdapter implements ThirdEventPublisher {
     @Override
     public void publishThirdUpdateEvent(ThirdUpdateEvent event) {
         applicationEventPublisher.publishEvent(event);
+    }
+    @Override
+    public void publishThirdDeleteEvent(ThirdDeleteEvent event) {
+        applicationEventPublisher.publishEvent(event);
+        
     }
 }
