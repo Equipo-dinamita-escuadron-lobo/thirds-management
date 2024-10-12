@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
-import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUserCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
@@ -19,7 +18,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
-import org.apache.el.stream.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +30,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
-// @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
+//@PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
 public class ThirdRestAdapter {
 
     private final CreateThirdUseCase createThirdUseCase;
@@ -48,11 +45,11 @@ public class ThirdRestAdapter {
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
     private final UpdateThirdUseCase updateThirdUseCase;
-    private final DeleteThirdUserCase deleteThirdUserCase;
 
     private final ThirdRestMapper thirdRestMapper;
 
-    @Operation(summary = "Crear Tercero", description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
+    @Operation(summary = "Crear Tercero",
+       description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -61,13 +58,14 @@ public class ThirdRestAdapter {
         System.out.println("\n");
 
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
-        System.out.println("///////////////////////////////////////////////////////" + third);
+        System.out.println("///////////////////////////////////////////////////////"+third);
         third = createThirdUseCase.createThird(third);
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Actualiza Un Tercero", description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
+    @Operation(summary = "Actualiza Un Tercero",
+       description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -82,133 +80,98 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
     }
 
-    @Operation(summary = "Eliminar Tercero", description = "Elimina un Tercero por su ID")
-@DeleteMapping("/delete")
-public ResponseEntity<Void> deleteThird(
-    @NotNull(message = "Third ID must not be empty") @RequestParam("thId") Long thId) {
-    System.out.println("Entrando a petición delete eliminar");
-
-    try {
-        Third third = getThirdUseCase.getThirdById(thId);
-
-        if (third != null) {
-            System.out.println("Enviando a eliminar...");
-            deleteThirdUserCase.deleteThirdById(thId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            System.out.println("Tercero no encontrado");
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    } catch (Exception e) {
-        System.err.println("Error al eliminar el tercero: " + e.getMessage());
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-}
-
-
     @Operation(summary = "Cambia El Estado De Un Tercero")
     @PutMapping("/")
-    public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
-            @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
+    public ResponseEntity<ChangeThirdStateResponse> changeThirdState(@NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
         System.out.println("\n Entrando a petición put cambiar estado \n");
 
         Boolean result = changeThirdStateUseCase.changeThirdState(thId);
 
-        return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
+        return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result),HttpStatus.OK);
     }
 
-    @Operation(summary = "Obtiene Un Tercero", description = "Obtiene Un Tercero Por El Id De Este")
+    @Operation(summary = "Obtiene Un Tercero",
+       description = "Obtiene Un Tercero Por El Id De Este")
     @GetMapping("/third")
-    public ResponseEntity<Third> getThirdById(
-            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
+    public ResponseEntity<Third> getThirdById(@NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
         System.out.println("\n");
         System.out.println("Entrando a petición get third by Id");
         System.out.println("\n");
 
         Third third = getThirdUseCase.getThirdById(thId);
 
-        return new ResponseEntity<>(third, HttpStatus.OK);
+
+        return new ResponseEntity<>(third,HttpStatus.OK);
     }
+    
 
-    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este")
-    @GetMapping("/existBy")
-    public ResponseEntity<Boolean> existThirdById(
-            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición existe Third By Id");
-        System.out.println("ID recibido desde el frontend: " + thId);
-        System.out.println("\n");
-        boolean exists = false;
-
-        exists = getThirdUseCase.existThirdById(thId);
-        System.out.println("valor de ex:  " + exists);
-
-        return new ResponseEntity<>(exists, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Obtiene Una Lista de Terceros", description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
+    @Operation(summary = "Obtiene Una Lista de Terceros",
+    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get thirds");
         System.out.println("\n");
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
-    @Operation(summary = "Inactiva Un Tercero", description = "Inactiva Un Tercero Dandole el Id Del Tercero")
+    @Operation(summary = "Inactiva Un Tercero",
+    description = "Inactiva Un Tercero Dandole el Id Del Tercero")
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getInactiveThirdsList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get inactive thirds");
         System.out.println("\n");
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
-    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores", description = "Obtiene Una Lista de Terceros que son proveedores, dando como parametros en Id de la empresa y el numero de pagina")
+    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores",
+    description = "Obtiene Una Lista de Terceros que son proveedores, dando como parametros en Id de la empresa y el numero de pagina")
     @GetMapping("/providers")
     public ResponseEntity<Page<Third>> getProvidersList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get providers");
         System.out.println("\n");
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    @Operation(summary = "Obtiene Una Lista de Clientes", description = "Obtiene Una Lista de Terceros que son Clientes, dando como parametros en Id de la empresa y el numero de pagina")
+    @Operation(summary = "Obtiene Una Lista de Clientes",
+    description = "Obtiene Una Lista de Terceros que son Clientes, dando como parametros en Id de la empresa y el numero de pagina")
     @GetMapping("/customers")
     public ResponseEntity<Page<Third>> getCustomersList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
+        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
         System.out.println("\n");
         System.out.println("Entrando a petición get customers");
         System.out.println("\n");
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
-    }
-}
+    }    
+} 

@@ -71,19 +71,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     @Override
-    public boolean existThirdById(long id) {
-        System.out.println("Entrando a existThirdByID \n");
-        boolean existe = false;
-        existe = thirdRepository.existThirdBy(id);
-        return existe;
-    }
-    @Override
-    public void deleteThirdById(Long id) {
-        System.out.println("entrando a deleteThirdById");
-        thirdRepository.deleteById(id);        
-    }
-
-    @Override
     public boolean changeThirdState(Long thId) {
         System.out.println("\n Entrando a changeThirdState \n");
         Optional<ThirdEntity> thirdEntity = thirdRepository.findById(thId);

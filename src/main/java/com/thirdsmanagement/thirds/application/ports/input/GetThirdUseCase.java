@@ -4,5 +4,4 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 
 public interface GetThirdUseCase {
     Third getThirdById(Long id);
-    boolean existThirdById(long  id);
 }
