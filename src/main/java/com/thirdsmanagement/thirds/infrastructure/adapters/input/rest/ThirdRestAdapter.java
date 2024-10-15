@@ -104,6 +104,21 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(third,HttpStatus.OK);
     }
     
+    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este")
+    @GetMapping("/existBy")
+    public ResponseEntity<Boolean> existThirdById(
+            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición existe Third By Id");
+        System.out.println("ID recibido desde el frontend: " + thId);
+        System.out.println("\n");
+        boolean exists = false;
+
+        exists = getThirdUseCase.existThirdById(thId);
+        System.out.println("valor de ex:  " + exists);
+
+        return new ResponseEntity<>(exists, HttpStatus.OK);
+    }
 
     @Operation(summary = "Obtiene Una Lista de Terceros",
     description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
