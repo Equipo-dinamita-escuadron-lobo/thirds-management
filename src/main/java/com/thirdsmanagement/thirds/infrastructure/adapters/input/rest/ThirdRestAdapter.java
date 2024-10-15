@@ -115,7 +115,7 @@ public class ThirdRestAdapter {
         System.out.println("Entrando a petición get thirds");
         System.out.println("\n");
 
-        Pageable pageable = PageRequest.of(numPage, 10);
+        Pageable pageable = PageRequest.of(numPage, 100);
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId,pageable);
 
