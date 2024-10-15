@@ -15,5 +15,7 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
 
     List<ThirdTypeEntity> findAllByTtentId(String ttentId);
 
+    void deleteByTtentId(String ttentId);
+
     
 }
