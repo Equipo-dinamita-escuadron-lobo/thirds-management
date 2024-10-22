@@ -8,6 +8,7 @@ import com.thirdsmanagement.thirds.application.service.ChangeThirdStateService;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.CreateThirdTypeService;
 import com.thirdsmanagement.thirds.application.service.CreateTypeIdService;
+import com.thirdsmanagement.thirds.application.service.DeleteTypeThirdService;
 import com.thirdsmanagement.thirds.application.service.GetThirdService;
 import com.thirdsmanagement.thirds.application.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.application.service.ListThirdsService;
@@ -21,6 +22,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.ma
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.ThirdPersistenceMapper;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 
 @Configuration
@@ -92,5 +94,9 @@ public class BeanConfiguration {
     @Bean
     public GetThirdService getThirdService(ThirdPersistenceAdapter thirdPersistenceAdapter){
         return new GetThirdService(thirdPersistenceAdapter);
+    }
+    @Bean
+    public DeleteTypeThirdService deleteTypeThirdService(ThirdTypeRepository thirdTypeRepository, ThirdsAndTypesRepository thirdsAndTypesRepository ) {
+        return new DeleteTypeThirdService(thirdTypeRepository, thirdsAndTypesRepository);
     }
 }
