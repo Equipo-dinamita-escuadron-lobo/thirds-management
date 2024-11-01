@@ -1,12 +1,16 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
+import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
@@ -18,12 +22,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -104,6 +109,21 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(third,HttpStatus.OK);
     }
     
+    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este")
+    @GetMapping("/existBy")
+    public ResponseEntity<Boolean> existThirdById(
+            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición existe Third By Id");
+        System.out.println("ID recibido desde el frontend: " + thId);
+        System.out.println("\n");
+        boolean exists = false;
+
+        exists = getThirdUseCase.existThirdById(thId);
+        System.out.println("valor de ex:  " + exists);
+
+        return new ResponseEntity<>(exists, HttpStatus.OK);
+    }
 
     @Operation(summary = "Obtiene Una Lista de Terceros",
     description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
@@ -115,7 +135,7 @@ public class ThirdRestAdapter {
         System.out.println("Entrando a petición get thirds");
         System.out.println("\n");
 
-        Pageable pageable = PageRequest.of(numPage, 10);
+        Pageable pageable = PageRequest.of(numPage, 100);
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId,pageable);
 
@@ -173,5 +193,22 @@ public class ThirdRestAdapter {
         Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
-    }    
+    }
+    
+    //Crear tercero apartir del Pdf del RUT 
+    @Autowired
+    private PdfRUTService pdfRUTService;
+    @PostMapping("/content-PDF-RUT")
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file){
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            PdfRUTContent request = new  PdfRUTContent(file);
+            PdfRUTContentOutput response = pdfRUTService.extractContent(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 } 

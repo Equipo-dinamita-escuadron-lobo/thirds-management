@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.service;
+package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -15,5 +15,9 @@ public class GetThirdService implements GetThirdUseCase{
     @Override
     public Third getThirdById(Long id) {
         return thirdOutputPort.getThirdById(id).orElseThrow(()-> new ThirdNotFound("Third not found with id " + id));
+    }
+    @Override
+    public boolean existThirdById(long id) {
+        return thirdOutputPort.existThirdById(id);
     }
 }

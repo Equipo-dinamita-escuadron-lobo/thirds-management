@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.service;
+package com.thirdsmanagement.thirds.application.service;
 
 
 import org.springframework.data.domain.Page;
