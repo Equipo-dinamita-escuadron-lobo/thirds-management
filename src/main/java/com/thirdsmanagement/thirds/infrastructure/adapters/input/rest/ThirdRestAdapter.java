@@ -1,12 +1,16 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
+import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
@@ -18,6 +22,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -188,5 +193,22 @@ public class ThirdRestAdapter {
         Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
-    }    
+    }
+    
+    //Crear tercero apartir del Pdf del RUT 
+    @Autowired
+    private PdfRUTService pdfRUTService;
+    @PostMapping("/content-PDF-RUT")
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file){
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        try {
+            PdfRUTContent request = new  PdfRUTContent(file);
+            PdfRUTContentOutput response = pdfRUTService.extractContent(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
 } 
