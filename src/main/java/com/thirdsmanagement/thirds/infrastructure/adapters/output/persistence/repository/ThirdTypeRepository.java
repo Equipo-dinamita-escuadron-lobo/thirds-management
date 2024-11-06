@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 
@@ -13,7 +14,8 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
 
     List<ThirdTypeEntity> findByTtNameContaining(String name);
 
-    List<ThirdTypeEntity> findAllByTtentId(String ttentId);
+    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId OR tt.ttentId = 'standart'")
+    List<ThirdTypeEntity> findAllByTtentId(@Param("ttentId") String ttentId);
 
     void deleteByTtentId(String ttentId);
 
