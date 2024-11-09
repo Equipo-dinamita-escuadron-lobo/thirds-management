@@ -2,10 +2,11 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import java.util.Set;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
@@ -95,8 +96,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             state="true";
         }
 
-        entity.setState(state);
-
         thirdRepository.save(entity);
 
         return true;
@@ -161,7 +160,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         ThirdEntity thirdEntity = thirdRepository.findById(third.getThId()).orElse(null);
         System.out.println(thirdEntity.toString());
         System.out.println(thirdEntity.getNames());
-
         if(thirdEntity != null){
             thirdEntity.setNames(third.getNames());
             thirdEntity.setLastNames(third.getLastNames());
@@ -171,8 +169,33 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             thirdEntity.setCity(third.getCity());
             thirdEntity.setCountry(third.getCountry());
             thirdEntity.setProvince(third.getProvince());
+            System.out.println("El estado ga guardar es es" + third.getState());
+            if(third.getState()){
+                thirdEntity.setState("true");
+                System.out.println("El estado entro a guardar Activo " + third.getState());
+            }else{
+                thirdEntity.setState("false");
+                System.out.println("El estado entro a guardar Inactivo " + third.getState());
+            }
+            thirdEntity.setVerificationNumber(thirdEntity.getVerificationNumber());
             thirdEntity.setPhotoPath(third.getPhotoPath());
             thirdEntity.setPhoneNumber(third.getPhoneNumber());
+            thirdEntity.setEmail(third.getEmail());
+            Set<ThirdTypeEntity> thirdTypeEntities = third.getThirdTypes().stream()
+            .map(thirdType -> {
+                ThirdTypeEntity entity = new ThirdTypeEntity();
+                entity.setTtId(thirdType.getThirdTypeId());
+                entity.setTtName(thirdType.getThirdTypeName());
+                entity.setTtentId(thirdType.getEntId());
+                
+                // Log de cada tipo de tercero
+                System.out.println("Tercer tipo: " + thirdType.getThirdTypeName());
+                return entity;
+            })
+            .collect(Collectors.toSet());
+
+        // Asignación de los tipos de tercero
+        thirdEntity.setThirdTypes(thirdTypeEntities);
             thirdEntity = thirdRepository.save(thirdEntity);
         }
         return thirdPersistenceMapper.toThird(thirdEntity);
