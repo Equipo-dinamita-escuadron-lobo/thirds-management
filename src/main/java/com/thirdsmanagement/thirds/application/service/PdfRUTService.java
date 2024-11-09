@@ -24,7 +24,6 @@ public class PdfRUTService {
             pdfStripper.setStartPage(1);
             pdfStripper.setEndPage(1);  
             String content = pdfStripper.getText(document);
-            System.out.println(content);
             String typeId = "";
             int idPerson = 0;
             String razonSocial="";
@@ -39,7 +38,7 @@ public class PdfRUTService {
             long cell = 0;
             try{
                 String[] extractedLines = extractAfterClasificacion(content);
-                String[] extractedUbication = extractAfterColombia(content);
+                String[] extractedUbication = extractUbicationThird(content);
                 String[] personaJuridica;
                 String[] personaNatural;
                 String typePerson;
@@ -103,19 +102,17 @@ public class PdfRUTService {
             String[] lines = result.split("\\r?\\n"); 
             return lines;
         }
-        System.out.println("La palabra 'CLASIFICACIÓN' no se encontró en el contenido.");
         return new String[0];
     }
 
-    private String[] extractAfterColombia(String content) {
+    private String[] extractUbicationThird(String content) {
         int index = content.lastIndexOf("COLOMBIA");
         if (index != -1) {
-            // Incluir "COLOMBIA" en el resultado, no solo el texto después de ella
+            
             String result = content.substring(index).trim();
             String[] lines = result.split("\\r?\\n"); 
             return lines;
         }
-        System.out.println("La palabra 'COLOMBIA' no se encontró en el contenido.");
         return new String[0];
     }
     
