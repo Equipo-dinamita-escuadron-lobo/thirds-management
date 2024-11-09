@@ -19,76 +19,77 @@ public class PdfRUTService {
         // Transferir el archivo recibido a un archivo temporal
         request.getFile().transferTo(tempFile);
 
-        try (PDDocument document = PDDocument.load(tempFile)) {
+        try (PDDocument document = PDDocument.load(tempFile,"1")) {
             PDFTextStripper pdfStripper = new PDFTextStripper();
             pdfStripper.setStartPage(1);
-            pdfStripper.setEndPage(1);   
+            pdfStripper.setEndPage(1);  
             String content = pdfStripper.getText(document);
-            String[] extractedLines = extractAfterClasificacion(content);
-            String[] personaJuridica;
-            String[] personaNatural;
-            String typePerson;
-            String[] aux = separateNumbersAndText(extractedLines[3]);
-            typePerson = aux[0];
-            String typeId;
-            int idPerson;
-            String razonSocial=null;
-            String names=null;
-            String lastNames=null;
-            String [] ubication;
-            String pais;
-            String departamento;
-            String ciudad;
-            String direccion;
-            String correo;
-            Long cell;
-            if(extractedLines[3].contains("Persona jurídica")){
-                typeId = "NIT";
-                personaJuridica = separateNumbersAndText(cleanString(extractedLines[2]));
-                idPerson = Integer.parseInt(String.valueOf(personaJuridica[0]).length() > 0 ? String.valueOf(personaJuridica[0]).substring(0, String.valueOf(personaJuridica[0]).length() - 1) : String.valueOf(personaJuridica[0]));
-                razonSocial = extractedLines[5];
-                ubication =  separateNumbersAndText(cleanString(extractedLines[7]));
+            System.out.println(content);
+            String typeId = "";
+            int idPerson = 0;
+            String razonSocial="";
+            String names="";
+            String lastNames="";
+            String [] ubication = null;
+            String pais = "";
+            String departamento = "";
+            String ciudad = "";
+            String direccion = "";
+            String correo = "";
+            long cell = 0;
+            try{
+                String[] extractedLines = extractAfterClasificacion(content);
+                String[] extractedUbication = extractAfterColombia(content);
+                String[] personaJuridica;
+                String[] personaNatural;
+                String typePerson;
+                String[] aux = separateNumbersAndText(extractedLines[3]);
+                typePerson = aux[0];
+                if(extractedLines[3].contains("Persona jurídica")){
+                    //Extraer la primera parte de identificacion para persona juridica 
+                    typeId = "NIT";
+                    personaJuridica = separateNumbersAndText(cleanString(extractedLines[2]));
+                    idPerson = Integer.parseInt(String.valueOf(personaJuridica[0]).length() > 0 ? String.valueOf(personaJuridica[0]).substring(0, String.valueOf(personaJuridica[0]).length() - 1) : String.valueOf(personaJuridica[0]));
+                    razonSocial = extractedLines[5];
+                }else{
+                    //Extraer la primera parte de identificacion para persona natural
+                    String [] aux1 = separateNumbersAndText(cleanString(extractedLines[3]));
+                    typeId = aux1[2];
+                    typeId = typeId.trim();
+                    personaNatural = separateNumbersAndText(cleanString(extractedLines[2]));
+                    idPerson = Integer.parseInt(String.valueOf(personaNatural[0]).length() > 0 ? String.valueOf(personaNatural[0]).substring(0, String.valueOf(personaNatural[0]).length() - 1) : String.valueOf(personaNatural[0]));
+                    String[] datos = new String[4];
+                    datos = splitBySpaceAndUpperCase(extractedLines[5]);
+                    lastNames = datos[0]+" "+ datos[1];
+                    names = datos[2]+" "+ datos[3];
+                }
+                ubication =  separateNumbersAndText(cleanString(extractedUbication[0]));
                 pais = cleanString(ubication[0]);
                 departamento = cleanString(ubication[2]);
                 ciudad = cleanString(ubication[4]);
-                direccion = extractedLines[8];
-                correo = extractedLines[9];
-                String [] contact = separateAndJoinNumbers(extractedLines[10]);
+                direccion = extractedUbication[1];
+                correo = extractedUbication[2];
+                String [] contact = separateAndJoinNumbers(extractedUbication[3]);
                 cell = Long.parseLong(contact[1]);
-                
-            }else{
-                String [] aux1 = separateNumbersAndText(cleanString(extractedLines[3]));
-                typeId = aux1[2];
-                typeId = typeId.trim();
-                personaNatural = separateNumbersAndText(cleanString(extractedLines[2]));
-                idPerson = Integer.parseInt(String.valueOf(personaNatural[0]).length() > 0 ? String.valueOf(personaNatural[0]).substring(0, String.valueOf(personaNatural[0]).length() - 1) : String.valueOf(personaNatural[0]));
-                String[] datos = new String[4];
-                datos = splitBySpaceAndUpperCase(extractedLines[5]);
-                lastNames = datos[0]+" "+ datos[1];
-                names = datos[2]+" "+ datos[3];
-                ubication =  separateNumbersAndText(cleanString(extractedLines[4]));
-                pais = cleanString(ubication[0]);
-                departamento = cleanString(ubication[2]);
-                ciudad = cleanString(ubication[4]);
-                direccion = extractedLines[7];
-                correo = extractedLines[8];
-                String [] contact = separateAndJoinNumbers(extractedLines[9]);
-                cell = Long.parseLong(contact[1]);
-                
+                System.out.println("Tipo de persona: "+typePerson);
+                System.out.println("Tipo de identifiacion: "+ typeId);
+                System.out.println("Numero Identificacion: "+ idPerson);
+                System.out.println("Razon social: "+razonSocial);
+                System.out.println("Apellidos: "+lastNames);
+                System.out.println("Nombres: "+names);
+                System.out.println("Pais: "+pais);
+                System.out.println("Departamento: "+departamento);
+                System.out.println("Ciudad: "+ciudad);
+                System.out.println("Direccion: "+direccion);
+                System.out.println("Correo: "+correo);
+                System.out.println("Telefono: "+cell);
+                String infoThird = typePerson+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
+                return new PdfRUTContentOutput(infoThird);
+            }catch(Exception e){
+                System.err.println("Error processing PDF content: " + e.getMessage());
+                e.printStackTrace();
             }
-            System.out.println("Tipo de persona: "+typePerson);
-            System.out.println("Tipo de identifiacion: "+ typeId);
-            System.out.println("Numero Identificacion: "+ idPerson);
-            System.out.println("Razon social: "+razonSocial);
-            System.out.println("Apellidos: "+lastNames);
-            System.out.println("Nombres: "+names);
-            System.out.println("Pais: "+pais);
-            System.out.println("Departamento: "+departamento);
-            System.out.println("Ciudad: "+ciudad);
-            System.out.println("Direccion: "+direccion);
-            System.out.println("Correo: "+correo);
-            System.out.println("Telefono: "+cell);
-            String infoThird = typePerson+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
+            String infoThird = ""+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
             return new PdfRUTContentOutput(infoThird);
         } finally {
             tempFile.delete();
@@ -105,6 +106,20 @@ public class PdfRUTService {
         System.out.println("La palabra 'CLASIFICACIÓN' no se encontró en el contenido.");
         return new String[0];
     }
+
+    private String[] extractAfterColombia(String content) {
+        int index = content.lastIndexOf("COLOMBIA");
+        if (index != -1) {
+            // Incluir "COLOMBIA" en el resultado, no solo el texto después de ella
+            String result = content.substring(index).trim();
+            String[] lines = result.split("\\r?\\n"); 
+            return lines;
+        }
+        System.out.println("La palabra 'COLOMBIA' no se encontró en el contenido.");
+        return new String[0];
+    }
+    
+    
 
     public static String cleanString(String input) {
         String cleaned = input.replaceAll("\\s*\\n\\s*", "\n") // Limpiar saltos de linea con espacios
