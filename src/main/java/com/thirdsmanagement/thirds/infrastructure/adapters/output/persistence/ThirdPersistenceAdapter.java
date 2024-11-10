@@ -10,6 +10,7 @@ import java.util.Set;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
@@ -169,6 +170,23 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             thirdEntity.setCity(third.getCity());
             thirdEntity.setCountry(third.getCountry());
             thirdEntity.setProvince(third.getProvince());
+            
+            TypeIdEntity typeIdEntity = new TypeIdEntity();
+            TypeId typeId = third.getTypeId();
+
+            if (typeId != null) {
+                typeIdEntity.setTiId(typeId.getTypeId()); // Asigna typeId a tiId
+                typeIdEntity.setTiName(typeId.getTypeIdname()); // Asigna typeIdname a tiName
+                typeIdEntity.setTientId(typeId.getEntId()); // Asigna entId a tientId
+
+                // Log para verificar la conversión
+                System.out.println("Tipo de ID asignado: " + typeId.getTypeIdname());
+            }
+
+            // Asigna el resultado al atributo correspondiente
+            thirdEntity.setTypeId(typeIdEntity);
+
+
             System.out.println("El estado ga guardar es es" + third.getState());
             if(third.getState()){
                 thirdEntity.setState("true");
