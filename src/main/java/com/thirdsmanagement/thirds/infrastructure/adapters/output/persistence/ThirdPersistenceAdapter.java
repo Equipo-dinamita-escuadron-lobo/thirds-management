@@ -177,7 +177,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             if (typeId != null) {
                 typeIdEntity.setTiId(typeId.getTypeId()); // Asigna typeId a tiId
                 typeIdEntity.setTiName(typeId.getTypeIdname()); // Asigna typeIdname a tiName
-                typeIdEntity.setTientId(typeId.getEntId()); // Asigna entId a tientId
+
+                String entId = typeId.getEntId();
+                if (entId == null || entId.trim().isEmpty()) {
+                    entId = "standart";
+                }
+                typeIdEntity.setTientId(entId); // Asigna entId a tientId
 
                 // Log para verificar la conversión
                 System.out.println("Tipo de ID asignado: " + typeId.getTypeIdname());
