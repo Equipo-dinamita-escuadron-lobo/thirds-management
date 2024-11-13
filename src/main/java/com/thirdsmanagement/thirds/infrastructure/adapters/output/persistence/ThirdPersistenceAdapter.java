@@ -72,10 +72,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return Optional.of(third);
     }
     @Override
-    public boolean existThirdById(long id) {
+    public boolean existThirdById(long id, String entId) {
         System.out.println("Entrando a existThirdByID \n");
         boolean existe = false;
-        existe = thirdRepository.existThirdBy(id);
+        existe = thirdRepository.existThirdBy(id,  entId);
+
         return existe;
     }
 

@@ -17,7 +17,7 @@ public class GetThirdService implements GetThirdUseCase{
         return thirdOutputPort.getThirdById(id).orElseThrow(()-> new ThirdNotFound("Third not found with id " + id));
     }
     @Override
-    public boolean existThirdById(long id) {
-        return thirdOutputPort.existThirdById(id);
+    public boolean existThirdById(long id, String entId) {
+        return thirdOutputPort.existThirdById(id, entId);
     }
 }

@@ -11,7 +11,7 @@ public interface ThirdOutputPort {
     Third saveThird(Third third);
     Third updateThird(Third third);
     Optional<Third> getThirdById(Long id);
-    boolean existThirdById(long id);
+    boolean existThirdById(long id, String entId);
 
     boolean changeThirdState(Long thId);
 
