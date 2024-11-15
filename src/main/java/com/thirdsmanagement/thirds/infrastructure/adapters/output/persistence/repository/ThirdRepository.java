@@ -1,5 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -40,5 +42,8 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity,Long>{
     Page<ThirdEntity> getCustomersBy(Long entId, Pageable page);
 
     Page<ThirdEntity> findByEntIdAndStateTrueAndThirdTypes_TtName(Long entId, String ttName, Pageable page);
+
+    @Query("SELECT t FROM ThirdEntity t INNER JOIN t.thirdTypes tt WHERE t.entId = :entId")
+    List<ThirdEntity> getAllThirds(String entId);
 
 }

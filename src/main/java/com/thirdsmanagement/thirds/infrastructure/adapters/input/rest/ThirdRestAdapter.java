@@ -22,6 +22,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -209,4 +211,18 @@ public class ThirdRestAdapter {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @Operation(summary = "Obtiene Una Lista de Terceros",
+    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa")
+    @GetMapping("/list")
+    public ResponseEntity<List<Third>> getAllThirds(@NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición get list thirds");
+        System.out.println("\n");
+
+        List<Third> thirds = listThirdsUseCase.getAllThirds(entId);
+
+        return new ResponseEntity<>(thirds, HttpStatus.OK);
+    }
+    
 } 

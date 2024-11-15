@@ -219,4 +219,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
         return thirdPersistenceMapper.toThird(thirdEntity);
     }
+
+    @Override
+    public List<Third> getAllThirds(String entId) {
+        List<ThirdEntity> thirdEntities = thirdRepository.getAllThirds(entId);
+        List<Third> thirds = thirdEntities.stream().map(this::convertToThird).collect(Collectors.toList());
+        return thirds;
+    }
 }

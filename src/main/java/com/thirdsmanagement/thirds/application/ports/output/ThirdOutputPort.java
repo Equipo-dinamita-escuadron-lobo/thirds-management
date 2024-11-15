@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -19,4 +20,5 @@ public interface ThirdOutputPort {
     Page<Third> getAllInactiveThirdsBy(String entId, Pageable page);
     Page<Third> getAllProvidersBy(String entId,Pageable page);
     Page<Third> getAllCustomersBy(String entId,Pageable page);
+    List<Third> getAllThirds(String entId);
 }
