@@ -22,6 +22,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -109,18 +111,16 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(third,HttpStatus.OK);
     }
     
-    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este")
+    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este y entId")
     @GetMapping("/existBy")
     public ResponseEntity<Boolean> existThirdById(
-            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición existe Third By Id");
-        System.out.println("ID recibido desde el frontend: " + thId);
-        System.out.println("\n");
-        boolean exists = false;
+            @NotNull(message = "ID Number not be empty") @RequestParam("idNumber") Long idNumber,
+            @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
 
-        exists = getThirdUseCase.existThirdById(thId);
-        System.out.println("valor de ex:  " + exists);
+        System.out.println("\nEntrando a petición existe Third By Id");
+        System.out.println("\n");
+
+        boolean exists = getThirdUseCase.existThirdById(idNumber, entId);
 
         return new ResponseEntity<>(exists, HttpStatus.OK);
     }
@@ -211,4 +211,18 @@ public class ThirdRestAdapter {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+    @Operation(summary = "Obtiene Una Lista de Terceros",
+    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa")
+    @GetMapping("/list")
+    public ResponseEntity<List<Third>> getAllThirds(@NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+        System.out.println("\n");
+        System.out.println("Entrando a petición get list thirds");
+        System.out.println("\n");
+
+        List<Third> thirds = listThirdsUseCase.getAllThirds(entId);
+
+        return new ResponseEntity<>(thirds, HttpStatus.OK);
+    }
+    
 } 

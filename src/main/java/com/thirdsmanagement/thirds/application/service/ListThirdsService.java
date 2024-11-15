@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.application.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -61,4 +62,14 @@ public class ListThirdsService implements ListThirdsUseCase{
         return result;
     }
     
+    @Override
+    public List<Third> getAllThirds(String entId) {
+        List<Third> result = thirdOutputPort.getAllThirds(entId);
+
+        if(result.isEmpty()){
+            throw new ThirdsNotFound("No thirds found for enterprise id "+ entId);            
+        }
+
+        return result;
+    }
 }

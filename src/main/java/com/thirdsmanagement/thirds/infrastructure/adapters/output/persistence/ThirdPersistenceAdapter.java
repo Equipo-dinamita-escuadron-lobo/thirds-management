@@ -72,10 +72,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return Optional.of(third);
     }
     @Override
-    public boolean existThirdById(long id) {
+    public boolean existThirdById(long id, String entId) {
         System.out.println("Entrando a existThirdByID \n");
         boolean existe = false;
-        existe = thirdRepository.existThirdBy(id);
+        existe = thirdRepository.existThirdBy(id,  entId);
+
         return existe;
     }
 
@@ -222,5 +223,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             thirdEntity = thirdRepository.save(thirdEntity);
         }
         return thirdPersistenceMapper.toThird(thirdEntity);
+    }
+
+    @Override
+    public List<Third> getAllThirds(String entId) {
+        List<ThirdEntity> thirdEntities = thirdRepository.getAllThirds(entId);
+        List<Third> thirds = thirdEntities.stream().map(this::convertToThird).collect(Collectors.toList());
+        return thirds;
     }
 }
