@@ -161,7 +161,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         System.out.println("Entrando A Actualizar");
         
         ThirdEntity thirdEntity = thirdRepository.findById(third.getThId()).orElse(null);
-        System.out.println("Se encontrara iD" + thirdEntity);
         System.out.println(thirdEntity.toString());
         System.out.println(thirdEntity.getNames());
         if(thirdEntity != null){
@@ -181,7 +180,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 //thirdEntity.setGender("");
             }
                  
-            //System.out.println("El genero guardado es: " + third.getGender().name());
             TypeIdEntity typeIdEntity = new TypeIdEntity();
             TypeId typeId = third.getTypeId();
 
