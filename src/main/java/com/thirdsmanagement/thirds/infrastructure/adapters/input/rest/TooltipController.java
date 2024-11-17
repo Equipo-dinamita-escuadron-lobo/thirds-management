@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/tooltip")
+@RequestMapping("/api/thirds/tooltip")
 public class TooltipController {
 
     @Autowired
