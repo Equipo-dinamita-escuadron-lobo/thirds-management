@@ -21,10 +21,9 @@ public class WebConfiguration implements WebMvcConfigurer {
     }
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:4200") // URL del frontend
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("Content-Type", "Authorization")
-                .allowCredentials(true);
+                .allowedHeaders("*");
     }
 }
