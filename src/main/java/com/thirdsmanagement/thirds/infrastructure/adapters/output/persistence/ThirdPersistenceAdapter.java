@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.Set;
@@ -20,6 +21,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
@@ -155,6 +157,22 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return obj;
     }
 
+    /**
+    * Actualiza un tercero en el sistema.
+    * Este método permite actualizar la información de un tercero existente,
+    * incluyendo su nombre, apellidos, número de identificación, razón social,
+    * dirección, ubicación geográfica, tipo de persona, género, estado, tipo de
+    * identificación y otros datos relacionados.
+    *
+    * @param third el objeto {@link Third} que contiene la información actualizada del tercero.
+    *              Debe incluir el identificador único del tercero (ThId) para localizarlo en la base de datos.
+    * @return el objeto {@link Third} actualizado después de persistir los cambios en la base de datos.
+    *         Contiene los nuevos valores de las propiedades del tercero.
+    *
+    * @throws IllegalArgumentException si el tercero proporcionado es nulo.
+    * @throws EntityNotFoundException si no se encuentra un tercero con el identificador proporcionado (ThId).
+    * @throws DataIntegrityViolationException si se viola alguna restricción de la base de datos durante la actualización.
+    */
     @Override
     public Third updateThird(Third third) {
         
