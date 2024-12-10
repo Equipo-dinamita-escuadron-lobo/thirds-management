@@ -18,6 +18,10 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -39,12 +43,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
-//@PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
+// @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
 public class ThirdRestAdapter {
 
     private final CreateThirdUseCase createThirdUseCase;
@@ -55,30 +58,27 @@ public class ThirdRestAdapter {
 
     private final ThirdRestMapper thirdRestMapper;
 
-    @Operation(summary = "Crear Tercero",
-       description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
+    @Operation(summary = "Crear Tercero", description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este", responses = {
+            @ApiResponse(responseCode = "201", description = "Tercero creado exitosamente", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Datos del tercero no válidos o incompletos", content = @Content(mediaType = "application/json"))
+    })
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
-        System.out.println("\n");
-        System.out.println("Entrando a petición post crear");
-        System.out.println("\n");
-
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
-        System.out.println("///////////////////////////////////////////////////////"+third);
+
         third = createThirdUseCase.createThird(third);
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Actualiza Un Tercero",
-       description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este")
+    @Operation(summary = "Actualiza Un Tercero", description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este", responses = {
+            @ApiResponse(responseCode = "200", description = "Tercero actualizado exitosamente", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Datos del tercero no válidos o incompletos", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "El tercero no fue encontrado", content = @Content(mediaType = "application/json"))
+    })
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
-
-        System.out.println("\n");
-        System.out.println("Entrando a petición post Update");
-        System.out.println("\n");
 
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
 
@@ -87,124 +87,133 @@ public class ThirdRestAdapter {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
     }
 
-    @Operation(summary = "Cambia El Estado De Un Tercero")
+    @Operation(summary = "Cambia El Estado De Un Tercero", description = "Cambia el estado de un tercero en función de su ID.", responses = {
+            @ApiResponse(responseCode = "200", description = "Estado del tercero cambiado exitosamente", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "El ID del tercero no puede estar vacío o es inválido", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Tercero no encontrado con el ID proporcionado", content = @Content(mediaType = "application/json"))
+    })
     @PutMapping("/")
-    public ResponseEntity<ChangeThirdStateResponse> changeThirdState(@NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
-        System.out.println("\n Entrando a petición put cambiar estado \n");
-
+    public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
+            @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
         Boolean result = changeThirdStateUseCase.changeThirdState(thId);
 
-        return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result),HttpStatus.OK);
+        return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
     }
 
-    @Operation(summary = "Obtiene Un Tercero",
-       description = "Obtiene Un Tercero Por El Id De Este")
+    @Operation(summary = "Obtiene Un Tercero", description = "Obtiene un tercero a partir de su ID.", responses = {
+            @ApiResponse(responseCode = "200", description = "Tercero encontrado exitosamente", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "El ID del tercero no puede estar vacío o es inválido", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Tercero no encontrado con el ID proporcionado", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/third")
-    public ResponseEntity<Third> getThirdById(@NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get third by Id");
-        System.out.println("\n");
+    public ResponseEntity<Third> getThirdById(
+            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
 
         Third third = getThirdUseCase.getThirdById(thId);
 
-
-        return new ResponseEntity<>(third,HttpStatus.OK);
+        return new ResponseEntity<>(third, HttpStatus.OK);
     }
-    
-    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica Si Existe Un Tercero Por El Id De Este y entId")
+
+    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica si existe un tercero utilizando el ID del tercero y el ID de la empresa (entId).", responses = {
+            @ApiResponse(responseCode = "200", description = "Verificación exitosa. Retorna true si el tercero existe, false si no.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Uno o ambos parámetros (idNumber, entId) son inválidos o vacíos.", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/existBy")
     public ResponseEntity<Boolean> existThirdById(
             @NotNull(message = "ID Number not be empty") @RequestParam("idNumber") Long idNumber,
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
-
-        System.out.println("\nEntrando a petición existe Third By Id");
-        System.out.println("\n");
 
         boolean exists = getThirdUseCase.existThirdById(idNumber, entId);
 
         return new ResponseEntity<>(exists, HttpStatus.OK);
     }
 
-    @Operation(summary = "Obtiene Una Lista de Terceros",
-    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa, con el numero de pagina de Terceros")
+    @Operation(summary = "Obtiene Una Lista de Terceros", description = "Obtiene una lista de terceros asociados a una empresa, con paginación basada en el número de página.", responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de terceros obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
-        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get thirds");
-        System.out.println("\n");
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
 
         Pageable pageable = PageRequest.of(numPage, 100);
 
-        Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId,pageable);
+        Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
-    @Operation(summary = "Inactiva Un Tercero",
-    description = "Inactiva Un Tercero Dandole el Id Del Tercero")
+    @Operation(summary = "Inactiva Un Tercero", description = "Obtiene una lista de terceros inactivos asociados a una empresa, con paginación basada en el número de página.", responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de terceros inactivos obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getInactiveThirdsList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
-        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get inactive thirds");
-        System.out.println("\n");
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId,pageable);
+        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId, pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
 
     }
 
-    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores",
-    description = "Obtiene Una Lista de Terceros que son proveedores, dando como parametros en Id de la empresa y el numero de pagina")
+    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores", description = "Obtiene una lista de terceros que son proveedores asociados a una empresa, con paginación basada en el número de página.", responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de proveedores obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/providers")
     public ResponseEntity<Page<Third>> getProvidersList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
-        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get providers");
-        System.out.println("\n");
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId,pageable);
+        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId, pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    @Operation(summary = "Obtiene Una Lista de Clientes",
-    description = "Obtiene Una Lista de Terceros que son Clientes, dando como parametros en Id de la empresa y el numero de pagina")
+    @Operation(summary = "Obtiene Una Lista de Clientes", description = "Obtiene una lista de terceros que son clientes asociados a una empresa, con paginación basada en el número de página.", responses = {
+            @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
+            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
+    })
     @GetMapping("/customers")
     public ResponseEntity<Page<Third>> getCustomersList(
-        @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId, 
-        @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get customers");
-        System.out.println("\n");
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId,pageable);
+        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId, pageable);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
-    
-    //Crear tercero apartir del Pdf del RUT 
+
+    // Crear tercero apartir del Pdf del RUT
     @Autowired
     private PdfRUTService pdfRUTService;
+
+    @Operation(
+        summary = "Carga un archivo PDF y extrae su contenido",
+        description = "Permite cargar un archivo PDF (RUT) y extraer su contenido.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Contenido del PDF extraído exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PdfRUTContentOutput.class))),
+            @ApiResponse(responseCode = "400", description = "El archivo está vacío o es inválido.", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "500", description = "Error interno al procesar el archivo.", content = @Content(mediaType = "application/json"))
+        }
+    )
     @PostMapping("/content-PDF-RUT")
-    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file){
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
         try {
-            PdfRUTContent request = new  PdfRUTContent(file);
+            PdfRUTContent request = new PdfRUTContent(file);
             PdfRUTContentOutput response = pdfRUTService.extractContent(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -212,17 +221,22 @@ public class ThirdRestAdapter {
         }
     }
 
-    @Operation(summary = "Obtiene Una Lista de Terceros",
-    description = "Obtiene Una Lista de Terceros, se debe mandar el Id the la empresa")
-    @GetMapping("/list")
-    public ResponseEntity<List<Third>> getAllThirds(@NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
-        System.out.println("\n");
-        System.out.println("Entrando a petición get list thirds");
-        System.out.println("\n");
+@Operation(
+    summary = "Obtiene Una Lista de Terceros",
+    description = "Obtiene Una Lista de Terceros, se debe mandar el Id de la empresa",
+    responses = {
+        @ApiResponse(responseCode = "200", description = "Lista de terceros obtenida exitosamente", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Third.class)))),
+        @ApiResponse(responseCode = "400", description = "El ID de la empresa no puede estar vacío", content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "404", description = "No se encontraron terceros para la empresa proporcionada", content = @Content(mediaType = "application/json"))
+    }
+)
+@GetMapping("/list")
+    public ResponseEntity<List<Third>> getAllThirds(
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
 
         List<Third> thirds = listThirdsUseCase.getAllThirds(entId);
 
         return new ResponseEntity<>(thirds, HttpStatus.OK);
     }
-    
-} 
+
+}
