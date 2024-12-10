@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Tooltip.
+ */
 @Entity
 @Table(name = "tooltip")  // Optional, specify table name if different from class name
 @Builder

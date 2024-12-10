@@ -8,6 +8,11 @@ import com.thirdsmanagement.thirds.domain.exception.ThirdStateNotChanged;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Este servicio maneja la lógica de negocio para actualizar el estado de una entidad de terceros
+ * y publicar el evento correspondiente.
+ */
+
 @AllArgsConstructor
 public class ChangeThirdStateService implements  ChangeThirdStateUseCase{
 

@@ -10,6 +10,12 @@ import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Clase de servicio para listar los tipos de identificación.
+ * Implementa la interfaz {@link ListTypeIdUseCase}.
+ * Utiliza {@link IdOutputPort} para las operaciones de persistencia. 
+ * Este servicio proporciona un método para listar todos los tipos de identificación. 
+ */
 @AllArgsConstructor
 public class ListTypeIdService implements ListTypeIdUseCase {
 

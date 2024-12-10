@@ -10,9 +10,25 @@ import org.springframework.stereotype.Service;
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 
+/**
+ * Clase de servicio para extraer contenido de un archivo PDF de RUT.
+ * Implementa la interfaz {@link PdfRUTContent}.
+ * Este servicio proporciona un método para extraer el contenido de un archivo PDF de RUT.
+ * Utiliza la librería Apache PDFBox para extraer el texto del archivo PDF.
+ * El contenido extraído se procesa para obtener la información de un tercero.
+ * La información extraída se devuelve en un objeto {@link PdfRUTContentOutput}.
+ * Si no se puede extraer la información, se devuelve un objeto vacío.
+ * Si ocurre un error al procesar el contenido, se imprime un mensaje de error.
+ * Siempre se elimina el archivo temporal después de extraer el contenido.
+ */
 @Service
 public class PdfRUTService {
-    
+    /**
+     * Extrae el contenido de un archivo PDF de RUT.
+     * @param request Objeto con la información del archivo PDF.
+     * @return Objeto con la información extraída del archivo PDF.
+     * @throws IOException Si ocurre un error al cargar el archivo PDF.
+     */
     public PdfRUTContentOutput extractContent(PdfRUTContent request) throws IOException {
         File tempFile = File.createTempFile("upload", ".pdf");
 
@@ -95,6 +111,11 @@ public class PdfRUTService {
         }
     }
 
+    /**
+     * Extrae el contenido después de la palabra "CLASIFICACIÓN".
+     * @param content Contenido del archivo PDF.
+     * @return Arreglo con las líneas después de la palabra "CLASIFICACIÓN".
+     */
     private String[] extractAfterClasificacion(String content) {
         int index = content.indexOf("CLASIFICACIÓN");
         if (index != -1) {
@@ -105,6 +126,11 @@ public class PdfRUTService {
         return new String[0];
     }
 
+    /**
+     * Extrae la informacion de la ubicacion de un tercero desde el PDF de RUT.
+     * @param content Contenido del archivo PDF.
+     * @return Arreglo con las líneas de la ubicación de un tercero.
+     */
     private String[] extractUbicationThird(String content) {
         int index = content.lastIndexOf("COLOMBIA");
         if (index != -1) {
@@ -116,8 +142,11 @@ public class PdfRUTService {
         return new String[0];
     }
     
-    
-
+    /**
+     * Limpia el contenido de un string.
+     * @param input String a limpiar.
+     * @return String limpio.
+     */
     public static String cleanString(String input) {
         String cleaned = input.replaceAll("\\s*\\n\\s*", "\n") // Limpiar saltos de linea con espacios
                               .replaceAll("\\s{2,}", " ")    // Reemplaza multiples espacios por uno
@@ -127,11 +156,21 @@ public class PdfRUTService {
         return cleaned;
     }
 
+    /**
+     * Separa numeros y texto en un string.
+     * @param input String con numeros y texto.
+     * @return Arreglo con los numeros y texto separados.
+     */
     public static String[] separateNumbersAndText(String input) {
         // Regex para separar cuando hay un cambio de numeros a letras
         return input.split("(?<=\\d)(?=\\D)|(?<=\\D)(?=\\d)");
     }
 
+    /**
+     * Separa y une numeros en un string.
+     * @param input String con numeros.
+     * @return Arreglo con los numeros separados.
+     */
     public static String[] separateAndJoinNumbers(String input) {
         // Reemplaza multiples espacios con un separador especial
         String modifiedInput = input.replaceAll("\\s{2,}", ",");
@@ -141,6 +180,11 @@ public class PdfRUTService {
         return modifiedInput.split(",");
     }
 
+    /**
+     * Divide un string por espacios y letras mayúsculas.
+     * @param input String a dividir.
+     * @return Arreglo con las partes del string.
+     */
     public static String[] splitBySpaceAndUpperCase(String input) {
         return input.split("(?<=\\s)(?=[A-Z])");
     }

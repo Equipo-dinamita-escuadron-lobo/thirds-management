@@ -10,6 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la respuesta de la lista de terceros.
+ * Contiene una lista de terceros.
+ */
 @Builder
 @Getter
 @Setter

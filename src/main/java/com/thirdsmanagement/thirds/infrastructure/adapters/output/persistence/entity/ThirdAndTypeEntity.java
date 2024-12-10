@@ -6,7 +6,12 @@ import lombok.*;
 
 import java.util.List;
 
-
+/**
+ * Clase que representa la entidad de la tabla thirds_and_types.
+ * Contiene la relación entre un tercero y un tipo de tercero.
+ * La tabla tiene una clave primaria compuesta por el identificador de un tercero y el identificador de un tipo de tercero.
+ * La tabla tiene una relación muchos a uno con la tabla thirds y con la tabla third_types.
+ */
 @Getter
 @Setter
 @Entity

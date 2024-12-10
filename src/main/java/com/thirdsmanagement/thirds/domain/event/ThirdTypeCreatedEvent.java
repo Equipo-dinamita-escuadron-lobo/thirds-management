@@ -7,15 +7,29 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Evento de creación de tipo de tercero.
+ */
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class ThirdTypeCreatedEvent {
-      private Long thirdTypeId;
+    /**
+     * Identificador del tipo de tercero.
+     */
+    private Long thirdTypeId;
+
+    /**
+     * Fecha de creación del tipo de tercero.
+     */
     private LocalDateTime date;
 
+    /**
+     * Constructor de la clase.
+     * @param id Identificador del tipo de tercero.
+     */
     public ThirdTypeCreatedEvent(Long id) {
         this.thirdTypeId = id;
         this.date = LocalDateTime.now();

@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la petición de creación de un tipo de tercero.
+ */
 @Builder
 @Getter
 @Setter

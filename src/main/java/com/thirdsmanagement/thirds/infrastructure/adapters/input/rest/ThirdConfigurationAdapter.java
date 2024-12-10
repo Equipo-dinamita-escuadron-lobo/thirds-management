@@ -35,6 +35,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 
+/**
+ * Controlador REST para la configuración de terceros.
+ * Este controlador expone endpoints para la creación y listado de tipos de terceros y tipos de identificación.
+ */
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds/configuration")
@@ -100,23 +104,11 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(typeIds, HttpStatus.OK);
     }
 
-    /*
-     * @Operation(summary = "Elimina un tipo de tercero",
-     * description = "Elimina un tipo de terero a partir del Id del tercero")
-     * 
-     * @DeleteMapping("/{entId}")
-     * public ResponseEntity<Void> deleteThird(
-     * 
-     * @NotNull(message = "Enterprise ID must not be empty") @PathVariable Long
-     * entId) {
-     * 
-     * System.out.println("\nEntrando a petición delete type thirds\n");
-     * 
-     * deleteThirdTypeUseCase.deleteThirdTypeUseCase(entId);
-     * 
-     * return ResponseEntity.noContent().build(); // Usar noContent() es más
-     * apropiado para DELETE
-     * }
+    /**
+     * Elimina un tipo de tercero.
+     * @param entId Id del tipo de tercero a eliminar.
+     * @return Mensaje de éxito o error.
+     * @throws EntityNotFoundException Si el tipo de tercero no existe.
      */
     @Operation(summary = "Elimina un tipo de tercero", description = "Elimina un tipo de tercero a partir del Id del tercero", responses = {
             @ApiResponse(responseCode = "200", description = "El tipo de tercero fue eliminado exitosamente", content = @Content(mediaType = "application/json")),

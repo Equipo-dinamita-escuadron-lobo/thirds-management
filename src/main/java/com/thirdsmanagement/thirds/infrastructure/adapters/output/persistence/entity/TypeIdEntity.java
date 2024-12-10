@@ -15,6 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la entidad de la tabla type_id.
+ * Contiene la información de un tipo de identificación.
+ * La tabla tiene una clave primaria identificada por ti_id.
+ */
 @Entity
 @Getter
 @Setter

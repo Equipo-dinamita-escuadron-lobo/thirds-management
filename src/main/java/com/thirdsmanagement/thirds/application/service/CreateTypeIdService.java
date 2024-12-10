@@ -8,6 +8,10 @@ import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Implementación del servicio para la creación de un tipo de identificacion.
+ * Este servicio controla la lógica de negocios para crear un nuevo TypeId y guardarlo mediante IdOutputPort.
+ */ 
 @AllArgsConstructor
 public class CreateTypeIdService implements CreateTypeIdUseCase{
     

@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.application.service;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
@@ -12,6 +11,16 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Clase de servicio para listar terceros.
+ * Implementa la interfaz {@link ListThirdsUseCase}.
+ * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia.
+ * Este servicio proporciona métodos para listar terceros por diferentes criterios.
+ * Si no se encuentran terceros, lanza una excepción de tipo {@link ThirdsNotFound}.
+ * 
+ * @see ListThirdsUseCase
+ * @see ThirdOutputPort
+ */
 @AllArgsConstructor
 public class ListThirdsService implements ListThirdsUseCase{
 

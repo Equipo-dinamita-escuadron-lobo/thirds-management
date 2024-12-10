@@ -25,18 +25,28 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Clase adaptador de persistencia para la entidad Third.
+ * Implementa la interfaz {@link ThirdOutputPort}.
+ * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y {@link TypeIdRepository} para las operaciones de persistencia.
+ * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
+ * Proporciona métodos para guardar y obtener los terceros.
+ */
 @RequiredArgsConstructor
 public class ThirdPersistenceAdapter implements ThirdOutputPort{
-
     @PersistenceContext
     private EntityManager entityManager;
 
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
     private final TypeIdRepository typeIdRepository;
-
     private final ThirdPersistenceMapper thirdPersistenceMapper;
 
+    /**
+     * Guarda un tercero.
+     * @param third Tercero a guardar.
+     * @return Tercero guardado.
+     */
     @Override
     public Third saveThird(Third third) {
 
@@ -62,6 +72,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return result;
     }
 
+    /**
+     * Obtiene un tercero por su identificador.
+     * @param id Identificador del tercero.
+     * @return Tercero encontrado.
+     */
     @Override
     public Optional<Third> getThirdById(Long id) {
         Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
@@ -82,6 +97,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return existe;
     }
 
+    /**
+     * Cambia el estado de un tercero.
+     * @param thId Identificador del tercero.
+     * @return Verdadero si el estado del tercero cambió, falso en caso contrario.
+     */
     @Override
     public boolean changeThirdState(Long thId) {
         System.out.println("\n Entrando a changeThirdState \n");
@@ -105,6 +125,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return true;
     }
 
+    /**
+     * Obtiene una página de terceros filtrados por el identificador de entidad.
+     * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
+     * @param page El objeto Pageable que contiene la información de paginación.
+     * @return Una página de objetos Third que representan los terceros.
+     */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllThirdsBy \n");
@@ -114,6 +140,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    /**
+     * Obtiene una página de terceros inactivos filtrados por el identificador de entidad.
+     * @param entId El identificador de la entidad por la cual se filtrarán los terceros inactivos.
+     * @param page El objeto Pageable que contiene la información de paginación.
+     * @return Una página de objetos Third que representan los terceros inactivos.
+     */
     @Override
     public Page<Third> getAllInactiveThirdsBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllInactiveThirdsBy \n");
@@ -123,6 +155,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    /**
+     * Obtiene una página de proveedores basada en el ID de la entidad y la información de paginación proporcionada.
+     * @param entId El ID de la entidad para la cual se desean obtener los proveedores.
+     * @param page Información de paginación que incluye el número de página y el tamaño de la página.
+     * @return Una página de objetos Third que representan a los proveedores.
+     */
     @Override
     public Page<Third> getAllProvidersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllProvidersBy \n");
@@ -132,6 +170,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    /**
+     * Recupera una página de clientes basada en el identificador de la entidad y la información de paginación proporcionada.
+     * @param entId El identificador de la entidad para filtrar los clientes.
+     * @param page La información de paginación que incluye el número de página y el tamaño de la página.
+     * @return Una página de objetos Third que representan a los clientes.
+     */
     @Override
     public Page<Third> getAllCustomersBy(String entId, Pageable page) {
         System.out.println("\n Entrando a getAllCustomersBy \n");
@@ -141,6 +185,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+
+    /**
+     * Convierte un objeto ThirdEntity a un objeto Third.
+     * @param thirdEntity El objeto ThirdEntity que se va a convertir.
+     * @return El objeto Third resultante de la conversión.
+     */
     private Third convertToThird(ThirdEntity thirdEntity) {
 
         System.out.println("\n Entrando a convertToThird \n");
@@ -250,6 +300,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return thirdPersistenceMapper.toThird(thirdEntity);
     }
 
+    /**
+     * Obtiene todos los terceros.
+     * @param entId Id de la empresa.
+     * @return Lista de terceros.
+     */
     @Override
     public List<Third> getAllThirds(String entId) {
         List<ThirdEntity> thirdEntities = thirdRepository.getAllThirds(entId);

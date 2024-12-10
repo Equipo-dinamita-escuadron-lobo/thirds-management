@@ -8,6 +8,12 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Servicio respnsable de la creación de un tercero.
+ * Esta clase implementa la interfaz CreateThirdUseCase.
+ * Utiliza ThirdOutputPort para guardar el tercero creado y
+ * ThirdEventPublisher para publicar un evento una vez creada el tercero.
+ */
 @AllArgsConstructor
 public class CreateThirdService implements CreateThirdUseCase{
 

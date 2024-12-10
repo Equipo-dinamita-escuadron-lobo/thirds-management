@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la respuesta de una excepción.
+ */
 @Builder
 @Getter
 @Setter

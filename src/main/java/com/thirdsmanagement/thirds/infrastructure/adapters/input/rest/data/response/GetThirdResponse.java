@@ -16,6 +16,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la respuesta de la operación de obtención de un tercero.
+ */
 @Builder
 @Getter
 @Setter

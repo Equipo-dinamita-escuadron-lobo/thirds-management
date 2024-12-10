@@ -11,6 +11,10 @@ import org.springframework.stereotype.Repository;
 
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 
+/**
+ * Repositorio de terceros.
+ * Proporciona métodos para acceder a los datos de los terceros.
+ */
 @Repository
 public interface ThirdRepository extends JpaRepository<ThirdEntity,Long>{
 

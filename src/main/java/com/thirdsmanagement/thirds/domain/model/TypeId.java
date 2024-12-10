@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+/**
+ * Tipo de identificación.
+ */
 @Builder
 @Getter
 @Setter

@@ -16,18 +16,46 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Clase adaptador de persistencia para la entidad Id.
+ * Implementa la interfaz {@link IdOutputPort}.
+ * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y {@link TypeIdRepository} para las operaciones de persistencia.
+ * Utiliza {@link IdPersistenceMapper} para mapear las entidades y los modelos.
+ * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos de identificación.
+ */
 @RequiredArgsConstructor
 public class IdPersistenceAdapter implements IdOutputPort {
-    
+    /**
+     * Entity manager.
+     */
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Repositorio de terceros.
+     */
     private final ThirdRepository thirdRepository;
+
+    /**
+     * Repositorio de tipos de terceros.
+     */
     private final ThirdTypeRepository thirdTypeRepository;
+
+    /**
+     * Repositorio de tipos de identificación.
+     */
     private final TypeIdRepository typeIdRepository;
 
+    /**
+     * Mapeador de persistencia de Id.
+     */
     private final IdPersistenceMapper idPersistenceMapper;
-    
+
+    /**
+     * Guarda un tipo de tercero.
+     * @param thirdType Tipo de tercero a guardar.
+     * @return Tipo de tercero guardado.
+     */
     @Override
     public ThirdType saveThirdType(ThirdType thirdType) {
         ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdType(thirdType);
@@ -37,11 +65,21 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     }
 
+    /**
+     * Obtiene todos los tipos de terceros.
+     * @param entId Id de la entidad.
+     * @return Lista de tipos de terceros.
+     */
     @Override
     public List<ThirdType> getALLThirdTypes(String entId) {
         return idPersistenceMapper.toThirdTypeEntitys(thirdTypeRepository.findAllByTtentId(entId));
     }
 
+    /**
+     * Guarda un tipo de identificación.
+     * @param typeId Tipo de identificación a guardar.
+     * @return Tipo de identificación guardado.
+     */
     @Override
     public TypeId saveTypeId(TypeId typeId) {
        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeId(typeId);
@@ -50,6 +88,11 @@ public class IdPersistenceAdapter implements IdOutputPort {
        return result;
     }
 
+    /**
+     * Obtiene todos los tipos de identificación.
+     * @param entId Id de la entidad.
+     * @return Lista de tipos de identificación.
+     */
     @Override
     public List<TypeId> getAllTypeIds(String entId) {
         return idPersistenceMapper.toTypeIdEntititys(typeIdRepository.findAllByTientId(entId));

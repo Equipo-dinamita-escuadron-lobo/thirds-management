@@ -15,6 +15,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la entidad de la tabla third_type.
+ * Contiene la información de un tipo de tercero.
+ * La tabla tiene una clave primaria identificada por tt_id.
+ * La tabla tiene una relación muchos a muchos con la tabla thirds.
+ */
 @Entity
 @Getter
 @Setter

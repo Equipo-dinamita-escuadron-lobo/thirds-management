@@ -9,11 +9,21 @@ import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Clase adaptador de publicación de eventos para el tipo de identificación.
+ * Implementa la interfaz {@link TypeIdEventPublisher}.
+ * Utiliza {@link ApplicationEventPublisher} para publicar eventos.
+ */
 @RequiredArgsConstructor
 public class IdEventPublisherAdapter implements ThirdTypeEventPublisher{
-    
+    /**
+     * Publicador de eventos de la aplicación.
+     */
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * Publica un evento de creación de tipo de identificación.
+     */
     @Override
     public void publishThirdTypeCreatedEvent(ThirdTypeCreatedEvent event){
         applicationEventPublisher.publishEvent(event);

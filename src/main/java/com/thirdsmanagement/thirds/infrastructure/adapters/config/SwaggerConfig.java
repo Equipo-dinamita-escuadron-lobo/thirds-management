@@ -10,9 +10,15 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
+/**
+ * Clase de configuración de Swagger.
+ */
 @Configuration
 public class SwaggerConfig {
-    
+    /**
+     * Configura la documentación de Swagger.
+     * @return Documentación de Swagger.
+     */
     @Bean
     public OpenAPI customizeOpenAPI() {
         return new OpenAPI()

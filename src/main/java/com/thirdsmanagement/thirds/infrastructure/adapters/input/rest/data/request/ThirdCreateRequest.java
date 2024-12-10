@@ -20,6 +20,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Clase que representa la petición de creación de un tercero.
+ * Utiliza anotaciones de Lombok para la generación de constructores, getters y setters.
+ * Utiliza anotaciones de Jackson para la deserialización de los tipos de terceros y de identificación.
+ * Utiliza anotaciones de validación de Jakarta para la validación de los campos.
+ */
 @Builder
 @Getter
 @Setter

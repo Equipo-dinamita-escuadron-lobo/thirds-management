@@ -8,6 +8,12 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
 import lombok.AllArgsConstructor;
 
+/**
+ * Clase de servicio para listar los tipos de terceros.
+ * Implementa la interfaz {@link ListThirdTypeUseCase}.
+ * Utiliza {@link IdOutputPort} para las operaciones de persistencia. 
+ * Este servicio proporciona un método para listar todos los tipos de terceros. 
+ */
 @AllArgsConstructor
 public class ListThirdTypeService implements ListThirdTypeUseCase {
     
