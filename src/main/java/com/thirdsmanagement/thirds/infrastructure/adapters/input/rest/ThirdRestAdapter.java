@@ -40,14 +40,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * Controlador REST para la gestión de terceros.
  * Este controlador expone endpoints para la creación, actualización, inactivación y listado de terceros.
  */
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor

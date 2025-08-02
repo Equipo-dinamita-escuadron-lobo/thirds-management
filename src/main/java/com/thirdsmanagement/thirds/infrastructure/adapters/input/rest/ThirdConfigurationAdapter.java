@@ -2,7 +2,6 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +16,8 @@ import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
-import com.thirdsmanagement.thirds.application.service.ListThirdTypeService;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
@@ -39,7 +36,6 @@ import java.util.List;
  * Controlador REST para la configuración de terceros.
  * Este controlador expone endpoints para la creación y listado de tipos de terceros y tipos de identificación.
  */
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/thirds/configuration")
 @RequiredArgsConstructor
