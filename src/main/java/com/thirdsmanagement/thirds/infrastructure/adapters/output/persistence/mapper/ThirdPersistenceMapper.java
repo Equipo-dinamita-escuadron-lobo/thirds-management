@@ -14,7 +14,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
  * Se utiliza la anotación @Mapping para indicar el mapeo de los atributos de los objetos.
  * Se utiliza la anotación @InheritInverseConfiguration para indicar el mapeo inverso de los atributos de los objetos.
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {IdPersistenceMapper.class})
 public interface ThirdPersistenceMapper {
 
     /**
@@ -22,9 +22,11 @@ public interface ThirdPersistenceMapper {
      * @param third Objeto de la entidad de tercero.
      * @return Objeto de tercero.
      */
-    @Mapping(source = "typeId.typeId", target = "typeId.tiId")
     @Mapping(target = "thirdTypes", ignore = true)
     @Mapping(target = "thId", ignore = true)
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updateDate", ignore = true)
     ThirdEntity toThirdEntity(Third third);
 
     /**
@@ -32,7 +34,6 @@ public interface ThirdPersistenceMapper {
      * @param thirdEntity Objeto de tercero.
      * @return Objeto de la entidad de tercero.
      */
-    @Mapping(source = "typeId.tiId", target = "typeId.typeId")
     @Mapping(target = "thirdTypes", ignore = true)
     Third toThird(ThirdEntity thirdEntity);
 }

@@ -122,6 +122,7 @@ public class ThirdEntity {
     private LocalDateTime updateDate;
 
     @TenantId
+    @Column(name = "tenant_id")
     private String tenantId;
 
 }

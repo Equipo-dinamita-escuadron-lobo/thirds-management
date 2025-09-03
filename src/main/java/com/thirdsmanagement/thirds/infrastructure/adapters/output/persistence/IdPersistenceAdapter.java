@@ -59,11 +59,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public ThirdType saveThirdType(ThirdType thirdType) {
-        ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdType(thirdType);
+        ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdTypeEntity(thirdType);
         thirdTypeRepository.save(thirdTypeEntity);
-        ThirdType result = idPersistenceMapper.toThirdTypeEntity(thirdTypeEntity);
+        ThirdType result = idPersistenceMapper.toThirdType(thirdTypeEntity);
         return result;
-
     }
 
     /**
@@ -73,7 +72,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public List<ThirdType> getALLThirdTypes(String entId) {
-        return idPersistenceMapper.toThirdTypeEntitys(thirdTypeRepository.findAllByTtentId(entId));
+        return idPersistenceMapper.toThirdTypeList(thirdTypeRepository.findAllByTtentId(entId));
     }
 
     /**
@@ -83,9 +82,9 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public TypeId saveTypeId(TypeId typeId) {
-       TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeId(typeId);
+       TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(typeId);
        typeIdRepository.save(typeIdEntity);
-       TypeId result = idPersistenceMapper.toTypeIdEntity(typeIdEntity);
+       TypeId result = idPersistenceMapper.toTypeId(typeIdEntity);
        return result;
     }
 
@@ -96,8 +95,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public List<TypeId> getAllTypeIds(String entId) {
-        return idPersistenceMapper.toTypeIdEntititys(typeIdRepository.findAllByTientId(entId));
-       
+        return idPersistenceMapper.toTypeIdList(typeIdRepository.findAllByTientId(entId));
     }
     
 }

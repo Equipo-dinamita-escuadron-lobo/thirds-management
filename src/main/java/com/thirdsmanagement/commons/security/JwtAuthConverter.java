@@ -17,9 +17,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.stereotype.Component;
 
 /**
- * Convierte un {@link Jwt} en un {@link AbstractAuthenticationToken} y expone
- * utilidades para obtener datos del JWT. Implementa {@link IJwtUtils} para que
- * otros componentes (como el interceptor de tenant) puedan obtener el id.
+ * Clase que implementa la conversión de un JWT en un token de autenticación.
+ * También proporciona métodos utilitarios relacionados con JWT.
  */
 @Component
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken>, IJwtUtils {
@@ -34,6 +33,12 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
     private Jwt jwtToken;
 
+    /**
+     * Convierte un JWT en un token de autenticación.
+     *
+     * @param jwt el JWT a convertir
+     * @return el token de autenticación
+     */
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = Stream
@@ -41,44 +46,67 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 .toList();
 
         this.jwtToken = jwt;
-
         return new JwtAuthenticationToken(jwt, authorities, getPrincipalName(jwt));
     }
 
+    /**
+     * Obtiene el nombre principal del JWT.
+     *
+     * @param jwt el JWT
+     * @return el nombre principal
+     */
     private String getPrincipalName(Jwt jwt) {
         String claimName = JwtClaimNames.SUB;
-        if (principleAttribute != null && !principleAttribute.isBlank()) {
+
+        if (principleAttribute != null) {
             claimName = principleAttribute;
         }
+
         return jwt.getClaim(claimName);
     }
 
+    /**
+     * Extrae los roles de recursos del JWT.
+     *
+     * @param jwt el JWT
+     * @return una colección de autoridades concedidas
+     */
     @SuppressWarnings("unchecked")
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
+        Map<String, Object> resourceAccess;
+        Map<String, Object> resource;
+        Collection<String> resourceRoles;
+
         if (jwt.getClaim("resource_access") == null) {
             return List.of();
         }
 
-        Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+        resourceAccess = jwt.getClaim("resource_access");
+
         if (resourceAccess.get(resourceId) == null) {
             return List.of();
         }
 
-        Map<String, Object> resource = (Map<String, Object>) resourceAccess.get(resourceId);
+        resource = (Map<String, Object>) resourceAccess.get(resourceId);
+
         if (resource.get("roles") == null) {
             return List.of();
         }
 
-        Collection<String> resourceRoles = (Collection<String>) resource.get("roles");
+        resourceRoles = (Collection<String>) resource.get("roles");
+
         return resourceRoles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_".concat(role)))
                 .toList();
     }
 
+    /**
+     * Obtiene el ID del JWT.
+     *
+     * @return el ID del JWT
+     */
     @Override
     public String getId() {
         return (String) jwtToken.getClaims().get("sub");
     }
 }
-
-

@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -26,7 +25,6 @@ public class Third {
     private Long thId; 
     private String entId;
 
-    @Enumerated(EnumType.STRING)
     private TypeId typeId;
     
     @Default

@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.TenantId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,6 +40,10 @@ public class ThirdTypeEntity {
 
     @Column(name = "tt_entid")
     private String ttentId;
+
+    @TenantId
+    @Column(name = "tenant_id")
+    private String tenantId;
 
     @ManyToMany(mappedBy = "thirdTypes")
     private Set<ThirdEntity> thirds;

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 
@@ -12,6 +13,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
  * Repositorio de tipos de terceros.
  * Proporciona métodos para acceder a los datos de los tipos de terceros.
  */
+@Repository
 public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>{
     @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttName LIKE %:name%")
     List<ThirdTypeEntity> findByName(String name);

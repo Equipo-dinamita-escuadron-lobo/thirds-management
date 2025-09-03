@@ -1,20 +1,19 @@
 package com.thirdsmanagement.commons.multitenancy.async;
 
+import com.thirdsmanagement.commons.multitenancy.utils.TenantContext;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
 
-import com.thirdsmanagement.commons.multitenancy.util.TenantContext;
+public class TenantAwareTaskDecorator implements TaskDecorator {
 
 /**
- * Clase que representa el decorador de tareas consciente del inquilino.
- * Contiene el método para decorar una tarea con el inquilino actual.
+ * Decora un Runnable dado para asegurarse de que el contexto de inquilino actual se preserve
+ * y se establezca antes de que el Runnable se ejecute y se borre después de la ejecución.
+ * Esto asegura que los datos específicos del inquilino se manejen correctamente en tareas asíncronas.
+ *
+ * @param runnable el Runnable original a ser decorado
+ * @return un nuevo Runnable que establece y borra el contexto de inquilino alrededor de la ejecución
  */
-public class TenantAwareTaskDecorator implements TaskDecorator {
-    /**
-     * Método para decorar una tarea con el inquilino actual.
-     * @param runnable Tarea a decorar.
-     * @return Tarea decorada con el inquilino actual.
-     */
     @Override
     @NonNull
     public Runnable decorate(@NonNull Runnable runnable) {

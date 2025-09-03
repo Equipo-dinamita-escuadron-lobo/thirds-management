@@ -29,8 +29,8 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
-                .info(new Info().title("Products Management API")
-                        .description("API para la gestión de productos")
+                .info(new Info().title("Thirds Management API")
+                        .description("API para la gestión de terceros")
                         .version("1.0"));
     }
 }

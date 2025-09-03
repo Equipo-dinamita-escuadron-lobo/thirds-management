@@ -11,7 +11,11 @@ spring:
     properties:
       hibernate:
         dialect: ${DB_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
-        
+
+  h2:
+    console:
+      enabled: false
+
   security:
     oauth2:
       resourceserver:
