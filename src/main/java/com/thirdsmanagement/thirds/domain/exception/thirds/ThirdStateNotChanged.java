@@ -1,14 +1,33 @@
 package com.thirdsmanagement.thirds.domain.exception.thirds;
 
+import com.thirdsmanagement.thirds.domain.exception.BaseBusinessException;
+
 /**
- * Excepcion que se lanza cuando no se ha podido cambiar el estado de un tercero
+ * Excepción que se lanza cuando no se ha podido cambiar el estado de un tercero.
  */
-public class ThirdStateNotChanged extends RuntimeException{
+public class ThirdStateNotChanged extends BaseBusinessException {
+
     /**
-     * Constructor de la excepcion
-     * @param message mensaje de error
+     * Constructor por defecto.
      */
-    public ThirdStateNotChanged(String message){
-        super(message);
+    public ThirdStateNotChanged() {
+        super(ThirdsErrorCode.THIRD_STATE_NOT_CHANGED);
+    }
+
+    /**
+     * Constructor con mensaje personalizado.
+     * @param customMessage mensaje personalizado de error
+     */
+    public ThirdStateNotChanged(String customMessage) {
+        super(ThirdsErrorCode.THIRD_STATE_NOT_CHANGED, customMessage);
+    }
+
+    /**
+     * Constructor con mensaje personalizado y causa.
+     * @param customMessage mensaje personalizado de error
+     * @param cause causa del error
+     */
+    public ThirdStateNotChanged(String customMessage, Throwable cause) {
+        super(ThirdsErrorCode.THIRD_STATE_NOT_CHANGED, customMessage, cause);
     }
 }

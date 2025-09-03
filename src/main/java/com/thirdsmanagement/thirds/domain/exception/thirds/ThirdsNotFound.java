@@ -1,14 +1,33 @@
 package com.thirdsmanagement.thirds.domain.exception.thirds;
 
+import com.thirdsmanagement.thirds.domain.exception.BaseBusinessException;
+
 /**
- * Excepcion que se lanza cuando no se encuentran terceros
+ * Excepción que se lanza cuando no se encuentran terceros.
  */
-public class ThirdsNotFound extends RuntimeException{
+public class ThirdsNotFound extends BaseBusinessException {
+
     /**
-     * Constructor de la excepcion
-     * @param message mensaje de error
+     * Constructor por defecto.
      */
-    public ThirdsNotFound(String message){
-        super(message);
+    public ThirdsNotFound() {
+        super(ThirdsErrorCode.THIRDS_NOT_FOUND);
+    }
+
+    /**
+     * Constructor con mensaje personalizado.
+     * @param customMessage mensaje personalizado de error
+     */
+    public ThirdsNotFound(String customMessage) {
+        super(ThirdsErrorCode.THIRDS_NOT_FOUND, customMessage);
+    }
+
+    /**
+     * Constructor con mensaje personalizado y causa.
+     * @param customMessage mensaje personalizado de error
+     * @param cause causa del error
+     */
+    public ThirdsNotFound(String customMessage, Throwable cause) {
+        super(ThirdsErrorCode.THIRDS_NOT_FOUND, customMessage, cause);
     }
 }

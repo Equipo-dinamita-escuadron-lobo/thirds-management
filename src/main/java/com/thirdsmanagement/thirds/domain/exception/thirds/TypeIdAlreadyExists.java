@@ -3,23 +3,23 @@ package com.thirdsmanagement.thirds.domain.exception.thirds;
 import com.thirdsmanagement.thirds.domain.exception.BaseBusinessException;
 
 /**
- * Excepción que se lanza cuando no se encuentra un tercero.
+ * Excepción que se lanza cuando ya existe un tipo de identificación.
  */
-public class ThirdNotFound extends BaseBusinessException {
+public class TypeIdAlreadyExists extends BaseBusinessException {
 
     /**
      * Constructor por defecto.
      */
-    public ThirdNotFound() {
-        super(ThirdsErrorCode.THIRD_NOT_FOUND);
+    public TypeIdAlreadyExists() {
+        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS);
     }
 
     /**
      * Constructor con mensaje personalizado.
      * @param customMessage mensaje personalizado de error
      */
-    public ThirdNotFound(String customMessage) {
-        super(ThirdsErrorCode.THIRD_NOT_FOUND, customMessage);
+    public TypeIdAlreadyExists(String customMessage) {
+        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage);
     }
 
     /**
@@ -27,7 +27,7 @@ public class ThirdNotFound extends BaseBusinessException {
      * @param customMessage mensaje personalizado de error
      * @param cause causa del error
      */
-    public ThirdNotFound(String customMessage, Throwable cause) {
-        super(ThirdsErrorCode.THIRD_NOT_FOUND, customMessage, cause);
+    public TypeIdAlreadyExists(String customMessage, Throwable cause) {
+        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage, cause);
     }
 }
