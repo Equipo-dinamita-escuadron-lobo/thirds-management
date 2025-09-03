@@ -22,8 +22,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
-
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -84,8 +82,7 @@ public class ThirdConfigurationAdapter {
     /**
      * Elimina un tipo de tercero.
      * @param entId Id del tipo de tercero a eliminar.
-     * @return Mensaje de éxito o error.
-     * @throws EntityNotFoundException Si el tipo de tercero no existe.
+     * @return ResponseEntity con el resultado de la operación y el mensaje correspondiente.
      */
     @DeleteMapping("/{entId}")
     public ResponseEntity<String> deleteThird(
@@ -94,20 +91,13 @@ public class ThirdConfigurationAdapter {
         try {
             ResponseEntity<String> response = deleteThirdTypeUseCase.deleteThirdTypeUseCase(entId);
 
-            // Evaluamos el resultado que retorna tu método
-            if (response.getBody().equals("success")) {
-                String successMessage = "SUCCESS";
-                return ResponseEntity.ok(successMessage);
-            } else {
-                String errorMessage = "ERROR";
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-            }
+            // Retornamos la respuesta tal como viene del servicio, que ya incluye el código HTTP correcto
+            return response;
 
-        } catch (EntityNotFoundException e) {
-            String notFoundMessage = "El tipo de tercero con ID: " + entId + " no fue encontrado.";
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundMessage);
-
+        } catch (Exception e) {
+            // Manejar cualquier excepción no controlada
+            String errorMessage = "Error interno al procesar la solicitud: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
-
     }
 }

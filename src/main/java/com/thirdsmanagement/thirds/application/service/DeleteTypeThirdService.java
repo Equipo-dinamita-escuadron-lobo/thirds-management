@@ -4,6 +4,7 @@ import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCas
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +42,17 @@ public class DeleteTypeThirdService implements DeleteThirdTypeUseCase {
         }
         
         try {
+            // Verificar si el registro existe antes de intentar eliminarlo
+            if (!thirdTypeRepository.existsById(entId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("El tipo de tercero con ID " + entId + " no existe");
+            }
+
             thirdTypeRepository.deleteById(entId);
             return ResponseEntity.ok("Tipo de tercero eliminado exitosamente");
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body("Error interno al eliminar el tipo de tercero");
+                    .body("Error interno al eliminar el tipo de tercero: " + e.getMessage());
         }
     }
 }
