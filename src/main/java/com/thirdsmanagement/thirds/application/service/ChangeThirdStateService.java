@@ -4,7 +4,7 @@ import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCa
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
-import com.thirdsmanagement.thirds.domain.exception.ThirdStateNotChanged;
+import com.thirdsmanagement.thirds.domain.exception.thirds.ThirdStateNotChanged;
 
 import lombok.AllArgsConstructor;
 

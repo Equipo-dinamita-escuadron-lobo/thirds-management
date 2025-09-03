@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -10,8 +9,6 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
-
-import aj.org.objectweb.asm.Type;
 
 /**
  * Clase que representa el mapeo de los objetos de la capa de persistencia.

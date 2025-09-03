@@ -1,5 +1,4 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;

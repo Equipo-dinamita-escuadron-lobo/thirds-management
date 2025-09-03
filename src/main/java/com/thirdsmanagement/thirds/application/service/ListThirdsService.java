@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
-import com.thirdsmanagement.thirds.domain.exception.ThirdsNotFound;
+import com.thirdsmanagement.thirds.domain.exception.thirds.ThirdsNotFound;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;

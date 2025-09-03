@@ -17,11 +17,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -65,10 +61,6 @@ public class ThirdRestAdapter {
      * @param thirdCreateRequest Datos del tercero a crear.
      * @return Respuesta con los datos del tercero creado.
      */
-    @Operation(summary = "Crear Tercero", description = "Crea Un Tercero Recibiendo Todos Los Campos Obligatorios De Este", responses = {
-            @ApiResponse(responseCode = "201", description = "Tercero creado exitosamente", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Datos del tercero no válidos o incompletos", content = @Content(mediaType = "application/json"))
-    })
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -84,11 +76,6 @@ public class ThirdRestAdapter {
      * @param thirdCreateRequest Datos del tercero a actualizar.
      * @return Respuesta con los datos del tercero actualizado.
      */
-    @Operation(summary = "Actualiza Un Tercero", description = "Actualiza Un Tercero Recibiendo Todos Los Campos Obligatorios De Este", responses = {
-            @ApiResponse(responseCode = "200", description = "Tercero actualizado exitosamente", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Datos del tercero no válidos o incompletos", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "El tercero no fue encontrado", content = @Content(mediaType = "application/json"))
-    })
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -104,11 +91,6 @@ public class ThirdRestAdapter {
      * @param thId ID del tercero.
      * @return Respuesta con el resultado de la operación.
      */
-    @Operation(summary = "Cambia El Estado De Un Tercero", description = "Cambia el estado de un tercero en función de su ID.", responses = {
-            @ApiResponse(responseCode = "200", description = "Estado del tercero cambiado exitosamente", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "El ID del tercero no puede estar vacío o es inválido", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Tercero no encontrado con el ID proporcionado", content = @Content(mediaType = "application/json"))
-    })
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
             @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
@@ -122,11 +104,6 @@ public class ThirdRestAdapter {
      * @param thId ID del tercero.
      * @return Respuesta con los datos del tercero.
      */
-    @Operation(summary = "Obtiene Un Tercero", description = "Obtiene un tercero a partir de su ID.", responses = {
-            @ApiResponse(responseCode = "200", description = "Tercero encontrado exitosamente", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "El ID del tercero no puede estar vacío o es inválido", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Tercero no encontrado con el ID proporcionado", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/third")
     public ResponseEntity<Third> getThirdById(
             @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
@@ -142,10 +119,6 @@ public class ThirdRestAdapter {
      * @param entId ID de la empresa.
      * @return Respuesta con el resultado de la verificación.
      */
-    @Operation(summary = "Verifica Si Existe Un Tercero", description = "Verifica si existe un tercero utilizando el ID del tercero y el ID de la empresa (entId).", responses = {
-            @ApiResponse(responseCode = "200", description = "Verificación exitosa. Retorna true si el tercero existe, false si no.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Uno o ambos parámetros (idNumber, entId) son inválidos o vacíos.", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/existBy")
     public ResponseEntity<Boolean> existThirdById(
             @NotNull(message = "ID Number not be empty") @RequestParam("idNumber") Long idNumber,
@@ -162,10 +135,6 @@ public class ThirdRestAdapter {
      * @param numPage Número de página.
      * @return Respuesta con la lista de terceros.
      */
-    @Operation(summary = "Obtiene Una Lista de Terceros", description = "Obtiene una lista de terceros asociados a una empresa, con paginación basada en el número de página.", responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de terceros obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
@@ -185,10 +154,6 @@ public class ThirdRestAdapter {
      * @param numPage Número de página.
      * @return Respuesta con la lista de terceros inactivos.
      */
-    @Operation(summary = "Inactiva Un Tercero", description = "Obtiene una lista de terceros inactivos asociados a una empresa, con paginación basada en el número de página.", responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de terceros inactivos obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getInactiveThirdsList(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
@@ -208,10 +173,6 @@ public class ThirdRestAdapter {
      * @param numPage Número de página.
      * @return Respuesta con la lista de proveedores.
      */
-    @Operation(summary = "Obtiene Una Lista de Terceros Que Son Proveedores", description = "Obtiene una lista de terceros que son proveedores asociados a una empresa, con paginación basada en el número de página.", responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de proveedores obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/providers")
     public ResponseEntity<Page<Third>> getProvidersList(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
@@ -230,10 +191,6 @@ public class ThirdRestAdapter {
      * @param numPage Número de página.
      * @return Respuesta con la lista de clientes.
      */
-    @Operation(summary = "Obtiene Una Lista de Clientes", description = "Obtiene una lista de terceros que son clientes asociados a una empresa, con paginación basada en el número de página.", responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Page.class))),
-            @ApiResponse(responseCode = "400", description = "Parámetros de entrada inválidos o vacíos.", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/customers")
     public ResponseEntity<Page<Third>> getCustomersList(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
@@ -255,15 +212,6 @@ public class ThirdRestAdapter {
      * @return ResponseEntity con el contenido extraído del PDF en caso de éxito,
      *         o un ResponseEntity con un estado de error en caso de fallo.
      */
-    @Operation(
-        summary = "Carga un archivo PDF y extrae su contenido",
-        description = "Permite cargar un archivo PDF (RUT) y extraer su contenido.",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Contenido del PDF extraído exitosamente.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PdfRUTContentOutput.class))),
-            @ApiResponse(responseCode = "400", description = "El archivo está vacío o es inválido.", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "500", description = "Error interno al procesar el archivo.", content = @Content(mediaType = "application/json"))
-        }
-    )
     @PostMapping("/content-PDF-RUT")
     public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
@@ -283,15 +231,6 @@ public class ThirdRestAdapter {
      * @param entId Id de la empresa.
      * @return Respuesta con la lista de terceros.
      */
-    @Operation(
-        summary = "Obtiene Una Lista de Terceros",
-        description = "Obtiene Una Lista de Terceros, se debe mandar el Id de la empresa",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de terceros obtenida exitosamente", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = Third.class)))),
-            @ApiResponse(responseCode = "400", description = "El ID de la empresa no puede estar vacío", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "No se encontraron terceros para la empresa proporcionada", content = @Content(mediaType = "application/json"))
-        }
-    )
     @GetMapping("/list")
         public ResponseEntity<List<Third>> getAllThirds(
                 @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {

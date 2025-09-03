@@ -4,8 +4,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 /**
  * Clase que representa la entidad de la tabla thirds_and_types.
  * Contiene la relación entre un tercero y un tipo de tercero.
