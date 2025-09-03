@@ -10,6 +10,7 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Clase de servicio para listar terceros.
@@ -17,10 +18,11 @@ import lombok.AllArgsConstructor;
  * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia.
  * Este servicio proporciona métodos para listar terceros por diferentes criterios.
  * Si no se encuentran terceros, lanza una excepción de tipo {@link ThirdNotFound}.
- * 
+ *
  * @see ListThirdsUseCase
  * @see ThirdOutputPort
  */
+@Service
 @AllArgsConstructor
 public class ListThirdsService implements ListThirdsUseCase{
 

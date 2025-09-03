@@ -9,6 +9,7 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Clase de servicio para listar los tipos de identificación.
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
  * Utiliza {@link IdOutputPort} para las operaciones de persistencia. 
  * Este servicio proporciona un método para listar todos los tipos de identificación. 
  */
+@Service
 @AllArgsConstructor
 public class ListTypeIdService implements ListTypeIdUseCase {
 

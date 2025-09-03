@@ -24,6 +24,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de persistencia para la entidad Third.
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
  * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los terceros.
  */
+@Component
 @RequiredArgsConstructor
 public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @PersistenceContext

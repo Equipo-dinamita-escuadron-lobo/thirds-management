@@ -8,12 +8,14 @@ import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
 import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de publicación de eventos para el tipo de identificación.
  * Implementa la interfaz {@link TypeIdEventPublisher}.
  * Utiliza {@link ApplicationEventPublisher} para publicar eventos.
  */
+@Component
 @RequiredArgsConstructor
 public class IdEventPublisherAdapter implements ThirdTypeEventPublisher{
     /**

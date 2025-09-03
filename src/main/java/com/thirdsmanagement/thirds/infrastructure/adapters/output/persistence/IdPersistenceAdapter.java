@@ -14,6 +14,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de persistencia para la entidad Id.
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
  * Utiliza {@link IdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos de identificación.
  */
+@Component
 @RequiredArgsConstructor
 public class IdPersistenceAdapter implements IdOutputPort {
     /**

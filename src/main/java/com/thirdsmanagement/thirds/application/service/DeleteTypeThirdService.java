@@ -6,6 +6,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLOutput;
@@ -13,12 +14,13 @@ import java.sql.SQLOutput;
 /**
  * Clase de servicio para eliminar un tipo de tercero.
  * Implementa la interfaz {@link DeleteThirdTypeUseCase}.
- * Utiliza {@link ThirdTypeRepository} y {@link ThirdsAndTypesRepository} para las operaciones de persistencia. 
- * Este servicio proporciona un método para eliminar un tercer tipo por su ID. 
+ * Utiliza {@link ThirdTypeRepository} y {@link ThirdsAndTypesRepository} para las operaciones de persistencia.
+ * Este servicio proporciona un método para eliminar un tercer tipo por su ID.
  * Primero comprueba si el tipo de tercero está siendo utilizado por un tercero.
  * Si se está utilizando el tipo de tercero, devuelve una respuesta de error.
- * Si no se utiliza el tipo de tercero, elimina el tipo de tercero y devuelve una respuesta correcta. 
+ * Si no se utiliza el tipo de tercero, elimina el tipo de tercero y devuelve una respuesta correcta.
  */
+@Service
 @AllArgsConstructor
 public class DeleteTypeThirdService implements DeleteThirdTypeUseCase {
 

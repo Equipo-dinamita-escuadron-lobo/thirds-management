@@ -7,6 +7,7 @@ import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Servicio respnsable de la creación de un tercero.
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
  * Utiliza ThirdOutputPort para guardar el tercero creado y
  * ThirdEventPublisher para publicar un evento una vez creada el tercero.
  */
+@Service
 @AllArgsConstructor
 public class CreateThirdService implements CreateThirdUseCase{
 

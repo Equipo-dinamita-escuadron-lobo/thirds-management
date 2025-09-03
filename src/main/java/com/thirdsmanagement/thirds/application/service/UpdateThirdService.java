@@ -7,15 +7,17 @@ import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Clase de servicio para actualizar un tercero.
  * Implementa la interfaz {@link UpdateThirdUseCase}.
  * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia y {@link ThirdEventPublisher}
- * para publicar el evento. 
- * Este servicio proporciona un método para actualizar un tercero. 
- * Después de actualizar el tercero, publica un evento de actualización de tercero. 
+ * para publicar el evento.
+ * Este servicio proporciona un método para actualizar un tercero.
+ * Después de actualizar el tercero, publica un evento de actualización de tercero.
  */
+@Service
 @AllArgsConstructor
 public class UpdateThirdService implements UpdateThirdUseCase{
 

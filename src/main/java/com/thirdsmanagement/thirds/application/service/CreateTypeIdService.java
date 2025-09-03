@@ -7,11 +7,13 @@ import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementación del servicio para la creación de un tipo de identificacion.
  * Este servicio controla la lógica de negocios para crear un nuevo TypeId y guardarlo mediante IdOutputPort.
- */ 
+ */
+@Service
 @AllArgsConstructor
 public class CreateTypeIdService implements CreateTypeIdUseCase{
     

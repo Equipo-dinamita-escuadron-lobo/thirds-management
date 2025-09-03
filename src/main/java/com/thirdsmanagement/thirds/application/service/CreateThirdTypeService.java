@@ -5,6 +5,7 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Este servicio se encarga de gestionar la creación de tipos de terceros.
  * Utiliza IdOutputPort para guardar el yipo de tercero y generar un ID para él.
  */
+@Service
 @AllArgsConstructor
 public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     

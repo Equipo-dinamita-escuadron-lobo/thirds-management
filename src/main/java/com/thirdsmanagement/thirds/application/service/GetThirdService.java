@@ -6,6 +6,7 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Clase de servicio para obtener un tercero por su ID.
@@ -13,10 +14,11 @@ import lombok.AllArgsConstructor;
  * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia.
  * Este servicio proporciona un método para obtener un tercero por su ID.
  * Si el tercero no existe, lanza una excepción de tipo {@link ThirdNotFound}.
- * 
+ *
  * @see GetThirdUseCase
  * @see ThirdOutputPort
  */
+@Service
 @AllArgsConstructor
 public class GetThirdService implements GetThirdUseCase{
 

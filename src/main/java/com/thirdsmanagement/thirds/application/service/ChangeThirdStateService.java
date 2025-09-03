@@ -7,12 +7,14 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
 
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /**
  * Este servicio maneja la lógica de negocio para actualizar el estado de una entidad de terceros
  * y publicar el evento correspondiente.
  */
 
+@Service
 @AllArgsConstructor
 public class ChangeThirdStateService implements  ChangeThirdStateUseCase{
 
