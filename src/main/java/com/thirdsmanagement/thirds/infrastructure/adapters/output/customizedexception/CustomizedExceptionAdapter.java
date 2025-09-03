@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.thirdsmanagement.thirds.domain.exception.thirds.ThirdNotFound;
+import com.thirdsmanagement.commons.exceptions.thirds.ThirdNotFound;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.customizedexception.data.response.ExceptionResponse;
 
 /**

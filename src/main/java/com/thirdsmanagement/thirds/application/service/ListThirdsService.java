@@ -4,9 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
+import com.thirdsmanagement.commons.exceptions.thirds.ThirdNotFound;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
-import com.thirdsmanagement.thirds.domain.exception.thirds.ThirdsNotFound;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import lombok.AllArgsConstructor;
  * Implementa la interfaz {@link ListThirdsUseCase}.
  * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia.
  * Este servicio proporciona métodos para listar terceros por diferentes criterios.
- * Si no se encuentran terceros, lanza una excepción de tipo {@link ThirdsNotFound}.
+ * Si no se encuentran terceros, lanza una excepción de tipo {@link ThirdNotFound}.
  * 
  * @see ListThirdsUseCase
  * @see ThirdOutputPort
@@ -32,7 +32,7 @@ public class ListThirdsService implements ListThirdsUseCase{
         Page<Third> result = thirdOutputPort.getAllThirdsBy(entId, pageable);
 
         if(result.isEmpty()){
-            throw new ThirdsNotFound("No thirds found for enterprise id "+ entId);            
+            throw new ThirdNotFound("No thirds found for enterprise id "+ entId);            
         }
 
         return result;
@@ -43,7 +43,7 @@ public class ListThirdsService implements ListThirdsUseCase{
         Page<Third> result = thirdOutputPort.getAllInactiveThirdsBy(entId, pageable);
 
         if(result.isEmpty()){
-            throw new ThirdsNotFound("No inactive thirds found for enterprise id "+ entId);            
+            throw new ThirdNotFound("No inactive thirds found for enterprise id "+ entId);            
         }
 
         return result;
@@ -54,7 +54,7 @@ public class ListThirdsService implements ListThirdsUseCase{
         Page<Third> result = thirdOutputPort.getAllProvidersBy(entId, pageable);
 
         if(result.isEmpty()){
-            throw new ThirdsNotFound("No providers found for enterprise id "+ entId);            
+            throw new ThirdNotFound("No providers found for enterprise id "+ entId);            
         }
 
         return result;
@@ -65,7 +65,7 @@ public class ListThirdsService implements ListThirdsUseCase{
         Page<Third> result = thirdOutputPort.getAllCustomersBy(entId, pageable);
 
         if(result.isEmpty()){
-            throw new ThirdsNotFound("No customers found for enterprise id "+ entId);            
+            throw new ThirdNotFound("No customers found for enterprise id "+ entId);            
         }
 
         return result;
@@ -76,7 +76,7 @@ public class ListThirdsService implements ListThirdsUseCase{
         List<Third> result = thirdOutputPort.getAllThirds(entId);
 
         if(result.isEmpty()){
-            throw new ThirdsNotFound("No thirds found for enterprise id "+ entId);            
+            throw new ThirdNotFound("No thirds found for enterprise id "+ entId);            
         }
 
         return result;

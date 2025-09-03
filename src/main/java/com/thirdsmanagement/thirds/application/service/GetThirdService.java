@@ -1,8 +1,8 @@
 package com.thirdsmanagement.thirds.application.service;
 
+import com.thirdsmanagement.commons.exceptions.thirds.ThirdNotFound;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
-import com.thirdsmanagement.thirds.domain.exception.thirds.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.AllArgsConstructor;
