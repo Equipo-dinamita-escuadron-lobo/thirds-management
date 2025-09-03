@@ -1,4 +1,4 @@
-package com.thirdsmanagement.commons.exceptions.thirds;
+package com.thirdsmanagement.commons.exceptions.third;
 
 import com.thirdsmanagement.commons.exceptions.ErrorCodeDefinition;
 

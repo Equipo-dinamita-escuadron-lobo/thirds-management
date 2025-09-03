@@ -1,6 +1,6 @@
 package com.thirdsmanagement.thirds.application.service;
 
-import com.thirdsmanagement.commons.exceptions.thirds.ThirdStateNotChanged;
+import com.thirdsmanagement.commons.exceptions.third.ThirdStateNotChanged;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;

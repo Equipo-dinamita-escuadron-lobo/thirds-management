@@ -1,7 +1,7 @@
 package com.thirdsmanagement.commons.exceptions.typeId;
 
 import com.thirdsmanagement.commons.exceptions.BaseBusinessException;
-import com.thirdsmanagement.commons.exceptions.thirds.ThirdsErrorCode;
+import com.thirdsmanagement.commons.exceptions.third.ThirdsErrorCode;
 
 /**
  * Excepción que se lanza cuando ya existe un tipo de identificación.
