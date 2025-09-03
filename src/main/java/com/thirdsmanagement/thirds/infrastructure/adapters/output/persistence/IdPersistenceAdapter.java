@@ -10,6 +10,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.ma
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -63,6 +64,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @Override
     public ThirdType saveThirdType(ThirdType thirdType) {
         ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdTypeEntity(thirdType);
+
+        // Asignar tenant ID del contexto actual
+        thirdTypeEntity.setTenantId(TenantContext.getTenantId());
+
         thirdTypeRepository.save(thirdTypeEntity);
         ThirdType result = idPersistenceMapper.toThirdType(thirdTypeEntity);
         return result;
@@ -85,10 +90,27 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public TypeId saveTypeId(TypeId typeId) {
-       TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(typeId);
-       typeIdRepository.save(typeIdEntity);
-       TypeId result = idPersistenceMapper.toTypeId(typeIdEntity);
-       return result;
+        if (typeId == null) {
+            throw new IllegalArgumentException("El tipo de identificación no puede ser null");
+        }
+
+        if (typeId.getTypeId() == null || typeId.getTypeId().trim().isEmpty()) {
+            throw new IllegalArgumentException("El código del tipo de identificación no puede estar vacío");
+        }
+
+        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(typeId);
+
+        // Asignar tenant ID del contexto actual
+        typeIdEntity.setTenantId(TenantContext.getTenantId());
+
+        // Asegurar que el ID de la entidad se asigna correctamente
+        if (typeIdEntity.getTiId() == null) {
+            typeIdEntity.setTiId(typeId.getTypeId().toUpperCase());
+        }
+
+        typeIdRepository.save(typeIdEntity);
+        TypeId result = idPersistenceMapper.toTypeId(typeIdEntity);
+        return result;
     }
 
     /**

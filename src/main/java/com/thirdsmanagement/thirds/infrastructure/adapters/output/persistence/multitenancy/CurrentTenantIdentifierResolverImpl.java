@@ -14,7 +14,6 @@ import java.util.Map;
  * Implementación de resolver de identificador de inquilino actual para Hibernate.
  * Esta clase determina dinámicamente el inquilino actual basado en el contexto de TenantContext.
  */
-@SuppressWarnings("rawtypes")
 @Component
 public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 

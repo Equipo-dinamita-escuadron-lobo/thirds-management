@@ -19,6 +19,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.ma
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,24 +52,43 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Third saveThird(Third third) {
+        if (third == null) {
+            throw new IllegalArgumentException("El tercero no puede ser null");
+        }
+
+        if (third.getTypeId() == null || third.getTypeId().getTypeId() == null) {
+            throw new IllegalArgumentException("El tipo de identificación del tercero no puede ser null");
+        }
 
         ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
 
-        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeIdname());
+        // Asignar tenant ID del contexto actual
+        thirdEntity.setTenantId(TenantContext.getTenantId());
 
-        List<ThirdTypeEntity> thirdTypeEntities = thirdTypeRepository.findAll();
+        // Obtener la referencia del tipo de identificación usando el ID correcto
+        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
 
-        if(typeIdEntity != null){
-            for(ThirdType tt : third.getThirdTypes()){
-                for(ThirdTypeEntity tte : thirdTypeEntities){
-                    if(tte.getTtName().equals(tt.getThirdTypeName())){
+        // Asignar el tipo de identificación a la entidad
+        thirdEntity.setTypeId(typeIdEntity);
+
+        // Procesar los tipos de tercero si existen
+        if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
+            List<ThirdTypeEntity> thirdTypeEntities = thirdTypeRepository.findAll();
+
+            for (ThirdType tt : third.getThirdTypes()) {
+                for (ThirdTypeEntity tte : thirdTypeEntities) {
+                    if (tte.getTtName() != null && tte.getTtName().equals(tt.getThirdTypeName())) {
                         thirdEntity.getThirdTypes().add(tte);
+                        break; // Salir del bucle interno una vez encontrado
                     }
                 }
             }
-            thirdEntity = thirdRepository.save(thirdEntity);
         }
 
+        // Guardar la entidad
+        thirdEntity = thirdRepository.save(thirdEntity);
+
+        // Convertir de vuelta al dominio
         Third result = thirdPersistenceMapper.toThird(thirdEntity);
 
         return result;

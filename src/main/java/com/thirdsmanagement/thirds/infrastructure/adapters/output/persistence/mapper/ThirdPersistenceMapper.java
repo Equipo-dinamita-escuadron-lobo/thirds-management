@@ -18,21 +18,20 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 public interface ThirdPersistenceMapper {
 
     /**
-     * Método para mapear un objeto de la entidad de tercero a un objeto de tercero.
-     * @param third Objeto de la entidad de tercero.
-     * @return Objeto de tercero.
+     * Método para mapear un objeto de tercero a una entidad de tercero.
+     * @param third Objeto de tercero.
+     * @return Entidad de tercero.
      */
     @Mapping(target = "thirdTypes", ignore = true)
-    @Mapping(target = "thId", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)
     ThirdEntity toThirdEntity(Third third);
 
     /**
-     * Método para mapear un objeto de tercero a un objeto de la entidad de tercero.
-     * @param thirdEntity Objeto de tercero.
-     * @return Objeto de la entidad de tercero.
+     * Método para mapear una entidad de tercero a un objeto de tercero.
+     * @param thirdEntity Entidad de tercero.
+     * @return Objeto de tercero.
      */
     @Mapping(target = "thirdTypes", ignore = true)
     Third toThird(ThirdEntity thirdEntity);

@@ -39,5 +39,8 @@ public interface IdRestMapper {
      * @param typeIdCreateRequest Objeto de tipo {@link TypeIdCreateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
+    @org.mapstruct.Mapping(target = "typeIdname", source = "typeIdname")
+    @org.mapstruct.Mapping(target = "entId", source = "entId")
+    @org.mapstruct.Mapping(target = "typeId", source = "typeId")
     TypeId toTypeId(TypeIdCreateRequest typeIdCreateRequest);
 } 
