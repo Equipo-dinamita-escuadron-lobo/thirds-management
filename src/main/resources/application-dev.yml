@@ -8,11 +8,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${DB_HIBERNATE_DDL_AUTO:create-drop}
-    properties:
-      hibernate:
-        dialect: ${DB_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
-        multiTenancy: DATABASE
-        tenant_identifier_resolver: com.thirdsmanagement.commons.multitenancy.CurrentTenantIdentifierResolverImpl
 
   h2:
     console:

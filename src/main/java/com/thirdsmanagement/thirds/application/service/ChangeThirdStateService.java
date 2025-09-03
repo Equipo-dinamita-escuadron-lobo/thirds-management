@@ -1,10 +1,10 @@
 package com.thirdsmanagement.thirds.application.service;
 
-import com.thirdsmanagement.commons.exceptions.third.ThirdStateNotChanged;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdStateNotChanged;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
