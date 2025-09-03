@@ -16,7 +16,7 @@ import java.util.Map;
  */
 @SuppressWarnings("rawtypes")
 @Component
-public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver, HibernatePropertiesCustomizer {
+public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 
     /**
      * Resuelve el identificador del inquilino actual.

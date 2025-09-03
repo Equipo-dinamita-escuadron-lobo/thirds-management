@@ -34,7 +34,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Repositorio de terceros.
+     * Nota: Actualmente no se utiliza en este adaptador, pero se mantiene
+     * por compatibilidad futura con la arquitectura hexagonal.
      */
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
 
     /**

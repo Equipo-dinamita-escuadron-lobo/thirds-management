@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdTypeEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.TypeIdEventPublisher;
 import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
-import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

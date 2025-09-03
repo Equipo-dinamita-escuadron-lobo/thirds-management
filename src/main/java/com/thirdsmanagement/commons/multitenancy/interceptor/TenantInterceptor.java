@@ -21,12 +21,24 @@ public class TenantInterceptor implements WebRequestInterceptor {
 
     /**
      * Pre-manipulación de la solicitud para establecer el ID del inquilino en el contexto.
+     * Si no hay JWT disponible, usa el tenant por defecto.
      * @param request Objeto WebRequest que representa la solicitud actual.
      * @throws Exception Si ocurre algún error durante la manipulación de la solicitud.
      */
     @Override
     public void preHandle(WebRequest request) throws Exception {
-        TenantContext.setTenantId(jwtUtils.getId());
+        try {
+            String tenantId = jwtUtils.getId();
+            if (tenantId != null && !tenantId.trim().isEmpty()) {
+                TenantContext.setTenantId(tenantId);
+            } else {
+                // Usar tenant por defecto si no hay JWT disponible
+                TenantContext.setTenantId("default");
+            }
+        } catch (Exception e) {
+            // En caso de error, usar tenant por defecto
+            TenantContext.setTenantId("default");
+        }
     }
 
     /**

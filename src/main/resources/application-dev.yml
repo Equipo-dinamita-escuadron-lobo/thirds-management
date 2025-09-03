@@ -11,6 +11,8 @@ spring:
     properties:
       hibernate:
         dialect: ${DB_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
+        multiTenancy: DATABASE
+        tenant_identifier_resolver: com.thirdsmanagement.commons.multitenancy.CurrentTenantIdentifierResolverImpl
 
   h2:
     console:
