@@ -19,25 +19,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TypeIdCreateRequest {
 
-    /**
-     * Identificador de la empresa a la que pertenece el tipo de identificación.
-     * Campo obligatorio para segmentar los tipos por empresa.
-     */
+
     @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
 
-    /**
-     * Código único del tipo de identificación (ej: CC, NIT, CE).
-     * Será normalizado automáticamente antes del guardado.
-     */
     @NotNull(message = "El código del tipo de identificación no puede estar vacío")
     @Size(min = 2, max = 10, message = "El código debe tener entre 2 y 10 caracteres")
     private String typeId;
 
-    /**
-     * Nombre descriptivo del tipo de identificación.
-     * Campo obligatorio que describe el tipo (ej: Cédula de Ciudadanía).
-     */
     @NotNull(message = "El nombre del tipo de identificación no puede estar vacío")
     private String typeIdname;
+
+    @Builder.Default
+    private Boolean status = true;
 }

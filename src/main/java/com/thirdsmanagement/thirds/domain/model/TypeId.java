@@ -27,29 +27,22 @@ import lombok.ToString;
 @NoArgsConstructor
 public class TypeId {
 
-    /**
-     * Identificador de la empresa a la que pertenece el tipo de identificación.
-     * Permite segmentar los tipos de identificación por empresa.
-     */
+    
     @NotBlank(message = "El ID de la empresa no puede estar vacío")
     @Size(max = 50, message = "El ID de la empresa no puede exceder los 50 caracteres")
     private String entId;
 
-    /**
-     * Código único del tipo de identificación.
-     * Será normalizado automáticamente antes del guardado usando StringNormalizer.
-     */
+
     @NotBlank(message = "El código del tipo de identificación no puede estar vacío")
     @Size(max = 10, message = "El código del tipo de identificación no puede exceder los 10 caracteres")
     private String typeId;
 
-    /**
-     * Nombre descriptivo del tipo de identificación.
-     * Ejemplo: "Cédula de Ciudadanía", "Número de Identificación Tributaria".
-     */
     @NotBlank(message = "El nombre del tipo de identificación no puede estar vacío")
     @Size(max = 100, message = "El nombre del tipo de identificación no puede exceder los 100 caracteres")
     private String typeIdname;
+
+    @Builder.Default
+    private Boolean status = true;
 
     /**
      * Verifica si el tipo de identificación es válido para personas naturales.

@@ -50,4 +50,8 @@ public class TypeIdEntity {
     @Column(name = "ti_updated_at")
     @UpdateTimestamp
     private LocalDateTime updateDate;
+
+    @Builder.Default
+    @Column(name = "ti_status")
+    private Boolean status = true;
 }
