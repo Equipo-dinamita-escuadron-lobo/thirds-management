@@ -1,7 +1,6 @@
 package com.thirdsmanagement.thirds.domain.exceptions.typeId;
 
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
-import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 
 /**
  * Excepción que se lanza cuando no se encuentra un tipo de identificación.
@@ -12,7 +11,7 @@ public class TypeIdNotFound extends BaseBusinessException {
      * Constructor por defecto.
      */
     public TypeIdNotFound() {
-        super(ThirdsErrorCode.TYPE_ID_NOT_FOUND);
+        super(TypeIdErrorCode.TYPE_ID_NOT_FOUND);
     }
 
     /**
@@ -20,7 +19,7 @@ public class TypeIdNotFound extends BaseBusinessException {
      * @param customMessage mensaje personalizado de error
      */
     public TypeIdNotFound(String customMessage) {
-        super(ThirdsErrorCode.TYPE_ID_NOT_FOUND, customMessage);
+        super(TypeIdErrorCode.TYPE_ID_NOT_FOUND, customMessage);
     }
 
     /**
@@ -29,6 +28,6 @@ public class TypeIdNotFound extends BaseBusinessException {
      * @param cause causa del error
      */
     public TypeIdNotFound(String customMessage, Throwable cause) {
-        super(ThirdsErrorCode.TYPE_ID_NOT_FOUND, customMessage, cause);
+        super(TypeIdErrorCode.TYPE_ID_NOT_FOUND, customMessage, cause);
     }
 }

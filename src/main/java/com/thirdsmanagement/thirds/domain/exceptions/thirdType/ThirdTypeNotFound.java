@@ -1,7 +1,6 @@
 package com.thirdsmanagement.thirds.domain.exceptions.thirdType;
 
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
-import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 
 /**
  * Excepción que se lanza cuando no se encuentra un tipo de tercero.
@@ -12,7 +11,7 @@ public class ThirdTypeNotFound extends BaseBusinessException {
      * Constructor por defecto.
      */
     public ThirdTypeNotFound() {
-        super(ThirdsErrorCode.THIRD_TYPE_NOT_FOUND);
+        super(ThirdTypeErrorCode.THIRD_TYPE_NOT_FOUND);
     }
 
     /**
@@ -20,7 +19,7 @@ public class ThirdTypeNotFound extends BaseBusinessException {
      * @param customMessage mensaje personalizado de error
      */
     public ThirdTypeNotFound(String customMessage) {
-        super(ThirdsErrorCode.THIRD_TYPE_NOT_FOUND, customMessage);
+        super(ThirdTypeErrorCode.THIRD_TYPE_NOT_FOUND, customMessage);
     }
 
     /**
@@ -29,6 +28,6 @@ public class ThirdTypeNotFound extends BaseBusinessException {
      * @param cause causa del error
      */
     public ThirdTypeNotFound(String customMessage, Throwable cause) {
-        super(ThirdsErrorCode.THIRD_TYPE_NOT_FOUND, customMessage, cause);
+        super(ThirdTypeErrorCode.THIRD_TYPE_NOT_FOUND, customMessage, cause);
     }
 }

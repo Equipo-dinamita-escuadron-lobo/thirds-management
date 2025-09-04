@@ -1,7 +1,6 @@
 package com.thirdsmanagement.thirds.domain.exceptions.typeId;
 
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
-import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 
 /**
  * Excepción que se lanza cuando ya existe un tipo de identificación.
@@ -12,7 +11,7 @@ public class TypeIdAlreadyExists extends BaseBusinessException {
      * Constructor por defecto.
      */
     public TypeIdAlreadyExists() {
-        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS);
+        super(TypeIdErrorCode.TYPE_ID_ALREADY_EXISTS);
     }
 
     /**
@@ -20,7 +19,7 @@ public class TypeIdAlreadyExists extends BaseBusinessException {
      * @param customMessage mensaje personalizado de error
      */
     public TypeIdAlreadyExists(String customMessage) {
-        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage);
+        super(TypeIdErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage);
     }
 
     /**
@@ -29,6 +28,6 @@ public class TypeIdAlreadyExists extends BaseBusinessException {
      * @param cause causa del error
      */
     public TypeIdAlreadyExists(String customMessage, Throwable cause) {
-        super(ThirdsErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage, cause);
+        super(TypeIdErrorCode.TYPE_ID_ALREADY_EXISTS, customMessage, cause);
     }
 }

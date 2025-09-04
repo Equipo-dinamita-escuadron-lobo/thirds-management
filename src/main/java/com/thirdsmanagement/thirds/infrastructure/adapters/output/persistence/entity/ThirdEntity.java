@@ -18,7 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
+
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -57,11 +57,8 @@ public class ThirdEntity {
     private TypeIdEntity typeId;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-        name = "thirds_and_types",
-        joinColumns = @JoinColumn(name = "th_id"),
-        inverseJoinColumns = @JoinColumn(name = "tt_id")
-    )
+    // La relación con tipos de tercero se maneja a través de ThirdsAndTypesEntity
+    // para incluir correctamente el tenant_id
     @Default
     private Set<ThirdTypeEntity> thirdTypes = new HashSet<>();
 

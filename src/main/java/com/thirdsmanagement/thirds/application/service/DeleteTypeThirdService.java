@@ -34,7 +34,7 @@ public class DeleteTypeThirdService implements DeleteThirdTypeUseCase {
         }
 
         // Verificar si el tipo de tercero está siendo utilizado
-        boolean isUsed = thirdsAndTypesRepository.existsByThirdType_TtId(entId);
+        boolean isUsed = thirdsAndTypesRepository.existsByTtId(entId);
 
         if (isUsed) {
             return ResponseEntity.badRequest()
@@ -48,6 +48,10 @@ public class DeleteTypeThirdService implements DeleteThirdTypeUseCase {
                         .body("El tipo de tercero con ID " + entId + " no existe");
             }
 
+            // Eliminar todas las relaciones con terceros antes de eliminar el tipo
+            thirdsAndTypesRepository.deleteByTtId(entId);
+
+            // Eliminar el tipo de tercero
             thirdTypeRepository.deleteById(entId);
             return ResponseEntity.ok("Tipo de tercero eliminado exitosamente");
         } catch (Exception e) {

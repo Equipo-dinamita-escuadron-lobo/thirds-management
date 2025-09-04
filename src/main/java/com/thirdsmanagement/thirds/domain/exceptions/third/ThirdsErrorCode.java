@@ -14,11 +14,8 @@ public enum ThirdsErrorCode implements ErrorCodeDefinition {
     THIRDS_NOT_FOUND("THIRDS_NOT_FOUND", "No se encontraron terceros"),
     THIRD_STATE_NOT_CHANGED("THIRD_STATE_NOT_CHANGED", "No se pudo cambiar el estado del tercero"),
     THIRD_ALREADY_EXISTS("THIRD_ALREADY_EXISTS", "El tercero ya existe"),
-    THIRD_TYPE_NOT_FOUND("THIRD_TYPE_NOT_FOUND", "Tipo de tercero no encontrado"),
-    THIRD_TYPE_ALREADY_EXISTS("THIRD_TYPE_ALREADY_EXISTS", "El tipo de tercero ya existe"),
-    TYPE_ID_NOT_FOUND("TYPE_ID_NOT_FOUND", "Tipo de identificación no encontrado"),
-    TYPE_ID_ALREADY_EXISTS("TYPE_ID_ALREADY_EXISTS", "El tipo de identificación ya existe"),
-    INVALID_THIRD_DATA("INVALID_THIRD_DATA", "Datos del tercero inválidos");
+    INVALID_THIRD_DATA("INVALID_THIRD_DATA", "Datos del tercero inválidos"),
+    THIRD_FOREIGN_KEY_VIOLATION("THIRD_FOREIGN_KEY_VIOLATION", "Referencia a tipo de tercero o identificación inválida");
 
     private final String code;
     private final String message;

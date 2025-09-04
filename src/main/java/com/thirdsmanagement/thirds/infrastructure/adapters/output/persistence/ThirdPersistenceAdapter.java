@@ -15,11 +15,15 @@ import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdsAndTypesEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.ThirdPersistenceMapper;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -43,6 +47,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
     private final TypeIdRepository typeIdRepository;
+    private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final ThirdPersistenceMapper thirdPersistenceMapper;
 
     /**
@@ -65,28 +70,45 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         // Asignar tenant ID del contexto actual
         thirdEntity.setTenantId(TenantContext.getTenantId());
 
-        // Obtener la referencia del tipo de identificación usando el ID correcto
-        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
+        // Obtener y validar la referencia del tipo de identificación
+        TypeIdEntity typeIdEntity;
+        try {
+            typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
+        } catch (EntityNotFoundException e) {
+            throw new TypeIdForeignKeyViolationException(third.getTypeId().getTypeId(), e);
+        }
 
         // Asignar el tipo de identificación a la entidad
         thirdEntity.setTypeId(typeIdEntity);
 
-        // Procesar los tipos de tercero si existen
-        if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
-            List<ThirdTypeEntity> thirdTypeEntities = thirdTypeRepository.findAll();
+        // Guardar primero la entidad del tercero para obtener el ID
+        thirdEntity = thirdRepository.save(thirdEntity);
 
+        // Procesar y validar los tipos de tercero usando la entidad intermedia
+        if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
             for (ThirdType tt : third.getThirdTypes()) {
-                for (ThirdTypeEntity tte : thirdTypeEntities) {
-                    if (tte.getTtName() != null && tte.getTtName().equals(tt.getThirdTypeName())) {
-                        thirdEntity.getThirdTypes().add(tte);
-                        break; // Salir del bucle interno una vez encontrado
+                try {
+                    // Verificar que el tipo de tercero existe
+                    if (!thirdTypeRepository.existsById(tt.getThirdTypeId())) {
+                        throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()));
                     }
+
+                    // Crear la entidad intermedia con el tenant_id correcto
+                    ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                            .thId(thirdEntity.getThId())
+                            .ttId(tt.getThirdTypeId())
+                            .tenantId(TenantContext.getTenantId())
+                            .build();
+
+                    thirdsAndTypesRepository.save(relationEntity);
+
+                } catch (Exception e) {
+                    // Si hay error, limpiar el tercero que ya se guardó
+                    thirdRepository.deleteById(thirdEntity.getThId());
+                    throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()), e);
                 }
             }
         }
-
-        // Guardar la entidad
-        thirdEntity = thirdRepository.save(thirdEntity);
 
         // Convertir de vuelta al dominio
         Third result = thirdPersistenceMapper.toThird(thirdEntity);
