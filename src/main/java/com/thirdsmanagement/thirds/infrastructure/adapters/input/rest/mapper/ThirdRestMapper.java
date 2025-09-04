@@ -29,9 +29,73 @@ public interface ThirdRestMapper {
      * @return Objeto de tipo {@link ThirdResponse}.
      */
     @Mapping(source = "thId", target = "id")
-    @Mapping(source = "names", target = "name")
-    @Mapping(source = "state", target = "description")
+    @Mapping(target = "name", expression = "java(getThirdName(third))")
+    @Mapping(target = "description", expression = "java(getThirdDescription(third))")
     ThirdResponse toThirdCreateResponse(Third third);
+    
+    /**
+     * Obtiene el nombre completo del tercero según su tipo de persona.
+     * @param third el tercero
+     * @return el nombre completo
+     */
+    default String getThirdName(Third third) {
+        if (third == null) {
+            return null;
+        }
+        
+        if (third.isLegalEntity()) {
+            // Para personas jurídicas, usar la razón social
+            return third.getSocialReason();
+        } else {
+            // Para personas naturales, concatenar nombres y apellidos
+            StringBuilder name = new StringBuilder();
+            if (third.getNames() != null && !third.getNames().trim().isEmpty()) {
+                name.append(third.getNames());
+            }
+            if (third.getLastNames() != null && !third.getLastNames().trim().isEmpty()) {
+                if (name.length() > 0) {
+                    name.append(" ");
+                }
+                name.append(third.getLastNames());
+            }
+            return name.length() > 0 ? name.toString() : null;
+        }
+    }
+    
+    /**
+     * Obtiene la descripción del tercero con información útil.
+     * @param third el tercero
+     * @return la descripción
+     */
+    default String getThirdDescription(Third third) {
+        if (third == null) {
+            return null;
+        }
+        
+        StringBuilder description = new StringBuilder();
+        
+        // Tipo de persona
+        if (third.getPersonType() != null) {
+            description.append("Persona ").append(third.getPersonType().name());
+        }
+        
+        // Tipo de identificación y número
+        if (third.getTypeId() != null && third.getTypeId().getTypeIdname() != null) {
+            if (description.length() > 0) {
+                description.append(" - ");
+            }
+            description.append(third.getTypeId().getTypeIdname())
+                      .append(": ").append(third.getIdNumber());
+        }
+        
+        // Estado
+        if (description.length() > 0) {
+            description.append(" - ");
+        }
+        description.append("Estado: ").append(third.isActive() ? "Activo" : "Inactivo");
+        
+        return description.toString();
+    }
 
     /**
      * Método para mapear un objeto de tipo {@link Boolean} a un objeto de tipo {@link ChangeThirdStateResponse}.
