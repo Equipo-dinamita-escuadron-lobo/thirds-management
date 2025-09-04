@@ -1,29 +1,34 @@
 package com.thirdsmanagement.thirds.application.service;
-import java.util.ArrayList;
+
 import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-/**
- * Clase de servicio para listar los tipos de terceros.
- * Implementa la interfaz {@link ListThirdTypeUseCase}.
- * Utiliza {@link IdOutputPort} para las operaciones de persistencia. 
- * Este servicio proporciona un método para listar todos los tipos de terceros. 
- */
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class ListThirdTypeService implements ListThirdTypeUseCase {
     
     private final IdOutputPort idOutputPort;
     
+    /**
+     * Obtiene todos los tipos de terceros para una empresa específica.
+     * 
+     * @param entId el ID de la empresa
+     * @return lista de tipos de terceros disponibles
+     * @throws IllegalArgumentException si el ID de empresa es inválido
+     */
     @Override
     public List<ThirdType> getAllThirdTypes(String entId) {
-       
-        List<ThirdType> result = idOutputPort.getALLThirdTypes(entId);
-        return result;
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        
+        return idOutputPort.getALLThirdTypes(entId);
     }
     
 }

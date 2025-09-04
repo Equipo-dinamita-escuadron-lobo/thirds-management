@@ -4,24 +4,37 @@ import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCas
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Clase de servicio para crear un nuevo ThirdType.
- * Implementa la interfaz CreateThirdTypeUseCase.
- * Este servicio se encarga de gestionar la creación de tipos de terceros.
- * Utiliza IdOutputPort para guardar el yipo de tercero y generar un ID para él.
- */
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     
     private final IdOutputPort idOutputPort;
-    //private final ThirdTypeEventPublisher thirdTypeEventPublisher;
+    
+    /**
+     * Crea un nuevo tipo de tercero en el sistema.
+     * 
+     * @param thirdType el tipo de tercero a crear
+     * @return el tipo de tercero creado con su ID asignado
+     * @throws IllegalArgumentException si el tipo de tercero es null o tiene datos inválidos
+     */
     @Override
+    @Transactional
     public ThirdType createThirdType(ThirdType thirdType) {
-        thirdType = idOutputPort.saveThirdType(thirdType);
-        //thirdTypeEventPublisher.publishThirdTypeCreatedEvent(new ThirdTypeCreatedEvent(thirdType.getThirdTypeId()));
-        return thirdType;
+        if (thirdType == null) {
+            throw new IllegalArgumentException("El tipo de tercero no puede ser null");
+        }
+        
+        // Guardar el tipo de tercero
+        ThirdType createdThirdType = idOutputPort.saveThirdType(thirdType);
+        
+        // TODO: Implementar publicación de eventos cuando esté disponible el publisher
+        // thirdTypeEventPublisher.publishThirdTypeCreatedEvent(new ThirdTypeCreatedEvent(createdThirdType.getThirdTypeId()));
+        
+        return createdThirdType;
     }
     
 

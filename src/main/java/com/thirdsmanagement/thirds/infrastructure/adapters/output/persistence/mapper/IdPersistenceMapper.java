@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mapstruct.Mapper;
@@ -10,8 +9,6 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
-
-import aj.org.objectweb.asm.Type;
 
 /**
  * Clase que representa el mapeo de los objetos de la capa de persistencia.
@@ -31,64 +28,69 @@ public interface IdPersistenceMapper {
     @Mapping(source = "ttId", target = "thirdTypeId" )
     @Mapping(source = "ttName", target = "thirdTypeName" )
     @Mapping(source = "ttentId", target = "entId" )
-    ThirdType toThirdTypeEntity(ThirdTypeEntity thirdTypeEntity);
+    ThirdType toThirdType(ThirdTypeEntity thirdTypeEntity);
 
     /**
-     * Método para mapear una lista de objetos de la entidad de tipo de tercero a una lista de objetos de tipo de tercero.
-     * @param thirdTypeEntities Lista de objetos de la entidad de tipo de tercero.
-     * @return Lista de objetos de tipo de tercero.
+     * Método para mapear un objeto de tipo de tercero a una entidad de tipo de tercero.
+     * @param thirdType Objeto de tipo de tercero.
+     * @return Entidad de tipo de tercero.
      */
     @Mapping(target =  "ttId", source = "thirdTypeId" )
     @Mapping(target =  "ttName", source = "thirdTypeName" )
     @Mapping(target =  "ttentId", source = "entId" )
-    ThirdTypeEntity toThirdType(ThirdType thirdType);
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "thirds", ignore = true)
+    ThirdTypeEntity toThirdTypeEntity(ThirdType thirdType);
 
     /**
-     * Método para mapear un objeto de tipo de identificación a un objeto de la entidad de tipo de identificación.
-     * @param thirdTypes Objeto de tipo de identificación.
-     * @return Objeto de la entidad de tipo de identificación.
+     * Método para mapear una lista de objetos de tipo de tercero a una lista de entidades de tipo de tercero.
+     * @param thirdTypes Lista de objetos de tipo de tercero.
+     * @return Lista de entidades de tipo de tercero.
      */
-    List<ThirdTypeEntity> toThirdTypes(List<ThirdType> thirdTypes);
+    List<ThirdTypeEntity> toThirdTypeEntityList(List<ThirdType> thirdTypes);
 
     /**
-     * Método para mapear una lista de objetos de tipo de identificación a una lista de objetos de la entidad de tipo de identificación.
-     * @param thirdTypeEntities Lista de objetos de tipo de identificación.
-     * @return Lista de objetos de la entidad de tipo de identificación.
+     * Método para mapear una lista de entidades de tipo de tercero a una lista de objetos de tipo de tercero.
+     * @param thirdTypeEntities Lista de entidades de tipo de tercero.
+     * @return Lista de objetos de tipo de tercero.
      */
-    List<ThirdType> toThirdTypeEntitys(List<ThirdTypeEntity> thirdTypeEntities);
+    List<ThirdType> toThirdTypeList(List<ThirdTypeEntity> thirdTypeEntities);
 
     /**
-     * Método para mapear un objeto de tipo de identificación a un objeto de la entidad de tipo de identificación.
+     * Método para mapear un objeto de tipo de identificación a una entidad de tipo de identificación.
      * @param typeId Objeto de tipo de identificación.
-     * @return Objeto de la entidad de tipo de identificación.
+     * @return Entidad de tipo de identificación.
      */
     @Mapping(target =  "tiId", source = "typeId" )
     @Mapping(target =  "tiName", source = "typeIdname")
     @Mapping(target =  "tientId", source = "entId" )
-    TypeIdEntity toTypeId(TypeId typeId);
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updateDate", ignore = true)
+    TypeIdEntity toTypeIdEntity(TypeId typeId);
 
     /**
-     * Método para mapear una lista de objetos de tipo de identificación a una lista de objetos de la entidad de tipo de identificación.
-     * @param typeIdEntities Lista de objetos de tipo de identificación.
-     * @return Lista de objetos de la entidad de tipo de identificación.
+     * Método para mapear una entidad de tipo de identificación a un objeto de tipo de identificación.
+     * @param typeIdEntity Entidad de tipo de identificación.
+     * @return Objeto de tipo de identificación.
      */
     @Mapping(source =  "tiId", target = "typeId" )
     @Mapping(source =  "tiName", target = "typeIdname")
     @Mapping(source =  "tientId", target = "entId" )
-    TypeId toTypeIdEntity(TypeIdEntity typeIdEntity);
+    TypeId toTypeId(TypeIdEntity typeIdEntity);
 
     /**
-     * Método para mapear una lista de objetos de tipo de identificación a una lista de objetos de la entidad de tipo de identificación.
-     * @param typeIdEntities Lista de objetos de tipo de identificación.
-     * @return Lista de objetos de la entidad de tipo de identificación.
+     * Método para mapear una lista de objetos de tipo de identificación a una lista de entidades de tipo de identificación.
+     * @param typeIds Lista de objetos de tipo de identificación.
+     * @return Lista de entidades de tipo de identificación.
      */
-    List<TypeId> toTypeIdEntititys(List<TypeIdEntity> typeIdEntities);
+    List<TypeIdEntity> toTypeIdEntityList(List<TypeId> typeIds);
 
     /**
-     * Método para mapear un objeto de tipo de identificación a un objeto de la entidad de tipo de identificación.
-     * @param typeId Objeto de tipo de identificación.
-     * @return Objeto de la entidad de tipo de identificación.
+     * Método para mapear una lista de entidades de tipo de identificación a una lista de objetos de tipo de identificación.
+     * @param typeIdEntities Lista de entidades de tipo de identificación.
+     * @return Lista de objetos de tipo de identificación.
      */
-    List<TypeIdEntity> toTypeIds(List<TypeId> typeIds);
+    List<TypeId> toTypeIdList(List<TypeIdEntity> typeIdEntities);
     
 }

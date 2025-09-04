@@ -14,7 +14,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 /**
  * Interfaz Mapper para mapear los objetos de entrada y salida de los terceros.
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ThirdRestMapper {
     /**
      * Método para mapear un objeto de tipo {@link ThirdCreateRequest} a un objeto de tipo {@link Third}.
@@ -28,9 +28,9 @@ public interface ThirdRestMapper {
      * @param third
      * @return Objeto de tipo {@link ThirdResponse}.
      */
-    @Mapping(source = "idNumber",target = "id")
-    @Mapping(source = "names",target = "name")
-    @Mapping(source = "state",target = "description")
+    @Mapping(source = "thId", target = "id")
+    @Mapping(source = "names", target = "name")
+    @Mapping(source = "state", target = "description")
     ThirdResponse toThirdCreateResponse(Third third);
 
     /**
@@ -54,4 +54,12 @@ public interface ThirdRestMapper {
      * @return Objeto de tipo {@link GetThirdResponse}.
      */
     GetThirdResponse toGetThirdResponse(Third third);
+
+    /**
+     * Convierte una lista de entidades de tercero ({@link Third}) en una lista de respuestas de tercero ({@link GetThirdResponse}).
+     *
+     * @param thirdList la lista de entidades de tercero.
+     * @return la lista de respuestas de tercero convertida.
+     */
+    java.util.List<GetThirdResponse> toGetThirdResponseList(java.util.List<Third> thirdList);
 }

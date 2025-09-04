@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,13 +10,15 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
- * Clase de configuración de Swagger.
+ * Clase de configuración para Swagger/OpenAPI.
  */
 @Configuration
 public class SwaggerConfig {
+
     /**
-     * Configura la documentación de Swagger.
-     * @return Documentación de Swagger.
+     * Configura y personaliza la especificación OpenAPI para la API de gestión de productos.
+     *
+     * @return OpenAPI configurado.
      */
     @Bean
     public OpenAPI customizeOpenAPI() {
@@ -29,7 +30,7 @@ public class SwaggerConfig {
                                 .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
                 .info(new Info().title("Thirds Management API")
-                        .description("Api para gestión de terceros")
+                        .description("API para la gestión de terceros")
                         .version("1.0"));
     }
 }

@@ -3,8 +3,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.e
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.identifiers.ThirdsAndTypeId;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
+import org.hibernate.annotations.TenantId;
 
 /**
  * Clase que representa la entidad de la tabla thirds_and_types.
@@ -34,5 +33,8 @@ public class ThirdAndTypeEntity {
     @JoinColumn(name = "tt_id", nullable = false)
     private ThirdTypeEntity thirdType;
 
+    @TenantId
+    @Column(name = "tenant_id")
+    private String tenantId;
 
 }

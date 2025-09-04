@@ -8,12 +8,14 @@ import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
 import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de publicación de eventos para el tercero.
  * Implementa la interfaz {@link ThirdEventPublisher}.
  * Utiliza {@link ApplicationEventPublisher} para publicar eventos.
  */
+@Component
 @RequiredArgsConstructor
 public class ThirdEventPublisherAdapter implements ThirdEventPublisher {
     /**

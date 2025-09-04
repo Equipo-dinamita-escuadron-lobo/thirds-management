@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.e
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
@@ -37,6 +38,10 @@ public class TypeIdEntity {
 
     @Column(name = "ti_entid")
     private String tientId;
+
+    @TenantId
+    @Column(name = "tenant_id")
+    private String tenantId;
 
     @Column(name = "ti_created_at")
     @CreationTimestamp

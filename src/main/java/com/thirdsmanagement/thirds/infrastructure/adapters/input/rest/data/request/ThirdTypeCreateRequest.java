@@ -19,7 +19,7 @@ public class ThirdTypeCreateRequest {
     @NotNull(message = "Enterprise ID not be empty") 
     private String entId;
 
-    private long thirdTypeId;
+    private Long thirdTypeId;
 
     @NotNull(message = "Enterprise ThirdTypeName not be empty") 
     private String thirdTypeName;

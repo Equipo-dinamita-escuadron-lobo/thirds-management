@@ -6,30 +6,39 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-/**
- * Clase de servicio para actualizar un tercero.
- * Implementa la interfaz {@link UpdateThirdUseCase}.
- * Utiliza {@link ThirdOutputPort} para las operaciones de persistencia y {@link ThirdEventPublisher}
- * para publicar el evento. 
- * Este servicio proporciona un método para actualizar un tercero. 
- * Después de actualizar el tercero, publica un evento de actualización de tercero. 
- */
-@AllArgsConstructor
-public class UpdateThirdService implements UpdateThirdUseCase{
+@Service
+@RequiredArgsConstructor
+public class UpdateThirdService implements UpdateThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
     private final ThirdEventPublisher thirdEventPublisher;
 
+    /**
+     * Actualiza un tercero existente en el sistema.
+     * 
+     * @param third el tercero con los datos actualizados
+     * @return el tercero actualizado
+     * @throws IllegalArgumentException si el tercero es null o no tiene ID válido
+     */
     @Override
     public Third updateThird(Third third) {
+        if (third == null) {
+            throw new IllegalArgumentException("El tercero no puede ser null");
+        }
         
-        Third result = thirdOutputPort.updateThird(third);
-         thirdEventPublisher.publishThirdUpdateEvent(new ThirdUpdateEvent(third.getThId()));
+        if (third.getThId() == null) {
+            throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
+        }
+        
+        // Actualizar el tercero
+        Third updatedThird = thirdOutputPort.updateThird(third);
+        
+        // Publicar evento de actualización
+        thirdEventPublisher.publishThirdUpdateEvent(new ThirdUpdateEvent(updatedThird.getThId()));
 
-        return result;
+        return updatedThird;
     }
-    
-    
 }

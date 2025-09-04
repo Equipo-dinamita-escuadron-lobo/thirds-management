@@ -10,14 +10,3 @@ INSERT INTO type_id (ti_id, ti_name, ti_entid) VALUES
 ('Número de Identificación Tributaria', 'Número de Identificación Tributaria','standart'),
 ('Pasaporte', 'Pasaporte','standart'),
 ('Tarjeta de Identidad', 'Tarjeta de Identidad','standart');
-INSERT INTO tooltip (ent_Id, tip) VALUES
-('1', 'Cuadro ayuda uno'),
-('2', 'Cuadro ayuda dos'),
-('3', 'Cuadro ayuda tres'),
-('4', 'Cuadro ayuda cuatro'),
-('5', 'Cuadro ayuda cinco'),
-('6', 'Cuadro ayuda seis'),
-('7', 'Cuadro ayuda siete'),
-('8', 'Cuadro ayuda ocho'),
-('9', 'Cuadro ayuda nueve'),
-('10', 'Cuadro ayuda diez');

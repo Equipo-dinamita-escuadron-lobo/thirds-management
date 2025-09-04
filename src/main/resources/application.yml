@@ -6,21 +6,6 @@ spring:
     active:
     - ${PROFILE:dev}
 
-  jpa:
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-
-springdoc:
-    swagger-ui:
-      path: ${SWAGGER_PATH:/swagger-ui.html}
-
-server:
-  error:
-    include-stacktrace: never
-
 logging:
   level:
     org:

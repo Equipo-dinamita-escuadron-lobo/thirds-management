@@ -1,48 +1,62 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.identifiers.ThirdsAndTypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLOutput;
-
-/**
- * Clase de servicio para eliminar un tipo de tercero.
- * Implementa la interfaz {@link DeleteThirdTypeUseCase}.
- * Utiliza {@link ThirdTypeRepository} y {@link ThirdsAndTypesRepository} para las operaciones de persistencia. 
- * Este servicio proporciona un método para eliminar un tercer tipo por su ID. 
- * Primero comprueba si el tipo de tercero está siendo utilizado por un tercero.
- * Si se está utilizando el tipo de tercero, devuelve una respuesta de error.
- * Si no se utiliza el tipo de tercero, elimina el tipo de tercero y devuelve una respuesta correcta. 
- */
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class DeleteTypeThirdService implements DeleteThirdTypeUseCase {
 
     private final ThirdTypeRepository thirdTypeRepository;
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
-    //lo que creo nuevo
 
+    /**
+     * Elimina un tipo de tercero del sistema.
+     * 
+     * Verifica primero si el tipo de tercero está siendo utilizado por algún tercero
+     * antes de proceder con la eliminación para mantener la integridad referencial.
+     * 
+     * @param entId el ID del tipo de tercero a eliminar
+     * @return ResponseEntity con el resultado de la operación
+     * @throws IllegalArgumentException si el ID es null o inválido
+     */
     @Override
     @Transactional
     public ResponseEntity<String> deleteThirdTypeUseCase(Long entId) {
+        if (entId == null || entId <= 0) {
+            throw new IllegalArgumentException("El ID del tipo de tercero debe ser válido y mayor que 0");
+        }
 
-        //esto tambien lo hice
-
-        // Verificar si el tipo de tercero está siendo usado
-        boolean isUsed = thirdsAndTypesRepository.existsByThirdType_TtId(entId);
-
+        // Verificar si el tipo de tercero está siendo utilizado
+        boolean isUsed = thirdsAndTypesRepository.existsByTtId(entId);
 
         if (isUsed) {
-
-            return ResponseEntity.ok("error");
-        } else {
-            thirdTypeRepository.deleteById(entId);
-            return ResponseEntity.ok("success");
+            return ResponseEntity.badRequest()
+                    .body("No se puede eliminar el tipo de tercero porque está siendo utilizado");
         }
-       
+        
+        try {
+            // Verificar si el registro existe antes de intentar eliminarlo
+            if (!thirdTypeRepository.existsById(entId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("El tipo de tercero con ID " + entId + " no existe");
+            }
+
+            // Eliminar todas las relaciones con terceros antes de eliminar el tipo
+            thirdsAndTypesRepository.deleteByTtId(entId);
+
+            // Eliminar el tipo de tercero
+            thirdTypeRepository.deleteById(entId);
+            return ResponseEntity.ok("Tipo de tercero eliminado exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("Error interno al eliminar el tipo de tercero: " + e.getMessage());
+        }
     }
 }

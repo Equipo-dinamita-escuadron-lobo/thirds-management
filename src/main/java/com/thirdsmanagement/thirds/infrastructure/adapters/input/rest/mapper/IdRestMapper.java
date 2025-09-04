@@ -9,8 +9,9 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 
 /**
  * Interfaz Mapper para mapear los objetos de entrada y salida de los tipos de terceros y los tipos de identificación.
+ * Utiliza MapStruct para generar automáticamente las implementaciones de mapeo.
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface IdRestMapper {
     /**
      * Método para mapear un objeto de tipo {@link ThirdType} a un objeto de tipo {@link ThirdTypeCreateRequest}.
@@ -38,5 +39,8 @@ public interface IdRestMapper {
      * @param typeIdCreateRequest Objeto de tipo {@link TypeIdCreateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
+    @org.mapstruct.Mapping(target = "typeIdname", source = "typeIdname")
+    @org.mapstruct.Mapping(target = "entId", source = "entId")
+    @org.mapstruct.Mapping(target = "typeId", source = "typeId")
     TypeId toTypeId(TypeIdCreateRequest typeIdCreateRequest);
 } 

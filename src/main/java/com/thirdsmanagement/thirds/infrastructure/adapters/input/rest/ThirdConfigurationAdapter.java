@@ -22,11 +22,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -49,10 +44,6 @@ public class ThirdConfigurationAdapter {
 
     private final IdRestMapper idRestMapper;
 
-    @Operation(summary = "Crear un Tipo De Tercero", description = "Crea un Tipo de Tercero con los parámetros obligatorios", responses = {
-            @ApiResponse(responseCode = "201", description = "Tipo de tercero creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThirdType.class))),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta debido a datos de entrada inválidos", content = @Content(mediaType = "application/json"))
-    })
     @PostMapping("/thirdtype")
     public ResponseEntity<ThirdType> createThirdType(
             @RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest) {
@@ -63,10 +54,6 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(thirdType, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Obtiene los Tipos De Terceros", description = "Devuelve los Tipos de Terceros asociados a una Empresa", responses = {
-            @ApiResponse(responseCode = "200", description = "Lista de Tipos de Terceros obtenida exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ThirdType.class))),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta debido a un identificador de empresa inválido o vacío", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/thirdtype")
     public ResponseEntity<List<ThirdType>> getThirdType(
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
@@ -77,10 +64,6 @@ public class ThirdConfigurationAdapter {
 
     }
 
-    @Operation(summary = "Crear un Tipo De Identificación", description = "Crea un Tipo de Identificación con los parámetros obligatorios", responses = {
-            @ApiResponse(responseCode = "201", description = "Tipo de Identificación creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TypeId.class))),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta debido a parámetros inválidos", content = @Content(mediaType = "application/json"))
-    })
     @PostMapping("/typeid")
     public ResponseEntity<TypeId> createTypeId(@RequestBody @Valid TypeIdCreateRequest typeIdCreateRequest) {
         TypeId typeId = idRestMapper.toTypeId(typeIdCreateRequest);
@@ -89,10 +72,6 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(typeId, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Obtiene los Tipos De Identificación", description = "Devuelve los Tipos de Identificación asociados a una Empresa", responses = {
-            @ApiResponse(responseCode = "200", description = "Tipos de Identificación obtenidos exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TypeId.class))),
-            @ApiResponse(responseCode = "400", description = "Solicitud incorrecta debido a parámetros faltantes o inválidos", content = @Content(mediaType = "application/json"))
-    })
     @GetMapping("/typeid")
     public ResponseEntity<List<TypeId>> ListTypeId(
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
@@ -103,14 +82,8 @@ public class ThirdConfigurationAdapter {
     /**
      * Elimina un tipo de tercero.
      * @param entId Id del tipo de tercero a eliminar.
-     * @return Mensaje de éxito o error.
-     * @throws EntityNotFoundException Si el tipo de tercero no existe.
+     * @return ResponseEntity con el resultado de la operación y el mensaje correspondiente.
      */
-    @Operation(summary = "Elimina un tipo de tercero", description = "Elimina un tipo de tercero a partir del Id del tercero", responses = {
-            @ApiResponse(responseCode = "200", description = "El tipo de tercero fue eliminado exitosamente", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Error en la solicitud o en la eliminación del tipo de tercero", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "404", description = "Tipo de tercero no encontrado", content = @Content(mediaType = "application/json"))
-    })
     @DeleteMapping("/{entId}")
     public ResponseEntity<String> deleteThird(
             @NotNull(message = "Enterprise ID must not be empty") @PathVariable Long entId) {
@@ -118,20 +91,13 @@ public class ThirdConfigurationAdapter {
         try {
             ResponseEntity<String> response = deleteThirdTypeUseCase.deleteThirdTypeUseCase(entId);
 
-            // Evaluamos el resultado que retorna tu método
-            if (response.getBody().equals("success")) {
-                String successMessage = "SUCCESS";
-                return ResponseEntity.ok(successMessage);
-            } else {
-                String errorMessage = "ERROR";
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-            }
+            // Retornamos la respuesta tal como viene del servicio, que ya incluye el código HTTP correcto
+            return response;
 
-        } catch (EntityNotFoundException e) {
-            String notFoundMessage = "El tipo de tercero con ID: " + entId + " no fue encontrado.";
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(notFoundMessage);
-
+        } catch (Exception e) {
+            // Manejar cualquier excepción no controlada
+            String errorMessage = "Error interno al procesar la solicitud: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
         }
-
     }
 }

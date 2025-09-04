@@ -2,29 +2,33 @@ package com.thirdsmanagement.thirds.application.service;
 
 import java.util.List;
 
-import org.hibernate.bytecode.internal.bytebuddy.PrivateAccessorException;
-
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-/**
- * Clase de servicio para listar los tipos de identificación.
- * Implementa la interfaz {@link ListTypeIdUseCase}.
- * Utiliza {@link IdOutputPort} para las operaciones de persistencia. 
- * Este servicio proporciona un método para listar todos los tipos de identificación. 
- */
-@AllArgsConstructor
+@Service
+@RequiredArgsConstructor
 public class ListTypeIdService implements ListTypeIdUseCase {
 
     private final IdOutputPort idOutputPort;
 
+    /**
+     * Obtiene todos los tipos de identificación para una empresa específica.
+     * 
+     * @param entId el ID de la empresa
+     * @return lista de tipos de identificación disponibles
+     * @throws IllegalArgumentException si el ID de empresa es inválido
+     */
     @Override
     public List<TypeId> getAllTypeId(String entId) {
-        List<TypeId> result = idOutputPort.getAllTypeIds(entId);
-        return result;
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        
+        return idOutputPort.getAllTypeIds(entId);
     }
     
 }

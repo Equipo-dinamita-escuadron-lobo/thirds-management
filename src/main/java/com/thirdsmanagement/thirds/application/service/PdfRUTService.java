@@ -5,31 +5,33 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 
-/**
- * Clase de servicio para extraer contenido de un archivo PDF de RUT.
- * Implementa la interfaz {@link PdfRUTContent}.
- * Este servicio proporciona un método para extraer el contenido de un archivo PDF de RUT.
- * Utiliza la librería Apache PDFBox para extraer el texto del archivo PDF.
- * El contenido extraído se procesa para obtener la información de un tercero.
- * La información extraída se devuelve en un objeto {@link PdfRUTContentOutput}.
- * Si no se puede extraer la información, se devuelve un objeto vacío.
- * Si ocurre un error al procesar el contenido, se imprime un mensaje de error.
- * Siempre se elimina el archivo temporal después de extraer el contenido.
- */
 @Service
 public class PdfRUTService {
+    
+    private static final Logger logger = LoggerFactory.getLogger(PdfRUTService.class);
     /**
      * Extrae el contenido de un archivo PDF de RUT.
-     * @param request Objeto con la información del archivo PDF.
-     * @return Objeto con la información extraída del archivo PDF.
-     * @throws IOException Si ocurre un error al cargar el archivo PDF.
+     * 
+     * @param request objeto con la información del archivo PDF
+     * @return objeto con la información extraída del archivo PDF
+     * @throws IOException si ocurre un error al cargar el archivo PDF
+     * @throws IllegalArgumentException si el request es null o el archivo es inválido
      */
     public PdfRUTContentOutput extractContent(PdfRUTContent request) throws IOException {
+        if (request == null) {
+            throw new IllegalArgumentException("El request no puede ser null");
+        }
+        
+        if (request.getFile() == null || request.getFile().isEmpty()) {
+            throw new IllegalArgumentException("El archivo PDF no puede ser null o vacío");
+        }
         File tempFile = File.createTempFile("upload", ".pdf");
 
         // Transferir el archivo recibido a un archivo temporal
@@ -86,23 +88,23 @@ public class PdfRUTService {
                 correo = extractedUbication[2];
                 String [] contact = separateAndJoinNumbers(extractedUbication[3]);
                 cell = Long.parseLong(contact[1]);
-                System.out.println("Tipo de persona: "+typePerson);
-                System.out.println("Tipo de identifiacion: "+ typeId);
-                System.out.println("Numero Identificacion: "+ idPerson);
-                System.out.println("Razon social: "+razonSocial);
-                System.out.println("Apellidos: "+lastNames);
-                System.out.println("Nombres: "+names);
-                System.out.println("Pais: "+pais);
-                System.out.println("Departamento: "+departamento);
-                System.out.println("Ciudad: "+ciudad);
-                System.out.println("Direccion: "+direccion);
-                System.out.println("Correo: "+correo);
-                System.out.println("Telefono: "+cell);
+                logger.debug("Información extraída del PDF RUT:");
+                logger.debug("Tipo de persona: {}", typePerson);
+                logger.debug("Tipo de identificación: {}", typeId);
+                logger.debug("Número identificación: {}", idPerson);
+                logger.debug("Razón social: {}", razonSocial);
+                logger.debug("Apellidos: {}", lastNames);
+                logger.debug("Nombres: {}", names);
+                logger.debug("País: {}", pais);
+                logger.debug("Departamento: {}", departamento);
+                logger.debug("Ciudad: {}", ciudad);
+                logger.debug("Dirección: {}", direccion);
+                logger.debug("Correo: {}", correo);
+                logger.debug("Teléfono: {}", cell);
                 String infoThird = typePerson+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
                 return new PdfRUTContentOutput(infoThird);
-            }catch(Exception e){
-                System.err.println("Error processing PDF content: " + e.getMessage());
-                e.printStackTrace();
+            } catch(Exception e) {
+                logger.error("Error procesando el contenido del PDF: {}", e.getMessage(), e);
             }
             String infoThird = ""+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
             return new PdfRUTContentOutput(infoThird);

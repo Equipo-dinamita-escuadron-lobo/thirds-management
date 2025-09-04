@@ -15,15 +15,21 @@ import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdsAndTypesEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.ThirdPersistenceMapper;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de persistencia para la entidad Third.
@@ -32,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los terceros.
  */
+@Component
 @RequiredArgsConstructor
 public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @PersistenceContext
@@ -40,6 +47,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
     private final TypeIdRepository typeIdRepository;
+    private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final ThirdPersistenceMapper thirdPersistenceMapper;
 
     /**
@@ -49,24 +57,60 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Third saveThird(Third third) {
+        if (third == null) {
+            throw new IllegalArgumentException("El tercero no puede ser null");
+        }
+
+        if (third.getTypeId() == null || third.getTypeId().getTypeId() == null) {
+            throw new IllegalArgumentException("El tipo de identificación del tercero no puede ser null");
+        }
 
         ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
 
-        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeIdname());
+        // Asignar tenant ID del contexto actual
+        thirdEntity.setTenantId(TenantContext.getTenantId());
 
-        List<ThirdTypeEntity> thirdTypeEntities = thirdTypeRepository.findAll();
-
-        if(typeIdEntity != null){
-            for(ThirdType tt : third.getThirdTypes()){
-                for(ThirdTypeEntity tte : thirdTypeEntities){
-                    if(tte.getTtName().equals(tt.getThirdTypeName())){
-                        thirdEntity.getThirdTypes().add(tte);
-                    }
-                }
-            }
-            thirdEntity = thirdRepository.save(thirdEntity);
+        // Obtener y validar la referencia del tipo de identificación
+        TypeIdEntity typeIdEntity;
+        try {
+            typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
+        } catch (EntityNotFoundException e) {
+            throw new TypeIdForeignKeyViolationException(third.getTypeId().getTypeId(), e);
         }
 
+        // Asignar el tipo de identificación a la entidad
+        thirdEntity.setTypeId(typeIdEntity);
+
+        // Guardar primero la entidad del tercero para obtener el ID
+        thirdEntity = thirdRepository.save(thirdEntity);
+
+        // Procesar y validar los tipos de tercero usando la entidad intermedia
+        if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
+            for (ThirdType tt : third.getThirdTypes()) {
+                try {
+                    // Verificar que el tipo de tercero existe
+                    if (!thirdTypeRepository.existsById(tt.getThirdTypeId())) {
+                        throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()));
+                    }
+
+                    // Crear la entidad intermedia con el tenant_id correcto
+                    ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                            .thId(thirdEntity.getThId())
+                            .ttId(tt.getThirdTypeId())
+                            .tenantId(TenantContext.getTenantId())
+                            .build();
+
+                    thirdsAndTypesRepository.save(relationEntity);
+
+                } catch (Exception e) {
+                    // Si hay error, limpiar el tercero que ya se guardó
+                    thirdRepository.deleteById(thirdEntity.getThId());
+                    throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()), e);
+                }
+            }
+        }
+
+        // Convertir de vuelta al dominio
         Third result = thirdPersistenceMapper.toThird(thirdEntity);
 
         return result;
@@ -112,14 +156,15 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         ThirdEntity entity = thirdEntity.get();
-        String state = "";
+        String newState = "";
 
         if(entity.getState().equals("true")){
-            state="false";
+            newState = "false";
         }else{
-            state="true";
+            newState = "true";
         }
 
+        entity.setState(newState);
         thirdRepository.save(entity);
 
         return true;

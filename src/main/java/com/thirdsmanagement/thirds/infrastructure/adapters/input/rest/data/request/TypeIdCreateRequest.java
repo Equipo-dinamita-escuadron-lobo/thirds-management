@@ -9,6 +9,7 @@ import lombok.Setter;
 
 /**
  * Clase que representa la petición de creación de un tipo de identificación.
+ * Contiene la información necesaria para crear un nuevo tipo de identificación en el sistema.
  */
 @Builder
 @Getter
@@ -16,9 +17,29 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TypeIdCreateRequest {
-    @NotNull(message = "Enterprise ID not be empty") 
+
+    /**
+     * Identificador de la empresa a la que pertenece el tipo de identificación.
+     * Campo obligatorio para segmentar los tipos por empresa.
+     */
+    @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
+
+    /**
+     * Código único del tipo de identificación (ej: CC, NIT, CE).
+     * Campo obligatorio que debe contener solo letras mayúsculas y números.
+     */
+    @NotNull(message = "El código del tipo de identificación no puede estar vacío")
+    @jakarta.validation.constraints.Pattern(
+        regexp = "^[A-Z0-9]{2,10}$",
+        message = "El código debe contener solo letras mayúsculas y números, entre 2 y 10 caracteres"
+    )
     private String typeId;
-    @NotNull(message = "TypeIdName not be empty") 
+
+    /**
+     * Nombre descriptivo del tipo de identificación.
+     * Campo obligatorio que describe el tipo (ej: Cédula de Ciudadanía).
+     */
+    @NotNull(message = "El nombre del tipo de identificación no puede estar vacío")
     private String typeIdname;
 }

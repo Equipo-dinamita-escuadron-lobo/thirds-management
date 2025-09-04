@@ -1,7 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.interceptor;
 
-
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.util.TenantContext;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 import com.thirdsmanagement.thirds.infrastructure.adapters.security.IJwtUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,30 +10,42 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 
 /**
- * Clase que representa el interceptor de inquilino.
- * Contiene los métodos para interceptar las peticiones.
+ * Interceptor para manejar el contexto de inquilino (tenant) basado en JWT.
+ * Este interceptor establece el ID del inquilino en el contexto para cada solicitud.
  */
 @Component
 public class TenantInterceptor implements WebRequestInterceptor {
-    /**
-     * Utilidades de JWT.
-     */
+
     @Autowired
     private IJwtUtils jwtUtils;
 
     /**
-     * Método para interceptar la petición antes de ser manejada.
-     * @param request Petición web.
+     * Pre-manipulación de la solicitud para establecer el ID del inquilino en el contexto.
+     * Si no hay JWT disponible, usa el tenant por defecto.
+     * @param request Objeto WebRequest que representa la solicitud actual.
+     * @throws Exception Si ocurre algún error durante la manipulación de la solicitud.
      */
     @Override
     public void preHandle(WebRequest request) throws Exception {
-        TenantContext.setTenantId(jwtUtils.getId());
+        try {
+            String tenantId = jwtUtils.getId();
+            if (tenantId != null && !tenantId.trim().isEmpty()) {
+                TenantContext.setTenantId(tenantId);
+            } else {
+                // Usar tenant por defecto si no hay JWT disponible
+                TenantContext.setTenantId("default");
+            }
+        } catch (Exception e) {
+            // En caso de error, usar tenant por defecto
+            TenantContext.setTenantId("default");
+        }
     }
 
     /**
-     * Método para interceptar la petición después de ser manejada.
-     * @param request Petición web.
-     * @param model Modelo.
+     * Manipulación posterior a la solicitud para limpiar el contexto del inquilino.
+     * @param request Objeto WebRequest que representa la solicitud actual.
+     * @param model Modelo de datos asociado con la solicitud.
+     * @throws Exception Si ocurre algún error durante la manipulación posterior a la solicitud.
      */
     @Override
     public void postHandle(WebRequest request, ModelMap model) throws Exception {
@@ -42,12 +53,13 @@ public class TenantInterceptor implements WebRequestInterceptor {
     }
 
     /**
-     * Método para interceptar la petición después de ser completada.
-     * @param request Petición web.
-     * @param ex Excepción.
+     * Método llamado después de completar la solicitud, no realiza ninguna acción en este caso.
+     * @param request Objeto WebRequest que representa la solicitud actual.
+     * @param ex Excepción que puede haber ocurrido durante la solicitud, o nulo si no hay excepción.
+     * @throws Exception Si ocurre algún error después de completar la solicitud.
      */
     @Override
     public void afterCompletion(WebRequest request, Exception ex) throws Exception {
-
+        // No se realiza ninguna acción en este método para este interceptor.
     }
 }

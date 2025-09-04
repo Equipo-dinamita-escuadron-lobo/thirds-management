@@ -1,5 +1,4 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
@@ -11,10 +10,12 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.ma
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de persistencia para la entidad Id.
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
  * Utiliza {@link IdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos de identificación.
  */
+@Component
 @RequiredArgsConstructor
 public class IdPersistenceAdapter implements IdOutputPort {
     /**
@@ -33,7 +35,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Repositorio de terceros.
+     * Nota: Actualmente no se utiliza en este adaptador, pero se mantiene
+     * por compatibilidad futura con la arquitectura hexagonal.
      */
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
 
     /**
@@ -58,11 +63,14 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public ThirdType saveThirdType(ThirdType thirdType) {
-        ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdType(thirdType);
-        thirdTypeRepository.save(thirdTypeEntity);
-        ThirdType result = idPersistenceMapper.toThirdTypeEntity(thirdTypeEntity);
-        return result;
+        ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdTypeEntity(thirdType);
 
+        // Asignar tenant ID del contexto actual
+        thirdTypeEntity.setTenantId(TenantContext.getTenantId());
+
+        thirdTypeRepository.save(thirdTypeEntity);
+        ThirdType result = idPersistenceMapper.toThirdType(thirdTypeEntity);
+        return result;
     }
 
     /**
@@ -72,7 +80,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public List<ThirdType> getALLThirdTypes(String entId) {
-        return idPersistenceMapper.toThirdTypeEntitys(thirdTypeRepository.findAllByTtentId(entId));
+        return idPersistenceMapper.toThirdTypeList(thirdTypeRepository.findAllByTtentId(entId));
     }
 
     /**
@@ -82,10 +90,27 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public TypeId saveTypeId(TypeId typeId) {
-       TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeId(typeId);
-       typeIdRepository.save(typeIdEntity);
-       TypeId result = idPersistenceMapper.toTypeIdEntity(typeIdEntity);
-       return result;
+        if (typeId == null) {
+            throw new IllegalArgumentException("El tipo de identificación no puede ser null");
+        }
+
+        if (typeId.getTypeId() == null || typeId.getTypeId().trim().isEmpty()) {
+            throw new IllegalArgumentException("El código del tipo de identificación no puede estar vacío");
+        }
+
+        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(typeId);
+
+        // Asignar tenant ID del contexto actual
+        typeIdEntity.setTenantId(TenantContext.getTenantId());
+
+        // Asegurar que el ID de la entidad se asigna correctamente
+        if (typeIdEntity.getTiId() == null) {
+            typeIdEntity.setTiId(typeId.getTypeId().toUpperCase());
+        }
+
+        typeIdRepository.save(typeIdEntity);
+        TypeId result = idPersistenceMapper.toTypeId(typeIdEntity);
+        return result;
     }
 
     /**
@@ -95,8 +120,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public List<TypeId> getAllTypeIds(String entId) {
-        return idPersistenceMapper.toTypeIdEntititys(typeIdRepository.findAllByTientId(entId));
-       
+        return idPersistenceMapper.toTypeIdList(typeIdRepository.findAllByTientId(entId));
     }
     
 }
