@@ -36,4 +36,11 @@ public interface IdOutputPort {
      * @return La lista de tipos de identificacion
      */
     List<TypeId> getAllTypeIds(String entId);
+    
+    /**
+     * Actualiza un tipo de identificacion.
+     * @param typeId El tipo de identificacion a actualizar
+     * @return El tipo de identificacion actualizado
+     */
+    TypeId updateTypeId(TypeId typeId);
 }

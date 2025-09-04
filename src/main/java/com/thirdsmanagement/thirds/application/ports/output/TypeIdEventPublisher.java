@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
-public interface TypeIdEventPublisher {
+import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
-    
+public interface TypeIdEventPublisher {
+    void publishTypeIdCreatedEvent(TypeIdCreatedEvent event);
 } 

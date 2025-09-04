@@ -16,10 +16,12 @@ import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.UpdateTypeIdUseCase;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
 import jakarta.validation.Valid;
@@ -40,6 +42,7 @@ public class ThirdConfigurationAdapter {
     private final ListThirdTypeUseCase listThirdTypeUseCase;
     private final CreateTypeIdUseCase createTypeIdUseCase;
     private final ListTypeIdUseCase listTypeIdUseCase;
+    private final UpdateTypeIdUseCase updateTypeIdUseCase;
     private final DeleteThirdTypeUseCase deleteThirdTypeUseCase;
 
     private final IdRestMapper idRestMapper;
@@ -77,6 +80,14 @@ public class ThirdConfigurationAdapter {
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
         List<TypeId> typeIds = listTypeIdUseCase.getAllTypeId(entId);
         return new ResponseEntity<>(typeIds, HttpStatus.OK);
+    }
+
+    @PostMapping("/typeid/update")
+    public ResponseEntity<TypeId> updateTypeId(@RequestBody @Valid TypeIdUpdateRequest typeIdUpdateRequest) {
+        TypeId typeId = idRestMapper.toTypeId(typeIdUpdateRequest);
+        typeId = updateTypeIdUseCase.updateTypeId(typeId);
+
+        return new ResponseEntity<>(typeId, HttpStatus.OK);
     }
 
     /**

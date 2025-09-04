@@ -1,13 +1,18 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
+
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.domain.model.ThirdType;
-import com.thirdsmanagement.thirds.domain.model.TypeId;
-import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdAlreadyExists;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNameAlreadyExistsException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNotFound;
+import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.IdPersistenceMapper;
@@ -19,7 +24,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mu
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 /**
  * Clase adaptador de persistencia para la entidad Id.
@@ -92,7 +96,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
         
-        // Validar que no exista un typeId duplicado
         if (typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
             throw new TypeIdAlreadyExists("Ya existe un tipo de identificación con el código '" + normalizedTypeId + "'");
         }
@@ -102,10 +105,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
             throw new TypeIdNameAlreadyExistsException(typeId.getTypeIdname());
         }
         
+        // Crear el modelo normalizado para guardar
         TypeId normalizedTypeIdModel = TypeId.builder()
                 .typeId(normalizedTypeId)
                 .typeIdname(normalizedTypeIdName)
                 .entId(typeId.getEntId())
+                .status(typeId.getStatus())
                 .build();
 
         TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);
@@ -130,6 +135,66 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @Override
     public List<TypeId> getAllTypeIds(String entId) {
         return idPersistenceMapper.toTypeIdList(typeIdRepository.findAllByTientId(entId));
+    }
+
+    /**
+     * Actualiza un tipo de identificación.
+     * @param typeId Tipo de identificación a actualizar.
+     * @return Tipo de identificación actualizado.
+     */
+    @Override
+    public TypeId updateTypeId(TypeId typeId) {
+        if (typeId == null) {
+            throw new TypeIdInvalidDataException("El tipo de identificación no puede ser null");
+        }
+
+        if (typeId.getTypeId() == null || typeId.getTypeId().trim().isEmpty()) {
+            throw new TypeIdInvalidDataException("El código del tipo de identificación no puede estar vacío");
+        }
+
+        if (typeId.getTypeIdname() == null || typeId.getTypeIdname().trim().isEmpty()) {
+            throw new TypeIdInvalidDataException("El nombre del tipo de identificación no puede estar vacío");
+        }
+
+        // Normalizar valores para validaciones
+        String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
+        String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
+        
+        // Verificar que el tipo de identificación existe
+        Optional<TypeIdEntity> existingEntity = typeIdRepository.findById(normalizedTypeId);
+        if (existingEntity.isEmpty()) {
+            throw new TypeIdNotFound("No se encontró el tipo de identificación con código '" + normalizedTypeId + "'");
+        }
+
+        TypeIdEntity currentEntity = existingEntity.get();
+        
+        // Validar que pertenece a la misma entidad
+        if (!currentEntity.getTientId().equals(typeId.getEntId())) {
+            throw new TypeIdInvalidDataException("El tipo de identificación no pertenece a la entidad especificada");
+        }
+
+        // Validar que no exista otro typeIdname similar (case-insensitive) excluyendo el actual
+        if (!currentEntity.getTiName().equalsIgnoreCase(normalizedTypeIdName) &&
+            typeIdRepository.existsByTiNameIgnoreCaseAndTientId(normalizedTypeIdName, typeId.getEntId())) {
+            throw new TypeIdNameAlreadyExistsException(typeId.getTypeIdname());
+        }
+
+        // Crear el modelo normalizado para actualizar
+        TypeId normalizedTypeIdModel = TypeId.builder()
+                .typeId(normalizedTypeId)
+                .typeIdname(normalizedTypeIdName)
+                .entId(typeId.getEntId())
+                .status(typeId.getStatus())
+                .build();
+
+        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);
+        
+        // Preservar datos de auditoría
+        typeIdEntity.setTenantId(currentEntity.getTenantId());
+        typeIdEntity.setCreationDate(currentEntity.getCreationDate());
+
+        typeIdRepository.save(typeIdEntity);
+        return idPersistenceMapper.toTypeId(typeIdEntity);
     }
     
 }

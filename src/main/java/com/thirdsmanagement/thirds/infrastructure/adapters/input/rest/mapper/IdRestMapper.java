@@ -6,6 +6,7 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
 
 /**
  * Interfaz Mapper para mapear los objetos de entrada y salida de los tipos de terceros y los tipos de identificación.
@@ -43,4 +44,15 @@ public interface IdRestMapper {
     @org.mapstruct.Mapping(target = "entId", source = "entId")
     @org.mapstruct.Mapping(target = "typeId", source = "typeId")
     TypeId toTypeId(TypeIdCreateRequest typeIdCreateRequest);
+
+    /**
+     * Método para mapear un objeto de tipo {@link TypeIdUpdateRequest} a un objeto de tipo {@link TypeId}.
+     * @param typeIdUpdateRequest Objeto de tipo {@link TypeIdUpdateRequest}.
+     * @return Objeto de tipo {@link TypeId}.
+     */
+    @org.mapstruct.Mapping(target = "typeIdname", source = "typeIdname")
+    @org.mapstruct.Mapping(target = "entId", source = "entId")
+    @org.mapstruct.Mapping(target = "typeId", source = "typeId")
+    @org.mapstruct.Mapping(target = "status", source = "status")
+    TypeId toTypeId(TypeIdUpdateRequest typeIdUpdateRequest);
 } 
