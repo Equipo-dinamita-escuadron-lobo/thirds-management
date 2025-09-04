@@ -110,7 +110,14 @@ public class ThirdStateUpdateEvent {
      * @throws IllegalArgumentException si el ID del tercero es null
      */
     public ThirdStateUpdateEvent(Long thId) {
-        this(thId, null, null, null, null);
+        if (thId == null) {
+            throw new IllegalArgumentException("El ID del tercero no puede ser null");
+        }
+        
+        this.eventId = UUID.randomUUID().toString();
+        this.thId = thId;
+        this.date = LocalDateTime.now();
+        // No validamos newState como null en este constructor simplificado
     }
 
     /**

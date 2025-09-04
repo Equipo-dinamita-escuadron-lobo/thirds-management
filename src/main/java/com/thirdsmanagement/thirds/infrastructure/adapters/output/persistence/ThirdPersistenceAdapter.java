@@ -165,11 +165,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         ThirdEntity entity = thirdEntity.get();
-        String newState = "";
+        String currentState = entity.getState();
+        String newState;
 
-        if(entity.getState().equals("true")){
+        if("true".equals(currentState)){
             newState = "false";
-        }else{
+        } else {
             newState = "true";
         }
 
