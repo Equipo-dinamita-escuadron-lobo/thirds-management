@@ -43,4 +43,11 @@ public interface IdOutputPort {
      * @return El tipo de identificacion actualizado
      */
     TypeId updateTypeId(TypeId typeId);
+    
+    /**
+     * Actualiza un tipo de tercero.
+     * @param thirdType El tipo de tercero a actualizar
+     * @return El tipo de tercero actualizado
+     */
+    ThirdType updateThirdType(ThirdType thirdType);
 }

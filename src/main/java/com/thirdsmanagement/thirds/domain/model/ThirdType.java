@@ -55,6 +55,13 @@ public class ThirdType {
     private String thirdTypeName;
 
     /**
+     * Estado del tipo de tercero.
+     * true = activo, false = inactivo
+     */
+    @Builder.Default
+    private Boolean status = true;
+
+    /**
      * Verifica si el tipo de tercero es de tipo cliente.
      *
      * @return true si es un tipo cliente

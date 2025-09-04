@@ -23,5 +23,11 @@ public class ThirdTypeCreateRequest {
 
     @NotNull(message = "Enterprise ThirdTypeName not be empty") 
     private String thirdTypeName;
-    
+
+    /**
+     * Estado del tipo de tercero.
+     * true = activo, false = inactivo
+     */
+    @Builder.Default
+    private Boolean status = true;
 }

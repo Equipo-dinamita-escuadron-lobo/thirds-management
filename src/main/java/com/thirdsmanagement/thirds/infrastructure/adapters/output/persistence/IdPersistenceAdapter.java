@@ -10,6 +10,9 @@ import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdAlreadyExists;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNameAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNotFound;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNameAlreadyExistsException;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNotFound;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
@@ -196,5 +199,62 @@ public class IdPersistenceAdapter implements IdOutputPort {
         typeIdRepository.save(typeIdEntity);
         return idPersistenceMapper.toTypeId(typeIdEntity);
     }
-    
+
+    /**
+     * Actualiza un tipo de tercero.
+     * @param thirdType Tipo de tercero a actualizar.
+     * @return Tipo de tercero actualizado.
+     */
+    @Override
+    public ThirdType updateThirdType(ThirdType thirdType) {
+        if (thirdType == null) {
+            throw new ThirdTypeInvalidDataException("El tipo de tercero no puede ser null");
+        }
+
+        if (thirdType.getThirdTypeId() == null) {
+            throw new ThirdTypeInvalidDataException("El ID del tipo de tercero no puede ser null");
+        }
+
+        if (thirdType.getThirdTypeName() == null || thirdType.getThirdTypeName().trim().isEmpty()) {
+            throw new ThirdTypeInvalidDataException("El nombre del tipo de tercero no puede estar vacío");
+        }
+
+        // Normalizar el nombre para validaciones
+        String normalizedThirdTypeName = StringNormalizer.normalizePreservingCase(thirdType.getThirdTypeName());
+        
+        // Verificar que el tipo de tercero existe
+        Optional<ThirdTypeEntity> existingEntity = thirdTypeRepository.findById(thirdType.getThirdTypeId());
+        if (existingEntity.isEmpty()) {
+            throw new ThirdTypeNotFound("No se encontró el tipo de tercero con ID '" + thirdType.getThirdTypeId() + "'");
+        }
+
+        ThirdTypeEntity currentEntity = existingEntity.get();
+        
+        // Validar que pertenece a la misma entidad
+        if (!currentEntity.getTtentId().equals(thirdType.getEntId())) {
+            throw new ThirdTypeInvalidDataException("El tipo de tercero no pertenece a la entidad especificada");
+        }
+
+        // Validar que no exista otro thirdTypeName similar (case-insensitive) excluyendo el actual
+        if (!currentEntity.getTtName().equalsIgnoreCase(normalizedThirdTypeName) &&
+            thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId(normalizedThirdTypeName, thirdType.getEntId())) {
+            throw new ThirdTypeNameAlreadyExistsException(thirdType.getThirdTypeName());
+        }
+
+        // Crear el modelo normalizado para actualizar
+        ThirdType normalizedThirdTypeModel = ThirdType.builder()
+                .thirdTypeId(thirdType.getThirdTypeId())
+                .thirdTypeName(normalizedThirdTypeName)
+                .entId(thirdType.getEntId())
+                .status(thirdType.getStatus())
+                .build();
+
+        ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdTypeEntity(normalizedThirdTypeModel);
+
+        thirdTypeEntity.setTenantId(currentEntity.getTenantId());
+        thirdTypeEntity.setCreationDate(currentEntity.getCreationDate());
+
+        thirdTypeRepository.save(thirdTypeEntity);
+        return idPersistenceMapper.toThirdType(thirdTypeEntity);
+    }
 }

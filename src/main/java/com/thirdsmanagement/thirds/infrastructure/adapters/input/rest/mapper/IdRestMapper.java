@@ -1,10 +1,12 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
 
@@ -26,6 +28,7 @@ public interface IdRestMapper {
      * @param thirdTypeCreateRequest Objeto de tipo {@link ThirdTypeCreateRequest}.
      * @return Objeto de tipo {@link ThirdType}.
      */
+    @Mapping(target = "status", defaultValue = "true")
     ThirdType toThirdType(ThirdTypeCreateRequest thirdTypeCreateRequest);
 
     /**
@@ -40,9 +43,9 @@ public interface IdRestMapper {
      * @param typeIdCreateRequest Objeto de tipo {@link TypeIdCreateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
-    @org.mapstruct.Mapping(target = "typeIdname", source = "typeIdname")
-    @org.mapstruct.Mapping(target = "entId", source = "entId")
-    @org.mapstruct.Mapping(target = "typeId", source = "typeId")
+    @Mapping(target = "typeIdname", source = "typeIdname")
+    @Mapping(target = "entId", source = "entId")
+    @Mapping(target = "typeId", source = "typeId")
     TypeId toTypeId(TypeIdCreateRequest typeIdCreateRequest);
 
     /**
@@ -50,9 +53,20 @@ public interface IdRestMapper {
      * @param typeIdUpdateRequest Objeto de tipo {@link TypeIdUpdateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
-    @org.mapstruct.Mapping(target = "typeIdname", source = "typeIdname")
-    @org.mapstruct.Mapping(target = "entId", source = "entId")
-    @org.mapstruct.Mapping(target = "typeId", source = "typeId")
-    @org.mapstruct.Mapping(target = "status", source = "status")
+    @Mapping(target = "typeIdname", source = "typeIdname")
+    @Mapping(target = "entId", source = "entId")
+    @Mapping(target = "typeId", source = "typeId")
+    @Mapping(target = "status", source = "status")
     TypeId toTypeId(TypeIdUpdateRequest typeIdUpdateRequest);
+
+    /**
+     * Método para mapear un objeto de tipo {@link ThirdTypeUpdateRequest} a un objeto de tipo {@link ThirdType}.
+     * @param thirdTypeUpdateRequest Objeto de tipo {@link ThirdTypeUpdateRequest}.
+     * @return Objeto de tipo {@link ThirdType}.
+     */
+    @Mapping(target = "thirdTypeName", source = "thirdTypeName")
+    @Mapping(target = "entId", source = "entId")
+    @Mapping(target = "thirdTypeId", source = "thirdTypeId")
+    @Mapping(target = "status", source = "status")
+    ThirdType toThirdType(ThirdTypeUpdateRequest thirdTypeUpdateRequest);
 } 

@@ -22,6 +22,16 @@ public class ThirdTypeCreatedEvent {
     private Long thirdTypeId;
 
     /**
+     * Nombre del tipo de tercero.
+     */
+    private String thirdTypeName;
+
+    /**
+     * ID de la entidad.
+     */
+    private String entId;
+
+    /**
      * Fecha de creación del tipo de tercero.
      */
     private LocalDateTime date;
