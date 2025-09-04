@@ -65,55 +65,65 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             throw new IllegalArgumentException("El tipo de identificación del tercero no puede ser null");
         }
 
-        ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
+        validateTypeIdExists(third.getTypeId().getTypeId());
+        validateThirdTypesExist(third.getThirdTypes());
 
-        // Asignar tenant ID del contexto actual
+        // Preparar la entidad principal
+        ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
         thirdEntity.setTenantId(TenantContext.getTenantId());
 
-        // Obtener y validar la referencia del tipo de identificación
-        TypeIdEntity typeIdEntity;
-        try {
-            typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
-        } catch (EntityNotFoundException e) {
-            throw new TypeIdForeignKeyViolationException(third.getTypeId().getTypeId(), e);
-        }
-
-        // Asignar el tipo de identificación a la entidad
+        // Obtener la referencia del tipo de identificación
+        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
         thirdEntity.setTypeId(typeIdEntity);
 
-        // Guardar primero la entidad del tercero para obtener el ID
-        thirdEntity = thirdRepository.save(thirdEntity);
+        // Guardar la entidad del tercero
+        try {
+            thirdEntity = thirdRepository.save(thirdEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw e;
+        }
 
-        // Procesar y validar los tipos de tercero usando la entidad intermedia
+        // Crear las relaciones con tipos de tercero
         if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
             for (ThirdType tt : third.getThirdTypes()) {
+                ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                        .thId(thirdEntity.getThId())
+                        .ttId(tt.getThirdTypeId())
+                        .tenantId(TenantContext.getTenantId())
+                        .build();
+
                 try {
-                    // Verificar que el tipo de tercero existe
-                    if (!thirdTypeRepository.existsById(tt.getThirdTypeId())) {
-                        throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()));
-                    }
-
-                    // Crear la entidad intermedia con el tenant_id correcto
-                    ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
-                            .thId(thirdEntity.getThId())
-                            .ttId(tt.getThirdTypeId())
-                            .tenantId(TenantContext.getTenantId())
-                            .build();
-
                     thirdsAndTypesRepository.save(relationEntity);
-
-                } catch (Exception e) {
-                    // Si hay error, limpiar el tercero que ya se guardó
-                    thirdRepository.deleteById(thirdEntity.getThId());
-                    throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()), e);
+                } catch (DataIntegrityViolationException e) {
+                    throw e;
                 }
             }
         }
 
         // Convertir de vuelta al dominio
-        Third result = thirdPersistenceMapper.toThird(thirdEntity);
+        return thirdPersistenceMapper.toThird(thirdEntity);
+    }
 
-        return result;
+    /**
+     * Valida que el tipo de identificación existe antes de proceder con el guardado.
+     */
+    private void validateTypeIdExists(String typeId) {
+        if (!typeIdRepository.existsById(typeId)) {
+            throw new TypeIdForeignKeyViolationException(typeId);
+        }
+    }
+
+    /**
+     * Valida que todos los tipos de tercero existen antes de proceder con el guardado.
+     */
+    private void validateThirdTypesExist(Set<ThirdType> thirdTypes) {
+        if (thirdTypes != null && !thirdTypes.isEmpty()) {
+            for (ThirdType tt : thirdTypes) {
+                if (!thirdTypeRepository.existsById(tt.getThirdTypeId())) {
+                    throw new ThirdTypeForeignKeyViolationException(String.valueOf(tt.getThirdTypeId()));
+                }
+            }
+        }
     }
 
     /**
@@ -134,7 +144,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
     @Override
     public boolean existThirdById(long id, String entId) {
-        System.out.println("Entrando a existThirdByID \n");
         boolean existe = false;
         existe = thirdRepository.existThirdBy(id,  entId);
 

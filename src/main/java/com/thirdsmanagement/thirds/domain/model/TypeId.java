@@ -1,7 +1,6 @@
 package com.thirdsmanagement.thirds.domain.model;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -38,10 +37,9 @@ public class TypeId {
 
     /**
      * Código único del tipo de identificación.
-     * Debe ser un código alfanumérico sin espacios.
+     * Será normalizado automáticamente antes del guardado usando StringNormalizer.
      */
     @NotBlank(message = "El código del tipo de identificación no puede estar vacío")
-    @Pattern(regexp = "^[A-Z0-9]{2,10}$", message = "El código debe contener solo letras mayúsculas y números, entre 2 y 10 caracteres")
     @Size(max = 10, message = "El código del tipo de identificación no puede exceder los 10 caracteres")
     private String typeId;
 
@@ -76,11 +74,11 @@ public class TypeId {
     }
 
     /**
-     * Obtiene una representación en mayúsculas del código del tipo de identificación.
+     * Obtiene una representación normalizada del código del tipo de identificación.
      *
-     * @return código en mayúsculas
+     * @return código normalizado
      */
     public String getNormalizedTypeId() {
-        return typeId != null ? typeId.toUpperCase() : null;
+        return com.thirdsmanagement.thirds.domain.utils.StringNormalizer.normalizeCode(typeId);
     }
 }

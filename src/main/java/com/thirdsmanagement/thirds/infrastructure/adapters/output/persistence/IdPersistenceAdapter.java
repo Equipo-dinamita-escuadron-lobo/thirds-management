@@ -4,6 +4,10 @@ import java.util.List;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdAlreadyExists;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNameAlreadyExistsException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.IdPersistenceMapper;
@@ -27,34 +31,16 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class IdPersistenceAdapter implements IdOutputPort {
-    /**
-     * Entity manager.
-     */
+    
     @PersistenceContext
     private EntityManager entityManager;
 
-    /**
-     * Repositorio de terceros.
-     * Nota: Actualmente no se utiliza en este adaptador, pero se mantiene
-     * por compatibilidad futura con la arquitectura hexagonal.
-     */
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
-
-    /**
-     * Repositorio de tipos de terceros.
-     */
     private final ThirdTypeRepository thirdTypeRepository;
-
-    /**
-     * Repositorio de tipos de identificación.
-     */
     private final TypeIdRepository typeIdRepository;
-
-    /**
-     * Mapeador de persistencia de Id.
-     */
     private final IdPersistenceMapper idPersistenceMapper;
+    
 
     /**
      * Guarda un tipo de tercero.
@@ -91,21 +77,44 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @Override
     public TypeId saveTypeId(TypeId typeId) {
         if (typeId == null) {
-            throw new IllegalArgumentException("El tipo de identificación no puede ser null");
+            throw new TypeIdInvalidDataException("El tipo de identificación no puede ser null");
         }
 
         if (typeId.getTypeId() == null || typeId.getTypeId().trim().isEmpty()) {
-            throw new IllegalArgumentException("El código del tipo de identificación no puede estar vacío");
+            throw new TypeIdInvalidDataException("El código del tipo de identificación no puede estar vacío");
         }
 
-        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(typeId);
+        if (typeId.getTypeIdname() == null || typeId.getTypeIdname().trim().isEmpty()) {
+            throw new TypeIdInvalidDataException("El nombre del tipo de identificación no puede estar vacío");
+        }
+
+        // Normalizar valores para validaciones
+        String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
+        String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
+        
+        // Validar que no exista un typeId duplicado
+        if (typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
+            throw new TypeIdAlreadyExists("Ya existe un tipo de identificación con el código '" + normalizedTypeId + "'");
+        }
+
+        // Validar que no exista un typeIdname similar (case-insensitive) usando el nombre normalizado
+        if (typeIdRepository.existsByTiNameIgnoreCaseAndTientId(normalizedTypeIdName, typeId.getEntId())) {
+            throw new TypeIdNameAlreadyExistsException(typeId.getTypeIdname());
+        }
+        
+        TypeId normalizedTypeIdModel = TypeId.builder()
+                .typeId(normalizedTypeId)
+                .typeIdname(normalizedTypeIdName)
+                .entId(typeId.getEntId())
+                .build();
+
+        TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);
 
         // Asignar tenant ID del contexto actual
         typeIdEntity.setTenantId(TenantContext.getTenantId());
 
-        // Asegurar que el ID de la entidad se asigna correctamente
         if (typeIdEntity.getTiId() == null) {
-            typeIdEntity.setTiId(typeId.getTypeId().toUpperCase());
+            typeIdEntity.setTiId(normalizedTypeId);
         }
 
         typeIdRepository.save(typeIdEntity);

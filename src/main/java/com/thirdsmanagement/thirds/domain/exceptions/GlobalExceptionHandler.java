@@ -1,11 +1,15 @@
 package com.thirdsmanagement.thirds.domain.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -101,6 +105,82 @@ public class GlobalExceptionHandler {
                 "error", errorResponse,
                 "violations", violations
         ), status);
+    }
+
+    /**
+     * Maneja excepciones de integridad de datos, especialmente violaciones de clave foránea.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex, WebRequest request) {
+
+        String message = ex.getMessage();
+        String errorCode = ErrorCode.GENERIC_ERROR.getCode();
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        // Detectar violaciones de clave foránea específicas
+        if (message != null) {
+            if (message.contains("fk_thirds_third_types") || message.contains("tt_id")) {
+                // Extraer el ID del tipo de tercero del mensaje de error si es posible
+                String thirdTypeId = extractIdFromConstraintMessage(message, "tt_id");
+                if (thirdTypeId == null) {
+                    thirdTypeId = "desconocido";
+                }
+                
+                ThirdTypeForeignKeyViolationException customEx = 
+                    new ThirdTypeForeignKeyViolationException(thirdTypeId, ex);
+                return handleBusinessExceptions(customEx, request);
+            }
+            
+            if (message.contains("fk_thirds_type_id") || message.contains("ti_id")) {
+                // Extraer el ID del tipo de identificación del mensaje de error si es posible
+                String typeId = extractIdFromConstraintMessage(message, "ti_id");
+                if (typeId == null) {
+                    typeId = "desconocido";
+                }
+                
+                TypeIdForeignKeyViolationException customEx = 
+                    new TypeIdForeignKeyViolationException(typeId, ex);
+                return handleBusinessExceptions(customEx, request);
+            }
+        }
+
+        // Para otras violaciones de integridad de datos
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message("Error de integridad de datos: " + (message != null ? message : "Violación de restricción"))
+                .code(errorCode)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, status);
+    }
+
+    /**
+     * Extrae el ID de una restricción de clave foránea del mensaje de error.
+     */
+    private String extractIdFromConstraintMessage(String message, String columnName) {
+        try {
+            // Buscar patrones comunes en mensajes de error de PostgreSQL/MySQL
+            String[] patterns = {
+                "\\(" + columnName + "\\)=\\(([^)]+)\\)",
+                "'" + columnName + "'='([^']+)'",
+                columnName + "=([^\\s,)]+)"
+            };
+            
+            for (String pattern : patterns) {
+                java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+                java.util.regex.Matcher m = p.matcher(message);
+                if (m.find()) {
+                    return m.group(1);
+                }
+            }
+        } catch (Exception e) {
+            // Si no se puede extraer, devolver null
+        }
+        return null;
     }
 
     private HttpStatus mapStatusFromErrorCode(String code) {

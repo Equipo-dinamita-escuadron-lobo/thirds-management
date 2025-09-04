@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,13 +28,10 @@ public class TypeIdCreateRequest {
 
     /**
      * Código único del tipo de identificación (ej: CC, NIT, CE).
-     * Campo obligatorio que debe contener solo letras mayúsculas y números.
+     * Será normalizado automáticamente antes del guardado.
      */
     @NotNull(message = "El código del tipo de identificación no puede estar vacío")
-    @jakarta.validation.constraints.Pattern(
-        regexp = "^[A-Z0-9]{2,10}$",
-        message = "El código debe contener solo letras mayúsculas y números, entre 2 y 10 caracteres"
-    )
+    @Size(min = 2, max = 10, message = "El código debe tener entre 2 y 10 caracteres")
     private String typeId;
 
     /**
