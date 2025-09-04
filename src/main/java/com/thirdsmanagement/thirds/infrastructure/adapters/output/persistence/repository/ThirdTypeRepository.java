@@ -26,5 +26,8 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
     @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE LOWER(tt.ttName) = LOWER(:ttName) AND (tt.ttentId = :ttentId OR tt.ttentId = 'standart')")
     boolean existsByTtNameIgnoreCaseAndTtentId(@Param("ttName") String ttName, @Param("ttentId") String ttentId);
 
+    @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE tt.ttName = :ttName AND (tt.ttentId = :ttentId OR tt.ttentId = 'standart')")
+    boolean existsByTtNameAndTtentId(@Param("ttName") String ttName, @Param("ttentId") String ttentId);
+
     void deleteByTtentId(String ttentId);
 }
