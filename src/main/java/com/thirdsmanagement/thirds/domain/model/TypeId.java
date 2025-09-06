@@ -1,5 +1,5 @@
 package com.thirdsmanagement.thirds.domain.model;
-
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -49,6 +49,6 @@ public class TypeId {
     }
 
     public String getNormalizedTypeId() {
-        return com.thirdsmanagement.thirds.domain.utils.StringNormalizer.normalizeCode(typeId);
+        return StringNormalizer.normalizeCode(typeId);
     }
 }

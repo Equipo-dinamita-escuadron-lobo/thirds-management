@@ -7,11 +7,12 @@ import com.thirdsmanagement.thirds.domain.model.Third;
  */
 public interface GetThirdUseCase {
     /**
-     * Obtiene un tercero por su id.
+     * Obtiene un tercero por su id y empresa.
      * @param id El id del tercero a obtener
+     * @param entId El id de la empresa
      * @return El tercero obtenido
      */
-    Third getThirdById(Long id);
+    Third getThirdById(Long id, String entId);
     
     /**
      * Verifica si un tercero existe por su id.

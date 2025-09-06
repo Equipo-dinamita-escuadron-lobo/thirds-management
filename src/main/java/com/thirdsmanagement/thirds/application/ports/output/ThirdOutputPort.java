@@ -27,11 +27,12 @@ public interface ThirdOutputPort {
     Third updateThird(Third third);
     
     /**
-     * Obtiene un tercero por id.
+     * Obtiene un tercero por id y empresa.
      * @param id El id del tercero
+     * @param entId El id de la empresa
      * @return El tercero si existe, null en caso contrario
      */
-    Optional<Third> getThirdById(Long id);
+    Optional<Third> getThirdById(Long id, String entId);
     
     /**
      * Validar si existe un tercero por id y el id de la empresa.

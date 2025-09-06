@@ -100,15 +100,17 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Obtiene un tercero.
+     * Obtiene un tercero por ID y empresa.
      * @param thId ID del tercero.
+     * @param entId ID de la empresa.
      * @return Respuesta con los datos del tercero.
      */
     @GetMapping("/third")
     public ResponseEntity<Third> getThirdById(
-            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId) {
+            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId,
+            @NotNull(message = "Enterprise Id not be empty") @RequestParam("entId") String entId) {
 
-        Third third = getThirdUseCase.getThirdById(thId);
+        Third third = getThirdUseCase.getThirdById(thId, entId);
 
         return new ResponseEntity<>(third, HttpStatus.OK);
     }

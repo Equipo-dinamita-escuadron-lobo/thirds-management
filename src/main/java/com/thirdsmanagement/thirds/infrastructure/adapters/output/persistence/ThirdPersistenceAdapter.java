@@ -127,13 +127,14 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Obtiene un tercero por su identificador.
+     * Obtiene un tercero por su identificador y empresa.
      * @param id Identificador del tercero.
+     * @param entId Identificador de la empresa.
      * @return Tercero encontrado.
      */
     @Override
-    public Optional<Third> getThirdById(Long id) {
-        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
+    public Optional<Third> getThirdById(Long id, String entId) {
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findByThIdAndEntId(id, entId);
 
         if(thirdEntity.isEmpty()) {
             return Optional.empty();

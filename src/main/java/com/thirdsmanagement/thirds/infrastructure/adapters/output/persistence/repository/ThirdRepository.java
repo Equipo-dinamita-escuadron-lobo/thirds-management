@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,5 +50,8 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity,Long>{
 
     @Query("SELECT t FROM ThirdEntity t INNER JOIN t.thirdTypes tt WHERE t.entId = :entId")
     List<ThirdEntity> getAllThirds(String entId);
+
+    @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
+    Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
 }
