@@ -252,11 +252,21 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
         Third obj = this.thirdPersistenceMapper.toThird(thirdEntity);
 
-        for(ThirdTypeEntity tt : thirdEntity.getThirdTypes()){
-            ThirdType thirdType = new ThirdType();
-            thirdType.setThirdTypeName(tt.getTtName());
-            thirdType.setThirdTypeId(tt.getTtId());
-            obj.getThirdTypes().add(thirdType);
+        // Cargar los tipos de tercero desde la tabla de relación
+        List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdEntity.getThId());
+        
+        for(ThirdsAndTypesEntity relation : relations) {
+            Optional<ThirdTypeEntity> thirdTypeEntity = thirdTypeRepository.findById(relation.getTtId());
+            if (thirdTypeEntity.isPresent()) {
+                ThirdTypeEntity tt = thirdTypeEntity.get();
+                ThirdType thirdType = ThirdType.builder()
+                    .thirdTypeId(tt.getTtId())
+                    .thirdTypeName(tt.getTtName())
+                    .entId(tt.getTtentId())
+                    .status(tt.getStatus())
+                    .build();
+                obj.getThirdTypes().add(thirdType);
+            }
         }
 
         return obj;
