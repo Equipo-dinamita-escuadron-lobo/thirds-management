@@ -198,30 +198,16 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Obtiene una página de proveedores basada en el ID de la entidad y la información de paginación proporcionada.
-     * @param entId El ID de la entidad para la cual se desean obtener los proveedores.
-     * @param page Información de paginación que incluye el número de página y el tamaño de la página.
-     * @return Una página de objetos Third que representan a los proveedores.
+     * Obtiene una página de terceros filtrados por tipo de tercero y el identificador de entidad.
+     * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
+     * @param page El objeto Pageable que contiene la información de paginación.
+     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente").
+     * @return Una página de objetos Third que representan los terceros filtrados por tipo.
      */
     @Override
-    public Page<Third> getAllProvidersBy(String entId, Pageable page) {
-        System.out.println("\n Entrando a getAllProvidersBy \n");
-        Page<ThirdEntity> pageEntities = thirdRepository.getProvidersBy(entId, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
-
-    /**
-     * Recupera una página de clientes basada en el identificador de la entidad y la información de paginación proporcionada.
-     * @param entId El identificador de la entidad para filtrar los clientes.
-     * @param page La información de paginación que incluye el número de página y el tamaño de la página.
-     * @return Una página de objetos Third que representan a los clientes.
-     */
-    @Override
-    public Page<Third> getAllCustomersBy(String entId, Pageable page) {
-        System.out.println("\n Entrando a getAllCustomersBy \n");
-        Page<ThirdEntity> pageEntities = thirdRepository.getCustomersBy(entId, page);
+    public Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType) {
+        System.out.println("\n Entrando a getAllThirdsByType \n");
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByType(entId, thirdType, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
         return pageThirds;

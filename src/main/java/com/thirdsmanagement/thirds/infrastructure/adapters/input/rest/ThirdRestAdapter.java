@@ -174,37 +174,21 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Obtiene una lista de terceros que son proveedores.
+     * Obtiene una lista de terceros filtrados por tipo de tercero.
      * @param entId Id de la empresa.
      * @param numPage Número de página.
-     * @return Respuesta con la lista de proveedores.
+     * @param thirdType Tipo de tercero (ej: "Proveedor", "Cliente").
+     * @return Respuesta con la lista de terceros filtrados por tipo.
      */
-    @GetMapping("/providers")
-    public ResponseEntity<Page<Third>> getProvidersList(
+    @GetMapping("/by-type")
+    public ResponseEntity<Page<Third>> getThirdsByType(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage,
+            @NotNull(message = "Third type not be empty") @RequestParam("thirdType") String thirdType) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllProvidersBy(entId, pageable);
-
-        return new ResponseEntity<>(page, HttpStatus.OK);
-    }
-
-    /**
-     * Obtiene una lista de terceros que son clientes.
-     * @param entId Id de la empresa.
-     * @param numPage Número de página.
-     * @return Respuesta con la lista de clientes.
-     */
-    @GetMapping("/customers")
-    public ResponseEntity<Page<Third>> getCustomersList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
-
-        Pageable pageable = PageRequest.of(numPage, 10);
-
-        Page<Third> page = listThirdsUseCase.getAllCustomersBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllThirdsByType(entId, pageable, thirdType);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
