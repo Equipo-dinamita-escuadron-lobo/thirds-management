@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,8 +53,8 @@ public class ThirdRestAdapter {
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
     private final UpdateThirdUseCase updateThirdUseCase;
-
     private final ThirdRestMapper thirdRestMapper;
+    private final PdfRUTService pdfRUTService;
 
     /**
      * Crea un tercero.
@@ -193,9 +192,6 @@ public class ThirdRestAdapter {
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
-
-    @Autowired
-    private PdfRUTService pdfRUTService;
 
     /**
      * Cargar un archivo PDF y extraer su contenido RUT.
