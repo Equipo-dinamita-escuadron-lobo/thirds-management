@@ -57,13 +57,6 @@ public interface ThirdOutputPort {
      */
     Page<Third> getAllThirdsBy(String entId, Pageable page);
     
-    /**
-     * Obtiene todos los terceros inactivos.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @return La pagina de terceros inactivos
-     */
-    Page<Third> getAllInactiveThirdsBy(String entId, Pageable page);
     
     /**
      * Obtiene todos los proveedores
@@ -87,4 +80,13 @@ public interface ThirdOutputPort {
      * @return La lista de terceros
      */
     List<Third> getAllThirds(String entId);
+    
+    /**
+     * Obtiene todos los terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param page El pageable object
+     * @param isActive El estado del tercero (true para activos, false para inactivos)
+     * @return La pagina de terceros filtrados por estado
+     */
+    Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive);
 }

@@ -18,13 +18,6 @@ public interface ListThirdsUseCase {
      */
     Page<Third> getAllThirdsBy(String entId,Pageable pageable);
     
-    /**
-     * Obtiene todos los terceros inactivos.
-     * @param entId El id de la empresa
-     * @param pageable El objeto pageable
-     * @return La página de terceros inactivos
-     */
-    Page<Third> getAllInactiveThirdsBy(String entId,Pageable pageable);
     
     /**
      * Obtiene todos los proveedores.
@@ -48,4 +41,13 @@ public interface ListThirdsUseCase {
      * @return La lista de terceros
      */
     List<Third> getAllThirds(String entId);
+    
+    /**
+     * Obtiene todos los terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param pageable El objeto pageable
+     * @param isActive El estado del tercero (true para activos, false para inactivos)
+     * @return La página de terceros filtrados por estado
+     */
+    Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive);
 }

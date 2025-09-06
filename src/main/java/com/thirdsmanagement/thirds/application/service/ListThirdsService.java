@@ -41,28 +41,6 @@ public class ListThirdsService implements ListThirdsUseCase {
         return result;
     }
 
-    /**
-     * Obtiene todos los terceros inactivos de una empresa con paginación.
-     * 
-     * @param entId el ID de la empresa
-     * @param pageable información de paginación
-     * @return página de terceros inactivos encontrados
-     * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound si no se encuentran terceros inactivos
-     */
-    @Override
-    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable pageable) {
-        validateEnterpriseId(entId);
-        validatePageable(pageable);
-        
-        Page<Third> result = thirdOutputPort.getAllInactiveThirdsBy(entId, pageable);
-
-        if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron terceros inactivos para la empresa con ID: " + entId);            
-        }
-
-        return result;
-    }
 
     /**
      * Obtiene todos los proveedores de una empresa con paginación.
@@ -126,6 +104,31 @@ public class ListThirdsService implements ListThirdsUseCase {
 
         if (result.isEmpty()) {
             throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);            
+        }
+
+        return result;
+    }
+    
+    /**
+     * Obtiene todos los terceros filtrados por estado de una empresa con paginación.
+     * 
+     * @param entId el ID de la empresa
+     * @param pageable información de paginación
+     * @param isActive el estado del tercero (true para activos, false para inactivos)
+     * @return página de terceros filtrados por estado
+     * @throws IllegalArgumentException si los parámetros son inválidos
+     * @throws ThirdNotFound si no se encuentran terceros
+     */
+    @Override
+    public Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive) {
+        validateEnterpriseId(entId);
+        validatePageable(pageable);
+        
+        Page<Third> result = thirdOutputPort.getAllThirdsByStatus(entId, pageable, isActive);
+
+        if (result.isEmpty()) {
+            String statusMessage = isActive ? "activos" : "inactivos";
+            throw new ThirdNotFound("No se encontraron terceros " + statusMessage + " para la empresa con ID: " + entId);            
         }
 
         return result;

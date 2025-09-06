@@ -135,14 +135,16 @@ public class ThirdRestAdapter {
      * Obtiene una lista de terceros.
      * @param entId Id de la empresa.
      * @param numPage Número de página.
+     * @param size Tamaño de página (opcional, por defecto 30).
      * @return Respuesta con la lista de terceros.
      */
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage,
+            @RequestParam(value = "size", defaultValue = "30") int size) {
 
-        Pageable pageable = PageRequest.of(numPage, 100);
+        Pageable pageable = PageRequest.of(numPage, size);
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
 
@@ -151,19 +153,21 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Obtiene una lista de terceros inactivos.
+     * Obtiene una lista de terceros filtrados por estado.
      * @param entId Id de la empresa.
      * @param numPage Número de página.
-     * @return Respuesta con la lista de terceros inactivos.
+     * @param isActive Estado del tercero (true para activos, false para inactivos).
+     * @return Respuesta con la lista de terceros filtrados por estado.
      */
     @GetMapping("/inactive")
-    public ResponseEntity<Page<Third>> getInactiveThirdsList(
+    public ResponseEntity<Page<Third>> getThirdsByStatus(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage) {
+            @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage,
+            @NotNull(message = "Status parameter not be empty") @RequestParam("isActive") boolean isActive) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllInactiveThirdsBy(entId, pageable);
+        Page<Third> page = listThirdsUseCase.getAllThirdsByStatus(entId, pageable, isActive);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
 

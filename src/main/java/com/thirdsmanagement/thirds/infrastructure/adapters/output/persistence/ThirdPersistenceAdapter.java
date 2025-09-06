@@ -196,20 +196,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
-    /**
-     * Obtiene una página de terceros inactivos filtrados por el identificador de entidad.
-     * @param entId El identificador de la entidad por la cual se filtrarán los terceros inactivos.
-     * @param page El objeto Pageable que contiene la información de paginación.
-     * @return Una página de objetos Third que representan los terceros inactivos.
-     */
-    @Override
-    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable page) {
-        System.out.println("\n Entrando a getAllInactiveThirdsBy \n");
-        Page<ThirdEntity> pageEntities = thirdRepository.getInactiveThirdsBy(entId, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
 
     /**
      * Obtiene una página de proveedores basada en el ID de la entidad y la información de paginación proporcionada.
@@ -376,5 +362,22 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         List<ThirdEntity> thirdEntities = thirdRepository.getAllThirds(entId);
         List<Third> thirds = thirdEntities.stream().map(this::convertToThird).collect(Collectors.toList());
         return thirds;
+    }
+
+    /**
+     * Obtiene una página de terceros filtrados por estado y el identificador de entidad.
+     * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
+     * @param page El objeto Pageable que contiene la información de paginación.
+     * @param isActive El estado del tercero (true para activos, false para inactivos).
+     * @return Una página de objetos Third que representan los terceros filtrados por estado.
+     */
+    @Override
+    public Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive) {
+        System.out.println("\n Entrando a getAllThirdsByStatus \n");
+        String state = isActive ? "true" : "false";
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByStatus(entId, state, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
     }
 }
