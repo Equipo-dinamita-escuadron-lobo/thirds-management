@@ -5,17 +5,15 @@ import java.io.IOException;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
+import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFormatException;
 
 @Service
 public class PdfRUTService {
     
-    private static final Logger logger = LoggerFactory.getLogger(PdfRUTService.class);
     /**
      * Extrae el contenido de un archivo PDF de RUT.
      * 
@@ -88,26 +86,11 @@ public class PdfRUTService {
                 correo = extractedUbication[2];
                 String [] contact = separateAndJoinNumbers(extractedUbication[3]);
                 cell = Long.parseLong(contact[1]);
-                logger.debug("Información extraída del PDF RUT:");
-                logger.debug("Tipo de persona: {}", typePerson);
-                logger.debug("Tipo de identificación: {}", typeId);
-                logger.debug("Número identificación: {}", idPerson);
-                logger.debug("Razón social: {}", razonSocial);
-                logger.debug("Apellidos: {}", lastNames);
-                logger.debug("Nombres: {}", names);
-                logger.debug("País: {}", pais);
-                logger.debug("Departamento: {}", departamento);
-                logger.debug("Ciudad: {}", ciudad);
-                logger.debug("Dirección: {}", direccion);
-                logger.debug("Correo: {}", correo);
-                logger.debug("Teléfono: {}", cell);
                 String infoThird = typePerson+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
                 return new PdfRUTContentOutput(infoThird);
             } catch(Exception e) {
-                logger.error("Error procesando el contenido del PDF: {}", e.getMessage(), e);
+                throw new PdfRutInvalidFormatException("El archivo PDF no tiene el formato válido de RUT de la DIAN o no se pudo procesar correctamente");
             }
-            String infoThird = ""+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
-            return new PdfRUTContentOutput(infoThird);
         } finally {
             tempFile.delete();
         }

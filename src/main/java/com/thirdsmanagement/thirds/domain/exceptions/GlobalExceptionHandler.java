@@ -194,6 +194,9 @@ public class GlobalExceptionHandler {
         if (upper.endsWith("_ALREADY_EXISTS") || upper.contains("DUPLICATE") || upper.contains("ASSOCIATED")) {
             return HttpStatus.CONFLICT;
         }
+        if (upper.contains("PDF_RUT_INVALID_FORMAT") || upper.contains("INVALID_FORMAT")) {
+            return HttpStatus.BAD_REQUEST;
+        }
         return HttpStatus.BAD_REQUEST;
     }
 

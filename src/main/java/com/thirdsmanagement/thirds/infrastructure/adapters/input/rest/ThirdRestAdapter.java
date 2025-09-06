@@ -2,6 +2,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
@@ -203,17 +204,13 @@ public class ThirdRestAdapter {
      *         o un ResponseEntity con un estado de error en caso de fallo.
      */
     @PostMapping("/content-PDF-RUT")
-    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
-        try {
-            PdfRUTContent request = new PdfRUTContent(file);
-            PdfRUTContentOutput response = pdfRUTService.extractContent(request);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
-        }
+        PdfRUTContent request = new PdfRUTContent(file);
+        PdfRUTContentOutput response = pdfRUTService.extractContent(request);
+        return ResponseEntity.ok(response);
     }
 
     /**
