@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.service.GeographyFileDiscoveryService;
+import com.thirdsmanagement.thirds.domain.exceptions.geography.GeographyDataInitializationException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.SqlExecutionService;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.CountryRepository;
 
@@ -50,17 +51,15 @@ public class GeographyDataInitializer implements CommandLineRunner {
      */
     private void loadGeographyData() {
         try {
-
             List<String> discoveredFiles = fileDiscoveryService.discoverGeographyFiles();
 
             if (discoveredFiles.isEmpty()) {
                 return;
             }
-
             executeGeographyFiles(discoveredFiles);
 
         } catch (Exception e) {
-            throw new RuntimeException("Fallo en la inicialización de datos geográficos", e);
+            throw new GeographyDataInitializationException("Fallo en la inicialización de datos geográficos", e);
         }
     }
 
@@ -72,7 +71,8 @@ public class GeographyDataInitializer implements CommandLineRunner {
             try {
                 sqlExecutionService.executeSqlFile(sqlFile);
             } catch (Exception e) {
-                throw new RuntimeException("Error en archivo: " + sqlFile, e);
+                throw new GeographyDataInitializationException(
+                        "Error al procesar archivo de datos geográficos: " + sqlFile, e);
             }
         }
     }

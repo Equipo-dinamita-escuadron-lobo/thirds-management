@@ -35,9 +35,7 @@ public class GeographyDataConfig {
      * Directorios de países soportados
      */
     public static final List<String> COUNTRY_DIRECTORIES = List.of(
-        "colombia",
-        "usa", 
-        "mexico"
+        "colombia"
     );
     
     public String getBaseDirectory() {

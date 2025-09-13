@@ -15,7 +15,8 @@ public enum GeographyErrorCode implements ErrorCodeDefinition {
     INVALID_COUNTRY_CODE("INVALID_COUNTRY_CODE", "Código de país inválido"),
     INVALID_STATE_CODE("INVALID_STATE_CODE", "Código de estado inválido"),
     INVALID_CITY_CODE("INVALID_CITY_CODE", "Código de ciudad inválido"),
-    GEOGRAPHY_HIERARCHY_VIOLATION("GEOGRAPHY_HIERARCHY_VIOLATION", "Violación de jerarquía geográfica");
+    GEOGRAPHY_HIERARCHY_VIOLATION("GEOGRAPHY_HIERARCHY_VIOLATION", "Violación de jerarquía geográfica"),
+    GEOGRAPHY_DATA_INITIALIZATION_FAILED("GEOGRAPHY_DATA_INITIALIZATION_FAILED", "Error en la inicialización de datos geográficos");
 
     private final String code;
     private final String message;
