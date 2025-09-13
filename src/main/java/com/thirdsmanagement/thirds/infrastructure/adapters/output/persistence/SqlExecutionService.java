@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Servicio para ejecución de archivos SQL.
- * Aplica el principio de Single Responsibility y Open/Closed.
  */
 @Service
 @RequiredArgsConstructor

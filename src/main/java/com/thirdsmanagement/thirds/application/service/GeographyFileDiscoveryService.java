@@ -40,11 +40,9 @@ public class GeographyFileDiscoveryService {
             // 3. Archivos de ciudades (fase 3) - ordenados automáticamente
             allFiles.addAll(discoverCityFiles());
             
-            log.info("Descubiertos {} archivos SQL de geografía", allFiles.size());
             return allFiles;
             
         } catch (IOException e) {
-            log.error("Error descubriendo archivos de geografía", e);
             throw new RuntimeException("Error en descubrimiento de archivos", e);
         }
     }
@@ -103,7 +101,6 @@ public class GeographyFileDiscoveryService {
             int baseIndex = fullPath.indexOf(baseDir);
             return baseIndex >= 0 ? fullPath.substring(baseIndex) : null;
         } catch (Exception e) {
-            log.warn("Error extrayendo ruta relativa de recurso: {}", resource.getDescription());
             return null;
         }
     }

@@ -34,8 +34,6 @@ public class GeographyDataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (shouldLoadGeographyData()) {
             loadGeographyData();
-        } else {
-            log.info("Los datos geográficos ya están cargados en la base de datos.");
         }
     }
 
@@ -52,21 +50,16 @@ public class GeographyDataInitializer implements CommandLineRunner {
      */
     private void loadGeographyData() {
         try {
-            log.info("Iniciando carga automática de datos geográficos...");
-            
+
             List<String> discoveredFiles = fileDiscoveryService.discoverGeographyFiles();
-            
+
             if (discoveredFiles.isEmpty()) {
-                log.warn("No se encontraron archivos SQL de geografía para cargar");
                 return;
             }
-            
+
             executeGeographyFiles(discoveredFiles);
-            
-            log.info("Datos geográficos cargados exitosamente. {} archivos procesados.", discoveredFiles.size());
-            
+
         } catch (Exception e) {
-            log.error("Error en la carga de datos geográficos: {}", e.getMessage(), e);
             throw new RuntimeException("Fallo en la inicialización de datos geográficos", e);
         }
     }
@@ -77,10 +70,8 @@ public class GeographyDataInitializer implements CommandLineRunner {
     private void executeGeographyFiles(List<String> sqlFiles) {
         for (String sqlFile : sqlFiles) {
             try {
-                log.info("Procesando archivo: {}", sqlFile);
                 sqlExecutionService.executeSqlFile(sqlFile);
             } catch (Exception e) {
-                log.error("Error procesando archivo {}: {}", sqlFile, e.getMessage());
                 throw new RuntimeException("Error en archivo: " + sqlFile, e);
             }
         }
