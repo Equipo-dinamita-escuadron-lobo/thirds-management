@@ -51,11 +51,6 @@ public class ThirdEntity {
     @JoinColumn(name = "ti_id", referencedColumnName = "ti_id")
     private TypeIdEntity typeId;
 
-    // La relación con tipos de tercero se maneja a través de ThirdsAndTypesEntity
-    // para incluir correctamente el tenant_id
-
-    @Column(name = "th_ruth_path")
-    private String rutPath; 
 
     @Column(name = "th_person_type")
     private ePersonType personType; 
@@ -80,9 +75,6 @@ public class ThirdEntity {
 
     @Column(name = "th_state")
     private String state;
-
-    @Column(name = "th_photo_path")
-    private String photoPath;
 
     @Column(name = "th_country")
     private String country;

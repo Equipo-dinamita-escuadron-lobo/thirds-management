@@ -49,7 +49,6 @@ public class ThirdUpdateRequest {
     @NotNull(message = "The third type cannot be empty") 
     private Set<ThirdType> thirdTypes;
 
-    private String rutPath;
     private String names; 
     private String lastNames; 
     private String socialReason; 
@@ -57,7 +56,6 @@ public class ThirdUpdateRequest {
     private Long idNumber;
     private Long verificationNumber; 
     private Boolean state;
-    private String photoPath;
     
     @NotBlank(message = "Country code cannot be empty")
     @Size(max = 3, message = "Country code cannot exceed 3 characters")

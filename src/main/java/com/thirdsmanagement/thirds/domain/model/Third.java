@@ -40,9 +40,6 @@ public class Third {
     @NotNull(message = "Los tipos de tercero no pueden ser null")
     private Set<ThirdType> thirdTypes = new HashSet<>();
 
-    @Size(max = 500, message = "La ruta del RUT no puede exceder los 500 caracteres")
-    private String rutPath;
-
     @NotNull(message = "El tipo de persona es obligatorio")
     private ePersonType personType;
 
@@ -62,9 +59,6 @@ public class Third {
     @NotNull(message = "El estado del tercero es obligatorio")
     @Builder.Default
     private Boolean state = true;
-
-    @Size(max = 500, message = "La ruta de la foto no puede exceder los 500 caracteres")
-    private String photoPath;
 
     private Country country;
     private State province;

@@ -119,7 +119,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 .entId(third.getEntId())
                 .typeId(third.getTypeId())
                 .thirdTypes(third.getThirdTypes())
-                .rutPath(third.getRutPath())
                 .personType(third.getPersonType())
                 .names(third.getNames())
                 .lastNames(third.getLastNames())
@@ -128,7 +127,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 .idNumber(third.getIdNumber())
                 .verificationNumber(third.getVerificationNumber())
                 .state(third.getState())
-                .photoPath(third.getPhotoPath())
                 .country(geographyLoaderService.loadCountryByCode(thirdEntity.getCountry()))
                 .province(geographyLoaderService.loadStateByCode(thirdEntity.getProvince(), thirdEntity.getCountry()))
                 .city(geographyLoaderService.loadCityByCode(thirdEntity.getCity(), thirdEntity.getProvince(), thirdEntity.getCountry()))
@@ -352,7 +350,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 System.out.println("El estado entro a guardar Inactivo " + third.getState());
             }
             thirdEntity.setVerificationNumber(thirdEntity.getVerificationNumber());
-            thirdEntity.setPhotoPath(third.getPhotoPath());
             thirdEntity.setPhoneNumber(third.getPhoneNumber());
             thirdEntity.setEmail(third.getEmail());
             // Los tipos de tercero se manejan a través de ThirdsAndTypesEntity

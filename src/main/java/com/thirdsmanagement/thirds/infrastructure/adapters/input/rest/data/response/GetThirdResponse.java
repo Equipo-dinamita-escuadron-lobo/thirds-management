@@ -30,7 +30,7 @@ public class GetThirdResponse {
     
     private Set<ThirdType> thirdTypes;
 
-    private String rutPath; 
+ 
     private ePersonType personType; 
     private String names; 
     private String lastNames; 
@@ -39,7 +39,6 @@ public class GetThirdResponse {
     private Long idNumber;
     private Long verificationNumber; 
     private Boolean state;
-    private String photoPath;
     private String country;
     private String province;
     private String city; 
