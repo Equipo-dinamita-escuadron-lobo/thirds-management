@@ -71,4 +71,5 @@ public interface ThirdPersistenceMapper {
     default String mapCityToString(City city) {
         return city != null ? city.getCityCode() : null;
     }
+    
 }

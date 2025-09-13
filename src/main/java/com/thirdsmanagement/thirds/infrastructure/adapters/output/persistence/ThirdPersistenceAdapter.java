@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.Set;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.application.service.GeographyLoaderService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
@@ -49,6 +50,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     private final TypeIdRepository typeIdRepository;
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final ThirdPersistenceMapper thirdPersistenceMapper;
+    private final GeographyLoaderService geographyLoaderService;
 
     /**
      * Guarda un tercero.
@@ -101,7 +103,41 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         // Convertir de vuelta al dominio
-        return thirdPersistenceMapper.toThird(thirdEntity);
+        Third domainThird = thirdPersistenceMapper.toThird(thirdEntity);
+        return loadGeographyData(domainThird, thirdEntity);
+    }
+
+    /**
+     * Carga los datos geográficos completos para un objeto Third.
+     * @param third el objeto Third del dominio
+     * @param thirdEntity la entidad de persistencia con los códigos geográficos
+     * @return el objeto Third con datos geográficos completos
+     */
+    private Third loadGeographyData(Third third, ThirdEntity thirdEntity) {
+        return Third.builder()
+                .thId(third.getThId())
+                .entId(third.getEntId())
+                .typeId(third.getTypeId())
+                .thirdTypes(third.getThirdTypes())
+                .rutPath(third.getRutPath())
+                .personType(third.getPersonType())
+                .names(third.getNames())
+                .lastNames(third.getLastNames())
+                .socialReason(third.getSocialReason())
+                .gender(third.getGender())
+                .idNumber(third.getIdNumber())
+                .verificationNumber(third.getVerificationNumber())
+                .state(third.getState())
+                .photoPath(third.getPhotoPath())
+                .country(geographyLoaderService.loadCountryByCode(thirdEntity.getCountry()))
+                .province(geographyLoaderService.loadStateByCode(thirdEntity.getProvince(), thirdEntity.getCountry()))
+                .city(geographyLoaderService.loadCityByCode(thirdEntity.getCity(), thirdEntity.getProvince(), thirdEntity.getCountry()))
+                .address(third.getAddress())
+                .phoneNumber(third.getPhoneNumber())
+                .email(third.getEmail())
+                .creationDate(third.getCreationDate())
+                .updateDate(third.getUpdateDate())
+                .build();
     }
 
     /**
@@ -224,6 +260,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         System.out.println("\n Entrando a convertToThird \n");
 
         Third obj = this.thirdPersistenceMapper.toThird(thirdEntity);
+        obj = loadGeographyData(obj, thirdEntity);
 
         // Cargar los tipos de tercero desde la tabla de relación
         List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdEntity.getThId());
@@ -335,7 +372,8 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         thirdEntity.setThirdTypes(thirdTypeEntities);
             thirdEntity = thirdRepository.save(thirdEntity);
         }
-        return thirdPersistenceMapper.toThird(thirdEntity);
+        Third updatedThird = thirdPersistenceMapper.toThird(thirdEntity);
+        return loadGeographyData(updatedThird, thirdEntity);
     }
 
     /**
