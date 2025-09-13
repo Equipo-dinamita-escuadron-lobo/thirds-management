@@ -6,6 +6,9 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.model.City;
+import com.thirdsmanagement.thirds.domain.model.Country;
+import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
@@ -21,6 +24,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
     private final ThirdEventPublisher thirdEventPublisher;
     private final ThirdRepository thirdRepository;
+    private final ThirdGeographyValidationService geographyValidationService;
 
     /**
      * Crea un nuevo tercero en el sistema.
@@ -64,6 +68,55 @@ public class CreateThirdService implements CreateThirdUseCase {
         Third createdThird = thirdOutputPort.saveThird(normalizedThird);
         
         // Publicar evento de creación
+        thirdEventPublisher.publishThirdCreatedEvent(new ThirdCreatedEvent(createdThird.getThId()));
+        
+        return createdThird;
+    }
+    
+    /**
+     * Creates a Third with geography validation from request codes.
+     * @param third the Third object with geography codes
+     * @param countryCode country code
+     * @param stateCode state code  
+     * @param cityCode city code
+     * @return the created Third with validated geography
+     */
+    @Transactional
+    public Third createThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {
+        // Basic validation
+        validateThirdData(third);
+        
+        // Geography validation and retrieval
+        Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
+        Country country = (Country) geography[0];
+        State state = (State) geography[1];
+        City city = (City) geography[2];
+        
+        // Normalization of names and geography assignment
+        Third normalizedThird = Third.builder()
+                .entId(third.getEntId())
+                .personType(third.getPersonType())
+                .typeId(third.getTypeId())
+                .thirdTypes(third.getThirdTypes())
+                .names(third.getNames() != null ? StringNormalizer.normalizePreservingCase(third.getNames()) : null)
+                .lastNames(third.getLastNames() != null ? StringNormalizer.normalizePreservingCase(third.getLastNames()) : null)
+                .socialReason(third.getSocialReason() != null ? StringNormalizer.normalizePreservingCase(third.getSocialReason()) : null)
+                .gender(third.getGender())
+                .idNumber(third.getIdNumber())
+                .verificationNumber(third.getVerificationNumber())
+                .state(third.getState())
+                .address(third.getAddress())
+                .phoneNumber(third.getPhoneNumber())
+                .email(third.getEmail())
+                .country(country)
+                .province(state)
+                .city(city)
+                .build();
+        
+        // Duplicate validation and save
+        validateDuplicateThird(normalizedThird.getIdNumber(), normalizedThird.getEntId());
+        
+        Third createdThird = thirdOutputPort.saveThird(normalizedThird);
         thirdEventPublisher.publishThirdCreatedEvent(new ThirdCreatedEvent(createdThird.getThId()));
         
         return createdThird;

@@ -23,6 +23,16 @@ public class StateNotFoundException extends BaseBusinessException {
     }
 
     /**
+     * Constructor con código de estado y país.
+     * @param stateCode código del estado
+     * @param countryCode código del país
+     */
+    public StateNotFoundException(String stateCode, String countryCode) {
+        super(GeographyErrorCode.STATE_NOT_FOUND, 
+              String.format("El estado/departamento con código '%s' no existe en el país '%s'", stateCode, countryCode));
+    }
+
+    /**
      * Constructor con mensaje personalizado y causa.
      * @param customMessage mensaje personalizado de error
      * @param cause causa del error

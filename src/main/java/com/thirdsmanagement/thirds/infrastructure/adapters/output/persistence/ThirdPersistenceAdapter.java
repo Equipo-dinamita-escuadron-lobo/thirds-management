@@ -275,9 +275,9 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             thirdEntity.setIdNumber(third.getIdNumber());
             thirdEntity.setSocialReason(third.getSocialReason());
             thirdEntity.setAddress(third.getAddress());
-            thirdEntity.setCity(third.getCity());
-            thirdEntity.setCountry(third.getCountry());
-            thirdEntity.setProvince(third.getProvince());
+            thirdEntity.setCity(third.getCity() != null ? third.getCity().getCityCode() : null);
+            thirdEntity.setCountry(third.getCountry() != null ? third.getCountry().getCountryCode() : null);
+            thirdEntity.setProvince(third.getProvince() != null ? third.getProvince().getStateCode() : null);
             thirdEntity.setPersonType(third.getPersonType());
             
             if (third.getGender() != null) {

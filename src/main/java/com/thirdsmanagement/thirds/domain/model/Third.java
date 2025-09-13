@@ -66,14 +66,9 @@ public class Third {
     @Size(max = 500, message = "La ruta de la foto no puede exceder los 500 caracteres")
     private String photoPath;
 
-    @Size(max = 100, message = "El país no puede exceder los 100 caracteres")
-    private String country;
-
-    @Size(max = 100, message = "La provincia no puede exceder los 100 caracteres")
-    private String province;
-
-    @Size(max = 100, message = "La ciudad no puede exceder los 100 caracteres")
-    private String city;
+    private Country country;
+    private State province;
+    private City city;
 
     @Size(max = 300, message = "La dirección no puede exceder los 300 caracteres")
     private String address;

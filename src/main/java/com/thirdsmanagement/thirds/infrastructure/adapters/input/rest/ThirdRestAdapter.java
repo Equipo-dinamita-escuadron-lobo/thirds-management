@@ -5,15 +5,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
-import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
-import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
+import com.thirdsmanagement.thirds.application.service.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.PdfRUTService;
+import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
@@ -48,13 +49,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 // @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
 public class ThirdRestAdapter {
 
-    private final CreateThirdUseCase createThirdUseCase;
     private final ListThirdsUseCase listThirdsUseCase;
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
-    private final UpdateThirdUseCase updateThirdUseCase;
     private final ThirdRestMapper thirdRestMapper;
     private final PdfRUTService pdfRUTService;
+    private final CreateThirdService createThirdService;
+    private final UpdateThirdService updateThirdService;
 
     /**
      * Crea un tercero.
@@ -66,22 +67,30 @@ public class ThirdRestAdapter {
 
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
 
-        third = createThirdUseCase.createThird(third);
+        // Use geography validation service for proper geography integration
+        third = createThirdService.createThirdWithGeography(third, 
+                thirdCreateRequest.getCountryCode(), 
+                thirdCreateRequest.getStateCode(), 
+                thirdCreateRequest.getCityCode());
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
     /**
      * Actualiza un tercero.
-     * @param thirdCreateRequest Datos del tercero a actualizar.
+     * @param thirdUpdateRequest Datos del tercero a actualizar.
      * @return Respuesta con los datos del tercero actualizado.
      */
     @PostMapping("/update")
-    public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
+    public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdUpdateRequest thirdUpdateRequest) {
 
-        Third third = thirdRestMapper.toThird(thirdCreateRequest);
+        Third third = thirdRestMapper.toThird(thirdUpdateRequest);
 
-        third = updateThirdUseCase.updateThird(third);
+        // Use geography validation service for proper geography integration
+        third = updateThirdService.updateThirdWithGeography(third,
+                thirdUpdateRequest.getCountryCode(),
+                thirdUpdateRequest.getStateCode(),
+                thirdUpdateRequest.getCityCode());
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
     }

@@ -14,6 +14,7 @@ import com.thirdsmanagement.thirds.domain.model.TypeId;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -58,9 +59,17 @@ public class ThirdCreateRequest {
     private Long verificationNumber; 
     private Boolean state;
     private String photoPath;
-    private String country;
-    private String province;
-    private String city; 
+    @NotBlank(message = "Country code cannot be empty")
+    @Size(max = 3, message = "Country code cannot exceed 3 characters")
+    private String countryCode;
+
+    @NotBlank(message = "State code cannot be empty") 
+    @Size(max = 10, message = "State code cannot exceed 10 characters")
+    private String stateCode;
+
+    @NotBlank(message = "City code cannot be empty")
+    @Size(max = 10, message = "City code cannot exceed 10 characters") 
+    private String cityCode; 
 
     @NotBlank(message = "Address cannot be empty")  // Validación para address
     private String address;
