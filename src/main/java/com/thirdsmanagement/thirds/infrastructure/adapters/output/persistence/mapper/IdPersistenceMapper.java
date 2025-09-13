@@ -39,7 +39,8 @@ public interface IdPersistenceMapper {
     @Mapping(target =  "ttName", source = "thirdTypeName" )
     @Mapping(target =  "ttentId", source = "entId" )
     @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "thirds", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updateDate", ignore = true)
     ThirdTypeEntity toThirdTypeEntity(ThirdType thirdType);
 
     /**

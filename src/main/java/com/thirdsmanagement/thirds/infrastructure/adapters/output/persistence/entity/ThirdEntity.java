@@ -1,8 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
@@ -10,7 +8,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,7 +23,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Builder.Default;
 
 /**
  * Clase que representa la entidad de la tabla thirds.
@@ -56,11 +51,8 @@ public class ThirdEntity {
     @JoinColumn(name = "ti_id", referencedColumnName = "ti_id")
     private TypeIdEntity typeId;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     // La relación con tipos de tercero se maneja a través de ThirdsAndTypesEntity
     // para incluir correctamente el tenant_id
-    @Default
-    private Set<ThirdTypeEntity> thirdTypes = new HashSet<>();
 
     @Column(name = "th_ruth_path")
     private String rutPath; 

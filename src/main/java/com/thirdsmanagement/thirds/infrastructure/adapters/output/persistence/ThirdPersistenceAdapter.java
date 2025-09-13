@@ -355,21 +355,8 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             thirdEntity.setPhotoPath(third.getPhotoPath());
             thirdEntity.setPhoneNumber(third.getPhoneNumber());
             thirdEntity.setEmail(third.getEmail());
-            Set<ThirdTypeEntity> thirdTypeEntities = third.getThirdTypes().stream()
-            .map(thirdType -> {
-                ThirdTypeEntity entity = new ThirdTypeEntity();
-                entity.setTtId(thirdType.getThirdTypeId());
-                entity.setTtName(thirdType.getThirdTypeName());
-                entity.setTtentId(thirdType.getEntId());
-                
-                // Log de cada tipo de tercero
-                System.out.println("Tercer tipo: " + thirdType.getThirdTypeName());
-                return entity;
-            })
-            .collect(Collectors.toSet());
-
-        // Asignación de los tipos de tercero
-        thirdEntity.setThirdTypes(thirdTypeEntities);
+            // Los tipos de tercero se manejan a través de ThirdsAndTypesEntity
+            // No se asignan directamente a la entidad Third
             thirdEntity = thirdRepository.save(thirdEntity);
         }
         Third updatedThird = thirdPersistenceMapper.toThird(thirdEntity);

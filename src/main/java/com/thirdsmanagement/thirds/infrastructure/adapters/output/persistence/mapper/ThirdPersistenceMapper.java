@@ -25,7 +25,6 @@ public interface ThirdPersistenceMapper {
      * @param third Objeto de tercero.
      * @return Entidad de tercero.
      */
-    @Mapping(target = "thirdTypes", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)

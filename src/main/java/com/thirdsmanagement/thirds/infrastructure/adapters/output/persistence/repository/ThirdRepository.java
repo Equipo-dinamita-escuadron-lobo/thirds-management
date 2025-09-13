@@ -19,19 +19,19 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 @Repository
 public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
 
-    @Query("SELECT DISTINCT t FROM ThirdEntity t LEFT JOIN t.thirdTypes tt WHERE t.entId = :entId")
+    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
     Page<ThirdEntity> getThirdsBy(String entId, Pageable page);
 
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.idNumber = :idNumber AND t.entId = :entId")
     boolean existThirdBy(@Param("idNumber") Long idNumber, @Param("entId") String entId);
 
-    @Query("SELECT DISTINCT t FROM ThirdEntity t LEFT JOIN t.thirdTypes tt WHERE t.entId = :entId")
+    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
     List<ThirdEntity> getAllThirds(String entId);
 
     @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
-    @Query("SELECT DISTINCT t FROM ThirdEntity t LEFT JOIN t.thirdTypes tt WHERE t.entId = :entId AND t.state = :state")
+    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
     Page<ThirdEntity> getThirdsByStatus(@Param("entId") String entId, @Param("state") String state, Pageable page);
 
     @Query("SELECT DISTINCT t FROM ThirdEntity t " +
