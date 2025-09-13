@@ -1,57 +1,62 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.config;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 /**
- * Configuración externa para la carga de datos geográficos.
- * Permite configurar rutas y orden de carga sin modificar código.
+ * Configuración simplificada para la carga de datos geográficos.
+ * Contiene valores fijos y constantes para el descubrimiento automático de archivos.
  */
-@Data
 @Component
-@ConfigurationProperties(prefix = "geography.data")
 public class GeographyDataConfig {
     
     /**
      * Directorio base para archivos de geografía
      */
-    private String baseDirectory = "data/geography";
+    public static final String BASE_DIRECTORY = "data/geography";
     
     /**
-     * Configuración de carga por fases
+     * Archivo de países
      */
-    private LoadPhases phases = new LoadPhases();
+    public static final String COUNTRIES_FILE = "01_countries.sql";
     
     /**
-     * Configuración de países y sus directorios
+     * Archivo de estados por país
      */
-    private Map<String, CountryConfig> countries = Map.of(
-        "colombia", new CountryConfig("colombia", true),
-        "usa", new CountryConfig("usa", true),
-        "mexico", new CountryConfig("mexico", true)
+    public static final String STATES_FILE = "02_states.sql";
+    
+    /**
+     * Patrón para archivos de ciudades
+     */
+    public static final String CITIES_PATTERN = "**/*cities*.sql";
+    
+    /**
+     * Directorios de países soportados
+     */
+    public static final List<String> COUNTRY_DIRECTORIES = List.of(
+        "colombia",
+        "usa", 
+        "mexico"
     );
     
-    @Data
-    public static class LoadPhases {
-        private List<String> countries = List.of("01_countries.sql");
-        private List<String> states = List.of("02_states.sql");
-        private String citiesPattern = "**/*cities*.sql";
+    public String getBaseDirectory() {
+        return BASE_DIRECTORY;
     }
     
-    @Data
-    public static class CountryConfig {
-        private String directory;
-        private boolean enabled;
-        
-        public CountryConfig() {}
-        
-        public CountryConfig(String directory, boolean enabled) {
-            this.directory = directory;
-            this.enabled = enabled;
-        }
+    public String getCountriesFile() {
+        return COUNTRIES_FILE;
+    }
+    
+    public String getStatesFile() {
+        return STATES_FILE;
+    }
+    
+    public String getCitiesPattern() {
+        return CITIES_PATTERN;
+    }
+    
+    public List<String> getCountryDirectories() {
+        return COUNTRY_DIRECTORIES;
     }
 }

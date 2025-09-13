@@ -11,7 +11,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.config.GeographyDataC
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Servicio para descubrimiento automático de archivos SQL de geografía.
@@ -51,24 +50,19 @@ public class GeographyFileDiscoveryService {
     }
     
     private List<String> discoverCountryFiles() throws IOException {
-        return config.getPhases().getCountries().stream()
-            .map(file -> config.getBaseDirectory() + "/" + file)
-            .filter(this::resourceExists)
-            .collect(Collectors.toList());
+        String countriesFilePath = config.getBaseDirectory() + "/" + config.getCountriesFile();
+        return resourceExists(countriesFilePath) ? 
+            List.of(countriesFilePath) : 
+            List.of();
     }
     
     private List<String> discoverStateFiles() throws IOException {
         List<String> stateFiles = new ArrayList<>();
         
-        for (Map.Entry<String, GeographyDataConfig.CountryConfig> entry : config.getCountries().entrySet()) {
-            if (entry.getValue().isEnabled()) {
-                String countryDir = entry.getValue().getDirectory();
-                for (String stateFile : config.getPhases().getStates()) {
-                    String fullPath = config.getBaseDirectory() + "/" + countryDir + "/" + stateFile;
-                    if (resourceExists(fullPath)) {
-                        stateFiles.add(fullPath);
-                    }
-                }
+        for (String countryDir : config.getCountryDirectories()) {
+            String fullPath = config.getBaseDirectory() + "/" + countryDir + "/" + config.getStatesFile();
+            if (resourceExists(fullPath)) {
+                stateFiles.add(fullPath);
             }
         }
         
@@ -78,20 +72,17 @@ public class GeographyFileDiscoveryService {
     private List<String> discoverCityFiles() throws IOException {
         List<String> cityFiles = new ArrayList<>();
         
-        for (Map.Entry<String, GeographyDataConfig.CountryConfig> entry : config.getCountries().entrySet()) {
-            if (entry.getValue().isEnabled()) {
-                String countryDir = entry.getValue().getDirectory();
-                String pattern = config.getBaseDirectory() + "/" + countryDir + "/" + config.getPhases().getCitiesPattern();
-                
-                Resource[] resources = resourceResolver.getResources("classpath:" + pattern);
-                
-                // Ordenar archivos por nombre para mantener consistencia
-                Arrays.stream(resources)
-                    .map(resource -> extractRelativePath(resource, config.getBaseDirectory()))
-                    .filter(Objects::nonNull)
-                    .sorted()
-                    .forEach(cityFiles::add);
-            }
+        for (String countryDir : config.getCountryDirectories()) {
+            String pattern = config.getBaseDirectory() + "/" + countryDir + "/" + config.getCitiesPattern();
+            
+            Resource[] resources = resourceResolver.getResources("classpath:" + pattern);
+            
+            // Ordenar archivos por nombre para mantener consistencia
+            Arrays.stream(resources)
+                .map(resource -> extractRelativePath(resource, config.getBaseDirectory()))
+                .filter(Objects::nonNull)
+                .sorted()
+                .forEach(cityFiles::add);
         }
         
         return cityFiles;
