@@ -3,7 +3,5 @@
 -- ==============================================================================
 
 INSERT INTO countries (co_code, co_name) VALUES
-('COL', 'Colombia'),
-('USA', 'Estados Unidos'),
-('MEX', 'México')
+('COL', 'Colombia')
 ON CONFLICT (co_code) DO NOTHING;
