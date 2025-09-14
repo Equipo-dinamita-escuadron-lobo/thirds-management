@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
@@ -14,6 +15,7 @@ import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
@@ -38,6 +40,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 /**
  * Controlador REST para la gestión de terceros.
@@ -52,6 +57,7 @@ public class ThirdRestAdapter {
     private final ListThirdsUseCase listThirdsUseCase;
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
+    private final ExportThirdUseCase exportThirdUseCase;
     private final ThirdRestMapper thirdRestMapper;
     private final PdfRUTService pdfRUTService;
     private final CreateThirdService createThirdService;
@@ -231,5 +237,31 @@ public class ThirdRestAdapter {
 
             return new ResponseEntity<>(thirds, HttpStatus.OK);
         }
+
+    /**
+     * Exporta terceros en formato Excel (.xlsx).
+     * @param entId ID de la empresa.
+     * @return Archivo Excel con los terceros exportados.
+     */
+    @GetMapping("/export/excel")
+    public ResponseEntity<Resource> exportThirdsToExcel(
+            @NotNull(message = "Enterprise ID no puede estar vacio") @RequestParam("entId") String entId) {
+        
+        // Crear request con solo entId requerido
+        ThirdExportRequest exportRequest = ThirdExportRequest.builder()
+                .entId(entId)
+                .includeTypes(true)
+                .includeCities(true)
+                .build();
+        
+        Resource excelFile = exportThirdUseCase.exportThirdsToExcel(exportRequest);
+        
+        String filename = "Informacion_Terceros.xlsx";
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(excelFile);
+    }
 
 }
