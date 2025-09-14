@@ -16,12 +16,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThirdTypeCreateRequest {
-    @NotNull(message = "Enterprise ID not be empty") 
+    @NotNull(message = "El ID de la empresa no puede estar vacío") 
     private String entId;
 
     private Long thirdTypeId;
 
-    @NotNull(message = "Enterprise ThirdTypeName not be empty") 
+    @NotNull(message = "El nombre del tipo de tercero no puede estar vacío") 
     private String thirdTypeName;
 
     /**

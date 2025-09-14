@@ -32,10 +32,10 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
     @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
-    Page<ThirdEntity> getThirdsByStatus(@Param("entId") String entId, @Param("state") String state, Pageable page);
+    Page<ThirdEntity> getThirdsByStatus(@Param("entId") String entId, @Param("state") Boolean state, Pageable page);
 
     @Query("SELECT DISTINCT t FROM ThirdEntity t " +
-            "WHERE t.entId = :entId AND t.state = 'true' " +
+            "WHERE t.entId = :entId AND t.state = true " +
             "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
             "INNER JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
             "WHERE tat.thId = t.thId AND tt.ttName = :thirdType)")

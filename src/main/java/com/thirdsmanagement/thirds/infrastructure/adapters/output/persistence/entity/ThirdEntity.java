@@ -74,7 +74,8 @@ public class ThirdEntity {
     private Long verificationNumber; 
 
     @Column(name = "th_state")
-    private String state;
+    @Builder.Default
+    private Boolean state = true;
 
     @Column(name = "th_country")
     private String country;

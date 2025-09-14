@@ -192,7 +192,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public boolean changeThirdState(Long thId) {
-        System.out.println("\n Entrando a changeThirdState \n");
         Optional<ThirdEntity> thirdEntity = thirdRepository.findById(thId);
 
         if(thirdEntity.isEmpty()) {
@@ -200,14 +199,8 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         ThirdEntity entity = thirdEntity.get();
-        String currentState = entity.getState();
-        String newState;
-
-        if("true".equals(currentState)){
-            newState = "false";
-        } else {
-            newState = "true";
-        }
+        Boolean currentState = entity.getState();
+        Boolean newState = !Boolean.TRUE.equals(currentState);
 
         entity.setState(newState);
         thirdRepository.save(entity);
@@ -223,7 +216,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable page) {
-        System.out.println("\n Entrando a getAllThirdsBy \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
@@ -240,7 +232,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType) {
-        System.out.println("\n Entrando a getAllThirdsByType \n");
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByType(entId, thirdType, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
@@ -255,7 +246,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     private Third convertToThird(ThirdEntity thirdEntity) {
 
-        System.out.println("\n Entrando a convertToThird \n");
 
         Third obj = this.thirdPersistenceMapper.toThird(thirdEntity);
         obj = loadGeographyData(obj, thirdEntity);
@@ -299,7 +289,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Override
     public Third updateThird(Third third) {
         
-        System.out.println("Entrando A Actualizar");
         
         ThirdEntity thirdEntity = thirdRepository.findById(third.getThId()).orElse(null);
         System.out.println(thirdEntity.toString());
@@ -342,13 +331,8 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
             System.out.println("El estado ga guardar es es" + third.getState());
-            if(third.getState()){
-                thirdEntity.setState("true");
-                System.out.println("El estado entro a guardar Activo " + third.getState());
-            }else{
-                thirdEntity.setState("false");
-                System.out.println("El estado entro a guardar Inactivo " + third.getState());
-            }
+            thirdEntity.setState(third.getState() != null ? third.getState() : true);
+            System.out.println("El estado entro a guardar " + thirdEntity.getState());
             thirdEntity.setVerificationNumber(thirdEntity.getVerificationNumber());
             thirdEntity.setPhoneNumber(third.getPhoneNumber());
             thirdEntity.setEmail(third.getEmail());
@@ -381,8 +365,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive) {
-        System.out.println("\n Entrando a getAllThirdsByStatus \n");
-        String state = isActive ? "true" : "false";
+        Boolean state = isActive;
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByStatus(entId, state, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 

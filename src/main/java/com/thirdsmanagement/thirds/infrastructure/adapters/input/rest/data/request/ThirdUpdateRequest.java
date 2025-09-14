@@ -32,21 +32,21 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ThirdUpdateRequest {
     
-    @NotNull(message = "Third ID cannot be empty")
+    @NotNull(message = "El ID del tercero no puede estar vacío")
     private Long thId;
 
-    @NotNull(message = "Enterprise ID cannot be empty") 
+    @NotNull(message = "El ID de la empresa no puede estar vacío") 
     private String entId;
 
     @JsonDeserialize(using = TypeIdDeserializer.class)
-    @NotNull(message = "The id type cannot be empty") 
+    @NotNull(message = "El tipo de identificación no puede estar vacío") 
     private TypeId typeId;
 
-    @NotNull(message = "The person type cannot be empty")  
+    @NotNull(message = "El tipo de persona no puede estar vacío")  
     private ePersonType personType; 
     
     @JsonDeserialize(using = ThirdTypeDeserializer.class)
-    @NotNull(message = "The third type cannot be empty") 
+    @NotNull(message = "El tipo de tercero no puede estar vacío") 
     private Set<ThirdType> thirdTypes;
 
     private String names; 
@@ -55,28 +55,29 @@ public class ThirdUpdateRequest {
     private eThirdGender gender;
     private Long idNumber;
     private Long verificationNumber; 
-    private Boolean state;
+    @Builder.Default
+    private Boolean state = true;
     
-    @NotBlank(message = "Country code cannot be empty")
-    @Size(max = 3, message = "Country code cannot exceed 3 characters")
+    @NotBlank(message = "El código del país no puede estar vacío")
+    @Size(max = 3, message = "El código del país no puede exceder los 3 caracteres")
     private String countryCode;
 
-    @NotBlank(message = "State code cannot be empty") 
-    @Size(max = 10, message = "State code cannot exceed 10 characters")
+    @NotBlank(message = "El código del estado no puede estar vacío") 
+    @Size(max = 10, message = "El código del estado no puede exceder los 10 caracteres")
     private String stateCode;
 
-    @NotBlank(message = "City code cannot be empty")
-    @Size(max = 10, message = "City code cannot exceed 10 characters") 
+    @NotBlank(message = "El código de la ciudad no puede estar vacío")
+    @Size(max = 10, message = "El código de la ciudad no puede exceder los 10 caracteres") 
     private String cityCode;
 
-    @NotBlank(message = "Address cannot be empty")
+    @NotBlank(message = "La dirección no puede estar vacía")
     private String address;
 
-    @NotBlank(message = "Phone number cannot be empty")
+    @NotBlank(message = "El número de teléfono no puede estar vacío")
     private String phoneNumber; 
 
-    @NotBlank(message = "Email cannot be empty")
-    @Email(message = "Email should be valid")
+    @NotBlank(message = "El correo electrónico no puede estar vacío")
+    @Email(message = "El correo electrónico debe tener un formato válido")
     private String email; 
 
     private LocalDate creationDate;
