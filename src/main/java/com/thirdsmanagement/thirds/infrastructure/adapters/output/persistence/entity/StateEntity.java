@@ -1,9 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -47,13 +43,4 @@ public class StateEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "co_code", referencedColumnName = "co_code", insertable = false, updatable = false)
     private CountryEntity country;
-
-
-    @Column(name = "st_created_at")
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
-    @Column(name = "st_updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 }

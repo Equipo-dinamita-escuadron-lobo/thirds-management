@@ -20,8 +20,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 public interface GeographyPersistenceMapper {
 
     // Country mappings
-    @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "updateDate", ignore = true)
     CountryEntity toCountryEntity(Country country);
 
     Country toCountry(CountryEntity countryEntity);
@@ -31,8 +29,6 @@ public interface GeographyPersistenceMapper {
     List<Country> toCountryList(List<CountryEntity> countryEntities);
 
     // State mappings
-    @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "updateDate", ignore = true)
     @Mapping(target = "country", ignore = true)
     StateEntity toStateEntity(State state);
 
@@ -44,8 +40,6 @@ public interface GeographyPersistenceMapper {
     List<State> toStateList(List<StateEntity> stateEntities);
 
     // City mappings
-    @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "updateDate", ignore = true)
     @Mapping(target = "state", ignore = true)
     CityEntity toCityEntity(City city);
 

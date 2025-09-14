@@ -1,9 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,13 +30,4 @@ public class CountryEntity {
 
     @Column(name = "co_name", length = 100, nullable = false)
     private String countryName;
-
-
-    @Column(name = "co_created_at")
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
-    @Column(name = "co_updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 }
