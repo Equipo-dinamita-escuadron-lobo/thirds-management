@@ -1,10 +1,16 @@
 package com.thirdsmanagement.thirds.domain.model;
 
+import lombok.Getter;
 
+/**
+ * Enumeración que define los tipos de persona disponibles en el sistema.
+ * Distingue entre personas naturales y jurídicas para aplicar validaciones
+ * y reglas de negocio específicas.
+ */
+@Getter
 public enum ePersonType {
 
     Natural("NATURAL", "Persona Natural"),
-
     Juridica("JURIDICA", "Persona Jurídica");
 
     private final String code;
@@ -13,14 +19,6 @@ public enum ePersonType {
     ePersonType(String code, String description) {
         this.code = code;
         this.description = description;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean isNatural() {

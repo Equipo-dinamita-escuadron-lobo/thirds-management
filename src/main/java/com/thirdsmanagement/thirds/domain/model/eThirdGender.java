@@ -1,14 +1,13 @@
 package com.thirdsmanagement.thirds.domain.model;
 
+import lombok.Getter;
+
 /**
  * Enumeración que define los géneros disponibles para terceros en el sistema.
  * Se utiliza principalmente para personas naturales y proporciona opciones
  * inclusivas para diferentes identidades de género.
- *
- * @author Sistema de Gestión de Terceros
- * @version 1.0
- * @since 2024
  */
+@Getter
 public enum eThirdGender {
 
     Masculino("M", "Masculino"),
@@ -21,14 +20,6 @@ public enum eThirdGender {
     eThirdGender(String code, String description) {
         this.code = code;
         this.description = description;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getDescription() {
-        return description;
     }
 
     public boolean isMasculino() {

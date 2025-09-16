@@ -15,14 +15,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-
+/**
+ * Modelo de dominio que representa un tercero en el sistema.
+ * Un tercero puede ser una persona natural o jurídica con diferentes tipos
+ * (cliente, proveedor, empleado, etc.) y información geográfica asociada.
+ */
 @Builder
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"entId", "idNumber", "typeId"})
+@ToString(of = {"entId", "idNumber", "names", "lastNames", "socialReason"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Third {
