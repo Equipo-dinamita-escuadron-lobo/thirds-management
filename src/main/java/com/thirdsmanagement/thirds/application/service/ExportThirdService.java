@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
+    private final ExcelValidationService excelValidationService;
     
 
     @Override
     public Resource exportThirdsToExcel(ThirdExportRequest exportRequest) {
-        log.info("Iniciando exportación de terceros para entidad: {}", exportRequest.getEntId());
         
         try {
             // Obtener datos según filtros
@@ -245,5 +245,147 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
         
         return count + 3; // Dirección, teléfono, email
+    }
+
+    /**
+     * Exporta una plantilla de terceros con validaciones de datos (listas desplegables).
+     */
+    @Override
+    public Resource exportThirdTemplateWithValidations(String entId) {
+        
+        try {
+            byte[] templateData = generateTemplateWithValidations(entId);
+            return new ByteArrayResource(templateData);
+            
+        } catch (Exception e) {
+            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, 
+                "Error al generar plantilla con validaciones", e);
+        }
+    }
+
+
+    private byte[] generateTemplateWithValidations(String entId) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Plantilla_Terceros");
+            
+            // Crear estilos
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle templateStyle = createTemplateStyle(workbook);
+
+            // Crear encabezados
+            ThirdExportRequest templateRequest = ThirdExportRequest.builder()
+                .entId(entId)
+                .includeTypes(true)
+                .includeCities(true)
+                .build();
+            
+            createHeaders(sheet, headerStyle, templateRequest);
+
+            // Crear filas de ejemplo con estilos
+            createTemplateRows(sheet, templateStyle, templateRequest, 10); // 10 filas de ejemplo
+
+            // Crear hoja de datos de referencia
+            excelValidationService.createReferenceDataSheet(workbook, entId);
+
+            // Aplicar validaciones de datos
+            applyValidationsToTemplate(sheet, entId, templateRequest);
+
+            // Ajustar ancho de columnas
+            autoSizeColumns(sheet, getColumnCount(templateRequest));
+
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
+
+    private CellStyle createTemplateStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setItalic(true);
+        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
+        style.setFont(font);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        return style;
+    }
+
+    private void createTemplateRows(Sheet sheet, CellStyle templateStyle, ThirdExportRequest request, int numberOfRows) {
+        for (int i = 1; i <= numberOfRows; i++) {
+            Row row = sheet.createRow(i);
+            int colIndex = 0;
+
+            // Crear celdas con texto de ejemplo
+            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+            createTemplateCell(row, colIndex++, "123456789", templateStyle);
+            createTemplateCell(row, colIndex++, "1", templateStyle);
+            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+            createTemplateCell(row, colIndex++, "Nombres", templateStyle);
+            createTemplateCell(row, colIndex++, "Apellidos", templateStyle);
+            createTemplateCell(row, colIndex++, "Razón Social", templateStyle);
+            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+
+            if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+            }
+
+            if (Boolean.TRUE.equals(request.getIncludeCities())) {
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+            }
+
+            createTemplateCell(row, colIndex++, "Dirección ejemplo", templateStyle);
+            createTemplateCell(row, colIndex++, "3001234567", templateStyle);
+            createTemplateCell(row, colIndex++, "ejemplo@correo.com", templateStyle);
+        }
+    }
+
+    private void createTemplateCell(Row row, int colIndex, String value, CellStyle style) {
+        Cell cell = row.createCell(colIndex);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
+
+    private void applyValidationsToTemplate(Sheet sheet, String entId, ThirdExportRequest request) {
+        int startRow = 1; // Después del encabezado
+        int endRow = 1000; // Permitir muchas filas para la plantilla
+        
+        // Aplicar validaciones básicas
+        excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
+        
+        // Aplicar validaciones de tipos si están incluidos
+        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+            int typesColumnIndex = getTypesColumnIndex(request);
+            excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
+        }
+        
+        // Aplicar validaciones geográficas si están incluidas
+        if (Boolean.TRUE.equals(request.getIncludeCities())) {
+            int[] geoColumns = getGeographyColumnIndexes(request);
+            excelValidationService.applyGeographyValidations(sheet, startRow, endRow, 
+                geoColumns[0], geoColumns[1], geoColumns[2]);
+        }
+    }
+
+
+    private int getTypesColumnIndex(ThirdExportRequest request) {
+        // Los tipos de tercero aparecen después de las columnas básicas (8 columnas)
+        return 8;
+    }
+
+    private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
+        int baseIndex = 8; // Columnas básicas
+        
+        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+            baseIndex++; // Agregar columna de tipos
+        }
+        
+        return new int[]{baseIndex, baseIndex + 1, baseIndex + 2}; // País, Departamento, Ciudad
     }
 }

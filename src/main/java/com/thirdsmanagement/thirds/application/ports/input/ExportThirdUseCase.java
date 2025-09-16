@@ -15,4 +15,13 @@ public interface ExportThirdUseCase {
      * @return Resource que contiene el archivo Excel generado
      */
     Resource exportThirdsToExcel(ThirdExportRequest exportRequest);
+
+    /**
+     * Exporta una plantilla de terceros con validaciones de datos (listas desplegables).
+     *
+     * @param entId ID de la entidad
+     * @return Resource que contiene la plantilla Excel con validaciones
+     */
+    Resource exportThirdTemplateWithValidations(String entId);
+
 }

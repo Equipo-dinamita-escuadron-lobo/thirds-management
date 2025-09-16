@@ -3,6 +3,8 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
@@ -25,6 +27,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.Thi
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -48,6 +51,7 @@ import org.springframework.http.MediaType;
  * Controlador REST para la gestión de terceros.
  * Este controlador expone endpoints para la creación, actualización, inactivación y listado de terceros.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
@@ -263,5 +267,25 @@ public class ThirdRestAdapter {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelFile);
     }
+
+    /**
+     * Exporta una plantilla de terceros con validaciones de datos.
+     */
+    @GetMapping("/template/excel")
+    public ResponseEntity<Resource> exportThirdTemplate(
+            @RequestParam("entId") String entId) {
+                
+        Resource templateFile = exportThirdUseCase.exportThirdTemplateWithValidations(entId);
+        
+        // Generar nombre de archivo con timestamp
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = "Plantilla_Terceros_" + timestamp + ".xlsx";
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(templateFile);
+    }
+
 
 }

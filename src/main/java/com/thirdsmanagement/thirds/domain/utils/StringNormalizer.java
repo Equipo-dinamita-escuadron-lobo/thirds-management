@@ -93,6 +93,125 @@ public final class StringNormalizer {
     }
 
     /**
+     * Normaliza un nombre para uso en rangos con nombre de Excel.
+     * Aplica normalización específica para compatibilidad con fórmulas INDIRECT.
+     *
+     * @param input el texto a normalizar para rango con nombre
+     * @return el texto normalizado para Excel, o "Unknown" si el input es inválido
+     */
+    public static String normalizeForExcelNamedRange(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return "Unknown";
+        }
+        
+        return input.trim()
+                .replaceAll("\\s+", "_")
+                .replaceAll("ñ", "n")
+                .replaceAll("ó", "o")
+                .replaceAll("á", "a")
+                .replaceAll("é", "e")
+                .replaceAll("í", "i")
+                .replaceAll("ú", "u")
+                .replaceAll(",", "_")
+                .replaceAll("\\.", "_");
+    }
+
+    /**
+     * Normaliza un nombre para uso general en Excel (rangos con nombre, encabezados, etc.).
+     * Aplica normalización completa para manejar acentos y caracteres especiales.
+     * Incluye validaciones de longitud y caracteres válidos para Excel.
+     *
+     * @param input el texto a normalizar para Excel
+     * @return el texto normalizado para Excel con validaciones aplicadas
+     */
+    public static String normalizeForExcel(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return "Unknown";
+        }
+        
+        String normalized = input.trim()
+                   .replaceAll("\\s+", "_")           // Espacios por guión bajo
+                   .replaceAll("[áàäâ]", "a")         // Acentos a
+                   .replaceAll("[éèëê]", "e")         // Acentos e
+                   .replaceAll("[íìïî]", "i")         // Acentos i
+                   .replaceAll("[óòöô]", "o")         // Acentos o
+                   .replaceAll("[úùüû]", "u")         // Acentos u
+                   .replaceAll("[ñ]", "n")            // Ñ por n
+                   .replaceAll("[ÁÀÄÂ]", "A")         // Acentos A
+                   .replaceAll("[ÉÈËÊ]", "E")         // Acentos E
+                   .replaceAll("[ÍÌÏÎ]", "I")         // Acentos I
+                   .replaceAll("[ÓÒÖÔ]", "O")         // Acentos O
+                   .replaceAll("[ÚÙÜÛ]", "U")         // Acentos U
+                   .replaceAll("[Ñ]", "N")            // Ñ por N
+                   .replaceAll("[^a-zA-Z0-9_]", "_")  // Otros caracteres especiales por guión bajo
+                   .replaceAll("_+", "_")             // Múltiples guiones bajos por uno solo
+                   .replaceAll("^_|_$", "");          // Remover guiones bajos al inicio y final
+        
+        // Validar que no esté vacío después de la normalización
+        if (normalized.isEmpty()) {
+            normalized = "Item_" + Math.abs(input.hashCode());
+        }
+        
+        // Validar longitud máxima para Excel (255 caracteres)
+        if (normalized.length() > 255) {
+            normalized = normalized.substring(0, 252) + "_" + Math.abs(input.hashCode() % 100);
+        }
+        
+        return normalized;
+    }
+
+    /**
+     * Construye una fórmula de Excel con normalización de caracteres especiales usando SUBSTITUTE anidados.
+     * Esta fórmula se ejecuta dentro de Excel para normalizar referencias de celdas dinámicamente.
+     * Debe coincidir exactamente con la normalización aplicada en normalizeForExcelNamedRange().
+     *
+     * @param cellReference la referencia de celda de Excel (ej: "A1", "B2")
+     * @return la fórmula SUBSTITUTE anidada para normalización en Excel
+     */
+    public static String buildExcelNormalizationFormula(String cellReference) {
+        if (cellReference == null || cellReference.trim().isEmpty()) {
+            return "\"Unknown\"";
+        }
+        
+        return "SUBSTITUTE(" +
+                "SUBSTITUTE(" +
+                    "SUBSTITUTE(" +
+                        "SUBSTITUTE(" +
+                            "SUBSTITUTE(" +
+                                "SUBSTITUTE(" +
+                                    "SUBSTITUTE(" +
+                                        "SUBSTITUTE(" +
+                                            "SUBSTITUTE(" + cellReference + 
+                                            ",\" \",\"_\")" +
+                                        ",\"ñ\",\"n\")" +
+                                    ",\"ó\",\"o\")" +
+                                ",\"á\",\"a\")" +
+                            ",\"é\",\"e\")" +
+                        ",\"í\",\"i\")" +
+                    ",\"ú\",\"u\")" +
+                ",\",\",\"_\")" +
+            ",\".\",\"_\")";
+    }
+
+    /**
+     * Construye una fórmula INDIRECT completa con normalización para Excel.
+     * Combina la normalización con la función INDIRECT para referencias dinámicas.
+     *
+     * @param cellReference la referencia de celda de Excel
+     * @param prefix prefijo opcional para el nombre del rango (ej: "Estados_")
+     * @return la fórmula INDIRECT completa con normalización
+     */
+    public static String buildNormalizedIndirectFormula(String cellReference, String prefix) {
+        String baseFormula = buildExcelNormalizationFormula(cellReference);
+        
+        if (prefix != null && !prefix.isEmpty()) {
+            return "INDIRECT(\"" + prefix + "\"&" + baseFormula + ")";
+        } else {
+            return "INDIRECT(" + baseFormula + ")";
+        }
+    }
+
+    /**
      * Capitaliza la primera letra de una cadena.
      *
      * @param input el texto a capitalizar

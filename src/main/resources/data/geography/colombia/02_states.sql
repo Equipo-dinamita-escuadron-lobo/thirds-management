@@ -31,7 +31,7 @@ INSERT INTO states (st_code, co_code, st_name) VALUES
 ('81', 'COL', 'Arauca'),
 ('85', 'COL', 'Casanare'),
 ('86', 'COL', 'Putumayo'),
-('88', 'COL', 'Archipiélago de San Andrés, Providencia y Santa Catalina'),
+('88', 'COL', 'San Andrés y Providencia'),
 ('91', 'COL', 'Amazonas'),
 ('94', 'COL', 'Guainía'),
 ('95', 'COL', 'Guaviare'),
