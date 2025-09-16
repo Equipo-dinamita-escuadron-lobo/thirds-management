@@ -159,14 +159,11 @@ public class ExcelValidationService {
                 "Seleccione un país válido");
             
             // Departamento/Estado - validación dependiente del país usando rangos con nombre
-            log.info("Aplicando validación de departamentos dependiente del país usando rangos con nombre directos");
             applyStateValidationWithNamedRanges(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow);
             
             // Ciudad - validación dependiente del departamento usando rangos con nombre directos
-            log.info("Aplicando validación de ciudades dependiente del departamento usando rangos con nombre directos");
             applyCityValidationWithNamedRanges(sheet, cityColumnIndex, stateColumnIndex, startRow, endRow);
         } catch (Exception e) {
-            log.error("Error aplicando validaciones geográficas: {}", e.getMessage());
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
                 "Error al aplicar validaciones geográficas", e);
         }
@@ -178,13 +175,10 @@ public class ExcelValidationService {
     public void applyDropdownValidation(Sheet sheet, int columnIndex, int startRow, int endRow, 
                                       List<String> options, String errorMessage) {
         if (options == null || options.isEmpty()) {
-            log.warn("No se puede aplicar validación en columna {} - lista de opciones vacía", columnIndex);
             return;
         }
 
         try {
-            log.info("Aplicando validación dropdown en columna {} con {} opciones para filas {}-{}", 
-                    columnIndex, options.size(), startRow, endRow);
             
             XSSFSheet xssfSheet = (XSSFSheet) sheet;
             XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
@@ -211,10 +205,7 @@ public class ExcelValidationService {
             // Aplicar la validación a la hoja
             sheet.addValidationData(validation);
             
-            log.info("Validación dropdown aplicada exitosamente en columna {}", columnIndex);
-            
         } catch (Exception e) {
-            log.error("Error aplicando validación dropdown en columna {}: {}", columnIndex, e.getMessage());
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
                 "Error al aplicar validación en columna " + columnIndex, e);
         }
@@ -262,9 +253,6 @@ public class ExcelValidationService {
         
         // Crear tabla de mapeo para la validación dependiente
         createDepartmentMappingTable(refSheet);
-        
-        // Log de todos los rangos con nombre creados para debugging
-        logAllNamedRanges(workbook);
     }
 
     /**
@@ -314,7 +302,7 @@ public class ExcelValidationService {
             
         } catch (Exception e) {
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error aplicando validación de referencia: " + e.getMessage());
+                "Error aplicando validación de referencia: " + e.getMessage(), e);
         }
     }
 
@@ -324,9 +312,8 @@ public class ExcelValidationService {
      */
     private void createNamedRangesForStatesByCountry(Workbook workbook, Sheet referenceSheet) {
         List<String> countries = getCountryOptions();
-        int endColumn = processGeographicalEntities(workbook, referenceSheet, countries, 4, 
-                                                   "país", "Estados_", this::getStatesByCountryName);
-        log.info("Estructura de departamentos por país creada desde columna E hasta columna {}", getColumnLetter(endColumn - 1));
+        processGeographicalEntities(workbook, referenceSheet, countries, 4, 
+                                   "país", "Estados_", this::getStatesByCountryName);
     }
 
     /**
@@ -342,11 +329,9 @@ public class ExcelValidationService {
                 .sum();
         int startColumn = 4 + stateColumnsUsed; // Empezar después de las columnas básicas y las de departamentos
         
-        int endColumn = processGeographicalEntitiesWithCustomNormalization(workbook, referenceSheet, states, 
-                                                                          startColumn, "departamento", null, 
-                                                                          this::getCitiesByStateName);
-        log.info("Estructura de ciudades creada desde columna {} hasta columna {}", 
-                 getColumnLetter(startColumn), getColumnLetter(endColumn - 1));
+        processGeographicalEntitiesWithCustomNormalization(workbook, referenceSheet, states, 
+                                                          startColumn, "departamento", null, 
+                                                          this::getCitiesByStateName);
     }
 
     /**
@@ -370,7 +355,6 @@ public class ExcelValidationService {
                     String normalizedName = StringNormalizer.normalizeForExcelNamedRange(entityName);
 
                     if (normalizedName.isEmpty() || normalizedName.length() > 255) {
-                        log.warn("Nombre normalizado inválido para {} '{}': '{}'", entityType, entityName, normalizedName);
                         continue;
                     }
 
@@ -379,13 +363,11 @@ public class ExcelValidationService {
                     fillColumnData(referenceSheet, currentColumn, data);
                     createNamedRange(workbook, rangeName, currentColumn, data.size(), entityType);
 
-                    log.info("Creado rango con nombre '{}' para {} '{}' en columna {} con {} elementos",
-                             rangeName, entityType, entityName, getColumnLetter(currentColumn), data.size());
-
                     currentColumn++;
 
                 } catch (Exception e) {
-                    log.error("Error creando datos para {} '{}': {}", entityType, entityName, e.getMessage());
+                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
+                        "Error creando datos para " + entityType + " '" + entityName + "'", e);
                 }
             }
         }
@@ -409,8 +391,8 @@ public class ExcelValidationService {
                     .sorted()
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            log.error("Error obteniendo ciudades para departamento '{}': {}", stateName, e.getMessage());
-            return List.of();
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
+                "Error obteniendo ciudades para departamento '" + stateName + "'", e);
         }
     }
 
@@ -494,10 +476,8 @@ public class ExcelValidationService {
                 sheet.addValidationData(validation);
             }
 
-            log.info("Validación dependiente de {} aplicada usando INDIRECT con rangos con nombre", validationType);
 
         } catch (Exception e) {
-            log.error("Error aplicando validación de {}: {}", validationType, e.getMessage());
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
                 "Error al aplicar validación dependiente de " + validationType + " en columna " + targetColumnIndex, e);
         }
@@ -515,9 +495,9 @@ public class ExcelValidationService {
             String rangeFormula = "'Datos_Referencia'!$" + columnLetter + "$2:$" + columnLetter + "$" + (dataSize + 1);
             namedRange.setRefersToFormula(rangeFormula);
 
-            log.debug("Fórmula de rango para {}: {}", entityType, rangeFormula);
         } catch (Exception e) {
-            log.error("Error específico creando rango '{}': {}", rangeName, e.getMessage());
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
+                "Error específico creando rango '" + rangeName + "'", e);
         }
     }
 
@@ -541,7 +521,6 @@ public class ExcelValidationService {
                     String normalizedName = StringNormalizer.normalizeForExcel(entityName);
 
                     if (normalizedName.isEmpty() || normalizedName.length() > 255) {
-                        log.warn("Nombre normalizado inválido para {} '{}': '{}'", entityType, entityName, normalizedName);
                         continue;
                     }
 
@@ -550,13 +529,11 @@ public class ExcelValidationService {
                     fillColumnData(referenceSheet, currentColumn, data);
                     createNamedRange(workbook, rangeName, currentColumn, data.size(), entityType);
 
-                    log.info("Creado rango con nombre '{}' para {} '{}' en columna {} con {} elementos",
-                             rangeName, entityType, entityName, getColumnLetter(currentColumn), data.size());
-
                     currentColumn++;
 
                 } catch (Exception e) {
-                    log.error("Error creando datos para {} '{}': {}", entityType, entityName, e.getMessage());
+                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
+                        "Error creando datos para " + entityType + " '" + entityName + "'", e);
                 }
             }
         }
@@ -594,30 +571,12 @@ public class ExcelValidationService {
                 row.createCell(mappingColumn).setCellValue(normalizedName);
             }
             
-            log.info("Tabla de mapeo de departamentos creada en columna AM con {} entradas", states.size());
             
         } catch (Exception e) {
-            log.error("Error creando tabla de mapeo: {}", e.getMessage());
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
+                "Error creando tabla de mapeo", e);
         }
     }
 
-    /**
-     * Log de todos los rangos con nombre creados para debugging.
-     */
-    private void logAllNamedRanges(Workbook workbook) {
-        try {
-            int namedRangeCount = workbook.getNumberOfNames();
-            log.info("Total de rangos con nombre creados: {}", namedRangeCount);
-            
-            // Usar getAllNames() si está disponible o iterar usando getNames()
-            for (Name namedRange : workbook.getAllNames()) {
-                if (namedRange != null) {
-                    log.info("Rango con nombre: '{}' -> '{}'", namedRange.getNameName(), namedRange.getRefersToFormula());
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error listando rangos con nombre: {}", e.getMessage());
-        }
-    }
 
 }
