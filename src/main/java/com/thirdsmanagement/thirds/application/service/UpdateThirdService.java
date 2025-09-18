@@ -21,6 +21,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
     private final ThirdEventPublisher thirdEventPublisher;
     private final ThirdGeographyValidationService geographyValidationService;
+    private final ThirdValidationService thirdValidationService;
 
     /**
      * Actualiza un tercero existente en el sistema.
@@ -39,6 +40,9 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         if (third.getThId() == null) {
             throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
         }
+        
+        // Validar datos básicos y consistencia de tipo de persona
+        thirdValidationService.validateThirdData(third);
         
         // Normalize names
         Third normalizedThird = Third.builder()
@@ -88,6 +92,9 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         if (third.getThId() == null) {
             throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
         }
+        
+        // Validar datos básicos y consistencia de tipo de persona
+        thirdValidationService.validateThirdData(third);
         
         // Geography validation and retrieval
         Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
