@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.domain.model;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @EqualsAndHashCode(of = { "id" })
-@ToString(of = { "id", "typeId", "typeIdname" })
+@ToString(of = { "id", "typeId", "typeIdname", "classification" })
 @AllArgsConstructor
 @NoArgsConstructor
 public class TypeId {
@@ -38,16 +39,27 @@ public class TypeId {
     @Builder.Default
     private Boolean status = true;
 
+    @NotNull(message = "La clasificación de persona no puede estar vacía")
+    private PersonClassification classification;
+
+    /**
+     * Verifica si este tipo de identificación es válido para personas naturales.
+     * Utiliza la clasificación configurada en lugar de validaciones hardcodeadas.
+     * 
+     * @return true si es válido para personas naturales
+     */
     public boolean isValidForNaturalPerson() {
-        return "CC".equalsIgnoreCase(typeId) ||
-                "CE".equalsIgnoreCase(typeId) ||
-                "PA".equalsIgnoreCase(typeId) ||
-                "TI".equalsIgnoreCase(typeId);
+        return classification != null && classification.isValidForNaturalPerson();
     }
 
+    /**
+     * Verifica si este tipo de identificación es válido para personas jurídicas.
+     * Utiliza la clasificación configurada en lugar de validaciones hardcodeadas.
+     * 
+     * @return true si es válido para personas jurídicas
+     */
     public boolean isValidForLegalEntity() {
-        return "NIT".equalsIgnoreCase(typeId) ||
-                "RU".equalsIgnoreCase(typeId);
+        return classification != null && classification.isValidForLegalEntity();
     }
 
     public String getNormalizedTypeId() {

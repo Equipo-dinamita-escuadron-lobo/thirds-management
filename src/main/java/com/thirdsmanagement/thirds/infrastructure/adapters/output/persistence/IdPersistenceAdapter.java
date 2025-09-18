@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdAlreadyExists;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.PersonClassificationInvalidException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNameAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNotFound;
@@ -95,6 +96,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
             throw new TypeIdInvalidDataException("El nombre del tipo de identificación no puede estar vacío");
         }
 
+        if (typeId.getClassification() == null) {
+            throw PersonClassificationInvalidException.forNullClassification();
+        }
+
         // Normalizar valores para validaciones
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
@@ -114,6 +119,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 .typeIdname(normalizedTypeIdName)
                 .entId(typeId.getEntId())
                 .status(typeId.getStatus())
+                .classification(typeId.getClassification())
                 .build();
 
         TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);
@@ -159,6 +165,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
             throw new TypeIdInvalidDataException("El nombre del tipo de identificación no puede estar vacío");
         }
 
+        if (typeId.getClassification() == null) {
+            throw PersonClassificationInvalidException.forNullClassification();
+        }
+
         // Normalizar valores para validaciones
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
@@ -188,6 +198,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 .typeIdname(normalizedTypeIdName)
                 .entId(typeId.getEntId())
                 .status(typeId.getStatus())
+                .classification(typeId.getClassification())
                 .build();
 
         TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);

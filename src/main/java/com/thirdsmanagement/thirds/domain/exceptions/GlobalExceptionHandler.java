@@ -3,10 +3,13 @@ package com.thirdsmanagement.thirds.domain.exceptions;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
@@ -48,6 +51,42 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Maneja errores de deserialización JSON, incluyendo enums inválidos.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        
+        String message = "Error en el formato de los datos enviados";
+        String code = "INVALID_REQUEST_FORMAT";
+        
+        // Detectar si es un error de enum inválido
+        if (ex.getCause() instanceof InvalidFormatException) {
+            InvalidFormatException formatEx = (InvalidFormatException) ex.getCause();
+            
+            // Verificar si es un error de PersonClassification
+            if (formatEx.getTargetType() != null && 
+                formatEx.getTargetType().getSimpleName().equals("PersonClassification")) {
+                
+                message = "La clasificación de persona '" + formatEx.getValue() + 
+                         "' no es válida. Valores válidos: NATURAL_PERSON, LEGAL_ENTITY, BOTH";
+                code = "TYPE_ID_INVALID_CLASSIFICATION";
+            }
+        }
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(message)
+                .code(code)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    /**
      * Maneja errores de validación de payload (Bean Validation en @RequestBody con @Valid).
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -62,12 +101,21 @@ public class GlobalExceptionHandler {
                         (msg1, msg2) -> msg1
                 ));
 
+        // Detectar si es un error específico de clasificación
+        String message = "Error de validación de campos";
+        String code = ErrorCode.GENERIC_ERROR.getCode();
+        
+        if (fieldErrors.containsKey("classification")) {
+            message = "La clasificación de persona no puede ser nula. Debe especificar: NATURAL_PERSON, LEGAL_ENTITY o BOTH";
+            code = "TYPE_ID_INVALID_CLASSIFICATION";
+        }
+
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
-                .message("Error de validación de campos")
-                .code(ErrorCode.GENERIC_ERROR.getCode())
+                .message(message)
+                .code(code)
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 

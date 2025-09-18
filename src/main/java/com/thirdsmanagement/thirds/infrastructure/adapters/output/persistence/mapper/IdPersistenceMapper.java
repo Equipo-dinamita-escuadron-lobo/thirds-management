@@ -66,6 +66,7 @@ public interface IdPersistenceMapper {
     @Mapping(target =  "tiId", source = "typeId" )
     @Mapping(target =  "tiName", source = "typeIdname")
     @Mapping(target =  "tientId", source = "entId" )
+    @Mapping(target =  "classification", source = "classification")
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)
@@ -80,6 +81,7 @@ public interface IdPersistenceMapper {
     @Mapping(source =  "tiId", target = "typeId" )
     @Mapping(source =  "tiName", target = "typeIdname")
     @Mapping(source =  "tientId", target = "entId" )
+    @Mapping(source =  "classification", target = "classification")
     TypeId toTypeId(TypeIdEntity typeIdEntity);
 
     /**

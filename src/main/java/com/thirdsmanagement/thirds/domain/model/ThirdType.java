@@ -1,5 +1,7 @@
 package com.thirdsmanagement.thirds.domain.model;
 
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -38,32 +40,46 @@ public class ThirdType {
     @Builder.Default
     private Boolean status = true;
 
+    /**
+     * Verifica si este tipo de tercero es de tipo cliente.
+     * Utiliza comparación normalizada case-insensitive.
+     * 
+     * @return true si es tipo cliente
+     */
     public boolean isClientType() {
-        return "Cliente".equalsIgnoreCase(thirdTypeName) ||
-                "CLIENTE".equalsIgnoreCase(thirdTypeName);
+        return StringNormalizer.normalizeForComparison("Cliente")
+                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
     }
 
+    /**
+     * Verifica si este tipo de tercero es de tipo proveedor.
+     * Utiliza comparación normalizada case-insensitive.
+     * 
+     * @return true si es tipo proveedor
+     */
     public boolean isSupplierType() {
-        return "Proveedor".equalsIgnoreCase(thirdTypeName) ||
-                "PROVEEDOR".equalsIgnoreCase(thirdTypeName);
+        return StringNormalizer.normalizeForComparison("Proveedor")
+                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
     }
 
+    /**
+     * Verifica si este tipo de tercero es de tipo empleado.
+     * Utiliza comparación normalizada case-insensitive.
+     * 
+     * @return true si es tipo empleado
+     */
     public boolean isEmployeeType() {
-        return "Empleado".equalsIgnoreCase(thirdTypeName) ||
-                "EMPLEADO".equalsIgnoreCase(thirdTypeName);
+        return StringNormalizer.normalizeForComparison("Empleado")
+                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
     }
 
+    /**
+     * Obtiene el nombre normalizado usando StringNormalizer.
+     * Elimina acentos pero preserva el formato de caso original.
+     * 
+     * @return nombre normalizado
+     */
     public String getNormalizedName() {
-        if (thirdTypeName == null || thirdTypeName.trim().isEmpty()) {
-            return null;
-        }
-
-        String trimmed = thirdTypeName.trim();
-        if (trimmed.length() == 1) {
-            return trimmed.toUpperCase();
-        }
-
-        return trimmed.substring(0, 1).toUpperCase() +
-                trimmed.substring(1).toLowerCase();
+        return StringNormalizer.normalizePreservingCase(thirdTypeName);
     }
 }

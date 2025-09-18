@@ -6,8 +6,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.thirdsmanagement.thirds.domain.model.PersonClassification;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -60,4 +64,9 @@ public class TypeIdEntity {
     @Builder.Default
     @Column(name = "ti_status")
     private Boolean status = true;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "ti_classification")
+    private PersonClassification classification = PersonClassification.NATURAL_PERSON;
 }

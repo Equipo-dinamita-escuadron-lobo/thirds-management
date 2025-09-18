@@ -1,5 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
+import com.thirdsmanagement.thirds.domain.model.PersonClassification;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,4 +34,7 @@ public class TypeIdCreateRequest {
 
     @Builder.Default
     private Boolean status = true;
+
+    @NotNull(message = "La clasificación de persona no puede estar vacía")
+    private PersonClassification classification;
 }

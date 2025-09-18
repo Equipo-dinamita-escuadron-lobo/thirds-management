@@ -1,14 +1,13 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Interfaz Mapper para mapear los objetos de entrada y salida de los tipos de terceros y los tipos de identificación.
@@ -43,9 +42,11 @@ public interface IdRestMapper {
      * @param typeIdCreateRequest Objeto de tipo {@link TypeIdCreateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "typeIdname", source = "typeIdname")
     @Mapping(target = "entId", source = "entId")
     @Mapping(target = "typeId", source = "typeId")
+    @Mapping(target = "classification", source = "classification")
     TypeId toTypeId(TypeIdCreateRequest typeIdCreateRequest);
 
     /**
@@ -53,10 +54,12 @@ public interface IdRestMapper {
      * @param typeIdUpdateRequest Objeto de tipo {@link TypeIdUpdateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "typeIdname", source = "typeIdname")
     @Mapping(target = "entId", source = "entId")
     @Mapping(target = "typeId", source = "typeId")
     @Mapping(target = "status", source = "status")
+    @Mapping(target = "classification", source = "classification")
     TypeId toTypeId(TypeIdUpdateRequest typeIdUpdateRequest);
 
     /**

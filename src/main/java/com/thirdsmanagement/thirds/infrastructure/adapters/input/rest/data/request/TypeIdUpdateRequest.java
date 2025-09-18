@@ -1,5 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
+import com.thirdsmanagement.thirds.domain.model.PersonClassification;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -26,4 +28,6 @@ public class TypeIdUpdateRequest {
     private String typeIdname;
 
     private Boolean status;
+
+    private PersonClassification classification;
 }

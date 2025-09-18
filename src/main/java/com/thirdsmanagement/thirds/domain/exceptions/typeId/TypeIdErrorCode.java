@@ -14,7 +14,8 @@ public enum TypeIdErrorCode implements ErrorCodeDefinition {
     TYPE_ID_NAME_ALREADY_EXISTS("TYPE_ID_NAME_ALREADY_EXISTS", "Ya existe un tipo de identificación con ese nombre"),
     TYPE_ID_INVALID_DATA("TYPE_ID_INVALID_DATA", "Datos del tipo de identificación inválidos"),
     TYPE_ID_IN_USE("TYPE_ID_IN_USE", "El tipo de identificación está siendo utilizado y no puede ser eliminado"),
-    TYPE_ID_FOREIGN_KEY_VIOLATION("TYPE_ID_FOREIGN_KEY_VIOLATION", "Tipo de identificación no válido o no encontrado");
+    TYPE_ID_FOREIGN_KEY_VIOLATION("TYPE_ID_FOREIGN_KEY_VIOLATION", "Tipo de identificación no válido o no encontrado"),
+    TYPE_ID_INVALID_CLASSIFICATION("TYPE_ID_INVALID_CLASSIFICATION", "Clasificación de persona inválida o no encontrada");
 
     private final String code;
     private final String message;
