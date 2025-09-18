@@ -42,7 +42,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         }
         
         // Validar datos básicos y consistencia de tipo de persona
-        thirdValidationService.validateThirdData(third);
+        thirdValidationService.validatePersonTypeConsistency(third);
         
         // Normalize names
         Third normalizedThird = Third.builder()
@@ -94,7 +94,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         }
         
         // Validar datos básicos y consistencia de tipo de persona
-        thirdValidationService.validateThirdData(third);
+        thirdValidationService.validatePersonTypeConsistency(third);
         
         // Geography validation and retrieval
         Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);

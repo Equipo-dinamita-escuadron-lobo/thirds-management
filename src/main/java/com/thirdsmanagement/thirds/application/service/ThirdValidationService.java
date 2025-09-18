@@ -12,36 +12,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ThirdValidationService {
 
-    /**
-     * Valida los datos básicos del tercero.
-     * 
-     * @param third el tercero a validar
-     * @throws ThirdInvalidDataException si los datos son inválidos
-     */
-    public void validateThirdData(Third third) {
-        if (third == null) {
-            throw new ThirdInvalidDataException("El tercero no puede ser null");
-        }
-        
-        if (third.getEntId() == null || third.getEntId().trim().isEmpty()) {
-            throw new ThirdInvalidDataException("El ID de entidad no puede estar vacío");
-        }
-        
-        if (third.getIdNumber() == null) {
-            throw new ThirdInvalidDataException("El número de identificación no puede estar vacío");
-        }
-        
-        if (third.getTypeId() == null || third.getTypeId().getId() == null) {
-            throw new ThirdInvalidDataException("El tipo de identificación no puede estar vacío");
-        }
-        
-        if (third.getThirdTypes() == null || third.getThirdTypes().isEmpty()) {
-            throw new ThirdInvalidDataException("Los tipos de tercero no pueden estar vacíos");
-        }
-        
-        // Validar consistencia entre tipo de persona y campos requeridos
-        validatePersonTypeConsistency(third);
-    }
     
     /**
      * Valida la consistencia entre el tipo de persona y los campos requeridos.

@@ -38,7 +38,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     @Transactional
     public Third createThird(Third third) {
         // Validar datos básicos
-        thirdValidationService.validateThirdData(third);
+        thirdValidationService.validatePersonTypeConsistency(third);
         
         // Normalizar nombres
         Third normalizedThird = Third.builder()
@@ -84,7 +84,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     @Transactional
     public Third createThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {
         // Basic validation
-        thirdValidationService.validateThirdData(third);
+        thirdValidationService.validatePersonTypeConsistency(third);
         
         // Geography validation and retrieval
         Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
