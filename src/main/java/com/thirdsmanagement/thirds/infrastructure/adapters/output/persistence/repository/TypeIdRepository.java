@@ -17,21 +17,20 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
  */
 @Repository
 public interface TypeIdRepository extends JpaRepository<TypeIdEntity,Long>{
-    @Query("SELECT t FROM TypeIdEntity t WHERE t.tientId = :tientId OR t.tientId = 'standart'")
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tientId = :tientId")
     List<TypeIdEntity> findAllByTientId(@Param("tientId") String tientId);
     
     /**
      * Verifica si existe un tipo de identificación con el mismo nombre (case-insensitive) para una entidad.
      * Utiliza LOWER() para comparación case-insensitive.
-     * Busca en registros estándar Y en registros de la entidad específica para evitar duplicados.
      */
-    @Query("SELECT COUNT(t) > 0 FROM TypeIdEntity t WHERE LOWER(t.tiName) = LOWER(:tiName) AND (t.tientId = :tientId OR t.tientId = 'standart')")
+    @Query("SELECT COUNT(t) > 0 FROM TypeIdEntity t WHERE LOWER(t.tiName) = LOWER(:tiName) AND t.tientId = :tientId")
     boolean existsByTiNameIgnoreCaseAndTientId(@Param("tiName") String tiName, @Param("tientId") String tientId);
     
     /**
      * Verifica si existe un tipo de identificación con el mismo código para una entidad.
      */
-    @Query("SELECT COUNT(t) > 0 FROM TypeIdEntity t WHERE t.tiId = :tiId AND (t.tientId = :tientId OR t.tientId = 'standart')")
+    @Query("SELECT COUNT(t) > 0 FROM TypeIdEntity t WHERE t.tiId = :tiId AND t.tientId = :tientId")
     boolean existsByTiIdAndTientId(@Param("tiId") String tiId, @Param("tientId") String tientId);
     
     /**
@@ -43,6 +42,6 @@ public interface TypeIdRepository extends JpaRepository<TypeIdEntity,Long>{
     /**
      * Busca un tipo de identificación por su código para una entidad específica.
      */
-    @Query("SELECT t FROM TypeIdEntity t WHERE t.tiId = :tiId AND (t.tientId = :tientId OR t.tientId = 'standart')")
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tiId = :tiId AND t.tientId = :tientId")
     Optional<TypeIdEntity> findByTiIdAndTientId(@Param("tiId") String tiId, @Param("tientId") String tientId);
 }

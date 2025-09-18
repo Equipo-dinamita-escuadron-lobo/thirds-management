@@ -20,13 +20,13 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
 
     List<ThirdTypeEntity> findByTtNameContaining(String name);
 
-    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId OR tt.ttentId = 'standart'")
+    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId")
     List<ThirdTypeEntity> findAllByTtentId(@Param("ttentId") String ttentId);
 
-    @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE LOWER(tt.ttName) = LOWER(:ttName) AND (tt.ttentId = :ttentId OR tt.ttentId = 'standart')")
+    @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE LOWER(tt.ttName) = LOWER(:ttName) AND tt.ttentId = :ttentId")
     boolean existsByTtNameIgnoreCaseAndTtentId(@Param("ttName") String ttName, @Param("ttentId") String ttentId);
 
-    @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE tt.ttName = :ttName AND (tt.ttentId = :ttentId OR tt.ttentId = 'standart')")
+    @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE tt.ttName = :ttName AND tt.ttentId = :ttentId")
     boolean existsByTtNameAndTtentId(@Param("ttName") String ttName, @Param("ttentId") String ttentId);
 
     void deleteByTtentId(String ttentId);
