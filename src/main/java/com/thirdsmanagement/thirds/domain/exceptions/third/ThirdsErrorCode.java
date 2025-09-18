@@ -21,7 +21,8 @@ public enum ThirdsErrorCode implements ErrorCodeDefinition {
     THIRD_EXPORT_NO_DATA("THIRD_EXPORT_NO_DATA", "No hay terceros registrados para exportar en esta entidad"),
     THIRD_EXPORT_ERROR("THIRD_EXPORT_ERROR", "Error al generar archivo de exportación"),
     EXCEL_VALIDATION_ERROR("EXCEL_VALIDATION_ERROR", "Error al aplicar validaciones de datos en Excel"),
-    EXCEL_REFERENCE_SHEET_ERROR("EXCEL_REFERENCE_SHEET_ERROR", "Error al crear hoja de referencia en Excel");
+    EXCEL_REFERENCE_SHEET_ERROR("EXCEL_REFERENCE_SHEET_ERROR", "Error al crear hoja de referencia en Excel"),
+    THIRD_PERSON_TYPE_VALIDATION_ERROR("THIRD_PERSON_TYPE_VALIDATION_ERROR", "Error de validación de tipo de persona");
 
     private final String code;
     private final String message;
