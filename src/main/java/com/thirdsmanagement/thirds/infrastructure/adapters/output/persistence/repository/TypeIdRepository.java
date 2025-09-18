@@ -2,6 +2,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.r
 
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
  * Proporciona métodos para acceder a los datos de los tipos de identificación.
  */
 @Repository
-public interface TypeIdRepository extends JpaRepository<TypeIdEntity,String>{
+public interface TypeIdRepository extends JpaRepository<TypeIdEntity,Long>{
     @Query("SELECT t FROM TypeIdEntity t WHERE t.tientId = :tientId OR t.tientId = 'standart'")
     List<TypeIdEntity> findAllByTientId(@Param("tientId") String tientId);
     
@@ -32,4 +33,16 @@ public interface TypeIdRepository extends JpaRepository<TypeIdEntity,String>{
      */
     @Query("SELECT COUNT(t) > 0 FROM TypeIdEntity t WHERE t.tiId = :tiId AND (t.tientId = :tientId OR t.tientId = 'standart')")
     boolean existsByTiIdAndTientId(@Param("tiId") String tiId, @Param("tientId") String tientId);
+    
+    /**
+     * Busca un tipo de identificación por su código.
+     */
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tiId = :tiId")
+    Optional<TypeIdEntity> findByTiId(@Param("tiId") String tiId);
+    
+    /**
+     * Busca un tipo de identificación por su código para una entidad específica.
+     */
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tiId = :tiId AND (t.tientId = :tientId OR t.tientId = 'standart')")
+    Optional<TypeIdEntity> findByTiIdAndTientId(@Param("tiId") String tiId, @Param("tientId") String tientId);
 }

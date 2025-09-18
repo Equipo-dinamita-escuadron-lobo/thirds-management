@@ -164,7 +164,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
         
         // Verificar que el tipo de identificación existe
-        Optional<TypeIdEntity> existingEntity = typeIdRepository.findById(normalizedTypeId);
+        Optional<TypeIdEntity> existingEntity = typeIdRepository.findByTiIdAndTientId(normalizedTypeId, typeId.getEntId());
         if (existingEntity.isEmpty()) {
             throw new TypeIdNotFound("No se encontró el tipo de identificación con código '" + normalizedTypeId + "'");
         }

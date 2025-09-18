@@ -63,11 +63,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             throw new IllegalArgumentException("El tercero no puede ser null");
         }
 
-        if (third.getTypeId() == null || third.getTypeId().getTypeId() == null) {
+        if (third.getTypeId() == null || third.getTypeId().getId() == null) {
             throw new IllegalArgumentException("El tipo de identificación del tercero no puede ser null");
         }
 
-        validateTypeIdExists(third.getTypeId().getTypeId());
+        validateTypeIdExists(third.getTypeId().getId());
         validateThirdTypesExist(third.getThirdTypes());
 
         // Preparar la entidad principal
@@ -75,8 +75,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         thirdEntity.setTenantId(TenantContext.getTenantId());
 
         // Obtener la referencia del tipo de identificación
-        TypeIdEntity typeIdEntity = typeIdRepository.getReferenceById(third.getTypeId().getTypeId());
-        thirdEntity.setTypeId(typeIdEntity);
+        Optional<TypeIdEntity> typeIdEntityOpt = typeIdRepository.findById(third.getTypeId().getId());
+        if (typeIdEntityOpt.isEmpty()) {
+            throw new TypeIdForeignKeyViolationException(third.getTypeId().getId().toString());
+        }
+        thirdEntity.setTypeId(typeIdEntityOpt.get());
 
         // Guardar la entidad del tercero
         try {
@@ -141,9 +144,9 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     /**
      * Valida que el tipo de identificación existe antes de proceder con el guardado.
      */
-    private void validateTypeIdExists(String typeId) {
+    private void validateTypeIdExists(Long typeId) {
         if (!typeIdRepository.existsById(typeId)) {
-            throw new TypeIdForeignKeyViolationException(typeId);
+            throw new TypeIdForeignKeyViolationException(typeId.toString());
         }
     }
 
@@ -310,20 +313,21 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 //thirdEntity.setGender("");
             }
                  
-            TypeIdEntity typeIdEntity = new TypeIdEntity();
+            // Obtener la entidad TypeId completa por su ID numérico
             TypeId typeId = third.getTypeId();
+            TypeIdEntity typeIdEntity = null;
 
-            if (typeId != null) {
-                typeIdEntity.setTiId(typeId.getTypeId()); // Asigna typeId a tiId
-                typeIdEntity.setTiName(typeId.getTypeIdname()); // Asigna typeIdname a tiName
-                String entId = typeId.getEntId();
-                if (entId == null || entId.trim().isEmpty()) {
-                    entId = "standart";
+            if (typeId != null && typeId.getId() != null) {
+                Optional<TypeIdEntity> typeIdEntityOpt = typeIdRepository.findById(typeId.getId());
+                if (typeIdEntityOpt.isPresent()) {
+                    typeIdEntity = typeIdEntityOpt.get();
+                    // Log para verificar la conversión
+                    System.out.println("Tipo de ID encontrado: " + typeIdEntity.getTiName());
+                } else {
+                    System.err.println("No se encontró TypeId con ID: " + typeId.getId());
                 }
-                typeIdEntity.setTientId(entId); // Asigna entId a tientId
-
-                // Log para verificar la conversión
-                System.out.println("Tipo de ID asignado: " + typeId.getTypeIdname());
+            } else {
+                System.err.println("TypeId o su ID es null");
             }
 
             // Asigna el resultado al atributo correspondiente

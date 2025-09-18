@@ -62,6 +62,7 @@ public interface IdPersistenceMapper {
      * @param typeId Objeto de tipo de identificación.
      * @return Entidad de tipo de identificación.
      */
+    @Mapping(target =  "id", source = "id" )
     @Mapping(target =  "tiId", source = "typeId" )
     @Mapping(target =  "tiName", source = "typeIdname")
     @Mapping(target =  "tientId", source = "entId" )
@@ -75,6 +76,7 @@ public interface IdPersistenceMapper {
      * @param typeIdEntity Entidad de tipo de identificación.
      * @return Objeto de tipo de identificación.
      */
+    @Mapping(source =  "id", target = "id" )
     @Mapping(source =  "tiId", target = "typeId" )
     @Mapping(source =  "tiName", target = "typeIdname")
     @Mapping(source =  "tientId", target = "entId" )

@@ -15,11 +15,13 @@ import lombok.ToString;
 @Builder
 @Getter
 @Setter
-@EqualsAndHashCode(of = { "entId", "typeId" })
-@ToString(of = { "typeId", "typeIdname" })
+@EqualsAndHashCode(of = { "id" })
+@ToString(of = { "id", "typeId", "typeIdname" })
 @AllArgsConstructor
 @NoArgsConstructor
 public class TypeId {
+
+    private Long id;
 
     @NotBlank(message = "El ID de la empresa no puede estar vacío")
     @Size(max = 50, message = "El ID de la empresa no puede exceder los 50 caracteres")

@@ -48,7 +48,7 @@ public class ThirdEntity {
     private String entId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ti_id", referencedColumnName = "ti_id")
+    @JoinColumn(name = "type_id_fk", referencedColumnName = "ti_id")
     private TypeIdEntity typeId;
 
 

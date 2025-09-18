@@ -25,6 +25,7 @@ public interface ThirdPersistenceMapper {
      * @param third Objeto de tercero.
      * @return Entidad de tercero.
      */
+    @Mapping(target = "typeId", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)
@@ -38,6 +39,7 @@ public interface ThirdPersistenceMapper {
      * @param thirdEntity Entidad de tercero.
      * @return Objeto de tercero.
      */
+    @Mapping(target = "typeId", source = "typeId")
     @Mapping(target = "thirdTypes", ignore = true)
     @Mapping(target = "country", ignore = true)
     @Mapping(target = "province", ignore = true)

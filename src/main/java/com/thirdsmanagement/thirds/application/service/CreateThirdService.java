@@ -141,7 +141,7 @@ public class CreateThirdService implements CreateThirdUseCase {
             throw new ThirdInvalidDataException("El número de identificación no puede estar vacío");
         }
         
-        if (third.getTypeId() == null || third.getTypeId().getTypeId() == null) {
+        if (third.getTypeId() == null || third.getTypeId().getId() == null) {
             throw new ThirdInvalidDataException("El tipo de identificación no puede estar vacío");
         }
         
