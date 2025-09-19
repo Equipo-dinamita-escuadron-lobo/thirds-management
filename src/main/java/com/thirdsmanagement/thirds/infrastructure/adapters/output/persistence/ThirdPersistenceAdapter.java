@@ -12,7 +12,6 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.GeographyLoaderService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
-import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
@@ -23,11 +22,11 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -302,7 +301,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         // Buscar la entidad existente
         Optional<ThirdEntity> existingEntityOpt = thirdRepository.findById(third.getThId());
         if (existingEntityOpt.isEmpty()) {
-            throw new EntityNotFoundException("No se encontró el tercero con ID: " + third.getThId());
+            throw new ThirdNotFound("No se encontró el tercero con ID: " + third.getThId());
         }
 
         ThirdEntity thirdEntity = existingEntityOpt.get();

@@ -12,6 +12,7 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 
@@ -49,7 +50,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         
         // Validar que el tercero existe
         if (!thirdOutputPort.existThirdById(third.getThId(), third.getEntId())) {
-            throw new ThirdInvalidDataException("El tercero con ID " + third.getThId() + " no existe");
+            throw new ThirdNotFound("El tercero con ID " + third.getThId() + " no existe");
         }
         
         // Validar datos básicos y consistencia de tipo de persona
