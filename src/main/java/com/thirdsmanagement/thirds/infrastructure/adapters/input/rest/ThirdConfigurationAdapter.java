@@ -21,6 +21,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdTypeResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
 import jakarta.validation.Valid;
@@ -47,31 +48,31 @@ public class ThirdConfigurationAdapter {
     private final IdRestMapper idRestMapper;
 
     @PostMapping("/thirdtype")
-    public ResponseEntity<ThirdType> createThirdType(
+    public ResponseEntity<ThirdTypeResponse> createThirdType(
             @RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest) {
 
         ThirdType thirdType = idRestMapper.toThirdType(thirdTypeCreateRequest);
-        thirdType = createThirdTypeUseCase.createThirdType(thirdType);
+        ThirdType createdThirdType = createThirdTypeUseCase.createThirdType(thirdType);
 
-        return new ResponseEntity<>(thirdType, HttpStatus.CREATED);
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(createdThirdType), HttpStatus.CREATED);
     }
 
     @GetMapping("/thirdtype")
-    public ResponseEntity<List<ThirdType>> getThirdType(
+    public ResponseEntity<List<ThirdTypeResponse>> getThirdType(
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
 
         List<ThirdType> thirdTypes = listThirdTypeUseCase.getAllThirdTypes(entId);
 
-        return new ResponseEntity<>(thirdTypes, HttpStatus.OK);
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponseList(thirdTypes), HttpStatus.OK);
 
     }
 
     @PostMapping("/thirdtype/update")
-    public ResponseEntity<ThirdType> updateThirdType(@RequestBody @Valid ThirdTypeUpdateRequest thirdTypeUpdateRequest) {
+    public ResponseEntity<ThirdTypeResponse> updateThirdType(@RequestBody @Valid ThirdTypeUpdateRequest thirdTypeUpdateRequest) {
         ThirdType thirdType = idRestMapper.toThirdType(thirdTypeUpdateRequest);
-        thirdType = updateThirdTypeUseCase.updateThirdType(thirdType);
+        ThirdType updatedThirdType = updateThirdTypeUseCase.updateThirdType(thirdType);
 
-        return new ResponseEntity<>(thirdType, HttpStatus.OK);
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(updatedThirdType), HttpStatus.OK);
     }
 
     @PostMapping("/typeid")

@@ -6,6 +6,8 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdTypeResponse;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -72,4 +74,18 @@ public interface IdRestMapper {
     @Mapping(target = "thirdTypeId", source = "thirdTypeId")
     @Mapping(target = "status", source = "status")
     ThirdType toThirdType(ThirdTypeUpdateRequest thirdTypeUpdateRequest);
+
+    /**
+     * Método para mapear un objeto de tipo {@link ThirdType} a un objeto de tipo {@link ThirdTypeResponse}.
+     * @param thirdType Objeto de tipo {@link ThirdType}.
+     * @return Objeto de tipo {@link ThirdTypeResponse}.
+     */
+    ThirdTypeResponse toThirdTypeResponse(ThirdType thirdType);
+
+    /**
+     * Método para mapear una lista de objetos de tipo {@link ThirdType} a una lista de objetos de tipo {@link ThirdTypeResponse}.
+     * @param thirdTypes Lista de objetos de tipo {@link ThirdType}.
+     * @return Lista de objetos de tipo {@link ThirdTypeResponse}.
+     */
+    List<ThirdTypeResponse> toThirdTypeResponseList(List<ThirdType> thirdTypes);
 } 

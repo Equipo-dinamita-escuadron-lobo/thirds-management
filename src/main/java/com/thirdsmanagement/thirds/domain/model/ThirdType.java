@@ -40,38 +40,6 @@ public class ThirdType {
     @Builder.Default
     private Boolean status = true;
 
-    /**
-     * Verifica si este tipo de tercero es de tipo cliente.
-     * Utiliza comparación normalizada case-insensitive.
-     * 
-     * @return true si es tipo cliente
-     */
-    public boolean isClientType() {
-        return StringNormalizer.normalizeForComparison("Cliente")
-                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
-    }
-
-    /**
-     * Verifica si este tipo de tercero es de tipo proveedor.
-     * Utiliza comparación normalizada case-insensitive.
-     * 
-     * @return true si es tipo proveedor
-     */
-    public boolean isSupplierType() {
-        return StringNormalizer.normalizeForComparison("Proveedor")
-                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
-    }
-
-    /**
-     * Verifica si este tipo de tercero es de tipo empleado.
-     * Utiliza comparación normalizada case-insensitive.
-     * 
-     * @return true si es tipo empleado
-     */
-    public boolean isEmployeeType() {
-        return StringNormalizer.normalizeForComparison("Empleado")
-                .equals(StringNormalizer.normalizeForComparison(thirdTypeName));
-    }
 
     /**
      * Obtiene el nombre normalizado usando StringNormalizer.
