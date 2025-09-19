@@ -50,4 +50,18 @@ public interface IdOutputPort {
      * @return El tipo de tercero actualizado
      */
     ThirdType updateThirdType(ThirdType thirdType);
+    
+    /**
+     * Verifica si existe un tipo de identificación por su ID.
+     * @param typeIdId El ID del tipo de identificación
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsTypeIdById(Long typeIdId);
+    
+    /**
+     * Verifica si existe un tipo de tercero por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsThirdTypeById(Long thirdTypeId);
 }

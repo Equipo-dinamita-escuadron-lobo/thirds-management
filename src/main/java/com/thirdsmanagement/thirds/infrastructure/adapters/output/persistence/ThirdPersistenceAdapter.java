@@ -291,59 +291,62 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     */
     @Override
     public Third updateThird(Third third) {
-        
-        
-        ThirdEntity thirdEntity = thirdRepository.findById(third.getThId()).orElse(null);
-        System.out.println(thirdEntity.toString());
-        System.out.println(thirdEntity.getNames());
-        if(thirdEntity != null){
-            thirdEntity.setNames(third.getNames());
-            thirdEntity.setLastNames(third.getLastNames());
-            thirdEntity.setIdNumber(third.getIdNumber());
-            thirdEntity.setSocialReason(third.getSocialReason());
-            thirdEntity.setAddress(third.getAddress());
-            thirdEntity.setCity(third.getCity() != null ? third.getCity().getCityCode() : null);
-            thirdEntity.setCountry(third.getCountry() != null ? third.getCountry().getCountryCode() : null);
-            thirdEntity.setProvince(third.getProvince() != null ? third.getProvince().getStateCode() : null);
-            thirdEntity.setPersonType(third.getPersonType());
-            
-            if (third.getGender() != null) {
-                thirdEntity.setGender(third.getGender().name());
-            } else {
-                //thirdEntity.setGender("");
-            }
-                 
-            // Obtener la entidad TypeId completa por su ID numérico
-            TypeId typeId = third.getTypeId();
-            TypeIdEntity typeIdEntity = null;
-
-            if (typeId != null && typeId.getId() != null) {
-                Optional<TypeIdEntity> typeIdEntityOpt = typeIdRepository.findById(typeId.getId());
-                if (typeIdEntityOpt.isPresent()) {
-                    typeIdEntity = typeIdEntityOpt.get();
-                    // Log para verificar la conversión
-                    System.out.println("Tipo de ID encontrado: " + typeIdEntity.getTiName());
-                } else {
-                    System.err.println("No se encontró TypeId con ID: " + typeId.getId());
-                }
-            } else {
-                System.err.println("TypeId o su ID es null");
-            }
-
-            // Asigna el resultado al atributo correspondiente
-            thirdEntity.setTypeId(typeIdEntity);
-
-
-            System.out.println("El estado ga guardar es es" + third.getState());
-            thirdEntity.setState(third.getState() != null ? third.getState() : true);
-            System.out.println("El estado entro a guardar " + thirdEntity.getState());
-            thirdEntity.setVerificationNumber(thirdEntity.getVerificationNumber());
-            thirdEntity.setPhoneNumber(third.getPhoneNumber());
-            thirdEntity.setEmail(third.getEmail());
-            // Los tipos de tercero se manejan a través de ThirdsAndTypesEntity
-            // No se asignan directamente a la entidad Third
-            thirdEntity = thirdRepository.save(thirdEntity);
+        if (third == null) {
+            throw new IllegalArgumentException("El tercero no puede ser null");
         }
+
+        if (third.getThId() == null) {
+            throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
+        }
+
+        // Buscar la entidad existente
+        Optional<ThirdEntity> existingEntityOpt = thirdRepository.findById(third.getThId());
+        if (existingEntityOpt.isEmpty()) {
+            throw new EntityNotFoundException("No se encontró el tercero con ID: " + third.getThId());
+        }
+
+        ThirdEntity thirdEntity = existingEntityOpt.get();
+
+        // Validar que el TypeId existe antes de actualizar
+        if (third.getTypeId() != null && third.getTypeId().getId() != null) {
+            validateTypeIdExists(third.getTypeId().getId());
+            Optional<TypeIdEntity> typeIdEntityOpt = typeIdRepository.findById(third.getTypeId().getId());
+            if (typeIdEntityOpt.isPresent()) {
+                thirdEntity.setTypeId(typeIdEntityOpt.get());
+            }
+        }
+
+        // Validar que los ThirdTypes existen antes de actualizar
+        if (third.getThirdTypes() != null && !third.getThirdTypes().isEmpty()) {
+            validateThirdTypesExist(third.getThirdTypes());
+        }
+
+        // Actualizar los campos de la entidad principal
+        thirdEntity.setNames(third.getNames());
+        thirdEntity.setLastNames(third.getLastNames());
+        thirdEntity.setIdNumber(third.getIdNumber());
+        thirdEntity.setSocialReason(third.getSocialReason());
+        thirdEntity.setAddress(third.getAddress());
+        thirdEntity.setCity(third.getCity() != null ? third.getCity().getCityCode() : null);
+        thirdEntity.setCountry(third.getCountry() != null ? third.getCountry().getCountryCode() : null);
+        thirdEntity.setProvince(third.getProvince() != null ? third.getProvince().getStateCode() : null);
+        thirdEntity.setPersonType(third.getPersonType());
+        thirdEntity.setGender(third.getGender() != null ? third.getGender().name() : null);
+        thirdEntity.setState(third.getState() != null ? third.getState() : true);
+        thirdEntity.setPhoneNumber(third.getPhoneNumber());
+        thirdEntity.setEmail(third.getEmail());
+
+        // Guardar la entidad principal actualizada
+        try {
+            thirdEntity = thirdRepository.save(thirdEntity);
+        } catch (DataIntegrityViolationException e) {
+            throw e;
+        }
+
+        // Actualizar las relaciones de tipos de tercero
+        updateThirdTypeRelations(thirdEntity.getThId(), third.getThirdTypes());
+
+        // Convertir de vuelta al dominio
         Third updatedThird = thirdPersistenceMapper.toThird(thirdEntity);
         return loadGeographyData(updatedThird, thirdEntity);
     }
@@ -374,5 +377,36 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
         return pageThirds;
+    }
+    
+    /**
+     * Actualiza las relaciones de tipos de tercero para un tercero específico.
+     * Elimina todas las relaciones existentes y crea las nuevas.
+     * @param thirdId ID del tercero
+     * @param thirdTypes Nuevos tipos de tercero a asociar
+     */
+    private void updateThirdTypeRelations(Long thirdId, Set<ThirdType> thirdTypes) {
+        // Eliminar todas las relaciones existentes
+        List<ThirdsAndTypesEntity> existingRelations = thirdsAndTypesRepository.findByThId(thirdId);
+        if (!existingRelations.isEmpty()) {
+            thirdsAndTypesRepository.deleteAll(existingRelations);
+        }
+        
+        // Crear las nuevas relaciones si hay tipos de tercero
+        if (thirdTypes != null && !thirdTypes.isEmpty()) {
+            for (ThirdType thirdType : thirdTypes) {
+                ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                        .thId(thirdId)
+                        .ttId(thirdType.getThirdTypeId())
+                        .tenantId(TenantContext.getTenantId())
+                        .build();
+
+                try {
+                    thirdsAndTypesRepository.save(relationEntity);
+                } catch (DataIntegrityViolationException e) {
+                    throw e;
+                }
+            }
+        }
     }
 }
