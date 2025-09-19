@@ -5,9 +5,6 @@ import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 import com.thirdsmanagement.thirds.domain.model.eThirdGender;
-import com.thirdsmanagement.thirds.infrastructure.adapters.deserializers.ThirdTypeDeserializer;
-import com.thirdsmanagement.thirds.infrastructure.adapters.deserializers.TypeIdDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
@@ -39,14 +36,12 @@ public class ThirdCreateRequest {
     @NotNull(message = "El ID de la empresa no puede estar vacío") 
     private String entId;
 
-    @JsonDeserialize(using = TypeIdDeserializer.class)
     @NotNull(message = "El tipo de identificación no puede estar vacío") 
     private TypeId typeId;
 
     @NotNull(message = "El tipo de persona no puede estar vacío")  
     private ePersonType personType; 
     
-    @JsonDeserialize(using = ThirdTypeDeserializer.class)
     @NotNull(message = "El tipo de tercero no puede estar vacío") 
     private Set<ThirdType> thirdTypes;
 
