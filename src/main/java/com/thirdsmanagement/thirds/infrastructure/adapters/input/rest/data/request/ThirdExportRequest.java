@@ -31,10 +31,10 @@ public class ThirdExportRequest {
     private Boolean status;
 
     /**
-     * Lista de tipos de tercero a incluir en la exportación.
-     * Si está vacía o es null, se incluyen todos los tipos.
+     * ID específico de tipo de tercero para filtrar.
+     * Si es null, se incluyen todos los tipos.
      */
-    private List<String> thirdTypes;
+    private Long thirdTypeId;
 
     /**
      * Lista de IDs específicos de terceros a exportar.

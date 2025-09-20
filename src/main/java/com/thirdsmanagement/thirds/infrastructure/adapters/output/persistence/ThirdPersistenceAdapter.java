@@ -224,15 +224,30 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Obtiene una página de terceros filtrados por tipo de tercero y el identificador de entidad.
-     * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
-     * @param page El objeto Pageable que contiene la información de paginación.
+     * Obtiene todos los terceros filtrados por tipo de tercero.
+     * @param entId El ID de la empresa.
+     * @param page El objeto Pageable para la paginación.
      * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente").
      * @return Una página de objetos Third que representan los terceros filtrados por tipo.
      */
     @Override
     public Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType) {
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByType(entId, thirdType, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    /**
+     * Obtiene todos los terceros filtrados por ID de tipo de tercero.
+     * @param entId El ID de la empresa.
+     * @param page El objeto Pageable para la paginación.
+     * @param thirdTypeId El ID del tipo de tercero.
+     * @return Una página de objetos Third que representan los terceros filtrados por ID de tipo.
+     */
+    @Override
+    public Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId) {
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByTypeId(entId, thirdTypeId, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
         return pageThirds;

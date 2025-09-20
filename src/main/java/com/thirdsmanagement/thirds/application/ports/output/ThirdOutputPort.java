@@ -69,6 +69,15 @@ public interface ThirdOutputPort {
     Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType);
     
     /**
+     * Obtiene todos los terceros filtrados por ID de tipo de tercero.
+     * @param entId El id de la empresa
+     * @param page El pageable object
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return La pagina de terceros filtrados por ID de tipo
+     */
+    Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId);
+    
+    /**
      * Obtiene todos los terceros.
      * @param entId El id de la empresa
      * @return La lista de terceros

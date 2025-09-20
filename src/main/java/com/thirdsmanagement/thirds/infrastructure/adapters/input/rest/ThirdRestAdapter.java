@@ -245,33 +245,7 @@ public class ThirdRestAdapter {
         }
 
     /**
-     * Exporta terceros en formato Excel (.xlsx).
-     * @param entId ID de la empresa.
-     * @return Archivo Excel con los terceros exportados.
-     */
-    @GetMapping("/export/excel")
-    public ResponseEntity<Resource> exportThirdsToExcel(
-            @NotNull(message = "Enterprise ID no puede estar vacio") @RequestParam("entId") String entId) {
-        
-        // Crear request con solo entId requerido
-        ThirdExportRequest exportRequest = ThirdExportRequest.builder()
-                .entId(entId)
-                .includeTypes(true)
-                .includeCities(true)
-                .build();
-        
-        Resource excelFile = exportThirdUseCase.exportThirdsToExcel(exportRequest);
-        
-        String filename = "Informacion_Terceros.xlsx";
-        
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(excelFile);
-    }
-
-    /**
-     * Exporta una plantilla de terceros con validaciones de datos.
+     * Exporta una plantilla de terceros.
      */
     @GetMapping("/template/excel")
     public ResponseEntity<Resource> exportThirdTemplate(
@@ -287,6 +261,37 @@ public class ThirdRestAdapter {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(templateFile);
+    }
+
+    /**
+     * Exporta terceros existentes.
+     * Permite filtrar opcionalmente por ID de tipo de tercero e incluye toda la información.
+     */
+    @GetMapping("/export/excel")
+    public ResponseEntity<Resource> exportThirdsWithValidations(
+            @NotNull(message = "Enterprise ID no puede estar vacío") @RequestParam("entId") String entId,
+            @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId) {
+        
+        // Crear request simplificado con toda la información incluida
+        ThirdExportRequest exportRequest = ThirdExportRequest.builder()
+                .entId(entId)
+                .thirdTypeId(thirdTypeId)  // Usar ID en lugar de nombre
+                .includeTypes(true)  // Siempre incluir tipos
+                .includeCities(true) // Siempre incluir geografía
+                .build();
+        
+        Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
+        
+        // Generar nombre de archivo con timestamp y tipo si aplica
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = thirdTypeId != null 
+            ? "Terceros_Tipo_" + thirdTypeId + "_" + timestamp + ".xlsx"
+            : "Terceros_" + timestamp + ".xlsx";
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(excelFile);
     }
 
 

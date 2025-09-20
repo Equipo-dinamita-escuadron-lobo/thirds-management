@@ -13,6 +13,9 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -32,61 +35,22 @@ public class ExportThirdService implements ExportThirdUseCase {
     private final ExcelValidationService excelValidationService;
     
 
-    @Override
-    public Resource exportThirdsToExcel(ThirdExportRequest exportRequest) {
-        
-        try {
-            // Obtener datos según filtros
-            List<Third> thirds = getFilteredThirds(exportRequest);
-            
-            // Validar que existan terceros para exportar
-            if (thirds == null || thirds.isEmpty()) {
-                throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_NO_DATA);
-            }
-            
-            // Generar archivo Excel
-            byte[] excelData = generateExcelFile(thirds, exportRequest);
-            
-            return new ByteArrayResource(excelData);
-            
-        } catch (ThirdExportException e) {
-            // Re-lanzar excepciones de negocio sin modificar
-            throw e;
-        } catch (Exception e) {
-            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, "Error al generar archivo de exportación", e);
-        }
-    }
 
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Exportar todos los terceros sin aplicar filtros
+        // Si se especifica un ID de tipo de tercero, filtrar por ese tipo
+        if (request.getThirdTypeId() != null) {
+            // Crear un Pageable que obtenga todos los registros (tamaño grande)
+            Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+            Page<Third> page = thirdOutputPort.getAllThirdsByTypeId(request.getEntId(), pageable, request.getThirdTypeId());
+            
+            return page.getContent();
+        }
+        
+        // Si no se especifica tipo, exportar todos los terceros
         return thirdOutputPort.getAllThirds(request.getEntId());
     }
 
 
-    private byte[] generateExcelFile(List<Third> thirds, ThirdExportRequest request) throws IOException {
-        try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-
-            Sheet sheet = workbook.createSheet("Terceros");
-            
-            // Crear estilos
-            CellStyle headerStyle = createHeaderStyle(workbook);
-            CellStyle dataStyle = createDataStyle(workbook);
-            CellStyle dateStyle = createDateStyle(workbook);
-
-            // Crear encabezados
-            createHeaders(sheet, headerStyle, request);
-
-            // Llenar datos
-            fillData(sheet, thirds, dataStyle, dateStyle, request);
-
-            // Ajustar ancho de columnas
-            autoSizeColumns(sheet, getColumnCount(request));
-
-            workbook.write(outputStream);
-            return outputStream.toByteArray();
-        }
-    }
 
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -263,6 +227,36 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * Exporta terceros existentes con validaciones de datos (listas desplegables).
+     * Combina los datos reales con las validaciones de la plantilla.
+     */
+    @Override
+    public Resource exportThirdsWithValidations(ThirdExportRequest exportRequest) {
+        
+        try {
+            // Obtener datos según filtros
+            List<Third> thirds = getFilteredThirds(exportRequest);
+            
+            // Validar que existan terceros para exportar
+            if (thirds == null || thirds.isEmpty()) {
+                throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_NO_DATA);
+            }
+            
+            // Generar archivo Excel con datos y validaciones
+            byte[] excelData = generateExcelFileWithValidations(thirds, exportRequest);
+            
+            return new ByteArrayResource(excelData);
+            
+        } catch (ThirdExportException e) {
+            // Re-lanzar excepciones de negocio sin modificar
+            throw e;
+        } catch (Exception e) {
+            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, 
+                "Error al generar archivo de exportación con validaciones", e);
+        }
+    }
+
 
     private byte[] generateTemplateWithValidations(String entId) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
@@ -387,5 +381,64 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
         
         return new int[]{baseIndex, baseIndex + 1, baseIndex + 2}; // País, Departamento, Ciudad
+    }
+
+    /**
+     * Genera archivo Excel con datos reales y validaciones aplicadas.
+     */
+    private byte[] generateExcelFileWithValidations(List<Third> thirds, ThirdExportRequest request) throws IOException {
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Terceros");
+            
+            // Crear estilos (reutilizando métodos existentes)
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle dataStyle = createDataStyle(workbook);
+            CellStyle dateStyle = createDateStyle(workbook);
+
+            // Crear encabezados (reutilizando método existente)
+            createHeaders(sheet, headerStyle, request);
+
+            // Llenar datos reales (reutilizando método existente)
+            fillData(sheet, thirds, dataStyle, dateStyle, request);
+
+            // Crear hoja de datos de referencia para validaciones
+            excelValidationService.createReferenceDataSheet(workbook, request.getEntId());
+
+            // Aplicar validaciones de datos (reutilizando método existente)
+            applyValidationsToDataSheet(sheet, request.getEntId(), request, thirds.size());
+
+            // Ajustar ancho de columnas (reutilizando método existente)
+            autoSizeColumns(sheet, getColumnCount(request));
+
+            workbook.write(outputStream);
+            return outputStream.toByteArray();
+        }
+    }
+
+    /**
+     * Aplica validaciones de datos a una hoja con datos existentes.
+     * Reutiliza la lógica de applyValidationsToTemplate pero ajustada para datos reales.
+     */
+    private void applyValidationsToDataSheet(Sheet sheet, String entId, ThirdExportRequest request, int dataRowCount) {
+        int startRow = 1; // Después del encabezado
+        int endRow = Math.max(dataRowCount + 100, 1000); // Datos existentes + filas adicionales para edición
+        
+        // Aplicar validaciones básicas (reutilizando método existente)
+        excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
+        
+        // Aplicar validaciones de tipos si están incluidos (reutilizando lógica existente)
+        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+            int typesColumnIndex = getTypesColumnIndex(request);
+            excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
+        }
+        
+        // Aplicar validaciones geográficas si están incluidas (reutilizando lógica existente)
+        if (Boolean.TRUE.equals(request.getIncludeCities())) {
+            int[] geoColumns = getGeographyColumnIndexes(request);
+            excelValidationService.applyGeographyValidations(sheet, startRow, endRow, 
+                geoColumns[0], geoColumns[1], geoColumns[2]);
+        }
     }
 }
