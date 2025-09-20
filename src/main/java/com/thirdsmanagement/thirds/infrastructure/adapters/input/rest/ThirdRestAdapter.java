@@ -3,8 +3,6 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
@@ -13,6 +11,7 @@ import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
+import com.thirdsmanagement.thirds.domain.utils.ExcelFileNameGenerator;
 import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.Third;
@@ -66,6 +65,7 @@ public class ThirdRestAdapter {
     private final PdfRUTService pdfRUTService;
     private final CreateThirdService createThirdService;
     private final UpdateThirdService updateThirdService;
+    private final ExcelFileNameGenerator fileNameGenerator;
 
     /**
      * Crea un tercero.
@@ -252,10 +252,7 @@ public class ThirdRestAdapter {
             @RequestParam("entId") String entId) {
                 
         Resource templateFile = exportThirdUseCase.exportThirdTemplateWithValidations(entId);
-        
-        // Generar nombre de archivo con timestamp
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String filename = "Plantilla_Terceros_" + timestamp + ".xlsx";
+        String filename = fileNameGenerator.generateTemplateFileName();
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
@@ -272,21 +269,15 @@ public class ThirdRestAdapter {
             @NotNull(message = "Enterprise ID no puede estar vacío") @RequestParam("entId") String entId,
             @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId) {
         
-        // Crear request simplificado con toda la información incluida
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
-                .thirdTypeId(thirdTypeId)  // Usar ID en lugar de nombre
-                .includeTypes(true)  // Siempre incluir tipos
-                .includeCities(true) // Siempre incluir geografía
+                .thirdTypeId(thirdTypeId)
+                .includeTypes(true)  // incluir tipos
+                .includeCities(true) // incluir geografía
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        
-        // Generar nombre de archivo con timestamp y tipo si aplica
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
-        String filename = thirdTypeId != null 
-            ? "Terceros_Tipo_" + thirdTypeId + "_" + timestamp + ".xlsx"
-            : "Terceros_" + timestamp + ".xlsx";
+        String filename = fileNameGenerator.generateExportFileName(entId, thirdTypeId);
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")

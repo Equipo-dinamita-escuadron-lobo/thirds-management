@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +29,9 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
 
     @Query("SELECT COUNT(tt) > 0 FROM ThirdTypeEntity tt WHERE tt.ttName = :ttName AND tt.ttentId = :ttentId")
     boolean existsByTtNameAndTtentId(@Param("ttName") String ttName, @Param("ttentId") String ttentId);
+
+    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttId = :ttId AND tt.ttentId = :ttentId")
+    Optional<ThirdTypeEntity> findByTtIdAndTtentId(@Param("ttId") Long ttId, @Param("ttentId") String ttentId);
 
     void deleteByTtentId(String ttentId);
 }

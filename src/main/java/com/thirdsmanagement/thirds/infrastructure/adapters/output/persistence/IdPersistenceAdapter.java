@@ -310,4 +310,36 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 .map(idPersistenceMapper::toTypeId)
                 .orElse(null);
     }
+    
+    /**
+     * Obtiene un tipo de tercero completo por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return El tipo de tercero completo o null si no existe
+     */
+    @Override
+    public ThirdType getThirdTypeById(Long thirdTypeId, String entId) {
+        if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
+            return null;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            Optional<ThirdTypeEntity> thirdTypeEntity = thirdTypeRepository.findByTtIdAndTtentId(thirdTypeId, entId);
+            
+            // Si no se encuentra con el entId específico, buscar en los datos estándar
+            if (thirdTypeEntity.isEmpty()) {
+                thirdTypeEntity = thirdTypeRepository.findByTtIdAndTtentId(thirdTypeId, "standart");
+            }
+            
+            return thirdTypeEntity
+                    .map(idPersistenceMapper::toThirdType)
+                    .orElse(null);
+                    
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
 }
