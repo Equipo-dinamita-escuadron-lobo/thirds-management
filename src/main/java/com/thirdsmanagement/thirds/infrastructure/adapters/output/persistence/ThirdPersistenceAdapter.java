@@ -187,11 +187,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     /**
      * Cambia el estado de un tercero.
      * @param thId Identificador del tercero.
+     * @param entId Identificador de la empresa.
      * @return Verdadero si el estado del tercero cambió, falso en caso contrario.
      */
     @Override
-    public boolean changeThirdState(Long thId) {
-        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(thId);
+    public boolean changeThirdState(Long thId, String entId) {
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findByThIdAndEntId(thId, entId);
 
         if(thirdEntity.isEmpty()) {
             return false;

@@ -45,9 +45,10 @@ public interface ThirdOutputPort {
     /**
      * Cambia el estado de un tercero.
      * @param thId El id del tercero
+     * @param entId El id de la empresa
      * @return True si se cambio el estado, false en caso contrario
      */
-    boolean changeThirdState(Long thId);
+    boolean changeThirdState(Long thId, String entId);
     
     /**
      * Obtiene todos los terceros.

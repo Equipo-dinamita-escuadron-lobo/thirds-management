@@ -108,12 +108,14 @@ public class ThirdRestAdapter {
     /**
      * Cambia el estado de un tercero.
      * @param thId ID del tercero.
+     * @param entId ID de la empresa.
      * @return Respuesta con el resultado de la operación.
      */
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
-            @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId) {
-        Boolean result = changeThirdStateUseCase.changeThirdState(thId);
+            @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId,
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+        Boolean result = changeThirdStateUseCase.changeThirdState(thId, entId);
 
         return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
     }
