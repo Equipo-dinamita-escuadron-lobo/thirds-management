@@ -294,4 +294,20 @@ public class IdPersistenceAdapter implements IdOutputPort {
         }
         return thirdTypeRepository.existsById(thirdTypeId);
     }
+    
+    /**
+     * Obtiene un tipo de identificación completo por su ID.
+     * @param typeIdId El ID del tipo de identificación
+     * @return El tipo de identificación completo o null si no existe
+     */
+    @Override
+    public TypeId getTypeIdById(Long typeIdId) {
+        if (typeIdId == null) {
+            return null;
+        }
+        
+        return typeIdRepository.findById(typeIdId)
+                .map(idPersistenceMapper::toTypeId)
+                .orElse(null);
+    }
 }

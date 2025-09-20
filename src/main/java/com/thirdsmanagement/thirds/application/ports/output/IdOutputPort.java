@@ -64,4 +64,11 @@ public interface IdOutputPort {
      * @return true si existe, false en caso contrario
      */
     boolean existsThirdTypeById(Long thirdTypeId);
+    
+    /**
+     * Obtiene un tipo de identificación completo por su ID.
+     * @param typeIdId El ID del tipo de identificación
+     * @return El tipo de identificación completo o null si no existe
+     */
+    TypeId getTypeIdById(Long typeIdId);
 }

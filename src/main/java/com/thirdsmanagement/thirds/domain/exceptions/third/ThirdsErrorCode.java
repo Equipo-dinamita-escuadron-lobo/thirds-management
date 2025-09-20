@@ -22,7 +22,8 @@ public enum ThirdsErrorCode implements ErrorCodeDefinition {
     THIRD_EXPORT_ERROR("THIRD_EXPORT_ERROR", "Error al generar archivo de exportación"),
     EXCEL_VALIDATION_ERROR("EXCEL_VALIDATION_ERROR", "Error al aplicar validaciones de datos en Excel"),
     EXCEL_REFERENCE_SHEET_ERROR("EXCEL_REFERENCE_SHEET_ERROR", "Error al crear hoja de referencia en Excel"),
-    THIRD_PERSON_TYPE_VALIDATION_ERROR("THIRD_PERSON_TYPE_VALIDATION_ERROR", "Error de validación de tipo de persona");
+    THIRD_PERSON_TYPE_VALIDATION_ERROR("THIRD_PERSON_TYPE_VALIDATION_ERROR", "Error de validación de tipo de persona"),
+    THIRD_TYPE_ID_PERSON_TYPE_INCOMPATIBILITY("THIRD_TYPE_ID_PERSON_TYPE_INCOMPATIBILITY", "Incompatibilidad entre tipo de identificación y tipo de persona");
 
     private final String code;
     private final String message;
