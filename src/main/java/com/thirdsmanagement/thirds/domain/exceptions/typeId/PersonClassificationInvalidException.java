@@ -50,7 +50,7 @@ public class PersonClassificationInvalidException extends BaseBusinessException 
     public static PersonClassificationInvalidException forInvalidCode(String invalidCode) {
         return new PersonClassificationInvalidException(
             "La clasificación de persona '" + invalidCode + "' no es válida. " +
-            "Valores válidos: NATURAL_PERSON, LEGAL_ENTITY, BOTH"
+            "Valores válidos: NATURAL_PERSON, LEGAL_ENTITY"
         );
     }
 
@@ -61,7 +61,7 @@ public class PersonClassificationInvalidException extends BaseBusinessException 
     public static PersonClassificationInvalidException forNullClassification() {
         return new PersonClassificationInvalidException(
             "La clasificación de persona no puede ser nula. " +
-            "Debe especificar: NATURAL_PERSON, LEGAL_ENTITY o BOTH"
+            "Debe especificar: NATURAL_PERSON o LEGAL_ENTITY"
         );
     }
 }

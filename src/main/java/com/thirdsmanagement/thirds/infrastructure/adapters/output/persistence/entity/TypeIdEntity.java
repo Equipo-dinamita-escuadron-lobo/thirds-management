@@ -65,8 +65,7 @@ public class TypeIdEntity {
     @Column(name = "ti_status")
     private Boolean status = true;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "ti_classification")
-    private PersonClassification classification = PersonClassification.NATURAL_PERSON;
+    private PersonClassification classification;
 }

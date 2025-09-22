@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
                 formatEx.getTargetType().getSimpleName().equals("PersonClassification")) {
                 
                 message = "La clasificación de persona '" + formatEx.getValue() + 
-                         "' no es válida. Valores válidos: NATURAL_PERSON, LEGAL_ENTITY, BOTH";
+                         "' no es válida. Valores válidos: NATURAL_PERSON, LEGAL_ENTITY";
                 code = "TYPE_ID_INVALID_CLASSIFICATION";
             }
         }
@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
         String code = ErrorCode.GENERIC_ERROR.getCode();
         
         if (fieldErrors.containsKey("classification")) {
-            message = "La clasificación de persona no puede ser nula. Debe especificar: NATURAL_PERSON, LEGAL_ENTITY o BOTH";
+            message = "La clasificación de persona no puede ser nula. Debe especificar: NATURAL_PERSON o LEGAL_ENTITY";
             code = "TYPE_ID_INVALID_CLASSIFICATION";
         }
 

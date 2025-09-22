@@ -16,13 +16,7 @@ public enum PersonClassification {
      * Tipo de identificación válido únicamente para personas jurídicas.
      * Ejemplos: NIT, RUT
      */
-    LEGAL_ENTITY("LEGAL_ENTITY", "Persona Jurídica"),
-    
-    /**
-     * Tipo de identificación válido para ambos tipos de persona.
-     * Ejemplos: Pasaporte (puede ser usado por personas naturales y jurídicas en algunos casos)
-     */
-    BOTH("BOTH", "Ambos");
+    LEGAL_ENTITY("LEGAL_ENTITY", "Persona Jurídica");
     
     private final String code;
     private final String description;
@@ -62,7 +56,7 @@ public enum PersonClassification {
      * @return true si es válida para personas naturales
      */
     public boolean isValidForNaturalPerson() {
-        return this == NATURAL_PERSON || this == BOTH;
+        return this == NATURAL_PERSON;
     }
     
     /**
@@ -71,7 +65,7 @@ public enum PersonClassification {
      * @return true si es válida para personas jurídicas
      */
     public boolean isValidForLegalEntity() {
-        return this == LEGAL_ENTITY || this == BOTH;
+        return this == LEGAL_ENTITY;
     }
     
     /**
