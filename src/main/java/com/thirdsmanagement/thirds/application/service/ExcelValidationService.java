@@ -66,6 +66,13 @@ public class ExcelValidationService {
     }
 
     /**
+     * Obtiene todas las opciones de estado (activo/inactivo).
+     */
+    public List<String> getStatusOptions() {
+        return List.of("ACTIVO", "INACTIVO");
+    }
+
+    /**
      * Obtiene todos los países activos.
      */
     public List<String> getCountryOptions() {
@@ -132,6 +139,11 @@ public class ExcelValidationService {
         applyDropdownValidation(sheet, 7, startRow, endRow, 
             getGenderOptions(), 
             "Seleccione MASCULINO, FEMENINO u OTRO");
+        
+        // Columna 8: Estado
+        applyDropdownValidation(sheet, 8, startRow, endRow, 
+            getStatusOptions(), 
+            "Seleccione ACTIVO o INACTIVO");
     }
 
     /**
@@ -228,6 +240,7 @@ public class ExcelValidationService {
         headerRow.createCell(1).setCellValue("Departamentos");
         headerRow.createCell(2).setCellValue("Tipos_ID");
         headerRow.createCell(3).setCellValue("Tipos_Tercero");
+        headerRow.createCell(4).setCellValue("Estados");
         
         // Llenar datos de países
         List<String> countries = getCountryOptions();
@@ -244,6 +257,10 @@ public class ExcelValidationService {
         // Llenar datos de tipos de tercero
         List<String> thirdTypes = getThirdTypeOptions(entId);
         fillColumnData(refSheet, 3, thirdTypes);
+        
+        // Llenar datos de campo estado
+        List<String> statusOptions = getStatusOptions();
+        fillColumnData(refSheet, 4, statusOptions);
         
         // Crear columnas separadas para departamentos de cada país
         createNamedRangesForStatesByCountry(workbook, refSheet);

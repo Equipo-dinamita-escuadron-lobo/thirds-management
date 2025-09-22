@@ -120,6 +120,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         createHeaderCell(headerRow, colIndex++, "Apellidos", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Razón Social", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Género", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Estado", headerStyle);
         
         // Encabezados opcionales
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
@@ -159,6 +160,7 @@ public class ExportThirdService implements ExportThirdUseCase {
             createDataCell(row, colIndex++, third.getLastNames(), dataStyle);
             createDataCell(row, colIndex++, third.getSocialReason(), dataStyle);
             createDataCell(row, colIndex++, third.getGender() != null ? third.getGender().toString() : "", dataStyle);
+            createDataCell(row, colIndex++, third.getState() != null && third.getState() ? "ACTIVO" : "INACTIVO", dataStyle);
 
             // Datos opcionales
             if (Boolean.TRUE.equals(request.getIncludeTypes())) {
@@ -220,7 +222,7 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     private int getColumnCount(ThirdExportRequest request) {
-        int count = 8; // Columnas básicas
+        int count = 9; // Columnas básicas (incluye Estado)
         
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             count++;
@@ -321,7 +323,6 @@ public class ExportThirdService implements ExportThirdUseCase {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setItalic(true);
-        font.setColor(IndexedColors.GREY_50_PERCENT.getIndex());
         style.setFont(font);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderTop(BorderStyle.THIN);
@@ -336,30 +337,61 @@ public class ExportThirdService implements ExportThirdUseCase {
             Row row = sheet.createRow(i);
             int colIndex = 0;
 
-            // Crear celdas con texto de ejemplo
-            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-            createTemplateCell(row, colIndex++, "123456789", templateStyle);
-            createTemplateCell(row, colIndex++, "1", templateStyle);
-            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-            createTemplateCell(row, colIndex++, "Nombres", templateStyle);
-            createTemplateCell(row, colIndex++, "Apellidos", templateStyle);
-            createTemplateCell(row, colIndex++, "Razón Social", templateStyle);
-            createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-
-            if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+            if (i == 1) {
+                // Primera fila con indicadores (estilo normal)
                 createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                createTemplateCell(row, colIndex++, "123456789", templateStyle);
+                createTemplateCell(row, colIndex++, "1", templateStyle);
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                createTemplateCell(row, colIndex++, "Nombres", templateStyle);
+                createTemplateCell(row, colIndex++, "Apellidos", templateStyle);
+                createTemplateCell(row, colIndex++, "Razón Social", templateStyle);
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                createTemplateCell(row, colIndex++, "ACTIVO", templateStyle);
+
+                if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                }
+
+                if (Boolean.TRUE.equals(request.getIncludeCities())) {
+                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                }
+
+                createTemplateCell(row, colIndex++, "Dirección ejemplo", templateStyle);
+                createTemplateCell(row, colIndex++, "3001234567", templateStyle);
+                createTemplateCell(row, colIndex++, "ejemplo@correo.com", templateStyle);
+            } else {
+                // Filas adicionales vacías con el mismo estilo
+                createEmptyTemplateRow(row, request, templateStyle);
             }
-
-            if (Boolean.TRUE.equals(request.getIncludeCities())) {
-                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-            }
-
-            createTemplateCell(row, colIndex++, "Dirección ejemplo", templateStyle);
-            createTemplateCell(row, colIndex++, "3001234567", templateStyle);
-            createTemplateCell(row, colIndex++, "ejemplo@correo.com", templateStyle);
         }
+    }
+
+    private void createEmptyTemplateRow(Row row, ThirdExportRequest request, CellStyle templateStyle) {
+        int colIndex = 0;
+        
+        // Crear celdas vacías con el mismo estilo
+        int basicColumns = 9; // Columnas básicas incluye Estado
+        for (int i = 0; i < basicColumns; i++) {
+            createTemplateCell(row, colIndex++, "", templateStyle);
+        }
+
+        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
+            createTemplateCell(row, colIndex++, "", templateStyle);
+        }
+
+        if (Boolean.TRUE.equals(request.getIncludeCities())) {
+            createTemplateCell(row, colIndex++, "", templateStyle);
+            createTemplateCell(row, colIndex++, "", templateStyle);
+            createTemplateCell(row, colIndex++, "", templateStyle);
+        }
+
+        // Columnas finales: Dirección, Teléfono, Email
+        createTemplateCell(row, colIndex++, "", templateStyle);
+        createTemplateCell(row, colIndex++, "", templateStyle);
+        createTemplateCell(row, colIndex++, "", templateStyle);
     }
 
     private void createTemplateCell(Row row, int colIndex, String value, CellStyle style) {
@@ -391,12 +423,12 @@ public class ExportThirdService implements ExportThirdUseCase {
 
 
     private int getTypesColumnIndex(ThirdExportRequest request) {
-        // Los tipos de tercero aparecen después de las columnas básicas (8 columnas)
-        return 8;
+        // Los tipos de tercero aparecen después de las columnas básicas (9 columnas incluye Estado)
+        return 9;
     }
 
     private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
-        int baseIndex = 8; // Columnas básicas
+        int baseIndex = 9; // Columnas básicas (incluye Estado)
         
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             baseIndex++; // Agregar columna de tipos
