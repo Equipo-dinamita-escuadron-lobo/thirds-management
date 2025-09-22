@@ -2,7 +2,6 @@ package com.thirdsmanagement.thirds.application.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -69,26 +68,6 @@ public class ListThirdsService implements ListThirdsUseCase {
         return result;
     }
 
-    /**
-     * Obtiene todos los terceros de una empresa sin paginación.
-     * 
-     * @param entId el ID de la empresa
-     * @return lista de todos los terceros encontrados
-     * @throws IllegalArgumentException si el ID de empresa es inválido
-     * @throws ThirdNotFound            si no se encuentran terceros
-     */
-    @Override
-    public List<Third> getAllThirds(String entId) {
-        validateEnterpriseId(entId);
-
-        List<Third> result = thirdOutputPort.getAllThirds(entId);
-
-        if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);
-        }
-
-        return result;
-    }
 
     /**
      * Obtiene todos los terceros filtrados por estado de una empresa con

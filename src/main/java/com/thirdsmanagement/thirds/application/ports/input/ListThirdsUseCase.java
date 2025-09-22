@@ -2,7 +2,6 @@ package com.thirdsmanagement.thirds.application.ports.input;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 
 import com.thirdsmanagement.thirds.domain.model.Third;
 
@@ -28,12 +27,6 @@ public interface ListThirdsUseCase {
      */
     Page<Third> getAllThirdsByType(String entId, Pageable pageable, String thirdType);
     
-    /**
-     * Obtiene todos los terceros.
-     * @param entId El id de la empresa
-     * @return La lista de terceros
-     */
-    List<Third> getAllThirds(String entId);
     
     /**
      * Obtiene todos los terceros filtrados por estado.

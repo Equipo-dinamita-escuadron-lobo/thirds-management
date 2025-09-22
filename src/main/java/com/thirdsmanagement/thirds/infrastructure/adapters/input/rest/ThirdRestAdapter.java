@@ -28,7 +28,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -230,19 +229,6 @@ public class ThirdRestAdapter {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Obtiene una lista de terceros.
-     * @param entId Id de la empresa.
-     * @return Respuesta con la lista de terceros.
-     */
-    @GetMapping("/list")
-        public ResponseEntity<List<Third>> getAllThirds(
-                @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
-
-            List<Third> thirds = listThirdsUseCase.getAllThirds(entId);
-
-            return new ResponseEntity<>(thirds, HttpStatus.OK);
-        }
 
     /**
      * Exporta una plantilla de terceros.
@@ -262,16 +248,18 @@ public class ThirdRestAdapter {
 
     /**
      * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por ID de tipo de tercero e incluye toda la información.
+     * Permite filtrar opcionalmente por ID de tipo de tercero, estado (activos/inactivos) e incluye toda la información.
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "Enterprise ID no puede estar vacío") @RequestParam("entId") String entId,
-            @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId) {
+            @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId,
+            @RequestParam(value = "status", required = false) Boolean status) {
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
                 .thirdTypeId(thirdTypeId)
+                .status(status)  // filtro por estado: true=activos, false=inactivos, null=todos
                 .includeTypes(true)  // incluir tipos
                 .includeCities(true) // incluir geografía
                 .build();

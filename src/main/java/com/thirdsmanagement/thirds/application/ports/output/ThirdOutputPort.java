@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -77,12 +76,6 @@ public interface ThirdOutputPort {
      */
     Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId);
     
-    /**
-     * Obtiene todos los terceros.
-     * @param entId El id de la empresa
-     * @return La lista de terceros
-     */
-    List<Third> getAllThirds(String entId);
     
     /**
      * Obtiene todos los terceros filtrados por estado.
@@ -92,4 +85,13 @@ public interface ThirdOutputPort {
      * @return La pagina de terceros filtrados por estado
      */
     Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive);
+    
+    /**
+     * Obtiene todos los terceros filtrados por ID de tipo de tercero sin filtro de estado.
+     * @param entId El id de la empresa
+     * @param page El pageable object
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return La pagina de terceros filtrados por ID de tipo (activos e inactivos)
+     */
+    Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId);
 }

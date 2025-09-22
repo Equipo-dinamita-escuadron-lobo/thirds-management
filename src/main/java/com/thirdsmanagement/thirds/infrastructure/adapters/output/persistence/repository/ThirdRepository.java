@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -28,8 +27,6 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     boolean existThirdByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
-    List<ThirdEntity> getAllThirds(String entId);
 
     @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
@@ -50,6 +47,13 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
             "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
             "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
     Page<ThirdEntity> getThirdsByTypeId(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
+            Pageable page);
+
+    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+            "WHERE t.entId = :entId " +
+            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
+            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
+    Page<ThirdEntity> getAllThirdsByTypeIdWithoutStateFilter(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
             Pageable page);
 
 }

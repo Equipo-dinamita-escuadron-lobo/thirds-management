@@ -37,17 +37,39 @@ public class ExportThirdService implements ExportThirdUseCase {
 
 
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Si se especifica un ID de tipo de tercero, filtrar por ese tipo
-        if (request.getThirdTypeId() != null) {
-            // Crear un Pageable que obtenga todos los registros (tamaño grande)
-            Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
-            Page<Third> page = thirdOutputPort.getAllThirdsByTypeId(request.getEntId(), pageable, request.getThirdTypeId());
+        // Crear un Pageable que obtenga todos los registros (tamaño grande)
+        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        
+        // Si se especifica un estado específico (activos o inactivos)
+        if (request.getStatus() != null) {
+            Page<Third> page = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, request.getStatus());
+            List<Third> thirds = page.getContent();
             
+            // Si también se especifica un ID de tipo de tercero, filtrar adicionalmente
+            if (request.getThirdTypeId() != null) {
+                return thirds.stream()
+                    .filter(third -> third.getThirdTypes().stream()
+                        .anyMatch(type -> type.getThirdTypeId().equals(request.getThirdTypeId())))
+                    .collect(Collectors.toList());
+            }
+            
+            return thirds;
+        }
+        
+        // Si se especifica un ID de tipo de tercero pero no estado, usar método sin filtro de estado
+        if (request.getThirdTypeId() != null) {
+            Page<Third> page = thirdOutputPort.getAllThirdsByTypeIdWithoutStateFilter(request.getEntId(), pageable, request.getThirdTypeId());
             return page.getContent();
         }
         
-        // Si no se especifica tipo, exportar todos los terceros
-        return thirdOutputPort.getAllThirds(request.getEntId());
+        // Si no se especifica filtro, obtener explícitamente activos e inactivos
+        Page<Third> activePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, true);
+        Page<Third> inactivePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, false);
+        
+        List<Third> allThirds = activePage.getContent();
+        allThirds.addAll(inactivePage.getContent());
+        
+        return allThirds;
     }
 
 
