@@ -32,19 +32,29 @@ public class ExcelFileNameGenerator {
      * Genera nombre de archivo para exportación de terceros.
      * 
      * @param entId ID de la empresa
+     * @param companyName Nombre de la empresa (opcional)
      * @param thirdTypeId ID del tipo de tercero (opcional)
-     * @return nombre del archivo con timestamp y tipo si aplica
+     * @return nombre del archivo con timestamp, empresa y tipo si aplica
      */
-    public String generateExportFileName(String entId, Long thirdTypeId) {
+    public String generateExportFileName(String entId, String companyName, Long thirdTypeId) {
         String timestamp = generateTimestamp();
+        StringBuilder fileName = new StringBuilder("Terceros");
         
+        // Agregar nombre de empresa si se proporciona
+        if (companyName != null && !companyName.trim().isEmpty()) {
+            String normalizedCompanyName = normalizeForFileName(companyName);
+            fileName.append("_").append(normalizedCompanyName);
+        }
+        
+        // Agregar tipo de tercero si se proporciona
         if (thirdTypeId != null) {
             String typeName = getThirdTypeName(thirdTypeId, entId);
             String fileTypeName = normalizeForFileName(typeName);
-            return "Terceros_" + fileTypeName + "_" + timestamp + ".xlsx";
-        } else {
-            return "Terceros_" + timestamp + ".xlsx";
+            fileName.append("_").append(fileTypeName);
         }
+        
+        fileName.append("_").append(timestamp).append(".xlsx");
+        return fileName.toString();
     }
     
     /**

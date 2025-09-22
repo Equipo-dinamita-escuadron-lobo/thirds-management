@@ -454,7 +454,6 @@ public class ExportThirdService implements ExportThirdUseCase {
             // Crear encabezados (reutilizando método existente)
             createHeaders(sheet, headerStyle, request);
 
-            // Llenar datos reales (reutilizando método existente)
             fillData(sheet, thirds, dataStyle, dateStyle, request);
 
             // Crear hoja de datos de referencia para validaciones
@@ -482,13 +481,13 @@ public class ExportThirdService implements ExportThirdUseCase {
         // Aplicar validaciones básicas (reutilizando método existente)
         excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
         
-        // Aplicar validaciones de tipos si están incluidos (reutilizando lógica existente)
+        // Aplicar validaciones de tipos si están incluidos 
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             int typesColumnIndex = getTypesColumnIndex(request);
             excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
         }
         
-        // Aplicar validaciones geográficas si están incluidas (reutilizando lógica existente)
+        // Aplicar validaciones geográficas si están incluidas
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
             int[] geoColumns = getGeographyColumnIndexes(request);
             excelValidationService.applyGeographyValidations(sheet, startRow, endRow, 

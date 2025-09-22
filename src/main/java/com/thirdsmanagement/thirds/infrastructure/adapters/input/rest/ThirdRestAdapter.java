@@ -249,12 +249,14 @@ public class ThirdRestAdapter {
     /**
      * Exporta terceros existentes.
      * Permite filtrar opcionalmente por ID de tipo de tercero, estado (activos/inactivos) e incluye toda la información.
+     * El nombre de la empresa se puede incluir en el nombre del archivo.
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "Enterprise ID no puede estar vacío") @RequestParam("entId") String entId,
             @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId,
-            @RequestParam(value = "status", required = false) Boolean status) {
+            @RequestParam(value = "status", required = false) Boolean status,
+            @RequestParam(value = "companyName", required = false) String companyName) {
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
@@ -265,7 +267,7 @@ public class ThirdRestAdapter {
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        String filename = fileNameGenerator.generateExportFileName(entId, thirdTypeId);
+        String filename = fileNameGenerator.generateExportFileName(entId, companyName, thirdTypeId);
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
