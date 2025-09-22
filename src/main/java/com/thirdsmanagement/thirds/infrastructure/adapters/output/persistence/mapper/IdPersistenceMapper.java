@@ -39,7 +39,8 @@ public interface IdPersistenceMapper {
     @Mapping(target =  "ttName", source = "thirdTypeName" )
     @Mapping(target =  "ttentId", source = "entId" )
     @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "thirds", ignore = true)
+    @Mapping(target = "creationDate", ignore = true)
+    @Mapping(target = "updateDate", ignore = true)
     ThirdTypeEntity toThirdTypeEntity(ThirdType thirdType);
 
     /**
@@ -61,9 +62,11 @@ public interface IdPersistenceMapper {
      * @param typeId Objeto de tipo de identificación.
      * @return Entidad de tipo de identificación.
      */
+    @Mapping(target =  "id", source = "id" )
     @Mapping(target =  "tiId", source = "typeId" )
     @Mapping(target =  "tiName", source = "typeIdname")
     @Mapping(target =  "tientId", source = "entId" )
+    @Mapping(target =  "classification", source = "classification")
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)
@@ -74,9 +77,11 @@ public interface IdPersistenceMapper {
      * @param typeIdEntity Entidad de tipo de identificación.
      * @return Objeto de tipo de identificación.
      */
+    @Mapping(source =  "id", target = "id" )
     @Mapping(source =  "tiId", target = "typeId" )
     @Mapping(source =  "tiName", target = "typeIdname")
     @Mapping(source =  "tientId", target = "entId" )
+    @Mapping(source =  "classification", target = "classification")
     TypeId toTypeId(TypeIdEntity typeIdEntity);
 
     /**

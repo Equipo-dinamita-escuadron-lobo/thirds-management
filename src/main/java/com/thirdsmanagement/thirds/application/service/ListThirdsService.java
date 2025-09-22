@@ -2,7 +2,6 @@ package com.thirdsmanagement.thirds.application.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -21,11 +20,11 @@ public class ListThirdsService implements ListThirdsUseCase {
     /**
      * Obtiene todos los terceros de una empresa con paginación.
      * 
-     * @param entId el ID de la empresa
+     * @param entId    el ID de la empresa
      * @param pageable información de paginación
      * @return página de terceros encontrados
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound si no se encuentran terceros
+     * @throws ThirdNotFound            si no se encuentran terceros
      */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
@@ -35,102 +34,69 @@ public class ListThirdsService implements ListThirdsUseCase {
         Page<Third> result = thirdOutputPort.getAllThirdsBy(entId, pageable);
 
         if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);            
+            throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);
         }
 
         return result;
     }
 
     /**
-     * Obtiene todos los terceros inactivos de una empresa con paginación.
+     * Obtiene todos los terceros filtrados por tipo de tercero de una empresa con
+     * paginación.
      * 
-     * @param entId el ID de la empresa
-     * @param pageable información de paginación
-     * @return página de terceros inactivos encontrados
+     * @param entId     el ID de la empresa
+     * @param pageable  información de paginación
+     * @param thirdType el tipo de tercero (ej: "Proveedor", "Cliente")
+     * @return página de terceros filtrados por tipo
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound si no se encuentran terceros inactivos
+     * @throws ThirdNotFound            si no se encuentran terceros del tipo
+     *                                  especificado
      */
     @Override
-    public Page<Third> getAllInactiveThirdsBy(String entId, Pageable pageable) {
+    public Page<Third> getAllThirdsByType(String entId, Pageable pageable, String thirdType) {
         validateEnterpriseId(entId);
         validatePageable(pageable);
-        
-        Page<Third> result = thirdOutputPort.getAllInactiveThirdsBy(entId, pageable);
+        validateThirdType(thirdType);
+
+        Page<Third> result = thirdOutputPort.getAllThirdsByType(entId, pageable, thirdType);
 
         if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron terceros inactivos para la empresa con ID: " + entId);            
+            throw new ThirdNotFound(
+                    "No se encontraron terceros del tipo '" + thirdType + "' para la empresa con ID: " + entId);
         }
 
         return result;
     }
 
+
     /**
-     * Obtiene todos los proveedores de una empresa con paginación.
+     * Obtiene todos los terceros filtrados por estado de una empresa con
+     * paginación.
      * 
-     * @param entId el ID de la empresa
+     * @param entId    el ID de la empresa
      * @param pageable información de paginación
-     * @return página de proveedores encontrados
+     * @param isActive el estado del tercero (true para activos, false para
+     *                 inactivos)
+     * @return página de terceros filtrados por estado
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound si no se encuentran proveedores
+     * @throws ThirdNotFound            si no se encuentran terceros
      */
     @Override
-    public Page<Third> getAllProvidersBy(String entId, Pageable pageable) {
+    public Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive) {
         validateEnterpriseId(entId);
         validatePageable(pageable);
-        
-        Page<Third> result = thirdOutputPort.getAllProvidersBy(entId, pageable);
+
+        Page<Third> result = thirdOutputPort.getAllThirdsByStatus(entId, pageable, isActive);
 
         if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron proveedores para la empresa con ID: " + entId);            
+            String statusMessage = isActive ? "activos" : "inactivos";
+            throw new ThirdNotFound(
+                    "No se encontraron terceros " + statusMessage + " para la empresa con ID: " + entId);
         }
 
         return result;
     }
 
-    /**
-     * Obtiene todos los clientes de una empresa con paginación.
-     * 
-     * @param entId el ID de la empresa
-     * @param pageable información de paginación
-     * @return página de clientes encontrados
-     * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound si no se encuentran clientes
-     */
-    @Override
-    public Page<Third> getAllCustomersBy(String entId, Pageable pageable) {
-        validateEnterpriseId(entId);
-        validatePageable(pageable);
-        
-        Page<Third> result = thirdOutputPort.getAllCustomersBy(entId, pageable);
-
-        if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron clientes para la empresa con ID: " + entId);            
-        }
-
-        return result;
-    }
-    
-    /**
-     * Obtiene todos los terceros de una empresa sin paginación.
-     * 
-     * @param entId el ID de la empresa
-     * @return lista de todos los terceros encontrados
-     * @throws IllegalArgumentException si el ID de empresa es inválido
-     * @throws ThirdNotFound si no se encuentran terceros
-     */
-    @Override
-    public List<Third> getAllThirds(String entId) {
-        validateEnterpriseId(entId);
-        
-        List<Third> result = thirdOutputPort.getAllThirds(entId);
-
-        if (result.isEmpty()) {
-            throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);            
-        }
-
-        return result;
-    }
-    
     /**
      * Valida que el ID de empresa no sea null o vacío.
      * 
@@ -142,7 +108,7 @@ public class ListThirdsService implements ListThirdsUseCase {
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
     }
-    
+
     /**
      * Valida que el objeto Pageable no sea null.
      * 
@@ -152,6 +118,18 @@ public class ListThirdsService implements ListThirdsUseCase {
     private void validatePageable(Pageable pageable) {
         if (pageable == null) {
             throw new IllegalArgumentException("El objeto Pageable no puede ser null");
+        }
+    }
+
+    /**
+     * Valida que el tipo de tercero no sea null o vacío.
+     * 
+     * @param thirdType el tipo de tercero a validar
+     * @throws IllegalArgumentException si el tipo de tercero es inválido
+     */
+    private void validateThirdType(String thirdType) {
+        if (thirdType == null || thirdType.trim().isEmpty()) {
+            throw new IllegalArgumentException("El tipo de tercero no puede ser null o vacío");
         }
     }
 }

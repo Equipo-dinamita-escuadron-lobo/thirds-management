@@ -5,15 +5,13 @@ import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.model.ePersonType;
 import com.thirdsmanagement.thirds.domain.model.eThirdGender;
-import com.thirdsmanagement.thirds.infrastructure.adapters.deserializers.ThirdTypeDeserializer;
-import com.thirdsmanagement.thirds.infrastructure.adapters.deserializers.TypeIdDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,41 +33,47 @@ public class ThirdCreateRequest {
     
     private Long thId;
 
-    @NotNull(message = "Enterprise ID cannot be empty") 
+    @NotNull(message = "El ID de la empresa no puede estar vacío") 
     private String entId;
 
-    @JsonDeserialize(using = TypeIdDeserializer.class)
-    @NotNull(message = "The id type cannot be empty") 
+    @NotNull(message = "El tipo de identificación no puede estar vacío") 
     private TypeId typeId;
 
-    @NotNull(message = "The person type cannot be empty")  
+    @NotNull(message = "El tipo de persona no puede estar vacío")  
     private ePersonType personType; 
     
-    @JsonDeserialize(using = ThirdTypeDeserializer.class)
-    @NotNull(message = "The third type cannot be empty") 
+    @NotNull(message = "El tipo de tercero no puede estar vacío") 
     private Set<ThirdType> thirdTypes;
 
-    private String rutPath;
     private String names; 
     private String lastNames; 
     private String socialReason; 
     private eThirdGender gender;
     private Long idNumber;
     private Long verificationNumber; 
-    private Boolean state;
-    private String photoPath;
-    private String country;
-    private String province;
-    private String city; 
+    @Builder.Default
+    private Boolean state = true;
+    
+    @NotBlank(message = "El código del país no puede estar vacío")
+    @Size(max = 3, message = "El código del país no puede exceder los 3 caracteres")
+    private String countryCode;
 
-    @NotBlank(message = "Address cannot be empty")  // Validación para address
+    @NotBlank(message = "El código del estado no puede estar vacío") 
+    @Size(max = 10, message = "El código del estado no puede exceder los 10 caracteres")
+    private String stateCode;
+
+    @NotBlank(message = "El código de la ciudad no puede estar vacío")
+    @Size(max = 10, message = "El código de la ciudad no puede exceder los 10 caracteres") 
+    private String cityCode; 
+
+    @NotBlank(message = "La dirección no puede estar vacía") 
     private String address;
 
-    @NotBlank(message = "Phone number cannot be empty") // Validación para phoneNumber
+    @NotBlank(message = "El número de teléfono no puede estar vacío")
     private String phoneNumber; 
 
-    @NotBlank(message = "Email cannot be empty") // Validación para email
-    @Email(message = "Email should be valid") // Validación adicional para el formato del email
+    @NotBlank(message = "El correo electrónico no puede estar vacío")
+    @Email(message = "El correo electrónico debe tener un formato válido")
     private String email; 
 
     private LocalDate creationDate;

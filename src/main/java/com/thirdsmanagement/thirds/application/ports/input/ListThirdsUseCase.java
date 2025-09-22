@@ -2,7 +2,6 @@ package com.thirdsmanagement.thirds.application.ports.input;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 
 import com.thirdsmanagement.thirds.domain.model.Third;
 
@@ -18,34 +17,23 @@ public interface ListThirdsUseCase {
      */
     Page<Third> getAllThirdsBy(String entId,Pageable pageable);
     
-    /**
-     * Obtiene todos los terceros inactivos.
-     * @param entId El id de la empresa
-     * @param pageable El objeto pageable
-     * @return La página de terceros inactivos
-     */
-    Page<Third> getAllInactiveThirdsBy(String entId,Pageable pageable);
     
     /**
-     * Obtiene todos los proveedores.
+     * Obtiene todos los terceros filtrados por tipo de tercero.
      * @param entId El id de la empresa
      * @param pageable El objeto pageable
-     * @return La página de proveedores
+     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente")
+     * @return La página de terceros filtrados por tipo
      */
-    Page<Third> getAllProvidersBy(String entId,Pageable pageable);
+    Page<Third> getAllThirdsByType(String entId, Pageable pageable, String thirdType);
+    
     
     /**
-     * Obtiene todos los clientes.
+     * Obtiene todos los terceros filtrados por estado.
      * @param entId El id de la empresa
      * @param pageable El objeto pageable
-     * @return La página de clientes
+     * @param isActive El estado del tercero (true para activos, false para inactivos)
+     * @return La página de terceros filtrados por estado
      */
-    Page<Third> getAllCustomersBy(String entId,Pageable pageable);
-    
-    /**
-     * Obtiene todos los terceros.
-     * @param entId El id de la empresa
-     * @return La lista de terceros
-     */
-    List<Third> getAllThirds(String entId);
+    Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive);
 }

@@ -3,6 +3,9 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.m
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.thirdsmanagement.thirds.domain.model.City;
+import com.thirdsmanagement.thirds.domain.model.Country;
+import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 
@@ -22,10 +25,13 @@ public interface ThirdPersistenceMapper {
      * @param third Objeto de tercero.
      * @return Entidad de tercero.
      */
-    @Mapping(target = "thirdTypes", ignore = true)
+    @Mapping(target = "typeId", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "creationDate", ignore = true)
     @Mapping(target = "updateDate", ignore = true)
+    @Mapping(target = "country", expression = "java(mapCountryToString(third.getCountry()))")
+    @Mapping(target = "province", expression = "java(mapStateToString(third.getProvince()))")
+    @Mapping(target = "city", expression = "java(mapCityToString(third.getCity()))")
     ThirdEntity toThirdEntity(Third third);
 
     /**
@@ -33,6 +39,38 @@ public interface ThirdPersistenceMapper {
      * @param thirdEntity Entidad de tercero.
      * @return Objeto de tercero.
      */
+    @Mapping(target = "typeId", source = "typeId")
     @Mapping(target = "thirdTypes", ignore = true)
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "province", ignore = true)
+    @Mapping(target = "city", ignore = true)
     Third toThird(ThirdEntity thirdEntity);
+    
+    /**
+     * Mapea un objeto Country a su código de país como String.
+     * @param country el objeto Country
+     * @return el código del país o null si el país es null
+     */
+    default String mapCountryToString(Country country) {
+        return country != null ? country.getCountryCode() : null;
+    }
+    
+    /**
+     * Mapea un objeto State a su código de estado como String.
+     * @param state el objeto State
+     * @return el código del estado o null si el estado es null
+     */
+    default String mapStateToString(State state) {
+        return state != null ? state.getStateCode() : null;
+    }
+    
+    /**
+     * Mapea un objeto City a su código de ciudad como String.
+     * @param city el objeto City
+     * @return el código de la ciudad o null si la ciudad es null
+     */
+    default String mapCityToString(City city) {
+        return city != null ? city.getCityCode() : null;
+    }
+    
 }

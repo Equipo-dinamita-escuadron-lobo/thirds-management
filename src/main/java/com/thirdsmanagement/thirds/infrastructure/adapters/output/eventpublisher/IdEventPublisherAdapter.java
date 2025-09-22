@@ -1,35 +1,37 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.eventpublisher;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdTypeEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.TypeIdEventPublisher;
 import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
+import com.thirdsmanagement.thirds.domain.event.ThirdTypeUpdatedEvent;
+import com.thirdsmanagement.thirds.domain.event.TypeIdCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 /**
- * Clase adaptador de publicación de eventos para el tipo de identificación.
- * Implementa la interfaz {@link TypeIdEventPublisher}.
- * Utiliza {@link ApplicationEventPublisher} para publicar eventos.
+ * Adaptador para la publicación de eventos de identificación.
  */
 @Component
 @RequiredArgsConstructor
-public class IdEventPublisherAdapter implements ThirdTypeEventPublisher{
-    /**
-     * Publicador de eventos de la aplicación.
-     */
+public class IdEventPublisherAdapter implements TypeIdEventPublisher, ThirdTypeEventPublisher {
+
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    /**
-     * Publica un evento de creación de tipo de identificación.
-     */
     @Override
-    public void publishThirdTypeCreatedEvent(ThirdTypeCreatedEvent event){
+    public void publishTypeIdCreatedEvent(TypeIdCreatedEvent event) {
         applicationEventPublisher.publishEvent(event);
     }
 
-   
-    
+    @Override
+    public void publishThirdTypeCreatedEvent(ThirdTypeCreatedEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    public void publishThirdTypeUpdatedEvent(ThirdTypeUpdatedEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
 }

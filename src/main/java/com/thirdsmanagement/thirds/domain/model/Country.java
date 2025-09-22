@@ -1,0 +1,34 @@
+package com.thirdsmanagement.thirds.domain.model;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+/**
+ * Modelo de dominio que representa un país.
+ * Contiene la información básica de un país para la jerarquía geográfica.
+ */
+@Builder
+@Getter
+@Setter
+@EqualsAndHashCode(of = {"countryCode"})
+@ToString(of = {"countryCode", "countryName"})
+@AllArgsConstructor
+@NoArgsConstructor
+public class Country {
+
+    @NotBlank(message = "El código del país no puede estar vacío")
+    @Size(max = 3, message = "El código del país no puede exceder los 3 caracteres")
+    private String countryCode;
+
+    @NotBlank(message = "El nombre del país no puede estar vacío")
+    @Size(max = 100, message = "El nombre del país no puede exceder los 100 caracteres")
+    private String countryName;
+
+}

@@ -36,4 +36,47 @@ public interface IdOutputPort {
      * @return La lista de tipos de identificacion
      */
     List<TypeId> getAllTypeIds(String entId);
+    
+    /**
+     * Actualiza un tipo de identificacion.
+     * @param typeId El tipo de identificacion a actualizar
+     * @return El tipo de identificacion actualizado
+     */
+    TypeId updateTypeId(TypeId typeId);
+    
+    /**
+     * Actualiza un tipo de tercero.
+     * @param thirdType El tipo de tercero a actualizar
+     * @return El tipo de tercero actualizado
+     */
+    ThirdType updateThirdType(ThirdType thirdType);
+    
+    /**
+     * Verifica si existe un tipo de identificación por su ID.
+     * @param typeIdId El ID del tipo de identificación
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsTypeIdById(Long typeIdId);
+    
+    /**
+     * Verifica si existe un tipo de tercero por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsThirdTypeById(Long thirdTypeId);
+    
+    /**
+     * Obtiene un tipo de identificación completo por su ID.
+     * @param typeIdId El ID del tipo de identificación
+     * @return El tipo de identificación completo o null si no existe
+     */
+    TypeId getTypeIdById(Long typeIdId);
+    
+    /**
+     * Obtiene un tipo de tercero completo por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return El tipo de tercero completo o null si no existe
+     */
+    ThirdType getThirdTypeById(Long thirdTypeId, String entId);
 }

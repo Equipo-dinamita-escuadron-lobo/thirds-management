@@ -2,9 +2,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,13 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
-import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdTypeUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.UpdateTypeIdUseCase;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdTypeUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdTypeResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
 
 import jakarta.validation.Valid;
@@ -38,30 +40,39 @@ public class ThirdConfigurationAdapter {
 
     private final CreateThirdTypeUseCase createThirdTypeUseCase;
     private final ListThirdTypeUseCase listThirdTypeUseCase;
+    private final UpdateThirdTypeUseCase updateThirdTypeUseCase;
     private final CreateTypeIdUseCase createTypeIdUseCase;
     private final ListTypeIdUseCase listTypeIdUseCase;
-    private final DeleteThirdTypeUseCase deleteThirdTypeUseCase;
+    private final UpdateTypeIdUseCase updateTypeIdUseCase;
 
     private final IdRestMapper idRestMapper;
 
     @PostMapping("/thirdtype")
-    public ResponseEntity<ThirdType> createThirdType(
+    public ResponseEntity<ThirdTypeResponse> createThirdType(
             @RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest) {
 
         ThirdType thirdType = idRestMapper.toThirdType(thirdTypeCreateRequest);
-        thirdType = createThirdTypeUseCase.createThirdType(thirdType);
+        ThirdType createdThirdType = createThirdTypeUseCase.createThirdType(thirdType);
 
-        return new ResponseEntity<>(thirdType, HttpStatus.CREATED);
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(createdThirdType), HttpStatus.CREATED);
     }
 
     @GetMapping("/thirdtype")
-    public ResponseEntity<List<ThirdType>> getThirdType(
+    public ResponseEntity<List<ThirdTypeResponse>> getThirdType(
             @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
 
         List<ThirdType> thirdTypes = listThirdTypeUseCase.getAllThirdTypes(entId);
 
-        return new ResponseEntity<>(thirdTypes, HttpStatus.OK);
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponseList(thirdTypes), HttpStatus.OK);
 
+    }
+
+    @PostMapping("/thirdtype/update")
+    public ResponseEntity<ThirdTypeResponse> updateThirdType(@RequestBody @Valid ThirdTypeUpdateRequest thirdTypeUpdateRequest) {
+        ThirdType thirdType = idRestMapper.toThirdType(thirdTypeUpdateRequest);
+        ThirdType updatedThirdType = updateThirdTypeUseCase.updateThirdType(thirdType);
+
+        return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(updatedThirdType), HttpStatus.OK);
     }
 
     @PostMapping("/typeid")
@@ -79,25 +90,12 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(typeIds, HttpStatus.OK);
     }
 
-    /**
-     * Elimina un tipo de tercero.
-     * @param entId Id del tipo de tercero a eliminar.
-     * @return ResponseEntity con el resultado de la operación y el mensaje correspondiente.
-     */
-    @DeleteMapping("/{entId}")
-    public ResponseEntity<String> deleteThird(
-            @NotNull(message = "Enterprise ID must not be empty") @PathVariable Long entId) {
+    @PostMapping("/typeid/update")
+    public ResponseEntity<TypeId> updateTypeId(@RequestBody @Valid TypeIdUpdateRequest typeIdUpdateRequest) {
+        TypeId typeId = idRestMapper.toTypeId(typeIdUpdateRequest);
+        typeId = updateTypeIdUseCase.updateTypeId(typeId);
 
-        try {
-            ResponseEntity<String> response = deleteThirdTypeUseCase.deleteThirdTypeUseCase(entId);
-
-            // Retornamos la respuesta tal como viene del servicio, que ya incluye el código HTTP correcto
-            return response;
-
-        } catch (Exception e) {
-            // Manejar cualquier excepción no controlada
-            String errorMessage = "Error interno al procesar la solicitud: " + e.getMessage();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-        }
+        return new ResponseEntity<>(typeId, HttpStatus.OK);
     }
+
 }

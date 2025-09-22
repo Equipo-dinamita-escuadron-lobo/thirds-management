@@ -15,21 +15,26 @@ public class GetThirdService implements GetThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
 
     /**
-     * Obtiene un tercero por su ID.
+     * Obtiene un tercero por su ID y empresa.
      * 
      * @param id el ID del tercero a buscar
+     * @param entId el ID de la empresa
      * @return el tercero encontrado
-     * @throws IllegalArgumentException si el ID es null
+     * @throws IllegalArgumentException si algún parámetro es null o inválido
      * @throws ThirdNotFound si el tercero no existe
      */
     @Override
-    public Third getThirdById(Long id) {
+    public Third getThirdById(Long id, String entId) {
         if (id == null) {
             throw new IllegalArgumentException("El ID del tercero no puede ser null");
         }
         
-        return thirdOutputPort.getThirdById(id)
-                .orElseThrow(() -> new ThirdNotFound("Tercero no encontrado con ID: " + id));
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        
+        return thirdOutputPort.getThirdById(id, entId)
+                .orElseThrow(() -> new ThirdNotFound("Tercero no encontrado con ID: " + id + " para la empresa: " + entId));
     }
     
     /**

@@ -1,0 +1,85 @@
+package com.thirdsmanagement.thirds.application.service;
+
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdPersonTypeValidationException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdTypeIdPersonTypeIncompatibilityException;
+import com.thirdsmanagement.thirds.domain.model.Third;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * Servicio para validaciones comunes de terceros.
+ */
+@Component
+public class ThirdValidationService {
+
+    
+    /**
+     * Valida la consistencia entre el tipo de persona y los campos requeridos.
+     * 
+     * @param third el tercero a validar
+     * @throws ThirdPersonTypeValidationException si hay inconsistencias
+     */
+    public void validatePersonTypeConsistency(Third third) {
+        if (third.getPersonType() == null) {
+            throw new ThirdInvalidDataException("El tipo de persona no puede estar vacío");
+        }
+        
+        boolean hasNames = third.getNames() != null && !third.getNames().trim().isEmpty();
+        boolean hasLastNames = third.getLastNames() != null && !third.getLastNames().trim().isEmpty();
+        boolean hasGender = third.getGender() != null;
+        boolean hasSocialReason = third.getSocialReason() != null && !third.getSocialReason().trim().isEmpty();
+        
+        if (third.getPersonType().isNatural()) {
+            // Para persona natural: nombres, apellidos y género son obligatorios
+            if (!hasNames || !hasLastNames || !hasGender) {
+                throw ThirdPersonTypeValidationException.forNaturalPersonMissingFields();
+            }
+            
+            // Para persona natural: razón social NO debe estar presente
+            if (hasSocialReason) {
+                throw ThirdPersonTypeValidationException.forNaturalPersonWithForbiddenFields();
+            }
+        } else if (third.getPersonType().isJuridica()) {
+            // Para persona jurídica: razón social es obligatoria
+            if (!hasSocialReason) {
+                throw ThirdPersonTypeValidationException.forLegalEntityMissingFields();
+            }
+            
+            // Para persona jurídica: nombres, apellidos y género NO deben estar presentes
+            if (hasNames || hasLastNames || hasGender) {
+                throw ThirdPersonTypeValidationException.forLegalEntityWithForbiddenFields();
+            }
+        }
+    }
+    
+    /**
+     * Valida que el tipo de identificación sea compatible con el tipo de persona.
+     * 
+     * @param third el tercero a validar
+     * @throws ThirdTypeIdPersonTypeIncompatibilityException si hay incompatibilidad
+     */
+    public void validateTypeIdPersonTypeCompatibility(Third third) {
+        if (third.getTypeId() == null || third.getPersonType() == null) {
+            return; // Si no hay TypeId o PersonType, no se puede validar
+        }
+        
+        // Validar que el código del TypeId no sea null o vacío
+        String typeIdCode = third.getTypeId().getTypeId();
+        if (typeIdCode == null || typeIdCode.trim().isEmpty()) {
+            throw new ThirdInvalidDataException("El código del tipo de identificación no puede estar vacío");
+        }
+        
+        if (third.getPersonType().isNatural()) {
+            // Para persona natural, el TypeId debe ser válido para personas naturales
+            if (!third.getTypeId().isValidForNaturalPerson()) {
+                throw ThirdTypeIdPersonTypeIncompatibilityException.forNaturalPersonInvalidTypeId(typeIdCode);
+            }
+        } else if (third.getPersonType().isJuridica()) {
+            // Para persona jurídica, el TypeId debe ser válido para personas jurídicas
+            if (!third.getTypeId().isValidForLegalEntity()) {
+                throw ThirdTypeIdPersonTypeIncompatibilityException.forLegalEntityInvalidTypeId(typeIdCode);
+            }
+        }
+    }
+}

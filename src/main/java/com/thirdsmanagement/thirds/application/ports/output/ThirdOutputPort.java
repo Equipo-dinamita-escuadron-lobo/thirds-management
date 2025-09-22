@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -27,11 +26,12 @@ public interface ThirdOutputPort {
     Third updateThird(Third third);
     
     /**
-     * Obtiene un tercero por id.
+     * Obtiene un tercero por id y empresa.
      * @param id El id del tercero
+     * @param entId El id de la empresa
      * @return El tercero si existe, null en caso contrario
      */
-    Optional<Third> getThirdById(Long id);
+    Optional<Third> getThirdById(Long id, String entId);
     
     /**
      * Validar si existe un tercero por id y el id de la empresa.
@@ -44,9 +44,10 @@ public interface ThirdOutputPort {
     /**
      * Cambia el estado de un tercero.
      * @param thId El id del tercero
+     * @param entId El id de la empresa
      * @return True si se cambio el estado, false en caso contrario
      */
-    boolean changeThirdState(Long thId);
+    boolean changeThirdState(Long thId, String entId);
     
     /**
      * Obtiene todos los terceros.
@@ -56,34 +57,41 @@ public interface ThirdOutputPort {
      */
     Page<Third> getAllThirdsBy(String entId, Pageable page);
     
-    /**
-     * Obtiene todos los terceros inactivos.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @return La pagina de terceros inactivos
-     */
-    Page<Third> getAllInactiveThirdsBy(String entId, Pageable page);
     
     /**
-     * Obtiene todos los proveedores
+     * Obtiene todos los terceros filtrados por tipo de tercero.
      * @param entId El id de la empresa
      * @param page El pageable object
-     * @return La pagina de proveedores
+     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente")
+     * @return La pagina de terceros filtrados por tipo
      */
-    Page<Third> getAllProvidersBy(String entId,Pageable page);
+    Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType);
     
     /**
-     * Obtiene todos los clientes
+     * Obtiene todos los terceros filtrados por ID de tipo de tercero.
      * @param entId El id de la empresa
      * @param page El pageable object
-     * @return La pagina de clientes
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return La pagina de terceros filtrados por ID de tipo
      */
-    Page<Third> getAllCustomersBy(String entId,Pageable page);
+    Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId);
+    
     
     /**
-     * Obtiene todos los terceros.
+     * Obtiene todos los terceros filtrados por estado.
      * @param entId El id de la empresa
-     * @return La lista de terceros
+     * @param page El pageable object
+     * @param isActive El estado del tercero (true para activos, false para inactivos)
+     * @return La pagina de terceros filtrados por estado
      */
-    List<Third> getAllThirds(String entId);
+    Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive);
+    
+    /**
+     * Obtiene todos los terceros filtrados por ID de tipo de tercero sin filtro de estado.
+     * @param entId El id de la empresa
+     * @param page El pageable object
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return La pagina de terceros filtrados por ID de tipo (activos e inactivos)
+     */
+    Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId);
 }
