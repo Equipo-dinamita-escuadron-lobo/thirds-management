@@ -117,8 +117,8 @@ public class ThirdRestAdapter {
      */
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
-            @NotNull(message = "Third ID not be empty") @RequestParam("thId") Long thId,
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+            @NotNull(message = "thId es requerido") @RequestParam Long thId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
         Boolean result = changeThirdStateUseCase.changeThirdState(thId, entId);
 
         return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
@@ -132,8 +132,8 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/third")
     public ResponseEntity<Third> getThirdById(
-            @NotNull(message = "Third Id not be empty") @RequestParam("thId") Long thId,
-            @NotNull(message = "Enterprise Id not be empty") @RequestParam("entId") String entId) {
+            @NotNull(message = "thId es requerido") @RequestParam Long thId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
 
         Third third = getThirdUseCase.getThirdById(thId, entId);
 
@@ -148,8 +148,8 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/existBy")
     public ResponseEntity<Boolean> existThirdById(
-            @NotNull(message = "ID Number not be empty") @RequestParam("idNumber") Long idNumber,
-            @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
+            @NotNull(message = "idNumber es requerido") @RequestParam Long idNumber,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
 
         boolean exists = getThirdUseCase.existThirdById(idNumber, entId);
 
@@ -166,9 +166,9 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @RequestParam(value = "numPage", required = false) Optional<Integer> numPage,
-            @RequestParam(value = "size", required = false) Optional<Integer> size) {
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size) {
 
         long totalRecords = listThirdsUseCase.countAllThirdsByEntId(entId);
         Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
@@ -190,10 +190,10 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/inactive")
     public ResponseEntity<Page<Third>> getThirdsByStatus(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @RequestParam(value = "numPage", required = false) Optional<Integer> numPage,
-            @RequestParam(value = "size", required = false) Optional<Integer> size,
-            @NotNull(message = "Status parameter not be empty") @RequestParam("isActive") boolean isActive) {
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @NotNull(message = "isActive es requerido") @RequestParam boolean isActive) {
 
         long totalRecords = listThirdsUseCase.countAllThirdsByStatus(entId, isActive);
         Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
@@ -215,10 +215,10 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/by-type")
     public ResponseEntity<Page<Third>> getThirdsByType(
-            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
-            @RequestParam(value = "numPage", required = false) Optional<Integer> numPage,
-            @RequestParam(value = "size", required = false) Optional<Integer> size,
-            @NotNull(message = "Third type ID not be empty") @RequestParam("thirdTypeId") Long thirdTypeId) {
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @NotNull(message = "thirdTypeId es requerido") @RequestParam Long thirdTypeId) {
 
         long totalRecords = listThirdsUseCase.countAllThirdsByType(entId, thirdTypeId);
         Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
@@ -235,7 +235,7 @@ public class ThirdRestAdapter {
      *         o un ResponseEntity con un estado de error en caso de fallo.
      */
     @PostMapping("/content-PDF-RUT")
-    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(null);
         }
@@ -250,7 +250,7 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/template/excel")
     public ResponseEntity<Resource> exportThirdTemplate(
-            @RequestParam("entId") String entId) {
+            @RequestParam String entId) {
                 
         Resource templateFile = exportThirdUseCase.exportThirdTemplateWithValidations(entId);
         String filename = fileNameGenerator.generateTemplateFileName();
@@ -268,10 +268,10 @@ public class ThirdRestAdapter {
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
-            @NotNull(message = "Enterprise ID no puede estar vacío") @RequestParam("entId") String entId,
-            @RequestParam(value = "thirdTypeId", required = false) Long thirdTypeId,
-            @RequestParam(value = "status", required = false) Boolean status,
-            @RequestParam(value = "companyName", required = false) String companyName) {
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Long thirdTypeId,
+            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String companyName) {
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
@@ -299,8 +299,8 @@ public class ThirdRestAdapter {
      */
     @DeleteMapping("/delete")
     public ResponseEntity<Boolean> deleteThird(
-            @NotNull(message = "Third ID cannot be empty") @RequestParam("thirdId") Long thirdId,
-            @NotNull(message = "Enterprise ID cannot be empty") @RequestParam("entId") String entId) {
+            @NotNull(message = "thirdId es requerido") @RequestParam Long thirdId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
         
         boolean deleted = deleteThirdUseCase.deleteThird(thirdId, entId);
                 
