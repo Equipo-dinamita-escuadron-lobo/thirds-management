@@ -28,6 +28,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViol
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Component;
  * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los terceros.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ThirdPersistenceAdapter implements ThirdOutputPort{
@@ -424,4 +427,48 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             }
         }
     }
+    
+    /**
+     * Elimina un tercero del sistema junto con sus asociaciones.
+     * El tercero es la entidad raíz, por lo que sus asociaciones se eliminan automáticamente.
+     * @param thirdId El ID del tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    @Override
+    @Transactional
+    public boolean deleteThird(Long thirdId, String entId) {
+        if (thirdId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            // Buscar el tercero por ID y empresa
+            Optional<ThirdEntity> thirdEntity = thirdRepository.findByThIdAndEntId(thirdId, entId);
+            
+            if (thirdEntity.isPresent()) {
+                // Eliminar las asociaciones del tercero
+                List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdId);
+                if (!relations.isEmpty()) {
+                    thirdsAndTypesRepository.deleteAll(relations);
+                }
+                
+                // Eliminar el tercero
+                thirdRepository.delete(thirdEntity.get());
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception e) {
+            log.error("Error al eliminar tercero con ID: {} para empresa: {}", thirdId, entId, e);
+            return false;
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+    
 }

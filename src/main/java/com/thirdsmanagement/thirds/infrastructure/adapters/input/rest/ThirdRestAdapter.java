@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +61,7 @@ public class ThirdRestAdapter {
     private final ListThirdsUseCase listThirdsUseCase;
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
+    private final DeleteThirdUseCase deleteThirdUseCase;
     private final ExportThirdUseCase exportThirdUseCase;
     private final ThirdRestMapper thirdRestMapper;
     private final PdfRUTService pdfRUTService;
@@ -275,5 +278,21 @@ public class ThirdRestAdapter {
                 .body(excelFile);
     }
 
+    /**
+     * Elimina un tercero del sistema.
+     * Valida que el tercero no tenga dependencias antes de eliminarlo.
+     * @param thirdId ID del tercero a eliminar
+     * @param entId ID de la empresa
+     * @return Respuesta con el resultado de la eliminación
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<Boolean> deleteThird(
+            @NotNull(message = "Third ID cannot be empty") @RequestParam("thirdId") Long thirdId,
+            @NotNull(message = "Enterprise ID cannot be empty") @RequestParam("entId") String entId) {
+        
+        boolean deleted = deleteThirdUseCase.deleteThird(thirdId, entId);
+                
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
+    }
 
 }

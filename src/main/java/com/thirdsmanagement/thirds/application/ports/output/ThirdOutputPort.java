@@ -94,4 +94,12 @@ public interface ThirdOutputPort {
      * @return La pagina de terceros filtrados por ID de tipo (activos e inactivos)
      */
     Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId);
+    
+    /**
+     * Elimina un tercero del sistema junto con sus asociaciones.
+     * @param thirdId El ID del tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    boolean deleteThird(Long thirdId, String entId);
 }
