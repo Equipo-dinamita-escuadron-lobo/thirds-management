@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.DeleteTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdTypeUseCase;
@@ -47,6 +48,7 @@ public class ThirdConfigurationAdapter {
     private final CreateTypeIdUseCase createTypeIdUseCase;
     private final ListTypeIdUseCase listTypeIdUseCase;
     private final UpdateTypeIdUseCase updateTypeIdUseCase;
+    private final DeleteTypeIdUseCase deleteTypeIdUseCase;
 
     private final IdRestMapper idRestMapper;
 
@@ -107,6 +109,16 @@ public class ThirdConfigurationAdapter {
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
         
         boolean deleted = deleteThirdTypeUseCase.deleteThirdType(thirdTypeId, entId);
+        
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/typeid/delete")
+    public ResponseEntity<Boolean> deleteTypeId(
+            @NotNull(message = "Type ID not be empty") @RequestParam("typeIdId") Long typeIdId,
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+        
+        boolean deleted = deleteTypeIdUseCase.deleteTypeId(typeIdId, entId);
         
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }

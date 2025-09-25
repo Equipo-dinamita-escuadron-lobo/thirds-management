@@ -56,4 +56,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     Page<ThirdEntity> getAllThirdsByTypeIdWithoutStateFilter(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
             Pageable page);
 
+    @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId")
+    boolean existsByTypeIdTiIdAndEntId(@Param("typeIdCode") String typeIdCode, @Param("entId") String entId);
+
 }

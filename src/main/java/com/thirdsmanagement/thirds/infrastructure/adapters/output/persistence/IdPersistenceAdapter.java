@@ -417,4 +417,69 @@ public class IdPersistenceAdapter implements IdOutputPort {
             TenantContext.setTenantId(currentTenant);
         }
     }
+    
+    /**
+     * Elimina un tipo de identificación del sistema.
+     * @param typeIdId El ID del tipo de identificación a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    @Override
+    public boolean deleteTypeId(Long typeIdId, String entId) {
+        if (typeIdId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            Optional<TypeIdEntity> typeIdEntity = typeIdRepository.findById(typeIdId);
+            
+            if (typeIdEntity.isPresent() && entId.equals(typeIdEntity.get().getTientId())) {
+                typeIdRepository.delete(typeIdEntity.get());
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception e) {
+            // Log del error pero no lanzar excepción para mantener el contrato del método
+            return false;
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+    
+    /**
+     * Verifica si un tipo de identificación está siendo utilizado por terceros existentes.
+     * @param typeIdId El ID del tipo de identificación
+     * @param entId El ID de la empresa
+     * @return true si está en uso, false en caso contrario
+     */
+    @Override
+    public boolean isTypeIdInUse(Long typeIdId, String entId) {
+        if (typeIdId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            // Primero obtener el código del tipo de identificación
+            Optional<TypeIdEntity> typeIdEntity = typeIdRepository.findById(typeIdId);
+            if (typeIdEntity.isEmpty()) {
+                return false;
+            }
+            
+            String typeIdCode = typeIdEntity.get().getTiId();
+            
+            // Verificar si existe algún tercero que use este tipo de identificación
+            return thirdRepository.existsByTypeIdTiIdAndEntId(typeIdCode, entId);
+            
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
 }

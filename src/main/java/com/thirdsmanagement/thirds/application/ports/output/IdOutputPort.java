@@ -102,4 +102,20 @@ public interface IdOutputPort {
      * @return true si está en uso, false en caso contrario
      */
     boolean isThirdTypeInUse(Long thirdTypeId, String entId);
+    
+    /**
+     * Elimina un tipo de identificación del sistema.
+     * @param typeIdId El ID del tipo de identificación a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    boolean deleteTypeId(Long typeIdId, String entId);
+    
+    /**
+     * Verifica si un tipo de identificación está siendo utilizado por terceros existentes.
+     * @param typeIdId El ID del tipo de identificación
+     * @param entId El ID de la empresa
+     * @return true si está en uso, false en caso contrario
+     */
+    boolean isTypeIdInUse(Long typeIdId, String entId);
 }
