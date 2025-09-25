@@ -470,5 +470,49 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             TenantContext.setTenantId(currentTenant);
         }
     }
+
+    /**
+     * Cuenta el total de terceros por empresa.
+     * @param entId El id de la empresa
+     * @return El número total de terceros
+     */
+    @Override
+    public long countAllThirdsByEntId(String entId) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        return thirdRepository.countByEntId(entId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por tipo.
+     * @param entId El id de la empresa
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El número total de terceros del tipo especificado
+     */
+    @Override
+    public long countAllThirdsByType(String entId, Long thirdTypeId) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        if (thirdTypeId == null) {
+            throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
+        }
+        return thirdRepository.countByEntIdAndThirdTypeId(entId, thirdTypeId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param isActive El estado del tercero
+     * @return El número total de terceros con el estado especificado
+     */
+    @Override
+    public long countAllThirdsByStatus(String entId, boolean isActive) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        return thirdRepository.countByEntIdAndState(entId, isActive);
+    }
     
 }

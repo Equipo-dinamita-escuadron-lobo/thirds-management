@@ -59,4 +59,16 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId")
     boolean existsByTypeIdTiIdAndEntId(@Param("typeIdCode") String typeIdCode, @Param("entId") String entId);
 
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId")
+    long countByEntId(@Param("entId") String entId);
+
+    @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
+            "WHERE t.entId = :entId " +
+            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
+            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
+    long countByEntIdAndThirdTypeId(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId);
+
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
+    long countByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state);
+
 }

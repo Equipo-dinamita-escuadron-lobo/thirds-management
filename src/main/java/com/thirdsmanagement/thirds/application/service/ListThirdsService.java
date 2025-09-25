@@ -24,7 +24,7 @@ public class ListThirdsService implements ListThirdsUseCase {
      * @param pageable información de paginación
      * @return página de terceros encontrados
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound            si no se encuentran terceros
+     * @throws ThirdNotFound            si no se encuentran terceros para la empresa
      */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
@@ -33,7 +33,8 @@ public class ListThirdsService implements ListThirdsUseCase {
 
         Page<Third> result = thirdOutputPort.getAllThirdsBy(entId, pageable);
 
-        if (result.isEmpty()) {
+        // Verificar si hay registros totales para la empresa, no solo en esta página
+        if (result.getTotalElements() == 0) {
             throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);
         }
 
@@ -60,7 +61,8 @@ public class ListThirdsService implements ListThirdsUseCase {
 
         Page<Third> result = thirdOutputPort.getAllThirdsByTypeId(entId, pageable, thirdTypeId);
 
-        if (result.isEmpty()) {
+        // Verificar si hay registros totales para el filtro, no solo en esta página
+        if (result.getTotalElements() == 0) {
             throw new ThirdNotFound(
                     "No se encontro un tercero con ID de tipo de tercero '" + thirdTypeId + "' para la empresa con ID: " + entId);
         }
@@ -88,7 +90,8 @@ public class ListThirdsService implements ListThirdsUseCase {
 
         Page<Third> result = thirdOutputPort.getAllThirdsByStatus(entId, pageable, isActive);
 
-        if (result.isEmpty()) {
+        // Verificar si hay registros totales para el filtro, no solo en esta página
+        if (result.getTotalElements() == 0) {
             String statusMessage = isActive ? "activos" : "inactivos";
             throw new ThirdNotFound(
                     "No se encontraron terceros " + statusMessage + " para la empresa con ID: " + entId);
@@ -131,5 +134,47 @@ public class ListThirdsService implements ListThirdsUseCase {
         if (thirdTypeId == null) {
             throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
         }
+    }
+
+    /**
+     * Cuenta el total de terceros por empresa.
+     * 
+     * @param entId el ID de la empresa
+     * @return el número total de terceros
+     * @throws IllegalArgumentException si el ID de empresa es inválido
+     */
+    @Override
+    public long countAllThirdsByEntId(String entId) {
+        validateEnterpriseId(entId);
+        return thirdOutputPort.countAllThirdsByEntId(entId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por tipo.
+     * 
+     * @param entId       el ID de la empresa
+     * @param thirdTypeId el ID del tipo de tercero
+     * @return el número total de terceros del tipo especificado
+     * @throws IllegalArgumentException si los parámetros son inválidos
+     */
+    @Override
+    public long countAllThirdsByType(String entId, Long thirdTypeId) {
+        validateEnterpriseId(entId);
+        validateThirdTypeId(thirdTypeId);
+        return thirdOutputPort.countAllThirdsByType(entId, thirdTypeId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por estado.
+     * 
+     * @param entId    el ID de la empresa
+     * @param isActive el estado del tercero
+     * @return el número total de terceros con el estado especificado
+     * @throws IllegalArgumentException si el ID de empresa es inválido
+     */
+    @Override
+    public long countAllThirdsByStatus(String entId, boolean isActive) {
+        validateEnterpriseId(entId);
+        return thirdOutputPort.countAllThirdsByStatus(entId, isActive);
     }
 }

@@ -102,4 +102,27 @@ public interface ThirdOutputPort {
      * @return true si se eliminó correctamente, false en caso contrario
      */
     boolean deleteThird(Long thirdId, String entId);
+    
+    /**
+     * Cuenta el total de terceros por empresa.
+     * @param entId El id de la empresa
+     * @return El número total de terceros
+     */
+    long countAllThirdsByEntId(String entId);
+    
+    /**
+     * Cuenta el total de terceros filtrados por tipo.
+     * @param entId El id de la empresa
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El número total de terceros del tipo especificado
+     */
+    long countAllThirdsByType(String entId, Long thirdTypeId);
+    
+    /**
+     * Cuenta el total de terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param isActive El estado del tercero
+     * @return El número total de terceros con el estado especificado
+     */
+    long countAllThirdsByStatus(String entId, boolean isActive);
 }
