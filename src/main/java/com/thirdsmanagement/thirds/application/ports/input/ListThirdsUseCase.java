@@ -22,10 +22,10 @@ public interface ListThirdsUseCase {
      * Obtiene todos los terceros filtrados por tipo de tercero.
      * @param entId El id de la empresa
      * @param pageable El objeto pageable
-     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente")
+     * @param thirdTypeId El ID del tipo de tercero
      * @return La página de terceros filtrados por tipo
      */
-    Page<Third> getAllThirdsByType(String entId, Pageable pageable, String thirdType);
+    Page<Third> getAllThirdsByType(String entId, Pageable pageable, Long thirdTypeId);
     
     
     /**

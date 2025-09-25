@@ -44,25 +44,25 @@ public class ListThirdsService implements ListThirdsUseCase {
      * Obtiene todos los terceros filtrados por tipo de tercero de una empresa con
      * paginación.
      * 
-     * @param entId     el ID de la empresa
-     * @param pageable  información de paginación
-     * @param thirdType el tipo de tercero (ej: "Proveedor", "Cliente")
+     * @param entId       el ID de la empresa
+     * @param pageable    información de paginación
+     * @param thirdTypeId el ID del tipo de tercero
      * @return página de terceros filtrados por tipo
      * @throws IllegalArgumentException si los parámetros son inválidos
      * @throws ThirdNotFound            si no se encuentran terceros del tipo
      *                                  especificado
      */
     @Override
-    public Page<Third> getAllThirdsByType(String entId, Pageable pageable, String thirdType) {
+    public Page<Third> getAllThirdsByType(String entId, Pageable pageable, Long thirdTypeId) {
         validateEnterpriseId(entId);
         validatePageable(pageable);
-        validateThirdType(thirdType);
+        validateThirdTypeId(thirdTypeId);
 
-        Page<Third> result = thirdOutputPort.getAllThirdsByType(entId, pageable, thirdType);
+        Page<Third> result = thirdOutputPort.getAllThirdsByTypeId(entId, pageable, thirdTypeId);
 
         if (result.isEmpty()) {
             throw new ThirdNotFound(
-                    "No se encontraron terceros del tipo '" + thirdType + "' para la empresa con ID: " + entId);
+                    "No se encontro un tercero con ID de tipo de tercero '" + thirdTypeId + "' para la empresa con ID: " + entId);
         }
 
         return result;
@@ -122,14 +122,14 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Valida que el tipo de tercero no sea null o vacío.
+     * Valida que el ID del tipo de tercero no sea null.
      * 
-     * @param thirdType el tipo de tercero a validar
-     * @throws IllegalArgumentException si el tipo de tercero es inválido
+     * @param thirdTypeId el ID del tipo de tercero a validar
+     * @throws IllegalArgumentException si el ID del tipo de tercero es null
      */
-    private void validateThirdType(String thirdType) {
-        if (thirdType == null || thirdType.trim().isEmpty()) {
-            throw new IllegalArgumentException("El tipo de tercero no puede ser null o vacío");
+    private void validateThirdTypeId(Long thirdTypeId) {
+        if (thirdTypeId == null) {
+            throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
         }
     }
 }

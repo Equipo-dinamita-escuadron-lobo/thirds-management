@@ -197,18 +197,18 @@ public class ThirdRestAdapter {
      * Obtiene una lista de terceros filtrados por tipo de tercero.
      * @param entId Id de la empresa.
      * @param numPage Número de página.
-     * @param thirdType Tipo de tercero (ej: "Proveedor", "Cliente").
+     * @param thirdTypeId ID del tipo de tercero.
      * @return Respuesta con la lista de terceros filtrados por tipo.
      */
     @GetMapping("/by-type")
     public ResponseEntity<Page<Third>> getThirdsByType(
             @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId,
             @NotNull(message = "Number page not be empty") @RequestParam("numPage") int numPage,
-            @NotNull(message = "Third type not be empty") @RequestParam("thirdType") String thirdType) {
+            @NotNull(message = "Third type ID not be empty") @RequestParam("thirdTypeId") Long thirdTypeId) {
 
         Pageable pageable = PageRequest.of(numPage, 10);
 
-        Page<Third> page = listThirdsUseCase.getAllThirdsByType(entId, pageable, thirdType);
+        Page<Third> page = listThirdsUseCase.getAllThirdsByType(entId, pageable, thirdTypeId);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
