@@ -2,6 +2,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdTypeUseCase;
@@ -41,6 +43,7 @@ public class ThirdConfigurationAdapter {
     private final CreateThirdTypeUseCase createThirdTypeUseCase;
     private final ListThirdTypeUseCase listThirdTypeUseCase;
     private final UpdateThirdTypeUseCase updateThirdTypeUseCase;
+    private final DeleteThirdTypeUseCase deleteThirdTypeUseCase;
     private final CreateTypeIdUseCase createTypeIdUseCase;
     private final ListTypeIdUseCase listTypeIdUseCase;
     private final UpdateTypeIdUseCase updateTypeIdUseCase;
@@ -96,6 +99,16 @@ public class ThirdConfigurationAdapter {
         typeId = updateTypeIdUseCase.updateTypeId(typeId);
 
         return new ResponseEntity<>(typeId, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/thirdtype/delete")
+    public ResponseEntity<Boolean> deleteThirdType(
+            @NotNull(message = "Third type ID not be empty") @RequestParam("thirdTypeId") Long thirdTypeId,
+            @NotNull(message = "Enterprise ID not be empty") @RequestParam("entId") String entId) {
+        
+        boolean deleted = deleteThirdTypeUseCase.deleteThirdType(thirdTypeId, entId);
+        
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
 }

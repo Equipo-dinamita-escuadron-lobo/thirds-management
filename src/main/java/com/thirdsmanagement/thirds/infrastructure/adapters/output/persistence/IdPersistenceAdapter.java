@@ -22,6 +22,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.mapper.IdPersistenceMapper;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 
@@ -46,6 +47,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
+    private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final TypeIdRepository typeIdRepository;
     private final IdPersistenceMapper idPersistenceMapper;
     
@@ -338,6 +340,79 @@ public class IdPersistenceAdapter implements IdOutputPort {
                     .map(idPersistenceMapper::toThirdType)
                     .orElse(null);
                     
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+    
+    /**
+     * Obtiene un tipo de tercero completo por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El tipo de tercero completo o null si no existe
+     */
+    @Override
+    public ThirdType getThirdTypeById(Long thirdTypeId) {
+        if (thirdTypeId == null) {
+            return null;
+        }
+        
+        return thirdTypeRepository.findById(thirdTypeId)
+                .map(idPersistenceMapper::toThirdType)
+                .orElse(null);
+    }
+    
+    /**
+     * Elimina un tipo de tercero del sistema.
+     * @param thirdTypeId El ID del tipo de tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    @Override
+    public boolean deleteThirdType(Long thirdTypeId, String entId) {
+        if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            Optional<ThirdTypeEntity> thirdTypeEntity = thirdTypeRepository.findByTtIdAndTtentId(thirdTypeId, entId);
+            
+            if (thirdTypeEntity.isPresent()) {
+                thirdTypeRepository.delete(thirdTypeEntity.get());
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception e) {
+            // Log del error pero no lanzar excepción para mantener el contrato del método
+            return false;
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+    
+    /**
+     * Verifica si un tipo de tercero está siendo utilizado por terceros existentes.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return true si está en uso, false en caso contrario
+     */
+    @Override
+    public boolean isThirdTypeInUse(Long thirdTypeId, String entId) {
+        if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            // Verificar si existe algún tercero que use este tipo de tercero
+            return thirdsAndTypesRepository.existsByTtId(thirdTypeId);
+            
         } finally {
             TenantContext.setTenantId(currentTenant);
         }
