@@ -40,7 +40,7 @@ public class CreateThirdService implements CreateThirdUseCase {
      */
     @Override
     @Transactional
-    public Third createThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {
+    public Third createThird(Third third, String countryCode, String stateCode, String cityCode) {
         // Basic validation
         thirdValidationService.validatePersonTypeConsistency(third);
         

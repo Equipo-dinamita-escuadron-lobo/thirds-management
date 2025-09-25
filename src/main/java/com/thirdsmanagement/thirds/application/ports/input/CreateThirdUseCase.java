@@ -14,5 +14,5 @@ public interface CreateThirdUseCase {
      * @param cityCode código de la ciudad
      * @return el tercero creado con geografía validada
      */
-    Third createThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode);
+    Third createThird(Third third, String countryCode, String stateCode, String cityCode);
 }

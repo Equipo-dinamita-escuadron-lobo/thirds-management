@@ -77,7 +77,7 @@ public class ThirdRestAdapter {
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
 
         // Use geography validation service for proper geography integration
-        third = createThirdService.createThirdWithGeography(third, 
+        third = createThirdService.createThird(third, 
                 thirdCreateRequest.getCountryCode(), 
                 thirdCreateRequest.getStateCode(), 
                 thirdCreateRequest.getCityCode());
