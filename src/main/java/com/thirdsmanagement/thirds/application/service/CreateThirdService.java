@@ -31,57 +31,6 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Crea un nuevo tercero en el sistema.
-     * 
-     * @param third el tercero a crear
-     * @return el tercero creado con su ID asignado
-     * @throws ThirdInvalidDataException si el tercero es null o tiene datos inválidos
-     * @throws ThirdAlreadyExistsException si ya existe un tercero con el mismo número de identificación
-     */
-    @Override
-    @Transactional
-    public Third createThird(Third third) {
-        // Validar datos básicos
-        thirdValidationService.validatePersonTypeConsistency(third);
-        
-        // Cargar TypeId completo si es necesario y validar compatibilidad
-        Third thirdWithCompleteTypeId = loadCompleteTypeIdIfNeeded(third);
-        thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
-        
-        // Normalizar nombres usando el tercero con TypeId completo
-        Third normalizedThird = Third.builder()
-                .entId(thirdWithCompleteTypeId.getEntId())
-                .personType(thirdWithCompleteTypeId.getPersonType())
-                .typeId(thirdWithCompleteTypeId.getTypeId())
-                .thirdTypes(third.getThirdTypes())
-                .names(third.getNames() != null ? StringNormalizer.normalizePreservingCase(third.getNames()) : null)
-                .lastNames(third.getLastNames() != null ? StringNormalizer.normalizePreservingCase(third.getLastNames()) : null)
-                .socialReason(third.getSocialReason() != null ? StringNormalizer.normalizePreservingCase(third.getSocialReason()) : null)
-                .gender(third.getGender())
-                .idNumber(third.getIdNumber())
-                .verificationNumber(third.getVerificationNumber())
-                .state(third.getState() != null ? third.getState() : true)
-                .address(third.getAddress())
-                .phoneNumber(third.getPhoneNumber())
-                .email(third.getEmail())
-                .country(third.getCountry())
-                .province(third.getProvince())
-                .city(third.getCity())
-                .build();
-        
-        // Validar duplicados por número de identificación
-        validateDuplicateThird(normalizedThird.getIdNumber(), normalizedThird.getEntId());
-        
-        // Guardar el tercero y obtener la entidad persistida con ID
-        Third createdThird = thirdOutputPort.saveThird(normalizedThird);
-        
-        // Publicar evento de creación
-        thirdEventPublisher.publishThirdCreatedEvent(new ThirdCreatedEvent(createdThird.getThId()));
-        
-        return createdThird;
-    }
-    
-    /**
      * Creates a Third with geography validation from request codes.
      * @param third the Third object with geography codes
      * @param countryCode country code
@@ -89,6 +38,7 @@ public class CreateThirdService implements CreateThirdUseCase {
      * @param cityCode city code
      * @return the created Third with validated geography
      */
+    @Override
     @Transactional
     public Third createThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {
         // Basic validation
@@ -97,6 +47,9 @@ public class CreateThirdService implements CreateThirdUseCase {
         // Cargar TypeId completo si es necesario y validar compatibilidad
         Third thirdWithCompleteTypeId = loadCompleteTypeIdIfNeeded(third);
         thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
+        
+        // Validar formato de NIT para personas jurídicas
+        thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
         
         // Geography validation and retrieval
         Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);

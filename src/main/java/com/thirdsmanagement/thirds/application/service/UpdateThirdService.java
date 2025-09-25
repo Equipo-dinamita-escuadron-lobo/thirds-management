@@ -69,6 +69,9 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         // Validar compatibilidad entre TypeId y PersonType
         thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
         
+        // Validar formato de NIT para personas jurídicas
+        thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
+        
         // Validar que los ThirdTypes existen
         validateThirdTypesExist(third);
         

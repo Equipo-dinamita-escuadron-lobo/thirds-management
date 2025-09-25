@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNitInvalidFormatException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdPersonTypeValidationException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdTypeIdPersonTypeIncompatibilityException;
 import com.thirdsmanagement.thirds.domain.model.Third;
@@ -80,6 +81,39 @@ public class ThirdValidationService {
             if (!third.getTypeId().isValidForLegalEntity()) {
                 throw ThirdTypeIdPersonTypeIncompatibilityException.forLegalEntityInvalidTypeId(typeIdCode);
             }
+        }
+    }
+    
+    /**
+     * Valida que el formato del NIT sea correcto para personas jurídicas.
+     * El NIT debe empezar por 8 o 9.
+     * 
+     * @param third el tercero a validar
+     * @throws ThirdNitInvalidFormatException si el NIT no tiene el formato correcto
+     */
+    public void validateNitFormat(Third third) {
+        // Solo validar si es persona jurídica y tiene tipo de identificación NIT
+        if (third.getPersonType() == null || !third.getPersonType().isJuridica()) {
+            return;
+        }
+        
+        if (third.getTypeId() == null || third.getTypeId().getTypeId() == null) {
+            return;
+        }
+        
+        String typeIdCode = third.getTypeId().getTypeId().trim().toUpperCase();
+        if (!"NIT".equals(typeIdCode)) {
+            return;
+        }
+        
+        if (third.getIdNumber() == null) {
+            throw new ThirdInvalidDataException("El número de identificación es obligatorio para NIT");
+        }
+        
+        String nitNumber = third.getIdNumber().toString();
+
+        if (!nitNumber.startsWith("8") && !nitNumber.startsWith("9")) {
+            throw new ThirdNitInvalidFormatException(nitNumber);
         }
     }
 }
