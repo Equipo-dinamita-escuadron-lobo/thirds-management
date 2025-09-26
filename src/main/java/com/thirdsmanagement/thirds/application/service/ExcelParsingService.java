@@ -4,6 +4,7 @@ import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.*;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
+import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +29,9 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ExcelParsingService {
+
+    private static final int HEADER_ROW_INDEX = 0;
+    private static final int DATA_START_ROW_INDEX = 1;
 
 
     /**
@@ -86,8 +90,8 @@ public class ExcelParsingService {
                         "No se pudieron detectar las columnas requeridas");
             }
 
-            // Procesar filas de datos
-            for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+            // Procesar filas de datos (empezar después de headers)
+            for (int rowIndex = DATA_START_ROW_INDEX; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row == null || isEmptyRow(row)) {
                     continue;
@@ -119,7 +123,7 @@ public class ExcelParsingService {
      * Detecta el mapeo de columnas basado en los encabezados del archivo.
      */
     private Map<String, Integer> detectColumnMapping(Sheet sheet, List<ImportErrorDetail> errors) {
-        Row headerRow = sheet.getRow(0);
+        Row headerRow = sheet.getRow(HEADER_ROW_INDEX);
         if (headerRow == null) {
                 errors.add(ImportErrorDetail.builder()
                         .rowNumber(1)
@@ -133,14 +137,17 @@ public class ExcelParsingService {
         Map<String, Integer> columnMap = new HashMap<>();
         Set<String> foundHeaders = new HashSet<>();
 
-        // Mapear todas las columnas encontradas
+        // Mapear todas las columnas encontradas con protección contra NPE
         for (int i = 0; i < headerRow.getLastCellNum(); i++) {
             Cell cell = headerRow.getCell(i);
-            if (cell != null) {
-                String header = cell.getStringCellValue().trim();
-                if (!header.isEmpty()) {
-                    columnMap.put(header, i);
-                    foundHeaders.add(header);
+            if (cell != null && cell.getCellType() == CellType.STRING) {
+                String headerValue = cell.getStringCellValue();
+                if (headerValue != null) {
+                    String header = headerValue.trim();
+                    if (!header.isEmpty()) {
+                        columnMap.put(header, i);
+                        foundHeaders.add(header);
+                    }
                 }
             }
         }
@@ -164,6 +171,7 @@ public class ExcelParsingService {
 
     /**
      * Parsea una fila individual del Excel usando el mapa de columnas detectado.
+     * REFACTORIZADO: Dividido en sub-métodos para mejor mantenibilidad.
      */
     private ThirdExcelData parseRow(Row row, int rowNumber, String entId, Map<String, Integer> columnMap, List<ImportErrorDetail> errors) {
         try {
@@ -171,52 +179,11 @@ public class ExcelParsingService {
                     .rowNumber(rowNumber)
                     .entId(entId);
 
-            // Parsear campos básicos (siempre presentes)
-            builder.typeIdName(getCellValueAsString(row, columnMap.get("Tipo Identificación")));
-            builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber, "Número Identificación", errors));
-            builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber, "Dígito Verificación", errors));
-            builder.personType(parsePersonType(getCellValueAsString(row, columnMap.get("Tipo Persona")), rowNumber, errors));
-            builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
-            builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
-            builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
-            builder.gender(parseGender(getCellValueAsString(row, columnMap.get("Género")), rowNumber, errors));
-            builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
-
-            // Parsear campos opcionales (solo si están presentes)
-            Integer typesColumn = columnMap.get(ImportConstants.OptionalHeaders.TYPES);
-            if (typesColumn != null) {
-                builder.thirdTypesNames(parseThirdTypes(getCellValueAsString(row, typesColumn)));
-            }
-
-            Integer countryColumn = columnMap.get(ImportConstants.OptionalHeaders.COUNTRY);
-            if (countryColumn != null) {
-                builder.countryName(getCellValueAsString(row, countryColumn));
-            }
-
-            Integer stateColumn = columnMap.get(ImportConstants.OptionalHeaders.STATE);
-            if (stateColumn != null) {
-                builder.stateName(getCellValueAsString(row, stateColumn));
-            }
-
-            Integer cityColumn = columnMap.get(ImportConstants.OptionalHeaders.CITY);
-            if (cityColumn != null) {
-                builder.cityName(getCellValueAsString(row, cityColumn));
-            }
-
-            Integer addressColumn = columnMap.get(ImportConstants.OptionalHeaders.ADDRESS);
-            if (addressColumn != null) {
-                builder.address(getCellValueAsString(row, addressColumn));
-            }
-
-            Integer phoneColumn = columnMap.get(ImportConstants.OptionalHeaders.PHONE);
-            if (phoneColumn != null) {
-                builder.phoneNumber(getCellValueAsString(row, phoneColumn));
-            }
-
-            Integer emailColumn = columnMap.get(ImportConstants.OptionalHeaders.EMAIL);
-            if (emailColumn != null) {
-                builder.email(getCellValueAsString(row, emailColumn));
-            }
+            // Parsear campos básicos usando sub-método especializado
+            parseBasicFields(row, builder, columnMap, rowNumber, errors);
+            
+            // Parsear campos opcionales usando sub-método especializado
+            parseOptionalFields(row, builder, columnMap);
 
             return builder.build();
 
@@ -228,6 +195,152 @@ public class ExcelParsingService {
                     .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
                     .build());
             return null;
+        }
+    }
+
+    /**
+     * Parsea los campos básicos requeridos de una fila.
+     */
+    private void parseBasicFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, 
+                                 Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
+        builder.typeIdName(getCellValueAsString(row, columnMap.get("Tipo Identificación")));
+        builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber, "Número Identificación", errors));
+        builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber, "Dígito Verificación", errors));
+        builder.personType(parseEnum(getCellValueAsString(row, columnMap.get("Tipo Persona")), 
+                ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType));
+        builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
+        builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
+        builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
+        builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")), 
+                eThirdGender.class, "Género", rowNumber, errors, this::mapGender));
+        builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
+    }
+
+    /**
+     * Parsea los campos opcionales de una fila (solo si están presentes).
+     */
+    private void parseOptionalFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+        // Tipos de tercero
+        Integer typesColumn = columnMap.get(ImportConstants.OptionalHeaders.TYPES);
+        if (typesColumn != null) {
+            builder.thirdTypesNames(parseThirdTypes(getCellValueAsString(row, typesColumn)));
+        }
+
+        // Geografía
+        parseGeographyFields(row, builder, columnMap);
+        
+        // Información de contacto
+        parseContactFields(row, builder, columnMap);
+    }
+
+    /**
+     * Parsea los campos geográficos opcionales.
+     */
+    private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+        Integer countryColumn = columnMap.get(ImportConstants.OptionalHeaders.COUNTRY);
+        if (countryColumn != null) {
+            builder.countryName(getCellValueAsString(row, countryColumn));
+        }
+
+        Integer stateColumn = columnMap.get(ImportConstants.OptionalHeaders.STATE);
+        if (stateColumn != null) {
+            builder.stateName(getCellValueAsString(row, stateColumn));
+        }
+
+        Integer cityColumn = columnMap.get(ImportConstants.OptionalHeaders.CITY);
+        if (cityColumn != null) {
+            builder.cityName(getCellValueAsString(row, cityColumn));
+        }
+
+        Integer addressColumn = columnMap.get(ImportConstants.OptionalHeaders.ADDRESS);
+        if (addressColumn != null) {
+            builder.address(getCellValueAsString(row, addressColumn));
+        }
+    }
+
+    /**
+     * Parsea los campos de información de contacto.
+     */
+    private void parseContactFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+        Integer phoneColumn = columnMap.get(ImportConstants.OptionalHeaders.PHONE);
+        if (phoneColumn != null) {
+            builder.phoneNumber(getCellValueAsString(row, phoneColumn));
+        }
+
+        Integer emailColumn = columnMap.get(ImportConstants.OptionalHeaders.EMAIL);
+        if (emailColumn != null) {
+            builder.email(getCellValueAsString(row, emailColumn));
+        }
+    }
+
+    /**
+     * REFACTORIZADO: Método genérico para parsear cualquier enum con mapeo personalizado.
+     * Elimina duplicación de código entre parsePersonType, parseGender, etc.
+     */
+    private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName, 
+                                           int rowNumber, List<ImportErrorDetail> errors,
+                                           java.util.function.Function<String, T> mapper) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+
+        try {
+            T result = mapper.apply(value.trim().toUpperCase());
+            if (result == null) {
+                errors.add(ImportErrorDetail.builder()
+                        .rowNumber(rowNumber)
+                        .columnName(fieldName)
+                        .fieldValue(value)
+                        .errorCode(ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName))
+                        .errorMessage(fieldName + " inválido: " + value)
+                        .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
+                        .build());
+            }
+            return result;
+        } catch (Exception e) {
+            errors.add(ImportErrorDetail.builder()
+                    .rowNumber(rowNumber)
+                    .columnName(fieldName)
+                    .fieldValue(value)
+                    .errorCode(ErrorMappingUtils.generateParsingErrorCode(fieldName))
+                    .errorMessage("Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage())
+                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .build());
+            return null;
+        }
+    }
+
+    /**
+     * Mapea valores de string a ePersonType.
+     */
+    private ePersonType mapPersonType(String normalizedValue) {
+        switch (normalizedValue) {
+            case "NATURAL":
+                return ePersonType.Natural;
+            case "JURIDICA":
+            case "JURÍDICA":
+                return ePersonType.Juridica;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Mapea valores de string a eThirdGender.
+     */
+    private eThirdGender mapGender(String normalizedValue) {
+        switch (normalizedValue) {
+            case "MASCULINO":
+            case "M":
+                return eThirdGender.Masculino;
+            case "FEMENINO":
+            case "F":
+                return eThirdGender.Femenino;
+            case "OTRO":
+            case "O":
+                return eThirdGender.Otro;
+            default:
+                return null;
         }
     }
 
@@ -282,7 +395,7 @@ public class ExcelParsingService {
         } catch (NumberFormatException e) {
             errors.add(ImportErrorDetail.builder()
                     .rowNumber(rowNumber)
-                    .columnNumber(columnIndex)
+                    .columnNumber(columnIndex + 1)
                     .columnName(fieldName)
                     .fieldValue(cell.toString())
                     .errorCode("INVALID_NUMBER_FORMAT")
@@ -293,89 +406,6 @@ public class ExcelParsingService {
         }
     }
 
-    /**
-     * Parsea el tipo de persona desde String.
-     */
-    private ePersonType parsePersonType(String value, int rowNumber, List<ImportErrorDetail> errors) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
-        }
-
-        try {
-            String normalizedValue = value.trim().toUpperCase();
-            switch (normalizedValue) {
-                case "NATURAL":
-                    return ePersonType.Natural;
-                case "JURIDICA":
-                case "JURÍDICA":
-                    return ePersonType.Juridica;
-                default:
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(rowNumber)
-                        .columnName("Tipo Persona")
-                        .fieldValue(value)
-                        .errorCode("INVALID_PERSON_TYPE")
-                        .errorMessage("Tipo de persona inválido: " + value)
-                        .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
-                        .build());
-                    return null;
-            }
-        } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName("Tipo Persona")
-                    .fieldValue(value)
-                    .errorCode("PERSON_TYPE_PARSING_ERROR")
-                    .errorMessage("Error parseando tipo de persona: " + e.getMessage())
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
-                    .build());
-            return null;
-        }
-    }
-
-    /**
-     * Parsea el género desde String.
-     */
-    private eThirdGender parseGender(String value, int rowNumber, List<ImportErrorDetail> errors) {
-        if (value == null || value.trim().isEmpty()) {
-            return null;
-        }
-
-        try {
-            String normalizedValue = value.trim().toUpperCase();
-            switch (normalizedValue) {
-                case "MASCULINO":
-                case "M":
-                    return eThirdGender.Masculino;
-                case "FEMENINO":
-                case "F":
-                    return eThirdGender.Femenino;
-                case "OTRO":
-                case "O":
-                    return eThirdGender.Otro;
-                default:
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(rowNumber)
-                        .columnName("Género")
-                        .fieldValue(value)
-                        .errorCode("INVALID_GENDER")
-                        .errorMessage("Género inválido: " + value)
-                        .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
-                        .build());
-                    return null;
-            }
-        } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName("Género")
-                    .fieldValue(value)
-                    .errorCode("GENDER_PARSING_ERROR")
-                    .errorMessage("Error parseando género: " + e.getMessage())
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
-                    .build());
-            return null;
-        }
-    }
 
     /**
      * Parsea el estado desde String.

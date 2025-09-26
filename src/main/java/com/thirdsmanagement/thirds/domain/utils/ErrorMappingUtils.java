@@ -194,6 +194,52 @@ public final class ErrorMappingUtils {
                 .build();
     }
 
+    // ===== GENERACIÓN DE CÓDIGOS DE ERROR =====
+
+    /**
+     * Genera un código de error consistente basado en el nombre del campo.
+     * Centraliza la lógica de generación para mantener consistencia.
+     * 
+     * @param prefix prefijo del código (ej: "INVALID", "MISSING")
+     * @param fieldName nombre del campo
+     * @return código de error normalizado (ej: "INVALID_TIPO_PERSONA")
+     */
+    public static String generateErrorCode(String prefix, String fieldName) {
+        if (prefix == null || fieldName == null) {
+            return "UNKNOWN_ERROR";
+        }
+        
+        return prefix.toUpperCase() + "_" + 
+               fieldName.toUpperCase()
+                       .replace(" ", "_")
+                       .replace("Ó", "O")
+                       .replace("É", "E")
+                       .replace("Í", "I")
+                       .replace("Á", "A")
+                       .replace("Ú", "U")
+                       .replaceAll("[^A-Z0-9_]", "_");
+    }
+
+    /**
+     * Genera código de error para valores inválidos de campo.
+     * 
+     * @param fieldName nombre del campo
+     * @return código de error para valor inválido
+     */
+    public static String generateInvalidFieldErrorCode(String fieldName) {
+        return generateErrorCode("INVALID", fieldName);
+    }
+
+    /**
+     * Genera código de error para errores de parseo de campo.
+     * 
+     * @param fieldName nombre del campo
+     * @return código de error para parseo
+     */
+    public static String generateParsingErrorCode(String fieldName) {
+        return generateErrorCode(fieldName, "PARSING_ERROR");
+    }
+
     // ===== UTILIDADES DE MAPEO =====
 
     /**
