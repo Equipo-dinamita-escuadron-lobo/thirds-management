@@ -1,6 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
 
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -513,6 +513,28 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
         return thirdRepository.countByEntIdAndState(entId, isActive);
+    }
+
+    /**
+     * Encuentra qué números de identificación ya existen en la base de datos.
+     * 
+     * @param idNumbers conjunto de números de identificación a verificar
+     * @param entId el id de la empresa
+     * @return conjunto de números de identificación que ya existen
+     */
+    @Override
+    public Set<Long> findExistingIdNumbers(Set<Long> idNumbers, String entId) {
+        if (idNumbers == null || idNumbers.isEmpty()) {
+            return Collections.emptySet();
+        }
+        
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+
+        // Usar consulta batch optimizada del repositorio
+        List<Long> existingList = thirdRepository.findExistingIdNumbers(idNumbers, entId);
+        return new HashSet<>(existingList);
     }
     
 }

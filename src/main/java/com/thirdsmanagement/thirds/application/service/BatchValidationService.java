@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio especializado en validaciones en lotes para importación de terceros.
- * Optimiza las validaciones pre-cargando datos de referencia y procesando en lotes. * 
+ * Optimiza las validaciones pre-cargando datos de referencia y procesando en
+ * lotes. *
  */
 @Slf4j
 @Service
@@ -28,17 +29,17 @@ public class BatchValidationService {
     private final GeographyOutputPort geographyOutputPort;
     private final ThirdValidationService thirdValidationService;
 
-    // Sin campos de cache - se pasan como parámetros locales para mejor testabilidad
-
     /**
      * Valida un lote de datos de terceros de Excel.
      * 
      * @param thirdsData lista de datos de terceros a validar
-     * @param entId identificador de la entidad
-     * @param columnMap mapa de columnas del Excel para incluir números de columna en errores
+     * @param entId      identificador de la entidad
+     * @param columnMap  mapa de columnas del Excel para incluir números de columna
+     *                   en errores
      * @return resultado de validación con errores y advertencias
      */
-    public BatchValidationResult validateBatch(List<ThirdExcelData> thirdsData, String entId, Map<String, Integer> columnMap) {
+    public BatchValidationResult validateBatch(List<ThirdExcelData> thirdsData, String entId,
+            Map<String, Integer> columnMap) {
         List<ImportErrorDetail> errors = new ArrayList<>();
         List<ThirdExcelData> validRecords = new ArrayList<>();
 
@@ -50,13 +51,13 @@ public class BatchValidationService {
         for (ThirdExcelData excelData : thirdsData) {
             try {
                 ValidationResult result = validateSingleRecord(excelData, cache, columnMap);
-                
+
                 errors.addAll(result.getErrors());
-                
+
                 if (result.isValid()) {
                     validRecords.add(excelData);
                 }
-                
+
             } catch (Exception e) {
                 log.error("Error validando registro en fila {}: {}", excelData.getRowNumber(), e.getMessage());
                 errors.add(ImportErrorDetail.builder()
@@ -68,7 +69,7 @@ public class BatchValidationService {
             }
         }
 
-        log.info("Validación completada. Válidos: {}, Errores: {}", 
+        log.info("Validación completada. Válidos: {}, Errores: {}",
                 validRecords.size(), errors.size());
 
         return BatchValidationResult.builder()
@@ -93,8 +94,7 @@ public class BatchValidationService {
                 .collect(Collectors.toMap(
                         typeId -> typeId.getTypeIdname().toUpperCase(),
                         typeId -> typeId,
-                        (existing, replacement) -> existing
-                ));
+                        (existing, replacement) -> existing));
 
         // Cargar tipos de tercero
         Map<String, ThirdType> thirdTypes = idOutputPort.getALLThirdTypes(entId).stream()
@@ -102,23 +102,20 @@ public class BatchValidationService {
                 .collect(Collectors.toMap(
                         thirdType -> thirdType.getThirdTypeName().toUpperCase(),
                         thirdType -> thirdType,
-                        (existing, replacement) -> existing
-                ));
+                        (existing, replacement) -> existing));
 
         // Cargar geografía
         Map<String, Country> countries = geographyOutputPort.getAllActiveCountries().stream()
                 .collect(Collectors.toMap(
                         country -> country.getCountryName().toUpperCase(),
                         country -> country,
-                        (existing, replacement) -> existing
-                ));
+                        (existing, replacement) -> existing));
 
         Map<String, State> states = geographyOutputPort.getStatesByCountry("COL").stream()
                 .collect(Collectors.toMap(
                         state -> state.getStateName().toUpperCase(),
                         state -> state,
-                        (existing, replacement) -> existing
-                ));
+                        (existing, replacement) -> existing));
 
         Map<String, City> cities = new HashMap<>();
         for (State state : states.values()) {
@@ -130,18 +127,19 @@ public class BatchValidationService {
 
         // Crear objeto inmutable con todos los datos
         ReferenceDataCache cache = new ReferenceDataCache(typeIds, thirdTypes, countries, states, cities);
-        
+
         log.debug("Datos pre-cargados: {} tipos ID, {} tipos tercero, {} países, {} estados, {} ciudades",
                 typeIds.size(), thirdTypes.size(), countries.size(),
                 states.size(), cities.size());
-                
+
         return cache;
     }
 
     /**
      * Valida un registro individual usando los datos pre-cargados.
      */
-    private ValidationResult validateSingleRecord(ThirdExcelData excelData, ReferenceDataCache cache, Map<String, Integer> columnMap) {
+    private ValidationResult validateSingleRecord(ThirdExcelData excelData, ReferenceDataCache cache,
+            Map<String, Integer> columnMap) {
         List<ImportErrorDetail> errors = new ArrayList<>();
 
         // 1. Validaciones básicas de formato y campos requeridos
@@ -164,7 +162,8 @@ public class BatchValidationService {
     /**
      * Valida campos básicos y formato.
      */
-    private void validateBasicFields(ThirdExcelData excelData, List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
+    private void validateBasicFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
         // Validar campos requeridos usando métodos utilitarios
         if (!ValidationUtils.hasContent(excelData.getTypeIdName())) {
             errors.add(ErrorMappingUtils.createRequiredFieldError(
@@ -187,7 +186,8 @@ public class BatchValidationService {
                     excelData.getRowNumber(), excelData.getEmail(), columnMap));
         }
 
-        if (ValidationUtils.hasContent(excelData.getPhoneNumber()) && !ValidationUtils.isValidPhoneNumber(excelData.getPhoneNumber())) {
+        if (ValidationUtils.hasContent(excelData.getPhoneNumber())
+                && !ValidationUtils.isValidPhoneNumber(excelData.getPhoneNumber())) {
             errors.add(ErrorMappingUtils.createInvalidPhoneError(
                     excelData.getRowNumber(), excelData.getPhoneNumber(), columnMap));
         }
@@ -196,7 +196,8 @@ public class BatchValidationService {
     /**
      * Valida referencias a datos maestros.
      */
-    private void validateReferences(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache, Map<String, Integer> columnMap) {
+    private void validateReferences(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
+            Map<String, Integer> columnMap) {
         // Validar tipo de identificación
         if (ValidationUtils.hasContent(excelData.getTypeIdName())) {
             if (!cache.hasTypeId(excelData.getTypeIdName())) {
@@ -230,7 +231,8 @@ public class BatchValidationService {
     /**
      * Valida datos geográficos con completitud y existencia.
      */
-    private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache, Map<String, Integer> columnMap) {
+    private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
+            Map<String, Integer> columnMap) {
         boolean hasCountry = ValidationUtils.hasContent(excelData.getCountryName());
         boolean hasState = ValidationUtils.hasContent(excelData.getStateName());
         boolean hasCity = ValidationUtils.hasContent(excelData.getCityName());
@@ -252,7 +254,7 @@ public class BatchValidationService {
             return;
         }
 
-        // Validar existencia usando encapsulación correcta
+        // Validar existencia usando encapsulación
         if (hasCountry && !cache.hasCountry(excelData.getCountryName())) {
             errors.add(ErrorMappingUtils.createInvalidReferenceError(
                     excelData.getRowNumber(),
@@ -289,18 +291,17 @@ public class BatchValidationService {
     /**
      * Valida reglas de negocio reutilizando el servicio existente.
      */
-    private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache, Map<String, Integer> columnMap) {
+    private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            ReferenceDataCache cache, Map<String, Integer> columnMap) {
         try {
-            // Convertir a Third para validar con el servicio existente
+
             Third third = convertToThird(excelData, cache);
-            
-            // Usar las validaciones existentes del dominio
+
             thirdValidationService.validatePersonTypeConsistency(third);
             thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
             thirdValidationService.validateNitFormat(third);
-            
+
         } catch (Exception e) {
-            // Usar ErrorMappingUtils para crear error de regla de negocio
             errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
         }
     }
@@ -344,7 +345,6 @@ public class BatchValidationService {
                 .build();
     }
 
-
     /**
      * Objeto inmutable que encapsula todos los datos de referencia.
      * Simplifica testing y elimina complejidad de ThreadLocal.
@@ -359,7 +359,7 @@ public class BatchValidationService {
 
         // Constructor completo para uso en producción
         ReferenceDataCache(Map<String, TypeId> typeIds, Map<String, ThirdType> thirdTypes,
-                          Map<String, Country> countries, Map<String, State> states, Map<String, City> cities) {
+                Map<String, Country> countries, Map<String, State> states, Map<String, City> cities) {
             // Crear copias inmutables para evitar modificaciones externas
             this.typeIds = Collections.unmodifiableMap(new HashMap<>(typeIds));
             this.thirdTypes = Collections.unmodifiableMap(new HashMap<>(thirdTypes));
@@ -368,7 +368,8 @@ public class BatchValidationService {
             this.cities = Collections.unmodifiableMap(new HashMap<>(cities));
         }
 
-        // Constructor simplificado para testing unitario (usado en tests, no en producción)
+        // Constructor simplificado para testing unitario (usado en tests, no en
+        // producción)
         @SuppressWarnings("unused")
         ReferenceDataCache(Map<String, TypeId> typeIds, Map<String, ThirdType> thirdTypes) {
             this(typeIds, thirdTypes, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
@@ -404,7 +405,8 @@ public class BatchValidationService {
         }
 
         boolean hasCity(String cityName, String stateCode) {
-            if (cityName == null || stateCode == null) return false;
+            if (cityName == null || stateCode == null)
+                return false;
             String key = cityName.toUpperCase() + "_" + stateCode;
             return cities.containsKey(key);
         }
