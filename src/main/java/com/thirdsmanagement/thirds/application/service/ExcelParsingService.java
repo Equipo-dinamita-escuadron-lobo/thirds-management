@@ -24,8 +24,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExcelParsingService {
 
-    // Constantes movidas a ImportConstants para reutilización
-
 
     /**
      * Valida el formato básico del archivo Excel.

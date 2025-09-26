@@ -22,18 +22,18 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de importación con toda la información disponible.
      * 
-     * @param rowNumber número de fila donde ocurrió el error
-     * @param columnName nombre de la columna donde ocurrió el error
-     * @param fieldValue valor del campo que causó el error
-     * @param errorCode código del error para categorización
+     * @param rowNumber    número de fila donde ocurrió el error
+     * @param columnName   nombre de la columna donde ocurrió el error
+     * @param fieldValue   valor del campo que causó el error
+     * @param errorCode    código del error para categorización
      * @param errorMessage mensaje descriptivo del error
-     * @param errorType tipo de error para clasificación
-     * @param columnMap mapa de columnas para obtener el número de columna
+     * @param errorType    tipo de error para clasificación
+     * @param columnMap    mapa de columnas para obtener el número de columna
      * @return error de importación estructurado
      */
     public static ImportErrorDetail createError(int rowNumber, String columnName, String fieldValue,
-                                              String errorCode, String errorMessage, 
-                                              ImportErrorType errorType, Map<String, Integer> columnMap) {
+            String errorCode, String errorMessage,
+            ImportErrorType errorType, Map<String, Integer> columnMap) {
         Integer columnNumber = null;
         if (columnMap != null && columnName != null) {
             columnNumber = columnMap.get(columnName);
@@ -56,13 +56,13 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de validación de campo requerido.
      * 
-     * @param rowNumber número de fila
+     * @param rowNumber  número de fila
      * @param columnName nombre de la columna
-     * @param columnMap mapa de columnas
+     * @param columnMap  mapa de columnas
      * @return error de campo requerido
      */
-    public static ImportErrorDetail createRequiredFieldError(int rowNumber, String columnName, 
-                                                           Map<String, Integer> columnMap) {
+    public static ImportErrorDetail createRequiredFieldError(int rowNumber, String columnName,
+            Map<String, Integer> columnMap) {
         return createError(rowNumber, columnName, null,
                 ImportConstants.ErrorCodes.REQUIRED_FIELD_MISSING,
                 "El campo " + columnName + " es obligatorio",
@@ -73,13 +73,13 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de formato de email inválido.
      * 
-     * @param rowNumber número de fila
+     * @param rowNumber  número de fila
      * @param emailValue valor del email inválido
-     * @param columnMap mapa de columnas
+     * @param columnMap  mapa de columnas
      * @return error de formato de email
      */
     public static ImportErrorDetail createInvalidEmailError(int rowNumber, String emailValue,
-                                                          Map<String, Integer> columnMap) {
+            Map<String, Integer> columnMap) {
         return createError(rowNumber, ImportConstants.OptionalHeaders.EMAIL, emailValue,
                 ImportConstants.ErrorCodes.INVALID_EMAIL_FORMAT,
                 "El formato del correo electrónico no es válido",
@@ -90,13 +90,13 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de formato de teléfono inválido.
      * 
-     * @param rowNumber número de fila
+     * @param rowNumber  número de fila
      * @param phoneValue valor del teléfono inválido
-     * @param columnMap mapa de columnas
+     * @param columnMap  mapa de columnas
      * @return error de formato de teléfono
      */
     public static ImportErrorDetail createInvalidPhoneError(int rowNumber, String phoneValue,
-                                                          Map<String, Integer> columnMap) {
+            Map<String, Integer> columnMap) {
         return createError(rowNumber, ImportConstants.OptionalHeaders.PHONE, phoneValue,
                 ImportConstants.ErrorCodes.INVALID_PHONE_FORMAT,
                 "El formato del número de teléfono no es válido",
@@ -107,19 +107,19 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de referencia inválida para datos maestros.
      * 
-     * @param rowNumber número de fila
-     * @param columnName nombre de la columna
-     * @param fieldValue valor que no existe en referencia
+     * @param rowNumber     número de fila
+     * @param columnName    nombre de la columna
+     * @param fieldValue    valor que no existe en referencia
      * @param referenceType tipo de referencia (ej: "tipo de identificación")
-     * @param columnMap mapa de columnas
+     * @param columnMap     mapa de columnas
      * @return error de referencia inválida
      */
-    public static ImportErrorDetail createInvalidReferenceError(int rowNumber, String columnName, 
-                                                              String fieldValue, String referenceType,
-                                                              Map<String, Integer> columnMap) {
+    public static ImportErrorDetail createInvalidReferenceError(int rowNumber, String columnName,
+            String fieldValue, String referenceType,
+            Map<String, Integer> columnMap) {
         String errorCode = "INVALID_" + referenceType.toUpperCase().replace(" ", "_") + "_REFERENCE";
         String errorMessage = String.format("El %s '%s' no existe o está inactivo", referenceType, fieldValue);
-        
+
         return createError(rowNumber, columnName, fieldValue,
                 errorCode, errorMessage,
                 ImportErrorType.REFERENCE_ERROR,
@@ -135,10 +135,10 @@ public final class ErrorMappingUtils {
      * @return error de regla de negocio
      */
     public static ImportErrorDetail createBusinessRuleError(ThirdExcelData excelData, Exception exception,
-                                                          Map<String, Integer> columnMap) {
+            Map<String, Integer> columnMap) {
         String fieldName = ValidationUtils.detectFieldFromBusinessRuleError(exception.getMessage());
         String fieldValue = getFieldValueFromExcelData(excelData, fieldName);
-        
+
         return createError(excelData.getRowNumber(), fieldName, fieldValue,
                 ImportConstants.ErrorCodes.BUSINESS_RULE_VIOLATION,
                 "Violación de regla de negocio: " + exception.getMessage(),
@@ -149,14 +149,14 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de duplicado.
      * 
-     * @param rowNumber número de fila
+     * @param rowNumber  número de fila
      * @param fieldValue valor duplicado
      * @param columnName nombre del campo duplicado
-     * @param columnMap mapa de columnas
+     * @param columnMap  mapa de columnas
      * @return error de duplicado
      */
-    public static ImportErrorDetail createDuplicateError(int rowNumber, String fieldValue, 
-                                                        String columnName, Map<String, Integer> columnMap) {
+    public static ImportErrorDetail createDuplicateError(int rowNumber, String fieldValue,
+            String columnName, Map<String, Integer> columnMap) {
         return createError(rowNumber, columnName, fieldValue,
                 ImportConstants.ErrorCodes.DUPLICATE_RECORD,
                 "El registro con " + columnName + " '" + fieldValue + "' ya existe",
@@ -181,7 +181,7 @@ public final class ErrorMappingUtils {
     /**
      * Crea un error de procesamiento durante la creación del registro.
      * 
-     * @param excelData datos del registro
+     * @param excelData    datos del registro
      * @param errorMessage mensaje del error
      * @return error de procesamiento
      */
@@ -209,15 +209,15 @@ public final class ErrorMappingUtils {
         }
 
         return switch (fieldName) {
-            case "Número Identificación" -> 
+            case "Número Identificación" ->
                 excelData.getIdNumber() != null ? excelData.getIdNumber().toString() : null;
-            case "Tipo Persona" -> 
+            case "Tipo Persona" ->
                 excelData.getPersonType() != null ? excelData.getPersonType().toString() : null;
             case "Tipo Identificación" -> excelData.getTypeIdName();
             case "Nombres" -> excelData.getNames();
             case "Apellidos" -> excelData.getLastNames();
             case "Razón Social" -> excelData.getSocialReason();
-            case "Género" -> 
+            case "Género" ->
                 excelData.getGender() != null ? excelData.getGender().toString() : null;
             case "Email" -> excelData.getEmail();
             case "Teléfono" -> excelData.getPhoneNumber();
