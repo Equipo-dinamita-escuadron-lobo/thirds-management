@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -53,11 +52,6 @@ public class ThirdImportResponse {
      * Número de registros que fallaron.
      */
     private Integer failedImports;
-
-    /**
-     * Número de registros omitidos (duplicados, inválidos, etc.).
-     */
-    private Integer skippedRecords;
 
     /**
      * Número de registros omitidos por ser duplicados.

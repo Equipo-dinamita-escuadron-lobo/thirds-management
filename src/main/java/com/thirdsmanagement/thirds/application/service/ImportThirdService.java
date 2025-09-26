@@ -83,12 +83,12 @@ public class ImportThirdService implements ImportThirdUseCase {
 
             // 4. Calcular duplicados omitidos (detección previa + procesamiento)
             int duplicatesFromDetection = validationResult.getValidCount() - duplicateResult.getUniqueCount();
-            int duplicatesFromProcessing = processingResult.getSkippedCount(); // Esto incluye los duplicados detectados durante el procesamiento
+            int duplicatesFromProcessing = processingResult.getSkippedCount(); // Duplicados detectados durante el procesamiento
             int duplicatesSkipped = duplicatesFromDetection + duplicatesFromProcessing;
             
             // 5. Generar respuesta final
             return createSuccessResponse(importId, importRequest, 
-                    parsingResult.getTotalRows(), processingResult, allErrors, duplicatesSkipped, duplicatesFromProcessing);
+                    parsingResult.getTotalRows(), processingResult, allErrors, duplicatesSkipped);
 
         } catch (Exception e) {
             log.error("Error durante importación {}: {}", importId, e.getMessage(), e);
@@ -409,7 +409,6 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .totalRecords(0)
                 .successfulImports(0)
                 .failedImports(0)
-                .skippedRecords(0)
                 .duplicatesSkipped(0)
                 .errors(errors)
                 .build();
@@ -421,7 +420,7 @@ public class ImportThirdService implements ImportThirdUseCase {
      */
     private ThirdImportResponse createSuccessResponse(String importId, ThirdImportRequest request, 
                                                     int totalRecords, ImportProcessingResult processingResult,
-                                                    List<ImportErrorDetail> errors, int duplicatesSkipped, int duplicatesFromProcessing) {
+                                                    List<ImportErrorDetail> errors, int duplicatesSkipped) {
         
         // Determinar estado simple basado en éxitos y fallos
         ThirdImportResponse.ImportStatus status;
@@ -441,7 +440,6 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .totalRecords(totalRecords)
                 .successfulImports(processingResult.getSuccessCount())
                 .failedImports(processingResult.getFailureCount())
-                .skippedRecords(processingResult.getSkippedCount() - duplicatesFromProcessing) // Solo omitidos por otros motivos (no duplicados)
                 .duplicatesSkipped(duplicatesSkipped)
                 .errors(errors)
                 .build();
