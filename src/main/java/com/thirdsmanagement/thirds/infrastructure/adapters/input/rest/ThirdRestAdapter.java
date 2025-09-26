@@ -9,6 +9,7 @@ import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCa
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
@@ -20,8 +21,10 @@ import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 
@@ -64,6 +67,7 @@ public class ThirdRestAdapter {
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
     private final DeleteThirdUseCase deleteThirdUseCase;
     private final ExportThirdUseCase exportThirdUseCase;
+    private final ImportThirdUseCase importThirdUseCase;
     private final ThirdRestMapper thirdRestMapper;
     private final PdfRUTService pdfRUTService;
     private final CreateThirdService createThirdService;
@@ -289,6 +293,45 @@ public class ThirdRestAdapter {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelFile);
     }
+
+    /**
+     * Importa terceros masivamente desde un archivo Excel.
+     * Procesa el archivo, valida datos y crea los terceros en el sistema.
+     * 
+     * Comportamiento:
+     * - Los duplicados se omiten automáticamente (usabilidad)
+     * - Se procesan archivos grandes sin límite de lote específico
+     * - La importación se detiene al primer error crítico de validación
+     * - Permite reimportar el mismo archivo omitiendo registros existentes
+     * 
+     * @param entId ID de la empresa
+     * @param file Archivo Excel con los terceros a importar
+     * @return Respuesta con estadísticas detalladas incluyendo duplicados omitidos
+     */
+    @PostMapping("/import/excel")
+    public ResponseEntity<ThirdImportResponse> importThirdsFromExcel(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotNull(message = "El archivo Excel es obligatorio") @RequestParam("file") MultipartFile file) {
+
+        ThirdImportRequest importRequest = ThirdImportRequest.builder()
+                .entId(entId)
+                .excelFile(file)
+                .fileName(file.getOriginalFilename())
+                .build();
+
+        ThirdImportResponse response = importThirdUseCase.importThirdsFromExcel(importRequest);
+
+        // Determinar código de respuesta HTTP basado en el estado
+        HttpStatus status = switch (response.getStatus()) {
+            case COMPLETED -> HttpStatus.OK;
+            case COMPLETED_WITH_ERRORS -> HttpStatus.ACCEPTED;
+            case FAILED -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+
+        return new ResponseEntity<>(response, status);
+    }
+
 
     /**
      * Elimina un tercero del sistema.
