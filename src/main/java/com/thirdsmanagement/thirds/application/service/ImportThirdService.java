@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -45,7 +44,6 @@ public class ImportThirdService implements ImportThirdUseCase {
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
         String importId = generateImportId();
-        LocalDateTime startTime = LocalDateTime.now();
         
         log.info("Iniciando importación {} para entidad {} - archivo: {}", 
                 importId, importRequest.getEntId(), importRequest.getFileName());
@@ -56,7 +54,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                     importRequest.getExcelFile(), importRequest.getEntId());
 
             if (parsingResult.getThirdsData().isEmpty()) {
-                return createFailedResponse(importId, importRequest, startTime, 
+                return createFailedResponse(importId, importRequest, 
                         "No se encontraron datos válidos para importar", parsingResult.getErrors());
             }
 
@@ -89,7 +87,7 @@ public class ImportThirdService implements ImportThirdUseCase {
             int duplicatesSkipped = duplicatesFromDetection + duplicatesFromProcessing;
             
             // 5. Generar respuesta final
-            return createSuccessResponse(importId, importRequest, startTime, 
+            return createSuccessResponse(importId, importRequest, 
                     parsingResult.getTotalRows(), processingResult, allErrors, duplicatesSkipped, duplicatesFromProcessing);
 
         } catch (Exception e) {
@@ -103,7 +101,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                         .build()
             );
             
-            return createFailedResponse(importId, importRequest, startTime, e.getMessage(), systemErrors);
+            return createFailedResponse(importId, importRequest, e.getMessage(), systemErrors);
         }
     }
 
@@ -401,17 +399,12 @@ public class ImportThirdService implements ImportThirdUseCase {
      * Crea una respuesta de error para importación fallida.
      */
     private ThirdImportResponse createFailedResponse(String importId, ThirdImportRequest request, 
-                                                   LocalDateTime startTime, String errorMessage, 
-                                                   List<ImportErrorDetail> errors) {
-        LocalDateTime endTime = LocalDateTime.now();
+                                                   String errorMessage, List<ImportErrorDetail> errors) {
         
         return ThirdImportResponse.builder()
                 .importId(importId)
                 .entId(request.getEntId())
                 .fileName(request.getFileName())
-                .startTime(startTime)
-                .endTime(endTime)
-                .durationMs(java.time.Duration.between(startTime, endTime).toMillis())
                 .status(ThirdImportResponse.ImportStatus.FAILED)
                 .totalRecords(0)
                 .successfulImports(0)
@@ -427,10 +420,8 @@ public class ImportThirdService implements ImportThirdUseCase {
      * Crea una respuesta de éxito para importación completada.
      */
     private ThirdImportResponse createSuccessResponse(String importId, ThirdImportRequest request, 
-                                                    LocalDateTime startTime, int totalRecords,
-                                                    ImportProcessingResult processingResult,
+                                                    int totalRecords, ImportProcessingResult processingResult,
                                                     List<ImportErrorDetail> errors, int duplicatesSkipped, int duplicatesFromProcessing) {
-        LocalDateTime endTime = LocalDateTime.now();
         
         // Determinar estado simple basado en éxitos y fallos
         ThirdImportResponse.ImportStatus status;
@@ -446,9 +437,6 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .importId(importId)
                 .entId(request.getEntId())
                 .fileName(request.getFileName())
-                .startTime(startTime)
-                .endTime(endTime)
-                .durationMs(java.time.Duration.between(startTime, endTime).toMillis())
                 .status(status)
                 .totalRecords(totalRecords)
                 .successfulImports(processingResult.getSuccessCount())

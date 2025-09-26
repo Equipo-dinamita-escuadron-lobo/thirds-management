@@ -33,20 +33,6 @@ public class ThirdImportResponse {
      */
     private String fileName;
 
-    /**
-     * Fecha y hora de inicio del proceso.
-     */
-    private LocalDateTime startTime;
-
-    /**
-     * Fecha y hora de finalización del proceso.
-     */
-    private LocalDateTime endTime;
-
-    /**
-     * Duración total del proceso en milisegundos.
-     */
-    private Long durationMs;
 
     /**
      * Estado del proceso de importación.

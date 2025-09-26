@@ -149,7 +149,7 @@ public class BatchValidationService {
 
         // 3. Validaciones de reglas de negocio
         if (errors.isEmpty()) {
-            validateBusinessRules(excelData, errors);
+            validateBusinessRules(excelData, errors, columnMap);
         }
 
         boolean isValid = errors.isEmpty();
@@ -284,7 +284,7 @@ public class BatchValidationService {
     /**
      * Valida reglas de negocio reutilizando el servicio existente.
      */
-    private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors) {
+    private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
         try {
             // Convertir a Third para validar con el servicio existente
             Third third = convertToThird(excelData);
@@ -295,11 +295,16 @@ public class BatchValidationService {
             thirdValidationService.validateNitFormat(third);
             
         } catch (Exception e) {
+            // Detectar el campo específico según el mensaje de error
+            String fieldName = detectFieldFromBusinessRuleError(e.getMessage());
+            String fieldValue = getFieldValueFromExcelData(excelData, fieldName);
+            Integer columnNumber = columnMap != null ? columnMap.get(fieldName) : null;
+            
             errors.add(ImportErrorDetail.builder()
                     .rowNumber(excelData.getRowNumber())
-                    .columnNumber(null)
-                    .columnName("Reglas Negocio")
-                    .fieldValue(null)
+                    .columnNumber(columnNumber != null ? columnNumber + 1 : null) // Empezar en 1, no en 0
+                    .columnName(fieldName)
+                    .fieldValue(fieldValue)
                     .errorCode("BUSINESS_RULE_VIOLATION")
                     .errorMessage("Violación de regla de negocio: " + e.getMessage())
                     .errorType(ImportErrorDetail.ErrorType.BUSINESS_RULE_ERROR)
@@ -357,13 +362,55 @@ public class BatchValidationService {
         Integer columnNumber = columnMap != null ? columnMap.get(columnName) : null;
         return ImportErrorDetail.builder()
                 .rowNumber(rowNumber)
-                .columnNumber(columnNumber)
+                .columnNumber(columnNumber != null ? columnNumber + 1 : null)
                 .columnName(columnName)
                 .fieldValue(fieldValue)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
                 .errorType(errorType)
                 .build();
+    }
+
+    /**
+     * Detecta el campo específico basado en el mensaje de error de reglas de negocio.
+     */
+    private String detectFieldFromBusinessRuleError(String errorMessage) {
+        if (errorMessage == null) return "Reglas Negocio";
+        
+        String lowerMessage = errorMessage.toLowerCase();
+        if (lowerMessage.contains("nit")) {
+            return "Número Identificación";
+        } else if (lowerMessage.contains("tipo de persona") || lowerMessage.contains("persona natural") || lowerMessage.contains("persona jurídica")) {
+            return "Tipo Persona";
+        } else if (lowerMessage.contains("tipo de identificación") || lowerMessage.contains("identificación")) {
+            return "Tipo Identificación";
+        } else if (lowerMessage.contains("nombre")) {
+            return "Nombres";
+        } else if (lowerMessage.contains("razón social")) {
+            return "Razón Social";
+        } else {
+            return "Reglas Negocio"; // Campo genérico si no se puede detectar
+        }
+    }
+
+    /**
+     * Obtiene el valor del campo específico desde ThirdExcelData.
+     */
+    private String getFieldValueFromExcelData(ThirdExcelData excelData, String fieldName) {
+        switch (fieldName) {
+            case "Número Identificación":
+                return excelData.getIdNumber() != null ? excelData.getIdNumber().toString() : null;
+            case "Tipo Persona":
+                return excelData.getPersonType() != null ? excelData.getPersonType().toString() : null;
+            case "Tipo Identificación":
+                return excelData.getTypeIdName();
+            case "Nombres":
+                return excelData.getNames();
+            case "Razón Social":
+                return excelData.getSocialReason();
+            default:
+                return null;
+        }
     }
 
 
