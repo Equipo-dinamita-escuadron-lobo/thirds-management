@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -42,7 +43,6 @@ public class ImportThirdService implements ImportThirdUseCase {
      * Importa terceros masivamente desde un archivo Excel.
      */
     @Override
-    @Transactional
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
         String importId = generateImportId();
         LocalDateTime startTime = LocalDateTime.now();
@@ -221,9 +221,8 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Procesa un único registro en su propia transacción.
+     * Procesa un único registro manejando excepciones de duplicados.
      */
-    @Transactional
     private ProcessingResult processSingleRecord(ThirdExcelData excelData, String entId) {
         try {
             Third convertedThird = convertExcelDataToThird(excelData);
@@ -232,26 +231,44 @@ public class ImportThirdService implements ImportThirdUseCase {
                 return ProcessingResult.skipped("Registro omitido por datos incompletos");
             }
             
-            // Usar el servicio existente de creación que ya maneja validaciones y geografía
+            // Crear en nueva transacción independiente
+            Third createdThird = createThirdInNewTransaction(convertedThird, excelData);
+            
+            if (createdThird != null) {
+                return ProcessingResult.success();
+            } else {
+                // createThirdInNewTransaction retornó null = duplicado detectado
+                return ProcessingResult.duplicateSkipped();
+            }
+            
+        } catch (Exception e) {
+            // Otros errores no manejados
+            return ProcessingResult.failed(e.getMessage());
+        }
+    }
+
+    /**
+     * Crea un tercero en una nueva transacción independiente.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private Third createThirdInNewTransaction(Third third, ThirdExcelData excelData) {
+        try {
+            // Resolver geografía
             Object[] geography = resolveGeography(excelData);
             String countryCode = geography[0] != null ? ((Country) geography[0]).getCountryCode() : null;
             String stateCode = geography[1] != null ? ((State) geography[1]).getStateCode() : null;
             String cityCode = geography[2] != null ? ((City) geography[2]).getCityCode() : null;
             
-            Third createdThird = createThirdService.createThird(convertedThird, countryCode, stateCode, cityCode);
-            
-            if (createdThird != null) {
-                return ProcessingResult.success();
-            } else {
-                return ProcessingResult.failed("No se pudo crear el tercero");
-            }
+            // Usar el servicio existente de creación
+            return createThirdService.createThird(third, countryCode, stateCode, cityCode);
             
         } catch (Exception e) {
+            // Si es duplicado, retornar null para manejarlo en el método padre
             if (isDuplicateError(e)) {
-                return ProcessingResult.duplicateSkipped();
-            } else {
-                return ProcessingResult.failed(e.getMessage());
+                return null; // Señal de duplicado
             }
+            // Re-lanzar otros errores
+            throw e;
         }
     }
 
