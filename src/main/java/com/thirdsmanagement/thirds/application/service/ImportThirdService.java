@@ -265,6 +265,10 @@ public class ImportThirdService implements ImportThirdUseCase {
             if (isDuplicateError(e)) {
                 return null; // Señal de duplicado
             }
+            // Si es error geográfico, también retornar null (ya debería haberse validado antes)
+            if (isGeographyError(e)) {
+                return null; // Error de geografía - ya debería estar en errores de validación
+            }
             // Re-lanzar otros errores
             throw e;
         }
@@ -432,6 +436,9 @@ public class ImportThirdService implements ImportThirdUseCase {
             status = ThirdImportResponse.ImportStatus.FAILED;
         }
 
+        // Calcular fallos totales: fallos de procesamiento + errores de validación
+        int totalFailedImports = processingResult.getFailureCount() + errors.size();
+        
         return ThirdImportResponse.builder()
                 .importId(importId)
                 .entId(request.getEntId())
@@ -439,7 +446,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .status(status)
                 .totalRecords(totalRecords)
                 .successfulImports(processingResult.getSuccessCount())
-                .failedImports(processingResult.getFailureCount())
+                .failedImports(totalFailedImports)
                 .duplicatesSkipped(duplicatesSkipped)
                 .errors(errors)
                 .build();
@@ -473,6 +480,29 @@ public class ImportThirdService implements ImportThirdUseCase {
                lowerMessage.contains("duplicado") ||
                lowerMessage.contains("unique constraint") ||
                lowerMessage.contains("número de identificación") && lowerMessage.contains("existe");
+    }
+
+    /**
+     * Verifica si la excepción es un error geográfico.
+     */
+    private boolean isGeographyError(Exception e) {
+        String message = e.getMessage();
+        if (message == null) {
+            return false;
+        }
+        
+        // Verificar patrones comunes de errores geográficos
+        String lowerMessage = message.toLowerCase();
+        return lowerMessage.contains("código del país") || 
+               lowerMessage.contains("código del estado") ||
+               lowerMessage.contains("código de la ciudad") ||
+               lowerMessage.contains("código del departamento") ||
+               lowerMessage.contains("obligatorio") && (
+                   lowerMessage.contains("país") || 
+                   lowerMessage.contains("estado") || 
+                   lowerMessage.contains("ciudad") ||
+                   lowerMessage.contains("departamento")
+               );
     }
 
     /**

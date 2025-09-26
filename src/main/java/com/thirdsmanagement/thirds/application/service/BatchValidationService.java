@@ -244,8 +244,31 @@ public class BatchValidationService {
     private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
         int rowNumber = excelData.getRowNumber();
 
+        // Validar completitud geográfica: si se proporciona uno, se deben proporcionar todos
+        boolean hasCountry = excelData.getCountryName() != null && !excelData.getCountryName().trim().isEmpty();
+        boolean hasState = excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty();
+        boolean hasCity = excelData.getCityName() != null && !excelData.getCityName().trim().isEmpty();
+
+        // Si hay ciudad o estado, debe haber país
+        if ((hasState || hasCity) && !hasCountry) {
+            errors.add(createError(rowNumber, "País", null,
+                    "MISSING_COUNTRY_FOR_GEOGRAPHY",
+                    "El país es obligatorio cuando se especifica departamento o ciudad",
+                    ImportErrorDetail.ErrorType.VALIDATION_ERROR, columnMap));
+            return;
+        }
+
+        // Si hay ciudad, debe haber estado
+        if (hasCity && !hasState) {
+            errors.add(createError(rowNumber, "Departamento", null,
+                    "MISSING_STATE_FOR_CITY",
+                    "El departamento es obligatorio cuando se especifica ciudad",
+                    ImportErrorDetail.ErrorType.VALIDATION_ERROR, columnMap));
+            return;
+        }
+
         // Validar país
-        if (excelData.getCountryName() != null && !excelData.getCountryName().trim().isEmpty()) {
+        if (hasCountry) {
             String countryKey = excelData.getCountryName().toUpperCase();
             if (!countriesCache.containsKey(countryKey)) {
                 errors.add(createError(rowNumber, "País", excelData.getCountryName(),
@@ -257,7 +280,7 @@ public class BatchValidationService {
         }
 
         // Validar estado/departamento
-        if (excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty()) {
+        if (hasState) {
             String stateKey = excelData.getStateName().toUpperCase();
             if (!statesCache.containsKey(stateKey)) {
                 errors.add(createError(rowNumber, "Departamento", excelData.getStateName(),
@@ -268,7 +291,7 @@ public class BatchValidationService {
             }
 
             // Validar ciudad
-            if (excelData.getCityName() != null && !excelData.getCityName().trim().isEmpty()) {
+            if (hasCity) {
                 State state = statesCache.get(stateKey);
                 String cityKey = excelData.getCityName().toUpperCase() + "_" + state.getStateCode();
                 if (!citiesCache.containsKey(cityKey)) {
