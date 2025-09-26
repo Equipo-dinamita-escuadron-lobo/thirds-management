@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.application.service;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.*;
+import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,21 +24,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExcelParsingService {
 
-    private static final int MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-    // Encabezados básicos requeridos (orden fijo)
-    private static final String[] BASIC_REQUIRED_HEADERS = {
-        "Tipo Identificación", "Número Identificación", "Dígito Verificación", 
-        "Tipo Persona", "Nombres", "Apellidos", "Razón Social", "Género", "Estado"
-    };
-    
-    // Encabezados opcionales
-    private static final String TYPES_HEADER = "Tipos de Tercero";
-    private static final String COUNTRY_HEADER = "País";
-    private static final String STATE_HEADER = "Departamento";
-    private static final String CITY_HEADER = "Ciudad";
-    private static final String ADDRESS_HEADER = "Dirección";
-    private static final String PHONE_HEADER = "Teléfono";
-    private static final String EMAIL_HEADER = "Email";
+    // Constantes movidas a ImportConstants para reutilización
 
 
     /**
@@ -51,11 +38,11 @@ public class ExcelParsingService {
             throw ThirdImportException.forEmptyFile("archivo no especificado");
         }
 
-        if (file.getSize() > MAX_FILE_SIZE) {
+        if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
             throw ThirdImportException.forFileSizeExceeded(
                 file.getOriginalFilename(), 
                 file.getSize(), 
-                MAX_FILE_SIZE
+                ImportConstants.MAX_FILE_SIZE
             );
         }
 
@@ -156,7 +143,7 @@ public class ExcelParsingService {
         }
 
         // Validar que existan los encabezados básicos requeridos
-        for (String requiredHeader : BASIC_REQUIRED_HEADERS) {
+        for (String requiredHeader : ImportConstants.BASIC_REQUIRED_HEADERS) {
             if (!foundHeaders.contains(requiredHeader)) {
                 errors.add(ImportErrorDetail.builder()
                         .rowNumber(1)
@@ -193,37 +180,37 @@ public class ExcelParsingService {
             builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
 
             // Parsear campos opcionales (solo si están presentes)
-            Integer typesColumn = columnMap.get(TYPES_HEADER);
+            Integer typesColumn = columnMap.get(ImportConstants.OptionalHeaders.TYPES);
             if (typesColumn != null) {
                 builder.thirdTypesNames(parseThirdTypes(getCellValueAsString(row, typesColumn)));
             }
 
-            Integer countryColumn = columnMap.get(COUNTRY_HEADER);
+            Integer countryColumn = columnMap.get(ImportConstants.OptionalHeaders.COUNTRY);
             if (countryColumn != null) {
                 builder.countryName(getCellValueAsString(row, countryColumn));
             }
 
-            Integer stateColumn = columnMap.get(STATE_HEADER);
+            Integer stateColumn = columnMap.get(ImportConstants.OptionalHeaders.STATE);
             if (stateColumn != null) {
                 builder.stateName(getCellValueAsString(row, stateColumn));
             }
 
-            Integer cityColumn = columnMap.get(CITY_HEADER);
+            Integer cityColumn = columnMap.get(ImportConstants.OptionalHeaders.CITY);
             if (cityColumn != null) {
                 builder.cityName(getCellValueAsString(row, cityColumn));
             }
 
-            Integer addressColumn = columnMap.get(ADDRESS_HEADER);
+            Integer addressColumn = columnMap.get(ImportConstants.OptionalHeaders.ADDRESS);
             if (addressColumn != null) {
                 builder.address(getCellValueAsString(row, addressColumn));
             }
 
-            Integer phoneColumn = columnMap.get(PHONE_HEADER);
+            Integer phoneColumn = columnMap.get(ImportConstants.OptionalHeaders.PHONE);
             if (phoneColumn != null) {
                 builder.phoneNumber(getCellValueAsString(row, phoneColumn));
             }
 
-            Integer emailColumn = columnMap.get(EMAIL_HEADER);
+            Integer emailColumn = columnMap.get(ImportConstants.OptionalHeaders.EMAIL);
             if (emailColumn != null) {
                 builder.email(getCellValueAsString(row, emailColumn));
             }

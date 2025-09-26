@@ -7,6 +7,10 @@ import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.*;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
+import com.thirdsmanagement.thirds.domain.utils.ExcelUtils;
+import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
+import com.thirdsmanagement.thirds.domain.enums.ProcessingStatus;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
@@ -29,8 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ImportThirdService implements ImportThirdUseCase {
 
-    private static final String IMPORT_ID_PREFIX = "IMP";
-
+  
     private final ExcelParsingService excelParsingService;
     private final BatchValidationService batchValidationService;
     private final DuplicateDetectionService duplicateDetectionService;
@@ -43,7 +46,7 @@ public class ImportThirdService implements ImportThirdUseCase {
      */
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
-        String importId = generateImportId();
+        String importId = ExcelUtils.generateImportId();
         
         log.info("Iniciando importación {} para entidad {} - archivo: {}", 
                 importId, importRequest.getEntId(), importRequest.getFileName());
@@ -262,11 +265,11 @@ public class ImportThirdService implements ImportThirdUseCase {
             
         } catch (Exception e) {
             // Si es duplicado, retornar null para manejarlo en el método padre
-            if (isDuplicateError(e)) {
+            if (ValidationUtils.isDuplicateError(e.getMessage())) {
                 return null; // Señal de duplicado
             }
             // Si es error geográfico, también retornar null (ya debería haberse validado antes)
-            if (isGeographyError(e)) {
+            if (ValidationUtils.isGeographyError(e.getMessage())) {
                 return null; // Error de geografía - ya debería estar en errores de validación
             }
             // Re-lanzar otros errores
@@ -392,12 +395,7 @@ public class ImportThirdService implements ImportThirdUseCase {
         return batches;
     }
 
-    /**
-     * Genera un ID único para la importación.
-     */
-    private String generateImportId() {
-        return IMPORT_ID_PREFIX + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(0, 8);
-    }
+    // Método generateImportId movido a ExcelUtils para reutilización
 
     /**
      * Crea una respuesta de error para importación fallida.
@@ -409,7 +407,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .importId(importId)
                 .entId(request.getEntId())
                 .fileName(request.getFileName())
-                .status(ThirdImportResponse.ImportStatus.FAILED)
+                .status(ImportStatus.FAILED)
                 .totalRecords(0)
                 .successfulImports(0)
                 .failedImports(0)
@@ -427,13 +425,13 @@ public class ImportThirdService implements ImportThirdUseCase {
                                                     List<ImportErrorDetail> errors, int duplicatesSkipped) {
         
         // Determinar estado simple basado en éxitos y fallos
-        ThirdImportResponse.ImportStatus status;
+        ImportStatus status;
         if (processingResult.getFailureCount() == 0 && errors.isEmpty()) {
-            status = ThirdImportResponse.ImportStatus.COMPLETED;
+            status = ImportStatus.COMPLETED;
         } else if (processingResult.getSuccessCount() > 0) {
-            status = ThirdImportResponse.ImportStatus.COMPLETED_WITH_ERRORS;
+            status = ImportStatus.COMPLETED_WITH_ERRORS;
         } else {
-            status = ThirdImportResponse.ImportStatus.FAILED;
+            status = ImportStatus.FAILED;
         }
 
         // Calcular fallos totales: fallos de procesamiento + errores de validación
@@ -464,46 +462,6 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .build();
     }
 
-    /**
-     * Verifica si la excepción es un error de duplicado.
-     */
-    private boolean isDuplicateError(Exception e) {
-        String message = e.getMessage();
-        if (message == null) {
-            return false;
-        }
-        
-        // Verificar patrones comunes de errores de duplicado
-        String lowerMessage = message.toLowerCase();
-        return lowerMessage.contains("ya existe") || 
-               lowerMessage.contains("duplicate") || 
-               lowerMessage.contains("duplicado") ||
-               lowerMessage.contains("unique constraint") ||
-               lowerMessage.contains("número de identificación") && lowerMessage.contains("existe");
-    }
-
-    /**
-     * Verifica si la excepción es un error geográfico.
-     */
-    private boolean isGeographyError(Exception e) {
-        String message = e.getMessage();
-        if (message == null) {
-            return false;
-        }
-        
-        // Verificar patrones comunes de errores geográficos
-        String lowerMessage = message.toLowerCase();
-        return lowerMessage.contains("código del país") || 
-               lowerMessage.contains("código del estado") ||
-               lowerMessage.contains("código de la ciudad") ||
-               lowerMessage.contains("código del departamento") ||
-               lowerMessage.contains("obligatorio") && (
-                   lowerMessage.contains("país") || 
-                   lowerMessage.contains("estado") || 
-                   lowerMessage.contains("ciudad") ||
-                   lowerMessage.contains("departamento")
-               );
-    }
 
     /**
      * Clase para encapsular el resultado del procesamiento de importación.
@@ -558,13 +516,5 @@ public class ImportThirdService implements ImportThirdUseCase {
         }
     }
 
-    /**
-     * Estados posibles del procesamiento de un registro.
-     */
-    private enum ProcessingStatus {
-        SUCCESS,
-        DUPLICATE_SKIPPED,
-        FAILED,
-        SKIPPED
-    }
+
 }

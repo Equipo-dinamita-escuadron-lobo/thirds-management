@@ -3,6 +3,9 @@ package com.thirdsmanagement.thirds.application.service;
 import com.thirdsmanagement.thirds.application.ports.output.GeographyOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.*;
+import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
+import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -169,36 +172,36 @@ public class BatchValidationService {
         // Validar campos requeridos
         if (excelData.getTypeIdName() == null || excelData.getTypeIdName().trim().isEmpty()) {
             errors.add(createError(rowNumber, "Tipo Identificación", null, 
-                    "REQUIRED_FIELD_MISSING", "El tipo de identificación es obligatorio",
+                    ImportConstants.ErrorCodes.REQUIRED_FIELD_MISSING, "El tipo de identificación es obligatorio",
                     ImportErrorDetail.ErrorType.VALIDATION_ERROR, columnMap));
         }
 
         if (excelData.getIdNumber() == null) {
             errors.add(createError(rowNumber, "Número Identificación", null,
-                    "REQUIRED_FIELD_MISSING", "El número de identificación es obligatorio",
+                    ImportConstants.ErrorCodes.REQUIRED_FIELD_MISSING, "El número de identificación es obligatorio",
                     ImportErrorDetail.ErrorType.VALIDATION_ERROR, columnMap));
         }
 
         if (excelData.getPersonType() == null) {
             errors.add(createError(rowNumber, "Tipo Persona", null,
-                    "REQUIRED_FIELD_MISSING", "El tipo de persona es obligatorio",
+                    ImportConstants.ErrorCodes.REQUIRED_FIELD_MISSING, "El tipo de persona es obligatorio",
                     ImportErrorDetail.ErrorType.VALIDATION_ERROR, columnMap));
         }
 
         // Validar email si está presente
         if (excelData.getEmail() != null && !excelData.getEmail().trim().isEmpty()) {
-            if (!isValidEmail(excelData.getEmail())) {
+            if (!ValidationUtils.isValidEmail(excelData.getEmail())) {
                 errors.add(createError(rowNumber, "Email", excelData.getEmail(),
-                        "INVALID_EMAIL_FORMAT", "El formato del correo electrónico no es válido",
+                        ImportConstants.ErrorCodes.INVALID_EMAIL_FORMAT, "El formato del correo electrónico no es válido",
                         ImportErrorDetail.ErrorType.FORMAT_ERROR, columnMap));
             }
         }
 
         // Validar teléfono si está presente
         if (excelData.getPhoneNumber() != null && !excelData.getPhoneNumber().trim().isEmpty()) {
-            if (!isValidPhone(excelData.getPhoneNumber())) {
+            if (!ValidationUtils.isValidPhoneNumber(excelData.getPhoneNumber())) {
                 errors.add(createError(rowNumber, "Teléfono", excelData.getPhoneNumber(),
-                        "INVALID_PHONE_FORMAT", "El formato del número de teléfono no es válido",
+                        ImportConstants.ErrorCodes.INVALID_PHONE_FORMAT, "El formato del número de teléfono no es válido",
                         ImportErrorDetail.ErrorType.FORMAT_ERROR, columnMap));
             }
         }
@@ -319,8 +322,8 @@ public class BatchValidationService {
             
         } catch (Exception e) {
             // Detectar el campo específico según el mensaje de error
-            String fieldName = detectFieldFromBusinessRuleError(e.getMessage());
-            String fieldValue = getFieldValueFromExcelData(excelData, fieldName);
+            String fieldName = ValidationUtils.detectFieldFromBusinessRuleError(e.getMessage());
+            String fieldValue = ErrorMappingUtils.getFieldValueFromExcelData(excelData, fieldName);
             Integer columnNumber = columnMap != null ? columnMap.get(fieldName) : null;
             
             errors.add(ImportErrorDetail.builder()
@@ -419,37 +422,7 @@ public class BatchValidationService {
     /**
      * Obtiene el valor del campo específico desde ThirdExcelData.
      */
-    private String getFieldValueFromExcelData(ThirdExcelData excelData, String fieldName) {
-        switch (fieldName) {
-            case "Número Identificación":
-                return excelData.getIdNumber() != null ? excelData.getIdNumber().toString() : null;
-            case "Tipo Persona":
-                return excelData.getPersonType() != null ? excelData.getPersonType().toString() : null;
-            case "Tipo Identificación":
-                return excelData.getTypeIdName();
-            case "Nombres":
-                return excelData.getNames();
-            case "Razón Social":
-                return excelData.getSocialReason();
-            default:
-                return null;
-        }
-    }
-
-
-    /**
-     * Valida formato de email.
-     */
-    private boolean isValidEmail(String email) {
-        return email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
-
-    /**
-     * Valida formato de teléfono.
-     */
-    private boolean isValidPhone(String phone) {
-        return phone.matches("^\\+?[0-9\\s\\-\\(\\)]{7,20}$");
-    }
+    // Métodos de validación movidos a ValidationUtils y ErrorMappingUtils para reutilización
 
     /**
      * Clase que representa el resultado de validación de un registro individual.

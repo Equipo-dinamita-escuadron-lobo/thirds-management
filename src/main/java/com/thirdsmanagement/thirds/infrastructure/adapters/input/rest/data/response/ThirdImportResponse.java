@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
 
+import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,24 +64,5 @@ public class ThirdImportResponse {
      */
     private List<ImportErrorDetail> errors;
 
-    /**
-     * Estados posibles del proceso de importación.
-     */
-    public enum ImportStatus {
-        IN_PROGRESS("En progreso"),
-        COMPLETED("Completado"),
-        COMPLETED_WITH_ERRORS("Completado con errores"),
-        FAILED("Fallido"),
-        CANCELLED("Cancelado");
-
-        private final String description;
-
-        ImportStatus(String description) {
-            this.description = description;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
+    // Enum ImportStatus movido a domain.enums para reutilización
 }
