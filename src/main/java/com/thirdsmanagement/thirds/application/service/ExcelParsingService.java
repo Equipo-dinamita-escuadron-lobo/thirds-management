@@ -217,6 +217,12 @@ public class ExcelParsingService {
         builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")),
                 eThirdGender.class, "Género", rowNumber, errors, this::mapGender));
         builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
+        
+        // Campos de contacto ahora requeridos
+        builder.address(getCellValueAsString(row, columnMap.get("Dirección")));
+        builder.phoneNumber(parsePhoneNumber(getCellValueAsString(row, columnMap.get("Teléfono")), 
+                rowNumber, errors));
+        builder.email(getCellValueAsString(row, columnMap.get("Email")));
     }
 
     /**
@@ -232,9 +238,6 @@ public class ExcelParsingService {
 
         // Geografía
         parseGeographyFields(row, builder, columnMap);
-
-        // Información de contacto
-        parseContactFields(row, builder, columnMap);
     }
 
     /**
@@ -263,25 +266,8 @@ public class ExcelParsingService {
         }
     }
 
-    /**
-     * Parsea los campos de información de contacto.
-     */
-    private void parseContactFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
-            Map<String, Integer> columnMap) {
-        Integer phoneColumn = columnMap.get(ImportConstants.OptionalHeaders.PHONE);
-        if (phoneColumn != null) {
-            builder.phoneNumber(getCellValueAsString(row, phoneColumn));
-        }
-
-        Integer emailColumn = columnMap.get(ImportConstants.OptionalHeaders.EMAIL);
-        if (emailColumn != null) {
-            builder.email(getCellValueAsString(row, emailColumn));
-        }
-    }
 
     /**
-     * REFACTORIZADO: Método genérico para parsear cualquier enum con mapeo
-     * personalizado.
      * Elimina duplicación de código entre parsePersonType, parseGender, etc.
      */
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
@@ -457,6 +443,22 @@ public class ExcelParsingService {
                     .build());
             return true;
         }
+    }
+
+    /**
+     * Parsea y normaliza el número de teléfono.
+     * Elimina espacios automáticamente y retorna el número limpio.
+     * La validación de formato se realiza en BatchValidationService.
+     */
+    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+
+        // Limpiar espacios automáticamente para mejorar UX
+        String cleanValue = value.trim().replaceAll("\\s+", "");
+        
+        return cleanValue;
     }
 
     /**

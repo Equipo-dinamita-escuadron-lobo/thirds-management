@@ -113,7 +113,10 @@ public class ThirdExcelData {
     public boolean hasRequiredFields() {
         return typeIdName != null && !typeIdName.trim().isEmpty()
                 && idNumber != null
-                && personType != null;
+                && personType != null
+                && address != null && !address.trim().isEmpty()
+                && phoneNumber != null && !phoneNumber.trim().isEmpty()
+                && email != null && !email.trim().isEmpty();
     }
 
     /**

@@ -177,6 +177,22 @@ public class BatchValidationService {
                     excelData.getRowNumber(), "Tipo Persona", columnMap));
         }
 
+        // Validar campos de contacto requeridos
+        if (!ValidationUtils.hasContent(excelData.getAddress())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Dirección", columnMap));
+        }
+
+        if (!ValidationUtils.hasContent(excelData.getPhoneNumber())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Teléfono", columnMap));
+        }
+
+        if (!ValidationUtils.hasContent(excelData.getEmail())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Email", columnMap));
+        }
+
         // Validar formatos usando ValidationUtils centralizado
         if (ValidationUtils.hasContent(excelData.getEmail()) && !ValidationUtils.isValidEmail(excelData.getEmail())) {
             errors.add(ErrorMappingUtils.createInvalidEmailError(

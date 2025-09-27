@@ -35,18 +35,18 @@ public final class ValidationUtils {
 
     /**
      * Valida si un número de teléfono tiene formato válido.
-     * Acepta formatos internacionales con +, espacios, guiones y paréntesis.
+     * Acepta solo números y opcionalmente signo + al inicio.
      * 
-     * @param phone el número de teléfono a validar
+     * @param phone el número de teléfono a validar (ya limpio, sin espacios)
      * @return true si el formato es válido, false en caso contrario
      */
     public static boolean isValidPhoneNumber(String phone) {
         if (phone == null || phone.trim().isEmpty()) {
             return false;
         }
-        String cleanPhone = phone.trim().replaceAll("\\s+", "");
+        String cleanPhone = phone.trim();
         return cleanPhone.length() >= 7 && cleanPhone.length() <= 15 && 
-               PHONE_PATTERN.matcher(phone.trim()).matches();
+               PHONE_PATTERN.matcher(cleanPhone).matches();
     }
 
     /**

@@ -42,7 +42,10 @@ public final class ImportConstants {
         "Apellidos", 
         "Razón Social", 
         "Género", 
-        "Estado"
+        "Estado",
+        "Dirección",
+        "Teléfono",
+        "Email"
     };
     
     /**
@@ -122,7 +125,7 @@ public final class ImportConstants {
      */
     public static final class ValidationPatterns {
         public static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        public static final String PHONE_PATTERN = "^[+]?[0-9\\s\\-\\(\\)]{7,15}$";
+        public static final String PHONE_PATTERN = "^[+]?[0-9]{7,15}$";
         public static final String NIT_START_PATTERN = "^[89].*";
         
         private ValidationPatterns() {}
