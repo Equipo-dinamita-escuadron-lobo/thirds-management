@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
 
+import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,28 +48,7 @@ public class ImportErrorDetail {
 
     /**
      * Tipo de error para clasificación.
+     * Usa el enum de dominio directamente para evitar duplicación.
      */
-    private ErrorType errorType;
-
-    /**
-     * Tipos de errores de importación.
-     */
-    public enum ErrorType {
-        VALIDATION_ERROR("Error de validación"),
-        DUPLICATE_ERROR("Error de duplicado"),
-        REFERENCE_ERROR("Error de referencia"),
-        FORMAT_ERROR("Error de formato"),
-        BUSINESS_RULE_ERROR("Error de regla de negocio"),
-        SYSTEM_ERROR("Error del sistema");
-
-        private final String description;
-
-        ErrorType(String description) {
-            this.description = description;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
+    private ImportErrorType errorType;
 }

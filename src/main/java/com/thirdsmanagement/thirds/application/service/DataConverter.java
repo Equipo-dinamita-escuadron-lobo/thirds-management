@@ -117,8 +117,11 @@ public class DataConverter {
         if (stateCode != null && 
             excelData.getCityName() != null && !excelData.getCityName().trim().isEmpty()) {
             if (cache.hasCity(excelData.getCityName().trim(), stateCode)) {
-                // La ciudad existe, obtener su código (simplificado para el ejemplo)
-                cityCode = excelData.getCityName().trim().toUpperCase().replace(" ", "_");
+                // Obtener el código de la ciudad desde el cache
+                City city = cache.getCity(excelData.getCityName().trim(), stateCode);
+                if (city != null) {
+                    cityCode = city.getCityCode();
+                }
             }
         }
 

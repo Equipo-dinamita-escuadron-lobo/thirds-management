@@ -1,10 +1,13 @@
 package com.thirdsmanagement.thirds.application.service;
 
+import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
+import com.thirdsmanagement.thirds.domain.model.ePersonType;
+import com.thirdsmanagement.thirds.domain.model.eThirdGender;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
-import com.thirdsmanagement.thirds.domain.model.*;
-import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
+import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
+import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import lombok.AllArgsConstructor;
@@ -126,7 +129,7 @@ public class ExcelParsingService {
                     .rowNumber(1)
                     .errorCode("MISSING_HEADERS")
                     .errorMessage("El archivo no contiene encabezados")
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .errorType(ImportErrorType.FORMAT_ERROR)
                     .build());
             return new HashMap<>();
         }
@@ -157,7 +160,7 @@ public class ExcelParsingService {
                         .columnName(requiredHeader)
                         .errorCode("MISSING_REQUIRED_HEADER")
                         .errorMessage("Falta el encabezado requerido: " + requiredHeader)
-                        .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                        .errorType(ImportErrorType.FORMAT_ERROR)
                         .build());
             }
         }
@@ -190,7 +193,7 @@ public class ExcelParsingService {
                     .rowNumber(rowNumber)
                     .errorCode("ROW_PARSING_ERROR")
                     .errorMessage("Error parseando fila: " + e.getMessage())
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .errorType(ImportErrorType.FORMAT_ERROR)
                     .build());
             return null;
         }
@@ -297,7 +300,7 @@ public class ExcelParsingService {
                         .fieldValue(value)
                         .errorCode(ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName))
                         .errorMessage(fieldName + " inválido: " + value)
-                        .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
+                        .errorType(ImportErrorType.VALIDATION_ERROR)
                         .build());
             }
             return result;
@@ -308,7 +311,7 @@ public class ExcelParsingService {
                     .fieldValue(value)
                     .errorCode(ErrorMappingUtils.generateParsingErrorCode(fieldName))
                     .errorMessage("Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage())
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .errorType(ImportErrorType.FORMAT_ERROR)
                     .build());
             return null;
         }
@@ -405,7 +408,7 @@ public class ExcelParsingService {
                     .fieldValue(cell.toString())
                     .errorCode("INVALID_NUMBER_FORMAT")
                     .errorMessage("Formato numérico inválido en " + fieldName)
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .errorType(ImportErrorType.FORMAT_ERROR)
                     .build());
             return null;
         }
@@ -439,7 +442,7 @@ public class ExcelParsingService {
                             .fieldValue(value)
                             .errorCode("INVALID_STATE")
                             .errorMessage("Estado inválido: " + value)
-                            .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
+                            .errorType(ImportErrorType.VALIDATION_ERROR)
                             .build());
                     return true; // Por defecto activo en caso de error
             }
@@ -450,7 +453,7 @@ public class ExcelParsingService {
                     .fieldValue(value)
                     .errorCode("STATE_PARSING_ERROR")
                     .errorMessage("Error parseando estado: " + e.getMessage())
-                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .errorType(ImportErrorType.FORMAT_ERROR)
                     .build());
             return true;
         }

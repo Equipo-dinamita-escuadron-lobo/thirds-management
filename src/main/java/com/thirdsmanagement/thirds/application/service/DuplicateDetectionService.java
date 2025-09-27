@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
@@ -146,7 +147,7 @@ public class DuplicateDetectionService {
                     .errorMessage(String.format(
                             "Número de identificación duplicado en archivo. Primera ocurrencia en fila %d.",
                             existingRecord.getRowNumber()))
-                    .errorType(ImportErrorDetail.ErrorType.DUPLICATE_ERROR)
+                    .errorType(ImportErrorType.DUPLICATE_ERROR)
                     .build());
         }
     }
@@ -164,7 +165,7 @@ public class DuplicateDetectionService {
                     .fieldValue(String.valueOf(currentRecord.getIdNumber()))
                     .errorCode("DATABASE_DUPLICATE_FOUND")
                     .errorMessage("El tercero ya existe en la base de datos.")
-                    .errorType(ImportErrorDetail.ErrorType.DUPLICATE_ERROR)
+                    .errorType(ImportErrorType.DUPLICATE_ERROR)
                     .build());
         }
     }

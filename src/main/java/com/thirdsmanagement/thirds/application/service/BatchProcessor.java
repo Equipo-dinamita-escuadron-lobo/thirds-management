@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.application.service;
 
+import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
@@ -134,7 +135,7 @@ public class BatchProcessor {
                 .rowNumber(excelData.getRowNumber())
                 .errorCode("PROCESSING_ERROR")
                 .errorMessage("Error al procesar: " + message)
-                .errorType(ImportErrorDetail.ErrorType.SYSTEM_ERROR)
+                .errorType(ImportErrorType.SYSTEM_ERROR)
                 .build();
     }
 

@@ -6,8 +6,14 @@ import com.thirdsmanagement.thirds.domain.model.*;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,7 +68,7 @@ public class BatchValidationService {
                         .rowNumber(excelData.getRowNumber())
                         .errorCode("VALIDATION_SYSTEM_ERROR")
                         .errorMessage("Error del sistema validando registro: " + e.getMessage())
-                        .errorType(ImportErrorDetail.ErrorType.SYSTEM_ERROR)
+                        .errorType(ImportErrorType.SYSTEM_ERROR)
                         .build());
             }
         }
@@ -86,7 +92,7 @@ public class BatchValidationService {
         Map<String, TypeId> typeIds = idOutputPort.getAllTypeIds(entId).stream()
                 .filter(typeId -> typeId.getStatus() != null && typeId.getStatus())
                 .collect(Collectors.toMap(
-                        typeId -> typeId.getTypeIdname().toUpperCase(),
+                        typeId -> StringNormalizer.normalizeCode(typeId.getTypeIdname()),
                         typeId -> typeId,
                         (existing, replacement) -> existing));
 
@@ -94,27 +100,28 @@ public class BatchValidationService {
         Map<String, ThirdType> thirdTypes = idOutputPort.getALLThirdTypes(entId).stream()
                 .filter(thirdType -> thirdType.getStatus() != null && thirdType.getStatus())
                 .collect(Collectors.toMap(
-                        thirdType -> thirdType.getThirdTypeName().toUpperCase(),
+                        thirdType -> StringNormalizer.normalizeCode(thirdType.getThirdTypeName()),
                         thirdType -> thirdType,
                         (existing, replacement) -> existing));
 
         // Cargar geografía
         Map<String, Country> countries = geographyOutputPort.getAllActiveCountries().stream()
                 .collect(Collectors.toMap(
-                        country -> country.getCountryName().toUpperCase(),
+                        country -> StringNormalizer.normalizeCode(country.getCountryName()),
                         country -> country,
                         (existing, replacement) -> existing));
 
         Map<String, State> states = geographyOutputPort.getStatesByCountry("COL").stream()
                 .collect(Collectors.toMap(
-                        state -> state.getStateName().toUpperCase(),
+                        state -> StringNormalizer.normalizeCode(state.getStateName()),
                         state -> state,
                         (existing, replacement) -> existing));
 
         Map<String, City> cities = new HashMap<>();
         for (State state : states.values()) {
             geographyOutputPort.getCitiesByState(state.getStateCode(), "COL").forEach(city -> {
-                String key = city.getCityName().toUpperCase() + "_" + state.getStateCode();
+                // construir la clave de búsqueda
+                String key = StringNormalizer.normalizeCode(city.getCityName()) + "_" + state.getStateCode();
                 cities.put(key, city);
             });
         }
@@ -365,50 +372,58 @@ public class BatchValidationService {
             this(typeIds, thirdTypes, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyMap());
         }
 
-        // Métodos de acceso con encapsulación correcta
+        // Métodos de acceso con encapsulación
         boolean hasTypeId(String name) {
-            return name != null && typeIds.containsKey(name.toUpperCase());
+            return name != null && typeIds.containsKey(StringNormalizer.normalizeCode(name));
         }
 
         TypeId getTypeId(String name) {
-            return name != null ? typeIds.get(name.toUpperCase()) : null;
+            return name != null ? typeIds.get(StringNormalizer.normalizeCode(name)) : null;
         }
 
         boolean hasThirdType(String name) {
-            return name != null && thirdTypes.containsKey(name.toUpperCase());
+            return name != null && thirdTypes.containsKey(StringNormalizer.normalizeCode(name));
         }
 
         ThirdType getThirdType(String name) {
-            return name != null ? thirdTypes.get(name.toUpperCase()) : null;
+            return name != null ? thirdTypes.get(StringNormalizer.normalizeCode(name)) : null;
         }
 
         boolean hasCountry(String name) {
-            return name != null && countries.containsKey(name.toUpperCase());
+            return name != null && countries.containsKey(StringNormalizer.normalizeCode(name));
         }
 
         boolean hasState(String name) {
-            return name != null && states.containsKey(name.toUpperCase());
+            return name != null && states.containsKey(StringNormalizer.normalizeCode(name));
         }
 
         State getState(String name) {
-            return name != null ? states.get(name.toUpperCase()) : null;
+            return name != null ? states.get(StringNormalizer.normalizeCode(name)) : null;
         }
 
         boolean hasCity(String cityName, String stateCode) {
             if (cityName == null || stateCode == null)
                 return false;
-            String key = cityName.toUpperCase() + "_" + stateCode;
+  
+            String key = StringNormalizer.normalizeCode(cityName) + "_" + stateCode;
             return cities.containsKey(key);
+        }
+
+        City getCity(String cityName, String stateCode) {
+            if (cityName == null || stateCode == null)
+                return null;
+            String key = StringNormalizer.normalizeCode(cityName) + "_" + stateCode;
+            return cities.get(key);
         }
     }
 
     /**
      * Clase que representa el resultado de validación de un registro individual.
      */
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ValidationResult {
         private boolean valid;
         private List<ImportErrorDetail> errors;
@@ -417,10 +432,10 @@ public class BatchValidationService {
     /**
      * Clase que representa el resultado de validación de un lote completo.
      */
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BatchValidationResult {
         private List<ThirdExcelData> validRecords;
         private List<ImportErrorDetail> errors;

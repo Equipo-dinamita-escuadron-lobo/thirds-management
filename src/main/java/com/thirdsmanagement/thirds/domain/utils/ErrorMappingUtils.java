@@ -49,7 +49,7 @@ public final class ErrorMappingUtils {
                 .fieldValue(fieldValue)
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)
-                .errorType(mapToLegacyErrorType(errorType))
+                .errorType(errorType)
                 .build();
     }
 
@@ -118,7 +118,7 @@ public final class ErrorMappingUtils {
             String fieldValue, String referenceType,
             Map<String, Integer> columnMap) {
         String errorCode = "INVALID_" + referenceType.toUpperCase().replace(" ", "_") + "_REFERENCE";
-        String errorMessage = String.format("El %s '%s' no existe o está inactivo", referenceType, fieldValue);
+        String errorMessage = String.format("%s '%s' no existe o está inactivo", referenceType, fieldValue);
 
         return createError(rowNumber, columnName, fieldValue,
                 errorCode, errorMessage,
@@ -174,7 +174,7 @@ public final class ErrorMappingUtils {
         return ImportErrorDetail.builder()
                 .errorCode(ImportConstants.ErrorCodes.SYSTEM_ERROR)
                 .errorMessage(ImportConstants.ErrorMessages.SYSTEM_ERROR + ": " + errorMessage)
-                .errorType(mapToLegacyErrorType(ImportErrorType.SYSTEM_ERROR))
+                .errorType(ImportErrorType.SYSTEM_ERROR)
                 .build();
     }
 
@@ -190,7 +190,7 @@ public final class ErrorMappingUtils {
                 .rowNumber(excelData.getRowNumber())
                 .errorCode(ImportConstants.ErrorCodes.SYSTEM_ERROR)
                 .errorMessage("Error al procesar registro: " + errorMessage)
-                .errorType(mapToLegacyErrorType(ImportErrorType.SYSTEM_ERROR))
+                .errorType(ImportErrorType.SYSTEM_ERROR)
                 .build();
     }
 
@@ -275,20 +275,4 @@ public final class ErrorMappingUtils {
         };
     }
 
-    /**
-     * Convierte el nuevo enum ImportErrorType al enum legacy para compatibilidad.
-     * 
-     * @param errorType tipo de error nuevo
-     * @return tipo de error legacy
-     */
-    private static ImportErrorDetail.ErrorType mapToLegacyErrorType(ImportErrorType errorType) {
-        return switch (errorType) {
-            case VALIDATION_ERROR -> ImportErrorDetail.ErrorType.VALIDATION_ERROR;
-            case FORMAT_ERROR -> ImportErrorDetail.ErrorType.FORMAT_ERROR;
-            case REFERENCE_ERROR -> ImportErrorDetail.ErrorType.REFERENCE_ERROR;
-            case BUSINESS_RULE_ERROR -> ImportErrorDetail.ErrorType.BUSINESS_RULE_ERROR;
-            case DUPLICATE_ERROR -> ImportErrorDetail.ErrorType.DUPLICATE_ERROR;
-            case SYSTEM_ERROR -> ImportErrorDetail.ErrorType.SYSTEM_ERROR;
-        };
-    }
 }

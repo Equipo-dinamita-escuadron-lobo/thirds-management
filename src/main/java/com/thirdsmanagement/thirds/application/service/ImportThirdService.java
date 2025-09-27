@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
+import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
@@ -188,7 +189,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                 ImportErrorDetail.builder()
                         .errorCode("SYSTEM_ERROR")
                         .errorMessage("Error del sistema durante la importación: " + e.getMessage())
-                        .errorType(ImportErrorDetail.ErrorType.SYSTEM_ERROR)
+                        .errorType(ImportErrorType.SYSTEM_ERROR)
                         .build());
 
         return responseBuilder.buildFailedResponse(importId, importRequest, e.getMessage(), systemErrors);
