@@ -80,7 +80,7 @@ public class BatchValidationService {
      * Pre-carga todos los datos de referencia para optimizar validaciones.
      * Retorna un objeto inmutable con todos los datos necesarios.
      */
-    private ReferenceDataCache preloadReferenceData(String entId) {
+    public ReferenceDataCache preloadReferenceData(String entId) {
 
         // Cargar tipos de identificación
         Map<String, TypeId> typeIds = idOutputPort.getAllTypeIds(entId).stream()
@@ -340,7 +340,7 @@ public class BatchValidationService {
      * Simplifica testing y elimina complejidad de ThreadLocal.
      * Aplica encapsulación correcta con métodos de acceso.
      */
-    private static class ReferenceDataCache {
+    public static class ReferenceDataCache {
         private final Map<String, TypeId> typeIds;
         private final Map<String, ThirdType> thirdTypes;
         private final Map<String, Country> countries;
