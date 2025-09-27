@@ -24,24 +24,24 @@ public class DeleteThirdService implements DeleteThirdUseCase {
      * Elimina un tercero del sistema con validaciones completas.
      * 
      * @param thirdId el ID del tercero a eliminar
-     * @param entId el ID de la empresa
+     * @param entId   el ID de la empresa
      * @return true si se eliminó correctamente
-     * @throws ThirdNotFound si el tercero no existe
+     * @throws ThirdNotFound            si el tercero no existe
      * @throws IllegalArgumentException si los parámetros son inválidos
      */
     @Override
     @Transactional
     public boolean deleteThird(Long thirdId, String entId) {
-        
+
         // Validar parámetros de entrada
         validateInputParameters(thirdId, entId);
-        
+
         // Verificar que el tercero existe
         validateThirdExists(thirdId, entId);
-        
+
         // Proceder con la eliminación directa (el tercero es la entidad raíz)
         boolean deleted = thirdOutputPort.deleteThird(thirdId, entId);
-        
+
         return deleted;
     }
 
@@ -49,14 +49,14 @@ public class DeleteThirdService implements DeleteThirdUseCase {
      * Valida que los parámetros de entrada no sean null o inválidos.
      * 
      * @param thirdId el ID del tercero
-     * @param entId el ID de la empresa
+     * @param entId   el ID de la empresa
      * @throws IllegalArgumentException si algún parámetro es inválido
      */
     private void validateInputParameters(Long thirdId, String entId) {
         if (thirdId == null) {
             throw new IllegalArgumentException("El ID del tercero no puede ser null");
         }
-        
+
         if (entId == null || entId.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
@@ -66,7 +66,7 @@ public class DeleteThirdService implements DeleteThirdUseCase {
      * Valida que el tercero existe en el sistema.
      * 
      * @param thirdId el ID del tercero
-     * @param entId el ID de la empresa
+     * @param entId   el ID de la empresa
      * @throws ThirdNotFound si el tercero no existe
      */
     private void validateThirdExists(Long thirdId, String entId) {

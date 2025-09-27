@@ -20,72 +20,70 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class GeographyFileDiscoveryService {
-    
+
     private final GeographyDataConfig config;
     private final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-    
+
     /**
      * Descubre y ordena todos los archivos SQL de geografía automáticamente
      */
     public List<String> discoverGeographyFiles() {
         List<String> allFiles = new ArrayList<>();
-        
+
         try {
             // 1. Archivos de países (fase 1)
             allFiles.addAll(discoverCountryFiles());
-            
-            // 2. Archivos de estados (fase 2) 
+
+            // 2. Archivos de estados (fase 2)
             allFiles.addAll(discoverStateFiles());
-            
+
             // 3. Archivos de ciudades (fase 3) - ordenados automáticamente
             allFiles.addAll(discoverCityFiles());
-            
+
             return allFiles;
-            
+
         } catch (IOException e) {
             throw new RuntimeException("Error en descubrimiento de archivos", e);
         }
     }
-    
+
     private List<String> discoverCountryFiles() throws IOException {
         String countriesFilePath = config.getBaseDirectory() + "/" + config.getCountriesFile();
-        return resourceExists(countriesFilePath) ? 
-            List.of(countriesFilePath) : 
-            List.of();
+        return resourceExists(countriesFilePath) ? List.of(countriesFilePath) : List.of();
     }
-    
+
     private List<String> discoverStateFiles() throws IOException {
         List<String> stateFiles = new ArrayList<>();
-        
+
         for (String countryDir : config.getCountryDirectories()) {
             String fullPath = config.getBaseDirectory() + "/" + countryDir + "/" + config.getStatesFile();
             if (resourceExists(fullPath)) {
                 stateFiles.add(fullPath);
             }
         }
-        
+
         return stateFiles;
     }
-    
+
     private List<String> discoverCityFiles() throws IOException {
         List<String> cityFiles = new ArrayList<>();
-        
+
         for (String countryDir : config.getCountryDirectories()) {
             String pattern = config.getBaseDirectory() + "/" + countryDir + "/" + config.getCitiesPattern();
-            
+
             Resource[] resources = resourceResolver.getResources("classpath:" + pattern);
-            
+
             // Ordenar archivos por nombre para mantener consistencia
             Arrays.stream(resources)
-                .map(resource -> extractRelativePath(resource, config.getBaseDirectory()))
-                .filter(Objects::nonNull)
-                .sorted()
-                .forEach(cityFiles::add);
+                    .map(resource -> extractRelativePath(resource, config.getBaseDirectory()))
+                    .filter(Objects::nonNull)
+                    .sorted()
+                    .forEach(cityFiles::add);
         }
-        
+
         return cityFiles;
     }
-    
+
     private boolean resourceExists(String path) {
         try {
             Resource resource = resourceResolver.getResource("classpath:" + path);
@@ -94,7 +92,7 @@ public class GeographyFileDiscoveryService {
             return false;
         }
     }
-    
+
     private String extractRelativePath(Resource resource, String baseDir) {
         try {
             String fullPath = resource.getURI().toString();

@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio especializado en la detección de duplicados durante la importación.
- * Maneja tanto duplicados internos del Excel como duplicados con la base de datos existente.
+ * Maneja tanto duplicados internos del Excel como duplicados con la base de
+ * datos existente.
  */
 @Slf4j
 @Service
@@ -29,17 +30,18 @@ public class DuplicateDetectionService {
     /**
      * Detecta duplicados en un lote de datos de terceros.
      * 
-     * @param thirdsData lista de datos de terceros a analizar
-     * @param entId identificador de la entidad
-     * @param skipDuplicates indica si se deben omitir duplicados o marcar como error
+     * @param thirdsData     lista de datos de terceros a analizar
+     * @param entId          identificador de la entidad
+     * @param skipDuplicates indica si se deben omitir duplicados o marcar como
+     *                       error
      * @return resultado de detección con registros únicos y reportes de duplicados
      */
-    public DuplicateDetectionResult detectDuplicates(List<ThirdExcelData> thirdsData, String entId, boolean skipDuplicates) {
-        log.info("Iniciando detección de duplicados para {} registros en entidad {}", thirdsData.size(), entId);
+    public DuplicateDetectionResult detectDuplicates(List<ThirdExcelData> thirdsData, String entId,
+            boolean skipDuplicates) {
 
         List<ThirdExcelData> uniqueRecords = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
-        
+
         // 1. Detectar duplicados internos del Excel
         DuplicateAnalysisResult internalDuplicates = detectInternalDuplicates(thirdsData, skipDuplicates);
         uniqueRecords.addAll(internalDuplicates.getUniqueRecords());
@@ -51,9 +53,6 @@ public class DuplicateDetectionService {
             uniqueRecords = dbDuplicates.getUniqueRecords();
             errors.addAll(dbDuplicates.getErrors());
         }
-
-        log.info("Detección completada. Únicos: {}, Errores: {}", 
-                uniqueRecords.size(), errors.size());
 
         return DuplicateDetectionResult.builder()
                 .uniqueRecords(uniqueRecords)
@@ -68,14 +67,13 @@ public class DuplicateDetectionService {
      * Detecta duplicados internos dentro del archivo Excel.
      */
     private DuplicateAnalysisResult detectInternalDuplicates(List<ThirdExcelData> thirdsData, boolean skipDuplicates) {
-        log.debug("Detectando duplicados internos en {} registros", thirdsData.size());
 
         List<ThirdExcelData> uniqueRecords = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
 
         // Mapa para rastrear registros ya procesados por ID de identificación
         Map<String, ThirdExcelData> processedRecords = new HashMap<>();
-        
+
         for (ThirdExcelData currentRecord : thirdsData) {
             if (currentRecord.getIdNumber() == null) {
                 continue;
@@ -92,8 +90,6 @@ public class DuplicateDetectionService {
             }
         }
 
-        log.debug("Duplicados internos detectados: {} únicos de {} totales", uniqueRecords.size(), thirdsData.size());
-
         return DuplicateAnalysisResult.builder()
                 .uniqueRecords(uniqueRecords)
                 .errors(errors)
@@ -103,8 +99,8 @@ public class DuplicateDetectionService {
     /**
      * Detecta duplicados con registros existentes en la base de datos.
      */
-    private DuplicateAnalysisResult detectDatabaseDuplicates(List<ThirdExcelData> thirdsData, String entId, boolean skipDuplicates) {
-        log.debug("Detectando duplicados con base de datos para {} registros", thirdsData.size());
+    private DuplicateAnalysisResult detectDatabaseDuplicates(List<ThirdExcelData> thirdsData, String entId,
+            boolean skipDuplicates) {
 
         List<ThirdExcelData> uniqueRecords = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
@@ -115,12 +111,8 @@ public class DuplicateDetectionService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        
         Set<Long> existingIds = thirdOutputPort.findExistingIdNumbers(idNumbers, entId);
-        
-        log.debug("De {} registros únicos, {} ya existen en la base de datos (consulta batch optimizada)", 
-                idNumbers.size(), existingIds.size());
-       
+
         for (ThirdExcelData currentRecord : thirdsData) {
             if (currentRecord.getIdNumber() == null) {
                 continue;
@@ -133,8 +125,6 @@ public class DuplicateDetectionService {
             }
         }
 
-        log.debug("Duplicados con BD detectados: {} únicos de {} analizados", uniqueRecords.size(), thirdsData.size());
-
         return DuplicateAnalysisResult.builder()
                 .uniqueRecords(uniqueRecords)
                 .errors(errors)
@@ -144,8 +134,8 @@ public class DuplicateDetectionService {
     /**
      * Maneja un duplicado interno encontrado.
      */
-    private void handleInternalDuplicate(ThirdExcelData currentRecord, ThirdExcelData existingRecord, 
-                                       boolean skipDuplicates, List<ImportErrorDetail> errors) {
+    private void handleInternalDuplicate(ThirdExcelData currentRecord, ThirdExcelData existingRecord,
+            boolean skipDuplicates, List<ImportErrorDetail> errors) {
         if (!skipDuplicates) {
             // Solo crear error si no se deben omitir duplicados
             errors.add(ImportErrorDetail.builder()
@@ -153,7 +143,8 @@ public class DuplicateDetectionService {
                     .columnName("Número Identificación")
                     .fieldValue(String.valueOf(currentRecord.getIdNumber()))
                     .errorCode("INTERNAL_DUPLICATE_FOUND")
-                    .errorMessage(String.format("Número de identificación duplicado en archivo. Primera ocurrencia en fila %d.", 
+                    .errorMessage(String.format(
+                            "Número de identificación duplicado en archivo. Primera ocurrencia en fila %d.",
                             existingRecord.getRowNumber()))
                     .errorType(ImportErrorDetail.ErrorType.DUPLICATE_ERROR)
                     .build());
@@ -163,8 +154,8 @@ public class DuplicateDetectionService {
     /**
      * Maneja un duplicado con la base de datos encontrado.
      */
-    private void handleDatabaseDuplicate(ThirdExcelData currentRecord, boolean skipDuplicates, 
-                                       List<ImportErrorDetail> errors) {
+    private void handleDatabaseDuplicate(ThirdExcelData currentRecord, boolean skipDuplicates,
+            List<ImportErrorDetail> errors) {
         if (!skipDuplicates) {
             // Solo crear error si no se deben omitir duplicados
             errors.add(ImportErrorDetail.builder()
@@ -185,8 +176,6 @@ public class DuplicateDetectionService {
     private String createDuplicateKey(ThirdExcelData record) {
         return record.getEntId() + "_" + record.getIdNumber();
     }
-
-
 
     /**
      * Clase que representa el resultado de análisis de duplicados.
@@ -215,5 +204,4 @@ public class DuplicateDetectionService {
         private int duplicateCount;
     }
 
-   
 }

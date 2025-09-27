@@ -15,22 +15,25 @@ import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataExcep
 
 @Service
 public class PdfRUTService {
-    
+
     /**
      * Extrae el contenido de un archivo PDF de RUT.
      * 
      * @param request objeto con la información del archivo PDF
      * @return objeto con la información extraída del archivo PDF
-     * @throws IOException si ocurre un error al cargar el archivo PDF
-     * @throws ThirdInvalidDataException si el request es null o el archivo es inválido
+     * @throws IOException                    si ocurre un error al cargar el
+     *                                        archivo PDF
+     * @throws ThirdInvalidDataException      si el request es null o el archivo es
+     *                                        inválido
      * @throws PdfRutInvalidFileTypeException si el archivo no es de tipo PDF
-     * @throws PdfRutInvalidFormatException si el PDF no tiene el formato válido de RUT
+     * @throws PdfRutInvalidFormatException   si el PDF no tiene el formato válido
+     *                                        de RUT
      */
     public PdfRUTContentOutput extractContent(PdfRUTContent request) throws IOException {
         if (request == null) {
             throw new ThirdInvalidDataException("El request no puede ser null");
         }
-        
+
         if (request.getFile() == null || request.getFile().isEmpty()) {
             throw new ThirdInvalidDataException("El archivo PDF no puede ser null o vacío");
         }
@@ -42,24 +45,24 @@ public class PdfRUTService {
         // Transferir el archivo recibido a un archivo temporal
         request.getFile().transferTo(tempFile);
 
-        try (PDDocument document = PDDocument.load(tempFile,"1")) {
+        try (PDDocument document = PDDocument.load(tempFile, "1")) {
             PDFTextStripper pdfStripper = new PDFTextStripper();
             pdfStripper.setStartPage(1);
-            pdfStripper.setEndPage(1);  
+            pdfStripper.setEndPage(1);
             String content = pdfStripper.getText(document);
             String typeId = "";
             int idPerson = 0;
-            String razonSocial="";
-            String names="";
-            String lastNames="";
-            String [] ubication = null;
+            String razonSocial = "";
+            String names = "";
+            String lastNames = "";
+            String[] ubication = null;
             String pais = "";
             String departamento = "";
             String ciudad = "";
             String direccion = "";
             String correo = "";
             long cell = 0;
-            try{
+            try {
                 String[] extractedLines = extractAfterClasificacion(content);
                 String[] extractedUbication = extractUbicationThird(content);
                 String[] personaJuridica;
@@ -67,36 +70,45 @@ public class PdfRUTService {
                 String typePerson;
                 String[] aux = separateNumbersAndText(extractedLines[3]);
                 typePerson = aux[0];
-                if(extractedLines[3].contains("Persona jurídica")){
-                    //Extraer la primera parte de identificacion para persona juridica 
+                if (extractedLines[3].contains("Persona jurídica")) {
+                    // Extraer la primera parte de identificacion para persona juridica
                     typeId = "NIT";
                     personaJuridica = separateNumbersAndText(cleanString(extractedLines[2]));
-                    idPerson = Integer.parseInt(String.valueOf(personaJuridica[0]).length() > 0 ? String.valueOf(personaJuridica[0]).substring(0, String.valueOf(personaJuridica[0]).length() - 1) : String.valueOf(personaJuridica[0]));
+                    idPerson = Integer.parseInt(String.valueOf(personaJuridica[0]).length() > 0
+                            ? String.valueOf(personaJuridica[0]).substring(0,
+                                    String.valueOf(personaJuridica[0]).length() - 1)
+                            : String.valueOf(personaJuridica[0]));
                     razonSocial = extractedLines[5];
-                }else{
-                    //Extraer la primera parte de identificacion para persona natural
-                    String [] aux1 = separateNumbersAndText(cleanString(extractedLines[3]));
+                } else {
+                    // Extraer la primera parte de identificacion para persona natural
+                    String[] aux1 = separateNumbersAndText(cleanString(extractedLines[3]));
                     typeId = aux1[2];
                     typeId = typeId.trim();
                     personaNatural = separateNumbersAndText(cleanString(extractedLines[2]));
-                    idPerson = Integer.parseInt(String.valueOf(personaNatural[0]).length() > 0 ? String.valueOf(personaNatural[0]).substring(0, String.valueOf(personaNatural[0]).length() - 1) : String.valueOf(personaNatural[0]));
+                    idPerson = Integer.parseInt(String.valueOf(personaNatural[0]).length() > 0
+                            ? String.valueOf(personaNatural[0]).substring(0,
+                                    String.valueOf(personaNatural[0]).length() - 1)
+                            : String.valueOf(personaNatural[0]));
                     String[] datos = new String[4];
                     datos = splitBySpaceAndUpperCase(extractedLines[5]);
-                    lastNames = datos[0]+" "+ datos[1];
-                    names = datos[2]+" "+ datos[3];
+                    lastNames = datos[0] + " " + datos[1];
+                    names = datos[2] + " " + datos[3];
                 }
-                ubication =  separateNumbersAndText(cleanString(extractedUbication[0]));
+                ubication = separateNumbersAndText(cleanString(extractedUbication[0]));
                 pais = cleanString(ubication[0]);
                 departamento = cleanString(ubication[2]);
                 ciudad = cleanString(ubication[4]);
                 direccion = extractedUbication[1];
                 correo = extractedUbication[2];
-                String [] contact = separateAndJoinNumbers(extractedUbication[3]);
+                String[] contact = separateAndJoinNumbers(extractedUbication[3]);
                 cell = Long.parseLong(contact[1]);
-                String infoThird = typePerson+";"+typeId+";"+idPerson+";"+razonSocial+";"+lastNames+";"+names+";"+pais+";"+departamento+";"+ciudad+";"+direccion+";"+correo+";"+cell;
+                String infoThird = typePerson + ";" + typeId + ";" + idPerson + ";" + razonSocial + ";" + lastNames
+                        + ";" + names + ";" + pais + ";" + departamento + ";" + ciudad + ";" + direccion + ";" + correo
+                        + ";" + cell;
                 return new PdfRUTContentOutput(infoThird);
-            } catch(Exception e) {
-                throw new PdfRutInvalidFormatException("El archivo PDF no tiene el formato válido de RUT de la DIAN o no se pudo procesar correctamente");
+            } catch (Exception e) {
+                throw new PdfRutInvalidFormatException(
+                        "El archivo PDF no tiene el formato válido de RUT de la DIAN o no se pudo procesar correctamente");
             }
         } finally {
             tempFile.delete();
@@ -105,6 +117,7 @@ public class PdfRUTService {
 
     /**
      * Extrae el contenido después de la palabra "CLASIFICACIÓN".
+     * 
      * @param content Contenido del archivo PDF.
      * @return Arreglo con las líneas después de la palabra "CLASIFICACIÓN".
      */
@@ -112,7 +125,7 @@ public class PdfRUTService {
         int index = content.indexOf("CLASIFICACIÓN");
         if (index != -1) {
             String result = content.substring(index + "CLASIFICACIÓN".length()).trim();
-            String[] lines = result.split("\\r?\\n"); 
+            String[] lines = result.split("\\r?\\n");
             return lines;
         }
         return new String[0];
@@ -120,29 +133,31 @@ public class PdfRUTService {
 
     /**
      * Extrae la informacion de la ubicacion de un tercero desde el PDF de RUT.
+     * 
      * @param content Contenido del archivo PDF.
      * @return Arreglo con las líneas de la ubicación de un tercero.
      */
     private String[] extractUbicationThird(String content) {
         int index = content.lastIndexOf("COLOMBIA");
         if (index != -1) {
-            
+
             String result = content.substring(index).trim();
-            String[] lines = result.split("\\r?\\n"); 
+            String[] lines = result.split("\\r?\\n");
             return lines;
         }
         return new String[0];
     }
-    
+
     /**
      * Limpia el contenido de un string.
+     * 
      * @param input String a limpiar.
      * @return String limpio.
      */
     public static String cleanString(String input) {
         String cleaned = input.replaceAll("\\s*\\n\\s*", "\n") // Limpiar saltos de linea con espacios
-                              .replaceAll("\\s{2,}", " ")    // Reemplaza multiples espacios por uno
-                              .trim();                       // Elimina espacios al principio y al final
+                .replaceAll("\\s{2,}", " ") // Reemplaza multiples espacios por uno
+                .trim(); // Elimina espacios al principio y al final
         // Elimina espacios entre varios numeros consecutivos
         cleaned = cleaned.replaceAll("(\\d)\\s+(?=\\d)", "$1");
         return cleaned;
@@ -150,6 +165,7 @@ public class PdfRUTService {
 
     /**
      * Separa numeros y texto en un string.
+     * 
      * @param input String con numeros y texto.
      * @return Arreglo con los numeros y texto separados.
      */
@@ -160,6 +176,7 @@ public class PdfRUTService {
 
     /**
      * Separa y une numeros en un string.
+     * 
      * @param input String con numeros.
      * @return Arreglo con los numeros separados.
      */
@@ -174,6 +191,7 @@ public class PdfRUTService {
 
     /**
      * Divide un string por espacios y letras mayúsculas.
+     * 
      * @param input String a dividir.
      * @return Arreglo con las partes del string.
      */
@@ -183,27 +201,28 @@ public class PdfRUTService {
 
     /**
      * Valida que el archivo sea de tipo PDF válido.
+     * 
      * @param request objeto con la información del archivo
      * @throws PdfRutInvalidFileTypeException si el archivo no es de tipo PDF
      */
     private void validatePdfFileType(PdfRUTContent request) {
         String originalFilename = request.getFile().getOriginalFilename();
         String contentType = request.getFile().getContentType();
-        
+
         // Validar extensión del archivo
         if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".pdf")) {
             throw new PdfRutInvalidFileTypeException("El archivo debe tener extensión .pdf");
         }
-        
+
         // Validar content type
         if (contentType == null || !contentType.equals("application/pdf")) {
             throw new PdfRutInvalidFileTypeException("El archivo debe ser de tipo PDF (application/pdf)");
         }
-        
+
         // Validar que el archivo tenga contenido
         if (request.getFile().getSize() == 0) {
             throw new PdfRutInvalidFileTypeException("El archivo PDF está vacío");
         }
     }
-    
+
 }

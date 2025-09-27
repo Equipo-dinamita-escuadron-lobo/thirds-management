@@ -46,8 +46,6 @@ public class BatchValidationService {
         // Pre-cargar datos de referencia como objetos inmutables locales
         ReferenceDataCache cache = preloadReferenceData(entId);
 
-        log.info("Iniciando validación de lote con {} registros para entidad {}", thirdsData.size(), entId);
-
         for (ThirdExcelData excelData : thirdsData) {
             try {
                 ValidationResult result = validateSingleRecord(excelData, cache, columnMap);
@@ -69,9 +67,6 @@ public class BatchValidationService {
             }
         }
 
-        log.info("Validación completada. Válidos: {}, Errores: {}",
-                validRecords.size(), errors.size());
-
         return BatchValidationResult.builder()
                 .validRecords(validRecords)
                 .errors(errors)
@@ -86,7 +81,6 @@ public class BatchValidationService {
      * Retorna un objeto inmutable con todos los datos necesarios.
      */
     private ReferenceDataCache preloadReferenceData(String entId) {
-        log.debug("Pre-cargando datos de referencia para entidad {}", entId);
 
         // Cargar tipos de identificación
         Map<String, TypeId> typeIds = idOutputPort.getAllTypeIds(entId).stream()
@@ -127,10 +121,6 @@ public class BatchValidationService {
 
         // Crear objeto inmutable con todos los datos
         ReferenceDataCache cache = new ReferenceDataCache(typeIds, thirdTypes, countries, states, cities);
-
-        log.debug("Datos pre-cargados: {} tipos ID, {} tipos tercero, {} países, {} estados, {} ciudades",
-                typeIds.size(), thirdTypes.size(), countries.size(),
-                states.size(), cities.size());
 
         return cache;
     }

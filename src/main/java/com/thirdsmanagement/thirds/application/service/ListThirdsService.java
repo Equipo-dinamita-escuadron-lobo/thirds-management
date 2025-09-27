@@ -64,12 +64,12 @@ public class ListThirdsService implements ListThirdsUseCase {
         // Verificar si hay registros totales para el filtro, no solo en esta página
         if (result.getTotalElements() == 0) {
             throw new ThirdNotFound(
-                    "No se encontro un tercero con ID de tipo de tercero '" + thirdTypeId + "' para la empresa con ID: " + entId);
+                    "No se encontro un tercero con ID de tipo de tercero '" + thirdTypeId + "' para la empresa con ID: "
+                            + entId);
         }
 
         return result;
     }
-
 
     /**
      * Obtiene todos los terceros filtrados por estado de una empresa con

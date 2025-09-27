@@ -17,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * Servicio que implementa los casos de uso para listar información geográfica.
- * Proporciona validación de jerarquía geográfica y acceso a datos de países, estados y ciudades.
+ * Proporciona validación de jerarquía geográfica y acceso a datos de países,
+ * estados y ciudades.
  */
 @Service
 @RequiredArgsConstructor
@@ -48,7 +49,7 @@ public class ListGeographyService implements ListGeographyUseCase {
         if (stateCode == null || stateCode.trim().isEmpty()) {
             throw new GeographyInvalidDataException("El código del estado no puede ser null o vacío");
         }
-        
+
         if (countryCode == null || countryCode.trim().isEmpty()) {
             throw new GeographyInvalidDataException("El código del país no puede ser null o vacío");
         }
@@ -58,7 +59,8 @@ public class ListGeographyService implements ListGeographyUseCase {
         }
 
         if (!geographyOutputPort.existsActiveState(stateCode, countryCode)) {
-            throw new StateNotFoundException("El estado con código '" + stateCode + "' no existe o no pertenece al país '" + countryCode + "'");
+            throw new StateNotFoundException(
+                    "El estado con código '" + stateCode + "' no existe o no pertenece al país '" + countryCode + "'");
         }
 
         return geographyOutputPort.getCitiesByState(stateCode, countryCode);

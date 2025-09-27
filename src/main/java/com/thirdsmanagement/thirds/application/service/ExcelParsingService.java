@@ -22,7 +22,8 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Servicio especializado en el parseo de archivos Excel para importación de terceros.
+ * Servicio especializado en el parseo de archivos Excel para importación de
+ * terceros.
  * Maneja la lectura, validación de formato y conversión de datos desde Excel.
  */
 @Slf4j
@@ -32,7 +33,6 @@ public class ExcelParsingService {
 
     private static final int HEADER_ROW_INDEX = 0;
     private static final int DATA_START_ROW_INDEX = 1;
-
 
     /**
      * Valida el formato básico del archivo Excel.
@@ -47,25 +47,23 @@ public class ExcelParsingService {
 
         if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
             throw ThirdImportException.forFileSizeExceeded(
-                file.getOriginalFilename(), 
-                file.getSize(), 
-                ImportConstants.MAX_FILE_SIZE
-            );
+                    file.getOriginalFilename(),
+                    file.getSize(),
+                    ImportConstants.MAX_FILE_SIZE);
         }
 
         String filename = file.getOriginalFilename();
         if (filename == null || !filename.toLowerCase().endsWith(".xlsx")) {
             throw ThirdImportException.forInvalidExcelFile(
-                filename, 
-                "El archivo debe tener extensión .xlsx"
-            );
+                    filename,
+                    "El archivo debe tener extensión .xlsx");
         }
     }
 
     /**
      * Parsea el archivo Excel y extrae los datos de terceros.
      * 
-     * @param file archivo Excel a procesar
+     * @param file  archivo Excel a procesar
      * @param entId identificador de la entidad
      * @return lista de terceros parseados y lista de errores encontrados
      */
@@ -78,7 +76,7 @@ public class ExcelParsingService {
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
-            
+
             if (sheet.getPhysicalNumberOfRows() == 0) {
                 throw ThirdImportException.forEmptyFile(file.getOriginalFilename());
             }
@@ -86,7 +84,7 @@ public class ExcelParsingService {
             // Detectar mapa de columnas dinámicamente
             columnMap = detectColumnMapping(sheet, errors);
             if (columnMap.isEmpty()) {
-                throw ThirdImportException.forInvalidExcelFile(file.getOriginalFilename(), 
+                throw ThirdImportException.forInvalidExcelFile(file.getOriginalFilename(),
                         "No se pudieron detectar las columnas requeridas");
             }
 
@@ -105,10 +103,9 @@ public class ExcelParsingService {
 
         } catch (IOException e) {
             throw new ThirdImportException(
-                ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
-                "Error leyendo archivo Excel: " + e.getMessage(),
-                e
-            );
+                    ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error leyendo archivo Excel: " + e.getMessage(),
+                    e);
         }
 
         return ExcelParsingResult.builder()
@@ -125,12 +122,12 @@ public class ExcelParsingService {
     private Map<String, Integer> detectColumnMapping(Sheet sheet, List<ImportErrorDetail> errors) {
         Row headerRow = sheet.getRow(HEADER_ROW_INDEX);
         if (headerRow == null) {
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(1)
-                        .errorCode("MISSING_HEADERS")
-                        .errorMessage("El archivo no contiene encabezados")
-                        .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
-                        .build());
+            errors.add(ImportErrorDetail.builder()
+                    .rowNumber(1)
+                    .errorCode("MISSING_HEADERS")
+                    .errorMessage("El archivo no contiene encabezados")
+                    .errorType(ImportErrorDetail.ErrorType.FORMAT_ERROR)
+                    .build());
             return new HashMap<>();
         }
 
@@ -173,7 +170,8 @@ public class ExcelParsingService {
      * Parsea una fila individual del Excel usando el mapa de columnas detectado.
      * REFACTORIZADO: Dividido en sub-métodos para mejor mantenibilidad.
      */
-    private ThirdExcelData parseRow(Row row, int rowNumber, String entId, Map<String, Integer> columnMap, List<ImportErrorDetail> errors) {
+    private ThirdExcelData parseRow(Row row, int rowNumber, String entId, Map<String, Integer> columnMap,
+            List<ImportErrorDetail> errors) {
         try {
             ThirdExcelData.ThirdExcelDataBuilder builder = ThirdExcelData.builder()
                     .rowNumber(rowNumber)
@@ -181,7 +179,7 @@ public class ExcelParsingService {
 
             // Parsear campos básicos usando sub-método especializado
             parseBasicFields(row, builder, columnMap, rowNumber, errors);
-            
+
             // Parsear campos opcionales usando sub-método especializado
             parseOptionalFields(row, builder, columnMap);
 
@@ -201,17 +199,19 @@ public class ExcelParsingService {
     /**
      * Parsea los campos básicos requeridos de una fila.
      */
-    private void parseBasicFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, 
-                                 Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
+    private void parseBasicFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
+            Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
         builder.typeIdName(getCellValueAsString(row, columnMap.get("Tipo Identificación")));
-        builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber, "Número Identificación", errors));
-        builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber, "Dígito Verificación", errors));
-        builder.personType(parseEnum(getCellValueAsString(row, columnMap.get("Tipo Persona")), 
+        builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber,
+                "Número Identificación", errors));
+        builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber,
+                "Dígito Verificación", errors));
+        builder.personType(parseEnum(getCellValueAsString(row, columnMap.get("Tipo Persona")),
                 ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType));
         builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
         builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
         builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
-        builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")), 
+        builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")),
                 eThirdGender.class, "Género", rowNumber, errors, this::mapGender));
         builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
     }
@@ -219,7 +219,8 @@ public class ExcelParsingService {
     /**
      * Parsea los campos opcionales de una fila (solo si están presentes).
      */
-    private void parseOptionalFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+    private void parseOptionalFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
+            Map<String, Integer> columnMap) {
         // Tipos de tercero
         Integer typesColumn = columnMap.get(ImportConstants.OptionalHeaders.TYPES);
         if (typesColumn != null) {
@@ -228,7 +229,7 @@ public class ExcelParsingService {
 
         // Geografía
         parseGeographyFields(row, builder, columnMap);
-        
+
         // Información de contacto
         parseContactFields(row, builder, columnMap);
     }
@@ -236,7 +237,8 @@ public class ExcelParsingService {
     /**
      * Parsea los campos geográficos opcionales.
      */
-    private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+    private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
+            Map<String, Integer> columnMap) {
         Integer countryColumn = columnMap.get(ImportConstants.OptionalHeaders.COUNTRY);
         if (countryColumn != null) {
             builder.countryName(getCellValueAsString(row, countryColumn));
@@ -261,7 +263,8 @@ public class ExcelParsingService {
     /**
      * Parsea los campos de información de contacto.
      */
-    private void parseContactFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder, Map<String, Integer> columnMap) {
+    private void parseContactFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
+            Map<String, Integer> columnMap) {
         Integer phoneColumn = columnMap.get(ImportConstants.OptionalHeaders.PHONE);
         if (phoneColumn != null) {
             builder.phoneNumber(getCellValueAsString(row, phoneColumn));
@@ -274,12 +277,13 @@ public class ExcelParsingService {
     }
 
     /**
-     * REFACTORIZADO: Método genérico para parsear cualquier enum con mapeo personalizado.
+     * REFACTORIZADO: Método genérico para parsear cualquier enum con mapeo
+     * personalizado.
      * Elimina duplicación de código entre parsePersonType, parseGender, etc.
      */
-    private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName, 
-                                           int rowNumber, List<ImportErrorDetail> errors,
-                                           java.util.function.Function<String, T> mapper) {
+    private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
+            int rowNumber, List<ImportErrorDetail> errors,
+            java.util.function.Function<String, T> mapper) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
@@ -351,7 +355,7 @@ public class ExcelParsingService {
         if (columnIndex == null) {
             return null;
         }
-        
+
         Cell cell = row.getCell(columnIndex);
         if (cell == null) {
             return null;
@@ -372,11 +376,12 @@ public class ExcelParsingService {
     /**
      * Obtiene el valor de una celda como Long.
      */
-    private Long getCellValueAsLong(Row row, Integer columnIndex, int rowNumber, String fieldName, List<ImportErrorDetail> errors) {
+    private Long getCellValueAsLong(Row row, Integer columnIndex, int rowNumber, String fieldName,
+            List<ImportErrorDetail> errors) {
         if (columnIndex == null) {
             return null;
         }
-        
+
         Cell cell = row.getCell(columnIndex);
         if (cell == null) {
             return null;
@@ -406,7 +411,6 @@ public class ExcelParsingService {
         }
     }
 
-
     /**
      * Parsea el estado desde String.
      */
@@ -429,14 +433,14 @@ public class ExcelParsingService {
                 case "0":
                     return false;
                 default:
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(rowNumber)
-                        .columnName("Estado")
-                        .fieldValue(value)
-                        .errorCode("INVALID_STATE")
-                        .errorMessage("Estado inválido: " + value)
-                        .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
-                        .build());
+                    errors.add(ImportErrorDetail.builder()
+                            .rowNumber(rowNumber)
+                            .columnName("Estado")
+                            .fieldValue(value)
+                            .errorCode("INVALID_STATE")
+                            .errorMessage("Estado inválido: " + value)
+                            .errorType(ImportErrorDetail.ErrorType.VALIDATION_ERROR)
+                            .build());
                     return true; // Por defecto activo en caso de error
             }
         } catch (Exception e) {

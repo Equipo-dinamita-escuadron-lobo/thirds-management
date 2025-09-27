@@ -32,17 +32,18 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Actualiza un tercero existente en el sistema con validación opcional de geografía.
+     * Actualiza un tercero existente en el sistema con validación opcional de
+     * geografía.
      * Este método centraliza toda la lógica de actualización y puede manejar tanto
      * actualizaciones simples como actualizaciones con validación geográfica.
      * 
-     * @param third el tercero con los datos actualizados
+     * @param third       el tercero con los datos actualizados
      * @param countryCode código del país (opcional, puede ser null)
-     * @param stateCode código del estado/departamento (opcional, puede ser null)  
-     * @param cityCode código de la ciudad (opcional, puede ser null)
+     * @param stateCode   código del estado/departamento (opcional, puede ser null)
+     * @param cityCode    código de la ciudad (opcional, puede ser null)
      * @return el tercero actualizado
      * @throws IllegalArgumentException si el tercero es null o no tiene ID válido
-     * @throws ThirdNotFound si el tercero no existe
+     * @throws ThirdNotFound            si el tercero no existe
      */
     @Override
     @Transactional
@@ -50,44 +51,45 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         if (third == null) {
             throw new IllegalArgumentException("El tercero no puede ser null");
         }
-        
+
         if (third.getThId() == null) {
             throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
         }
-        
+
         // Validar que el tercero existe
         if (!thirdOutputPort.existThirdById(third.getThId(), third.getEntId())) {
             throw new ThirdNotFound("El tercero con ID " + third.getThId() + " no existe");
         }
-        
+
         // Validar datos básicos y consistencia de tipo de persona
         thirdValidationService.validatePersonTypeConsistency(third);
-        
+
         // Validar que el TypeId existe y cargarlo completo si es necesario
         Third thirdWithCompleteTypeId = validateAndLoadCompleteTypeId(third);
-        
+
         // Validar compatibilidad entre TypeId y PersonType
         thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
-        
+
         // Validar formato de NIT para personas jurídicas
         thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
-        
+
         // Validar que los ThirdTypes existen
         validateThirdTypesExist(third);
-        
+
         // Geography validation and retrieval (solo si se proporcionan códigos)
         Country country = third.getCountry();
         State state = third.getProvince();
         City city = third.getCity();
-        
+
         if (countryCode != null && stateCode != null && cityCode != null) {
             Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
             country = (Country) geography[0];
             state = (State) geography[1];
             city = (City) geography[2];
         }
-        
-        // Normalization of names and geography assignment usando el tercero con TypeId completo
+
+        // Normalization of names and geography assignment usando el tercero con TypeId
+        // completo
         Third normalizedThird = Third.builder()
                 .thId(thirdWithCompleteTypeId.getThId())
                 .entId(thirdWithCompleteTypeId.getEntId())
@@ -95,8 +97,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                 .typeId(thirdWithCompleteTypeId.getTypeId())
                 .thirdTypes(third.getThirdTypes())
                 .names(third.getNames() != null ? StringNormalizer.normalizePreservingCase(third.getNames()) : null)
-                .lastNames(third.getLastNames() != null ? StringNormalizer.normalizePreservingCase(third.getLastNames()) : null)
-                .socialReason(third.getSocialReason() != null ? StringNormalizer.normalizePreservingCase(third.getSocialReason()) : null)
+                .lastNames(third.getLastNames() != null ? StringNormalizer.normalizePreservingCase(third.getLastNames())
+                        : null)
+                .socialReason(third.getSocialReason() != null
+                        ? StringNormalizer.normalizePreservingCase(third.getSocialReason())
+                        : null)
                 .gender(third.getGender())
                 .idNumber(third.getIdNumber())
                 .verificationNumber(third.getVerificationNumber())
@@ -108,18 +113,19 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                 .province(state)
                 .city(city)
                 .build();
-        
+
         // Update the third
         Third updatedThird = thirdOutputPort.updateThird(normalizedThird);
-        
+
         // Publish update event
         thirdEventPublisher.publishThirdUpdateEvent(new ThirdUpdateEvent(updatedThird.getThId()));
-        
+
         return updatedThird;
     }
-    
+
     /**
      * Valida que el TypeId existe y lo carga completo desde la base de datos.
+     * 
      * @param third el tercero que contiene el TypeId a validar
      * @return el tercero con el TypeId completo cargado
      * @throws TypeIdForeignKeyViolationException si el TypeId no existe
@@ -128,18 +134,18 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         if (third.getTypeId() == null || third.getTypeId().getId() == null) {
             throw new ThirdInvalidDataException("El tipo de identificación no puede ser null");
         }
-        
+
         if (!idOutputPort.existsTypeIdById(third.getTypeId().getId())) {
             throw new TypeIdForeignKeyViolationException(third.getTypeId().getId().toString());
         }
-        
+
         // Si el TypeId no tiene código (typeId), cargarlo desde la base de datos
         if (third.getTypeId().getTypeId() == null || third.getTypeId().getTypeId().trim().isEmpty()) {
             TypeId completeTypeId = idOutputPort.getTypeIdById(third.getTypeId().getId());
             if (completeTypeId == null) {
                 throw new TypeIdForeignKeyViolationException(third.getTypeId().getId().toString());
             }
-            
+
             // Crear un nuevo Third con el TypeId completo
             return Third.builder()
                     .thId(third.getThId())
@@ -162,12 +168,13 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                     .city(third.getCity())
                     .build();
         }
-        
+
         return third;
     }
-    
+
     /**
      * Valida que todos los ThirdTypes existen en el sistema.
+     * 
      * @param third el tercero que contiene los ThirdTypes a validar
      * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
      */
@@ -175,12 +182,12 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         if (third.getThirdTypes() == null || third.getThirdTypes().isEmpty()) {
             throw new ThirdInvalidDataException("Los tipos de tercero no pueden estar vacíos");
         }
-        
+
         for (ThirdType thirdType : third.getThirdTypes()) {
             if (thirdType.getThirdTypeId() == null) {
                 throw new ThirdInvalidDataException("El ID del tipo de tercero no puede ser null");
             }
-            
+
             if (!idOutputPort.existsThirdTypeById(thirdType.getThirdTypeId())) {
                 throw new ThirdTypeForeignKeyViolationException(thirdType.getThirdTypeId().toString());
             }

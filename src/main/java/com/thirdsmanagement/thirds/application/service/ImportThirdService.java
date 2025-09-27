@@ -14,6 +14,11 @@ import com.thirdsmanagement.thirds.domain.enums.ProcessingStatus;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,14 +31,14 @@ import java.util.stream.Collectors;
 
 /**
  * Servicio principal para la importación masiva de terceros desde Excel.
- * Orquesta todo el proceso: parseo, validación, detección de duplicados y persistencia.
+ * Orquesta todo el proceso: parseo, validación, detección de duplicados y
+ * persistencia.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImportThirdService implements ImportThirdUseCase {
 
-  
     private final ExcelParsingService excelParsingService;
     private final BatchValidationService batchValidationService;
     private final DuplicateDetectionService duplicateDetectionService;
@@ -47,9 +52,6 @@ public class ImportThirdService implements ImportThirdUseCase {
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
         String importId = ExcelUtils.generateImportId();
-        
-        log.info("Iniciando importación {} para entidad {} - archivo: {}", 
-                importId, importRequest.getEntId(), importRequest.getFileName());
 
         try {
             // 1. Parsear archivo Excel
@@ -57,7 +59,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                     importRequest.getExcelFile(), importRequest.getEntId());
 
             if (parsingResult.getThirdsData().isEmpty()) {
-                return createFailedResponse(importId, importRequest, 
+                return createFailedResponse(importId, importRequest,
                         "No se encontraron datos válidos para importar", parsingResult.getErrors());
             }
 
@@ -65,10 +67,12 @@ public class ImportThirdService implements ImportThirdUseCase {
             BatchValidationService.BatchValidationResult validationResult = batchValidationService.validateBatch(
                     parsingResult.getThirdsData(), importRequest.getEntId(), parsingResult.getColumnMap());
 
-            // 3. Detección de duplicados - omitir duplicados automáticamente para usabilidad
-            DuplicateDetectionService.DuplicateDetectionResult duplicateResult = duplicateDetectionService.detectDuplicates(
-                    validationResult.getValidRecords(), importRequest.getEntId(), 
-                    true); // skipDuplicates = true (omitir duplicados existentes)
+            // 3. Detección de duplicados - omitir duplicados automáticamente para
+            // usabilidad
+            DuplicateDetectionService.DuplicateDetectionResult duplicateResult = duplicateDetectionService
+                    .detectDuplicates(
+                            validationResult.getValidRecords(), importRequest.getEntId(),
+                            true); // skipDuplicates = true (omitir duplicados existentes)
 
             // Consolidar errores
             List<ImportErrorDetail> allErrors = new ArrayList<>();
@@ -76,52 +80,46 @@ public class ImportThirdService implements ImportThirdUseCase {
             allErrors.addAll(validationResult.getErrors());
             allErrors.addAll(duplicateResult.getErrors());
 
-
             // 5. Procesar importación en lotes si hay registros válidos
             ImportProcessingResult processingResult = new ImportProcessingResult();
             if (!duplicateResult.getUniqueRecords().isEmpty()) {
-                processingResult = processImportInBatches(duplicateResult.getUniqueRecords(), 
+                processingResult = processImportInBatches(duplicateResult.getUniqueRecords(),
                         importRequest, allErrors);
             }
 
             // 4. Calcular duplicados omitidos (detección previa + procesamiento)
             int duplicatesFromDetection = validationResult.getValidCount() - duplicateResult.getUniqueCount();
-            int duplicatesFromProcessing = processingResult.getSkippedCount(); // Duplicados detectados durante el procesamiento
+            int duplicatesFromProcessing = processingResult.getSkippedCount(); // Duplicados detectados durante el
+                                                                               // procesamiento
             int duplicatesSkipped = duplicatesFromDetection + duplicatesFromProcessing;
-            
+
             // 5. Generar respuesta final
-            return createSuccessResponse(importId, importRequest, 
+            return createSuccessResponse(importId, importRequest,
                     parsingResult.getTotalRows(), processingResult, allErrors, duplicatesSkipped);
 
         } catch (Exception e) {
-            log.error("Error durante importación {}: {}", importId, e.getMessage(), e);
-            
+
             List<ImportErrorDetail> systemErrors = List.of(
-                ImportErrorDetail.builder()
-                        .errorCode("SYSTEM_ERROR")
-                        .errorMessage("Error del sistema durante la importación: " + e.getMessage())
-                        .errorType(ImportErrorDetail.ErrorType.SYSTEM_ERROR)
-                        .build()
-            );
-            
+                    ImportErrorDetail.builder()
+                            .errorCode("SYSTEM_ERROR")
+                            .errorMessage("Error del sistema durante la importación: " + e.getMessage())
+                            .errorType(ImportErrorDetail.ErrorType.SYSTEM_ERROR)
+                            .build());
+
             return createFailedResponse(importId, importRequest, e.getMessage(), systemErrors);
         }
     }
 
-
     /**
      * Procesa la importación en lotes para optimizar rendimiento.
      */
-    private ImportProcessingResult processImportInBatches(List<ThirdExcelData> uniqueRecords, 
-                                                        ThirdImportRequest importRequest,
-                                                        List<ImportErrorDetail> errors) {
-        
+    private ImportProcessingResult processImportInBatches(List<ThirdExcelData> uniqueRecords,
+            ThirdImportRequest importRequest,
+            List<ImportErrorDetail> errors) {
+
         // Usar un batch size grande para archivos masivos sin límite específico
         int batchSize = Math.min(uniqueRecords.size(), 1000); // Máximo 1000 por lote
         List<List<ThirdExcelData>> batches = createBatches(uniqueRecords, batchSize);
-        
-        log.info("Procesando {} registros en {} lotes de tamaño {}", 
-                uniqueRecords.size(), batches.size(), batchSize);
 
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
@@ -130,32 +128,25 @@ public class ImportThirdService implements ImportThirdUseCase {
         // Procesar lotes secuencialmente para mantener consistencia transaccional
         for (int i = 0; i < batches.size(); i++) {
             List<ThirdExcelData> batch = batches.get(i);
-            log.debug("Procesando lote {}/{} con {} registros", i + 1, batches.size(), batch.size());
 
             try {
                 // Procesar lote sin continuar en errores
-                BatchProcessingResult batchResult = processBatch(batch, importRequest.getEntId(), 
+                BatchProcessingResult batchResult = processBatch(batch, importRequest.getEntId(),
                         false); // detenerse en errores
-                
+
                 successCount.addAndGet(batchResult.getSuccessCount());
                 failureCount.addAndGet(batchResult.getFailureCount());
                 skippedCount.addAndGet(batchResult.getSkippedCount());
-                
+
                 errors.addAll(batchResult.getErrors());
-                
+
                 // Si hay errores en el lote, detener la importación completa
                 if (batchResult.getFailureCount() > 0) {
-                    log.error("Errores encontrados en lote {}/{}. Deteniendo importación.", i + 1, batches.size());
                     break;
                 }
-                
-                log.debug("Lote {}/{} completado - Éxitos: {}, Fallos: {}, Omitidos: {}", 
-                        i + 1, batches.size(), batchResult.getSuccessCount(), 
-                        batchResult.getFailureCount(), batchResult.getSkippedCount());
 
             } catch (Exception e) {
-                log.error("Error crítico en lote {}/{}: {}", i + 1, batches.size(), e.getMessage(), e);
-                throw new ThirdImportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, 
+                throw new ThirdImportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
                         "Error crítico en lote " + (i + 1) + ": " + e.getMessage(), e);
             }
         }
@@ -174,14 +165,14 @@ public class ImportThirdService implements ImportThirdUseCase {
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
         AtomicInteger skippedCount = new AtomicInteger(0);
-        
+
         List<ImportErrorDetail> batchErrors = new ArrayList<>();
 
         for (ThirdExcelData excelData : batch) {
             try {
                 // Procesar cada registro en su propia transacción para evitar rollback-only
                 ProcessingResult result = processSingleRecord(excelData, entId);
-                
+
                 switch (result.getStatus()) {
                     case SUCCESS:
                         successCount.incrementAndGet();
@@ -202,7 +193,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                         batchErrors.add(createProcessingError(excelData, result.getErrorMessage()));
                         break;
                 }
-                
+
             } catch (Exception e) {
                 if (continueOnError) {
                     failureCount.incrementAndGet();
@@ -227,21 +218,21 @@ public class ImportThirdService implements ImportThirdUseCase {
     private ProcessingResult processSingleRecord(ThirdExcelData excelData, String entId) {
         try {
             Third convertedThird = convertExcelDataToThird(excelData);
-            
+
             if (convertedThird == null) {
                 return ProcessingResult.skipped("Registro omitido por datos incompletos");
             }
-            
+
             // Crear en nueva transacción independiente
             Third createdThird = createThirdInNewTransaction(convertedThird, excelData);
-            
+
             if (createdThird != null) {
                 return ProcessingResult.success();
             } else {
                 // createThirdInNewTransaction retornó null = duplicado detectado
                 return ProcessingResult.duplicateSkipped();
             }
-            
+
         } catch (Exception e) {
             // Otros errores no manejados
             return ProcessingResult.failed(e.getMessage());
@@ -259,16 +250,17 @@ public class ImportThirdService implements ImportThirdUseCase {
             String countryCode = geography[0] != null ? ((Country) geography[0]).getCountryCode() : null;
             String stateCode = geography[1] != null ? ((State) geography[1]).getStateCode() : null;
             String cityCode = geography[2] != null ? ((City) geography[2]).getCityCode() : null;
-            
+
             // Usar el servicio existente de creación
             return createThirdService.createThird(third, countryCode, stateCode, cityCode);
-            
+
         } catch (Exception e) {
             // Si es duplicado, retornar null para manejarlo en el método padre
             if (ValidationUtils.isDuplicateError(e.getMessage())) {
                 return null; // Señal de duplicado
             }
-            // Si es error geográfico, también retornar null (ya debería haberse validado antes)
+            // Si es error geográfico, también retornar null (ya debería haberse validado
+            // antes)
             if (ValidationUtils.isGeographyError(e.getMessage())) {
                 return null; // Error de geografía - ya debería estar en errores de validación
             }
@@ -299,9 +291,14 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .typeId(typeId)
                 .thirdTypes(thirdTypes)
                 .personType(excelData.getPersonType())
-                .names(excelData.getNames() != null ? StringNormalizer.normalizePreservingCase(excelData.getNames()) : null)
-                .lastNames(excelData.getLastNames() != null ? StringNormalizer.normalizePreservingCase(excelData.getLastNames()) : null)
-                .socialReason(excelData.getSocialReason() != null ? StringNormalizer.normalizePreservingCase(excelData.getSocialReason()) : null)
+                .names(excelData.getNames() != null ? StringNormalizer.normalizePreservingCase(excelData.getNames())
+                        : null)
+                .lastNames(excelData.getLastNames() != null
+                        ? StringNormalizer.normalizePreservingCase(excelData.getLastNames())
+                        : null)
+                .socialReason(excelData.getSocialReason() != null
+                        ? StringNormalizer.normalizePreservingCase(excelData.getSocialReason())
+                        : null)
                 .gender(excelData.getGender())
                 .idNumber(excelData.getIdNumber())
                 .verificationNumber(excelData.getVerificationNumber())
@@ -329,9 +326,9 @@ public class ImportThirdService implements ImportThirdUseCase {
         }
 
         // Resolver estado (solo para Colombia por ahora)
-        if (country != null && "COL".equals(country.getCountryCode()) && 
-            excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty()) {
-            
+        if (country != null && "COL".equals(country.getCountryCode()) &&
+                excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty()) {
+
             state = geographyOutputPort.getStatesByCountry("COL").stream()
                     .filter(s -> s.getStateName().equalsIgnoreCase(excelData.getStateName().trim()))
                     .findFirst()
@@ -346,7 +343,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                     .orElse(null);
         }
 
-        return new Object[]{country, state, city};
+        return new Object[] { country, state, city };
     }
 
     /**
@@ -373,7 +370,7 @@ public class ImportThirdService implements ImportThirdUseCase {
         }
 
         List<ThirdType> allTypes = idOutputPort.getALLThirdTypes(entId);
-        
+
         return typeNames.stream()
                 .map(name -> allTypes.stream()
                         .filter(type -> type.getStatus() != null && type.getStatus())
@@ -400,9 +397,9 @@ public class ImportThirdService implements ImportThirdUseCase {
     /**
      * Crea una respuesta de error para importación fallida.
      */
-    private ThirdImportResponse createFailedResponse(String importId, ThirdImportRequest request, 
-                                                   String errorMessage, List<ImportErrorDetail> errors) {
-        
+    private ThirdImportResponse createFailedResponse(String importId, ThirdImportRequest request,
+            String errorMessage, List<ImportErrorDetail> errors) {
+
         return ThirdImportResponse.builder()
                 .importId(importId)
                 .entId(request.getEntId())
@@ -416,14 +413,13 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .build();
     }
 
-
     /**
      * Crea una respuesta de éxito para importación completada.
      */
-    private ThirdImportResponse createSuccessResponse(String importId, ThirdImportRequest request, 
-                                                    int totalRecords, ImportProcessingResult processingResult,
-                                                    List<ImportErrorDetail> errors, int duplicatesSkipped) {
-        
+    private ThirdImportResponse createSuccessResponse(String importId, ThirdImportRequest request,
+            int totalRecords, ImportProcessingResult processingResult,
+            List<ImportErrorDetail> errors, int duplicatesSkipped) {
+
         // Determinar estado simple basado en éxitos y fallos
         ImportStatus status;
         if (processingResult.getFailureCount() == 0 && errors.isEmpty()) {
@@ -436,7 +432,7 @@ public class ImportThirdService implements ImportThirdUseCase {
 
         // Calcular fallos totales: fallos de procesamiento + errores de validación
         int totalFailedImports = processingResult.getFailureCount() + errors.size();
-        
+
         return ThirdImportResponse.builder()
                 .importId(importId)
                 .entId(request.getEntId())
@@ -462,14 +458,13 @@ public class ImportThirdService implements ImportThirdUseCase {
                 .build();
     }
 
-
     /**
      * Clase para encapsular el resultado del procesamiento de importación.
      */
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class ImportProcessingResult {
         private int successCount;
         private int failureCount;
@@ -479,10 +474,10 @@ public class ImportThirdService implements ImportThirdUseCase {
     /**
      * Clase para encapsular el resultado del procesamiento de un lote.
      */
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class BatchProcessingResult {
         private int successCount;
         private int failureCount;
@@ -493,8 +488,8 @@ public class ImportThirdService implements ImportThirdUseCase {
     /**
      * Resultado del procesamiento de un registro individual.
      */
-    @lombok.Data
-    @lombok.AllArgsConstructor
+    @Data
+    @AllArgsConstructor
     private static class ProcessingResult {
         private ProcessingStatus status;
         private String errorMessage;
@@ -515,6 +510,5 @@ public class ImportThirdService implements ImportThirdUseCase {
             return new ProcessingResult(ProcessingStatus.SKIPPED, reason);
         }
     }
-
 
 }

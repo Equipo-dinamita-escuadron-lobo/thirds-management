@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ListThirdTypeService implements ListThirdTypeUseCase {
-    
+
     private final IdOutputPort idOutputPort;
-    
+
     /**
      * Obtiene todos los tipos de terceros para una empresa específica.
      * 
@@ -27,8 +27,8 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
         if (entId == null || entId.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
-        
+
         return idOutputPort.getALLThirdTypes(entId);
     }
-    
+
 }

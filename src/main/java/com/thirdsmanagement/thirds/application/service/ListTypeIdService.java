@@ -27,8 +27,8 @@ public class ListTypeIdService implements ListTypeIdUseCase {
         if (entId == null || entId.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
-        
+
         return idOutputPort.getAllTypeIds(entId);
     }
-    
+
 }
