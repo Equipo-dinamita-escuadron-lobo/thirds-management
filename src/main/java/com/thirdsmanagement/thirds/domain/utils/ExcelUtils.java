@@ -270,17 +270,6 @@ public final class ExcelUtils {
 
     // ===== UTILIDADES DE GENERACIÓN =====
 
-    /**
-     * Genera un ID único para procesos de importación.
-     * 
-     * @return ID único con formato IMP_timestamp_random
-     */
-    public static String generateImportId() {
-        return String.format("%s_%d_%s", 
-                ImportConstants.IMPORT_ID_PREFIX,
-                System.currentTimeMillis(),
-                Integer.toHexString(new Random().nextInt()));
-    }
 
     // ===== MANEJO DE ERRORES =====
 

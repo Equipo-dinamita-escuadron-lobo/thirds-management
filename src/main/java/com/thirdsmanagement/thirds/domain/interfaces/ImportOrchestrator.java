@@ -81,22 +81,12 @@ public interface ImportOrchestrator<TRequest, TResponse, TData> {
     /**
      * Crea la respuesta final con estadísticas y errores.
      * 
-     * @param importId identificador único de la importación
      * @param request solicitud original
      * @param processingResult resultado del procesamiento
      * @param allErrors todos los errores acumulados
      * @param status estado final de la importación
      * @return respuesta estructurada
      */
-    TResponse createResponse(String importId, TRequest request, ImportProcessingResult<TData> processingResult,
+    TResponse createResponse(TRequest request, ImportProcessingResult<TData> processingResult,
                            List<ImportErrorDetail> allErrors, ImportStatus status);
-
-    /**
-     * Genera un identificador único para la importación.
-     * 
-     * @return identificador único
-     */
-    default String generateImportId() {
-        return com.thirdsmanagement.thirds.domain.utils.ExcelUtils.generateImportId();
-    }
 }

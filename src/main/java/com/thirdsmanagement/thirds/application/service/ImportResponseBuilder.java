@@ -23,21 +23,19 @@ public class ImportResponseBuilder {
     /**
      * Construye respuesta de importación exitosa o parcialmente exitosa.
      */
-    public ThirdImportResponse buildSuccessResponse(String importId,
-            ThirdImportRequest request,
+    public ThirdImportResponse buildSuccessResponse(ThirdImportRequest request,
             ImportMetrics metrics,
             List<ImportErrorDetail> allErrors) {
 
         ImportStatus status = determineImportStatus(metrics, allErrors);
 
         return ThirdImportResponse.builder()
-                .importId(importId)
                 .entId(request.getEntId())
                 .fileName(request.getFileName())
                 .status(status)
                 .totalRecords(metrics.getTotalRecords())
                 .successfulImports(metrics.getSuccessCount())
-                .failedImports(calculateTotalFailures(metrics, allErrors))
+                .failedImports(metrics.getFailureCount())
                 .duplicatesSkipped(metrics.getDuplicatesSkipped())
                 .errors(allErrors)
                 .build();
@@ -46,14 +44,11 @@ public class ImportResponseBuilder {
     /**
      * Construye respuesta de importación fallida.
      */
-    public ThirdImportResponse buildFailedResponse(String importId,
-            ThirdImportRequest request,
+    public ThirdImportResponse buildFailedResponse(ThirdImportRequest request,
             String errorMessage,
             List<ImportErrorDetail> errors) {
 
-
         return ThirdImportResponse.builder()
-                .importId(importId)
                 .entId(request.getEntId())
                 .fileName(request.getFileName())
                 .status(ImportStatus.FAILED)
@@ -82,13 +77,6 @@ public class ImportResponseBuilder {
         }
     }
 
-    /**
-     * Calcula el total de fallos incluyendo errores de validación y procesamiento.
-     */
-    private int calculateTotalFailures(ImportMetrics metrics, List<ImportErrorDetail> allErrors) {
-        // Fallos de procesamiento + errores de validación/parseo
-        return metrics.getFailureCount() + allErrors.size();
-    }
 
     /**
      * Clase para encapsular métricas de importación.

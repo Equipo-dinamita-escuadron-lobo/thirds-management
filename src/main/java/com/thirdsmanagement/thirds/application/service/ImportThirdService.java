@@ -5,7 +5,6 @@ import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
-import com.thirdsmanagement.thirds.domain.utils.ExcelUtils;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
@@ -44,14 +43,12 @@ public class ImportThirdService implements ImportThirdUseCase {
      */
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
-        String importId = ExcelUtils.generateImportId();
-
         try {
             // 1. PARSEO: Extraer datos del Excel
             ExcelParsingService.ExcelParsingResult parsingResult = parseExcelFile(importRequest);
 
             if (parsingResult.getThirdsData().isEmpty()) {
-                return responseBuilder.buildFailedResponse(importId, importRequest,
+                return responseBuilder.buildFailedResponse(importRequest,
                         "No se encontraron datos válidos para importar", parsingResult.getErrors());
             }
 
@@ -66,11 +63,11 @@ public class ImportThirdService implements ImportThirdUseCase {
             BatchProcessingResult processingResult = processInBatches(duplicateResult.getUniqueRecords());
 
             // 5. RESPUESTA: Construir respuesta final consolidada
-            return buildFinalResponse(importId, importRequest, parsingResult, validationResult,
+            return buildFinalResponse(importRequest, parsingResult, validationResult,
                     duplicateResult, processingResult);
 
         } catch (Exception e) {
-            return handleCriticalError(importId, importRequest, e);
+            return handleCriticalError(importRequest, e);
         }
     }
 
@@ -153,8 +150,7 @@ public class ImportThirdService implements ImportThirdUseCase {
     /**
      * Paso 5: Construir respuesta final consolidada.
      */
-    private ThirdImportResponse buildFinalResponse(String importId,
-            ThirdImportRequest importRequest,
+    private ThirdImportResponse buildFinalResponse(ThirdImportRequest importRequest,
             ExcelParsingService.ExcelParsingResult parsingResult,
             BatchValidationService.BatchValidationResult validationResult,
             DuplicateDetectionService.DuplicateDetectionResult duplicateResult,
@@ -178,13 +174,13 @@ public class ImportThirdService implements ImportThirdUseCase {
                 processingResult.getFailureCount(),
                 totalDuplicatesSkipped);
 
-        return responseBuilder.buildSuccessResponse(importId, importRequest, metrics, allErrors);
+        return responseBuilder.buildSuccessResponse(importRequest, metrics, allErrors);
     }
 
     /**
      * Maneja errores críticos del sistema.
      */
-    private ThirdImportResponse handleCriticalError(String importId, ThirdImportRequest importRequest, Exception e) {
+    private ThirdImportResponse handleCriticalError(ThirdImportRequest importRequest, Exception e) {
         List<ImportErrorDetail> systemErrors = List.of(
                 ImportErrorDetail.builder()
                         .errorCode("SYSTEM_ERROR")
@@ -192,7 +188,7 @@ public class ImportThirdService implements ImportThirdUseCase {
                         .errorType(ImportErrorType.SYSTEM_ERROR)
                         .build());
 
-        return responseBuilder.buildFailedResponse(importId, importRequest, e.getMessage(), systemErrors);
+        return responseBuilder.buildFailedResponse(importRequest, e.getMessage(), systemErrors);
     }
 
     /**

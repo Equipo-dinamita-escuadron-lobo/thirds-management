@@ -19,11 +19,6 @@ import java.util.List;
 public class ThirdImportResponse {
 
     /**
-     * Identificador único del proceso de importación.
-     */
-    private String importId;
-
-    /**
      * Identificador de la entidad.
      */
     private String entId;

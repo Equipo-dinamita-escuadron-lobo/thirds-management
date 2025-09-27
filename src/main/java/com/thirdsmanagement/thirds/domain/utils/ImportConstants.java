@@ -65,10 +65,6 @@ public final class ImportConstants {
 
     // ===== CONFIGURACIÓN DE PROCESAMIENTO =====
     
-    /**
-     * Prefijo para generar IDs únicos de importación.
-     */
-    public static final String IMPORT_ID_PREFIX = "IMP";
     
     /**
      * Tamaño de lote por defecto para procesamiento.
