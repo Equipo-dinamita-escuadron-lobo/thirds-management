@@ -167,11 +167,16 @@ public class ImportThirdService implements ImportThirdUseCase {
         int duplicatesFromProcessing = processingResult.getSkippedCount();
         int totalDuplicatesSkipped = duplicatesFromDetection + duplicatesFromProcessing;
 
+        // Calcular fallos totales: registros únicos con errores de validación + errores de procesamiento
+        int validationFailures = calculateUniqueFailedRecords(validationResult.getErrors());
+        int processingFailures = processingResult.getFailureCount();
+        int totalFailures = validationFailures + processingFailures;
+
         // Crear métricas consolidadas
         ImportResponseBuilder.ImportMetrics metrics = new ImportResponseBuilder.ImportMetrics(
                 parsingResult.getTotalRows(),
                 processingResult.getSuccessCount(),
-                processingResult.getFailureCount(),
+                totalFailures,
                 totalDuplicatesSkipped);
 
         return responseBuilder.buildSuccessResponse(importRequest, metrics, allErrors);
@@ -203,7 +208,18 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Resultado simplificado del procesamiento en lotes.
+     * Calcula el número de registros únicos que tienen errores de validación.
+     * Un registro puede tener múltiples errores, pero solo cuenta como 1 fallo.
+     */
+    private int calculateUniqueFailedRecords(List<ImportErrorDetail> errors) {
+        return (int) errors.stream()
+                .mapToInt(ImportErrorDetail::getRowNumber)
+                .distinct()
+                .count();
+    }
+
+    /**
+     * Clase interna para resultado de procesamiento en lotes.
      */
     @Getter
     @AllArgsConstructor
