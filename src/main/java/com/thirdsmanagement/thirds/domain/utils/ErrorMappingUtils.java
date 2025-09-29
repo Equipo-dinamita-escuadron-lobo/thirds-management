@@ -1,8 +1,8 @@
 package com.thirdsmanagement.thirds.domain.utils;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
+import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import java.util.Map;
 

@@ -1,10 +1,10 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
+import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

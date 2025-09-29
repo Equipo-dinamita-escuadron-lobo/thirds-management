@@ -4,9 +4,9 @@ import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
+import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
 
 import lombok.AllArgsConstructor;

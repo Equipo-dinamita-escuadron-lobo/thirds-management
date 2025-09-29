@@ -5,10 +5,10 @@ import com.thirdsmanagement.thirds.domain.model.ePersonType;
 import com.thirdsmanagement.thirds.domain.model.eThirdGender;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
+import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

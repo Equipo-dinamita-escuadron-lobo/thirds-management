@@ -1,6 +1,8 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
+import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

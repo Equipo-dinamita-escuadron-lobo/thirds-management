@@ -7,7 +7,6 @@ import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ImportErrorDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
+package com.thirdsmanagement.thirds.domain.model;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import lombok.AllArgsConstructor;
