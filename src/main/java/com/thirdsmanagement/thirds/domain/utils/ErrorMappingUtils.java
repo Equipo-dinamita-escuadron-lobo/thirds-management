@@ -194,6 +194,21 @@ public final class ErrorMappingUtils {
                 .build();
     }
 
+    /**
+     * Crea un error de ciudad faltante cuando se especifica departamento.
+     * 
+     * @param rowNumber  número de fila
+     * @param columnMap  mapa de columnas
+     * @return error de ciudad faltante
+     */
+    public static ImportErrorDetail createMissingCityError(int rowNumber, Map<String, Integer> columnMap) {
+        return createError(rowNumber, "Ciudad", null,
+                ImportConstants.ErrorCodes.MISSING_CITY_FOR_COMPLETE_ADDRESS,
+                "La ciudad es obligatoria cuando se especifica departamento",
+                ImportErrorType.VALIDATION_ERROR,
+                columnMap);
+    }
+
     // ===== GENERACIÓN DE CÓDIGOS DE ERROR =====
 
     /**

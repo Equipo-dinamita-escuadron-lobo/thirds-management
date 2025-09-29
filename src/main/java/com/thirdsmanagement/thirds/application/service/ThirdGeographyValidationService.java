@@ -27,74 +27,101 @@ public class ThirdGeographyValidationService {
 
     /**
      * Valida y obtiene la información geográfica completa basada en los códigos
-     * proporcionados.
+     * proporcionados. Permite geografía parcial cuando los códigos son null.
      * 
-     * @param countryCode código del país
-     * @param stateCode   código del estado/departamento
-     * @param cityCode    código de la ciudad
-     * @return array con [Country, State, City] validados
+     * @param countryCode código del país (puede ser null)
+     * @param stateCode   código del estado/departamento (puede ser null)
+     * @param cityCode    código de la ciudad (puede ser null)
+     * @return array con [Country, State, City] validados (algunos pueden ser null)
      * @throws CountryNotFoundException      si el país no existe
      * @throws StateNotFoundException        si el estado no existe
      * @throws GeographyInvalidDataException si la jerarquía es inválida
      */
     public Object[] validateAndGetGeography(String countryCode, String stateCode, String cityCode) {
 
-        // Validar que se proporcionen todos los códigos requeridos
-        if (countryCode == null || countryCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código del país es obligatorio");
+        Country country = null;
+        State state = null;
+        City city = null;
+
+        // Validar país si se proporciona
+        if (countryCode != null && !countryCode.trim().isEmpty()) {
+            if (!geographyOutputPort.existsActiveCountry(countryCode.trim().toUpperCase())) {
+                throw new CountryNotFoundException(countryCode);
+            }
+            
+            // Obtener país
+            List<Country> countries = geographyOutputPort.getAllActiveCountries();
+            country = countries.stream()
+                    .filter(c -> c.getCountryCode().equals(countryCode.trim().toUpperCase()))
+                    .findFirst()
+                    .orElseThrow(() -> new CountryNotFoundException(countryCode));
         }
 
-        if (stateCode == null || stateCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código del estado/departamento es obligatorio");
+        // Validar estado si se proporciona
+        if (stateCode != null && !stateCode.trim().isEmpty()) {
+            if (countryCode == null || countryCode.trim().isEmpty()) {
+                throw new GeographyInvalidDataException("El código del país es obligatorio cuando se especifica estado");
+            }
+            
+            if (!geographyOutputPort.existsActiveState(stateCode.trim(), countryCode.trim().toUpperCase())) {
+                throw new StateNotFoundException(stateCode);
+            }
+            
+            // Obtener estado
+            List<State> states = geographyOutputPort.getStatesByCountry(countryCode.trim().toUpperCase());
+            state = states.stream()
+                    .filter(s -> s.getStateCode().equals(stateCode.trim()))
+                    .findFirst()
+                    .orElseThrow(() -> new StateNotFoundException(stateCode, countryCode));
         }
 
-        if (cityCode == null || cityCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código de la ciudad es obligatorio");
-        }
-
-        // Validar país
-        if (!geographyOutputPort.existsActiveCountry(countryCode.trim().toUpperCase())) {
-            throw new CountryNotFoundException(countryCode);
-        }
-
-        // Validar estado/departamento
-        if (!geographyOutputPort.existsActiveState(stateCode.trim(), countryCode.trim().toUpperCase())) {
-            throw new StateNotFoundException(stateCode);
-        }
-
-        // Validar ciudad
-        if (!geographyOutputPort.existsActiveCity(cityCode.trim(), stateCode.trim(),
-                countryCode.trim().toUpperCase())) {
-            throw new GeographyInvalidDataException(
-                    String.format("La ciudad con código '%s' no existe en el estado '%s' del país '%s'",
-                            cityCode, stateCode, countryCode));
-        }
-
-        // Obtener las entidades geográficas
-        List<Country> countries = geographyOutputPort.getAllActiveCountries();
-        Country country = countries.stream()
-                .filter(c -> c.getCountryCode().equals(countryCode.trim().toUpperCase()))
-                .findFirst()
-                .orElseThrow(() -> new CountryNotFoundException(countryCode));
-
-        List<State> states = geographyOutputPort.getStatesByCountry(countryCode.trim().toUpperCase());
-        State state = states.stream()
-                .filter(s -> s.getStateCode().equals(stateCode.trim()))
-                .findFirst()
-                .orElseThrow(() -> new StateNotFoundException(stateCode, countryCode));
-
-        List<City> cities = geographyOutputPort.getCitiesByState(stateCode.trim(), countryCode.trim().toUpperCase());
-        City city = cities.stream()
-                .filter(c -> c.getCityCode().equals(cityCode.trim()))
-                .findFirst()
-                .orElseThrow(() -> new GeographyInvalidDataException(
+        // Validar ciudad si se proporciona
+        if (cityCode != null && !cityCode.trim().isEmpty()) {
+            if (stateCode == null || stateCode.trim().isEmpty()) {
+                throw new GeographyInvalidDataException("El código del estado es obligatorio cuando se especifica ciudad");
+            }
+            
+            if (countryCode == null || countryCode.trim().isEmpty()) {
+                throw new GeographyInvalidDataException("El código del país es obligatorio cuando se especifica ciudad");
+            }
+            
+            if (!geographyOutputPort.existsActiveCity(cityCode.trim(), stateCode.trim(), countryCode.trim().toUpperCase())) {
+                throw new GeographyInvalidDataException(
                         String.format("La ciudad con código '%s' no existe en el estado '%s' del país '%s'",
-                                cityCode, stateCode, countryCode)));
+                                cityCode, stateCode, countryCode));
+            }
+            
+            // Obtener ciudad
+            List<City> cities = geographyOutputPort.getCitiesByState(stateCode.trim(), countryCode.trim().toUpperCase());
+            city = cities.stream()
+                    .filter(c -> c.getCityCode().equals(cityCode.trim()))
+                    .findFirst()
+                    .orElseThrow(() -> new GeographyInvalidDataException(
+                            String.format("La ciudad con código '%s' no existe en el estado '%s' del país '%s'",
+                                    cityCode, stateCode, countryCode)));
+        }
 
-        // Validar jerarquía
-        validateGeographyHierarchy(country, state, city);
+        // Validar jerarquía solo si hay elementos para validar
+        if (country != null && state != null) {
+            validateCountryStateHierarchy(country, state);
+        }
+        
+        if (country != null && state != null && city != null) {
+            validateGeographyHierarchy(country, state, city);
+        }
 
         return new Object[] { country, state, city };
+    }
+
+    /**
+     * Valida que el estado pertenezca al país.
+     */
+    private void validateCountryStateHierarchy(Country country, State state) {
+        if (!country.getCountryCode().equals(state.getCountryCode())) {
+            throw new GeographyInvalidDataException(
+                    String.format("El estado '%s' no pertenece al país '%s'",
+                            state.getStateName(), country.getCountryName()));
+        }
     }
 
     /**

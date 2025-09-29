@@ -109,6 +109,7 @@ public final class ImportConstants {
         public static final String DUPLICATE_RECORD = "DUPLICATE_RECORD";
         public static final String MISSING_COUNTRY_FOR_GEOGRAPHY = "MISSING_COUNTRY_FOR_GEOGRAPHY";
         public static final String MISSING_STATE_FOR_CITY = "MISSING_STATE_FOR_CITY";
+        public static final String MISSING_CITY_FOR_COMPLETE_ADDRESS = "MISSING_CITY_FOR_COMPLETE_ADDRESS";
         public static final String SYSTEM_ERROR = "SYSTEM_ERROR";
         
         private ErrorCodes() {}

@@ -267,6 +267,11 @@ public class BatchValidationService {
             return;
         }
 
+        if (hasState && !hasCity) {
+            errors.add(ErrorMappingUtils.createMissingCityError(excelData.getRowNumber(), columnMap));
+            return;
+        }
+
         // Validar existencia usando encapsulación
         if (hasCountry && !cache.hasCountry(excelData.getCountryName())) {
             errors.add(ErrorMappingUtils.createInvalidReferenceError(

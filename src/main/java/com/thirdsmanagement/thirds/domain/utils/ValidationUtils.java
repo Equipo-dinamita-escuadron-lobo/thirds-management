@@ -13,7 +13,6 @@ public final class ValidationUtils {
         // Clase utilitaria - constructor privado
     }
 
-    // Patrones compilados para mejor rendimiento
     private static final Pattern EMAIL_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.EMAIL_PATTERN);
     private static final Pattern PHONE_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.PHONE_PATTERN);
     private static final Pattern NIT_START_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.NIT_START_PATTERN);

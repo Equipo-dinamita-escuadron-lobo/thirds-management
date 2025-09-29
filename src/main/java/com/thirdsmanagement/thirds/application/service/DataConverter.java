@@ -123,6 +123,10 @@ public class DataConverter {
                     cityCode = city.getCityCode();
                 }
             }
+        } else if (stateCode != null) {
+            // Si hay departamento pero no ciudad, mantener cityCode como null
+            // para que la validación en BatchValidationService pueda detectar el error
+            cityCode = null;
         }
 
         return new GeographyData(countryCode, stateCode, cityCode);
