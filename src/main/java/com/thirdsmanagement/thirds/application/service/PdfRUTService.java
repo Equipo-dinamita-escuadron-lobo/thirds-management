@@ -7,11 +7,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 
-import com.thirdsmanagement.thirds.application.ports.input.PdfRUTContent;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFormatException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFileTypeException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 
 @Service
 public class PdfRUTService {
