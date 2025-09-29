@@ -75,4 +75,15 @@ public class ThirdPersonTypeValidationException extends BaseBusinessException {
             "Use únicamente razón social."
         );
     }
+
+    /**
+     * Constructor específico para persona jurídica con campo específico no permitido.
+     * @param fieldName nombre del campo específico que no está permitido
+     * @return nueva instancia de la excepción
+     */
+    public static ThirdPersonTypeValidationException forLegalEntityWithForbiddenField(String fieldName) {
+        return new ThirdPersonTypeValidationException(
+            String.format("Para personas jurídicas no se permite el campo %s. Use únicamente razón social.", fieldName)
+        );
+    }
 }

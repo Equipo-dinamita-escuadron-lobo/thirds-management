@@ -47,8 +47,14 @@ public class ThirdValidationService {
             }
 
             // Para persona jurídica: nombres, apellidos y género NO deben estar presentes
-            if (hasNames || hasLastNames || hasGender) {
-                throw ThirdPersonTypeValidationException.forLegalEntityWithForbiddenFields();
+            if (hasNames) {
+                throw ThirdPersonTypeValidationException.forLegalEntityWithForbiddenField("nombres");
+            }
+            if (hasLastNames) {
+                throw ThirdPersonTypeValidationException.forLegalEntityWithForbiddenField("apellidos");
+            }
+            if (hasGender) {
+                throw ThirdPersonTypeValidationException.forLegalEntityWithForbiddenField("género");
             }
         }
     }

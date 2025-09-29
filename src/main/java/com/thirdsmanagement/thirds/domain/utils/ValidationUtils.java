@@ -15,7 +15,8 @@ public final class ValidationUtils {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.EMAIL_PATTERN);
     private static final Pattern PHONE_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.PHONE_PATTERN);
-    private static final Pattern NIT_START_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.NIT_START_PATTERN);
+    private static final Pattern NIT_START_PATTERN = Pattern
+            .compile(ImportConstants.ValidationPatterns.NIT_START_PATTERN);
 
     // ===== VALIDACIONES DE FORMATO =====
 
@@ -44,8 +45,8 @@ public final class ValidationUtils {
             return false;
         }
         String cleanPhone = phone.trim();
-        return cleanPhone.length() >= 7 && cleanPhone.length() <= 15 && 
-               PHONE_PATTERN.matcher(cleanPhone).matches();
+        return cleanPhone.length() >= 7 && cleanPhone.length() <= 15 &&
+                PHONE_PATTERN.matcher(cleanPhone).matches();
     }
 
     /**
@@ -77,7 +78,7 @@ public final class ValidationUtils {
     /**
      * Verifica si una cadena tiene una longitud específica.
      * 
-     * @param value la cadena a verificar
+     * @param value          la cadena a verificar
      * @param expectedLength la longitud esperada
      * @return true si la longitud coincide, false en caso contrario
      */
@@ -88,7 +89,7 @@ public final class ValidationUtils {
     /**
      * Verifica si una cadena está dentro de un rango de longitud.
      * 
-     * @param value la cadena a verificar
+     * @param value     la cadena a verificar
      * @param minLength longitud mínima (inclusiva)
      * @param maxLength longitud máxima (inclusiva)
      * @return true si está en el rango, false en caso contrario
@@ -113,13 +114,13 @@ public final class ValidationUtils {
         if (errorMessage == null) {
             return false;
         }
-        
+
         String lowerMessage = errorMessage.toLowerCase();
-        return lowerMessage.contains("ya existe") || 
-               lowerMessage.contains("duplicate") || 
-               lowerMessage.contains("duplicado") ||
-               lowerMessage.contains("unique constraint") ||
-               (lowerMessage.contains("número de identificación") && lowerMessage.contains("existe"));
+        return lowerMessage.contains("ya existe") ||
+                lowerMessage.contains("duplicate") ||
+                lowerMessage.contains("duplicado") ||
+                lowerMessage.contains("unique constraint") ||
+                (lowerMessage.contains("número de identificación") && lowerMessage.contains("existe"));
     }
 
     /**
@@ -132,24 +133,23 @@ public final class ValidationUtils {
         if (errorMessage == null) {
             return false;
         }
-        
+
         String lowerMessage = errorMessage.toLowerCase();
-        return lowerMessage.contains("código del país") || 
-               lowerMessage.contains("código del estado") ||
-               lowerMessage.contains("código de la ciudad") ||
-               lowerMessage.contains("código del departamento") ||
-               (lowerMessage.contains("obligatorio") && (
-                   lowerMessage.contains("país") || 
-                   lowerMessage.contains("estado") || 
-                   lowerMessage.contains("ciudad") ||
-                   lowerMessage.contains("departamento")
-               ));
+        return lowerMessage.contains("código del país") ||
+                lowerMessage.contains("código del estado") ||
+                lowerMessage.contains("código de la ciudad") ||
+                lowerMessage.contains("código del departamento") ||
+                (lowerMessage.contains("obligatorio") && (lowerMessage.contains("país") ||
+                        lowerMessage.contains("estado") ||
+                        lowerMessage.contains("ciudad") ||
+                        lowerMessage.contains("departamento")));
     }
 
     // ===== VALIDACIONES DE NEGOCIO =====
 
     /**
-     * Detecta el campo específico basado en un mensaje de error de regla de negocio.
+     * Detecta el campo específico basado en un mensaje de error de regla de
+     * negocio.
      * 
      * @param errorMessage el mensaje de error a analizar
      * @return el nombre del campo detectado o un valor genérico
@@ -158,21 +158,33 @@ public final class ValidationUtils {
         if (errorMessage == null) {
             return "Reglas Negocio";
         }
-        
+
         String lowerMessage = errorMessage.toLowerCase();
+
+        // Casos específicos primero (más específicos)
         if (lowerMessage.contains("nit")) {
             return "Número Identificación";
-        } else if (lowerMessage.contains("tipo de persona") || 
-                   lowerMessage.contains("persona natural") || 
-                   lowerMessage.contains("persona jurídica")) {
-            return "Tipo Persona";
-        } else if (lowerMessage.contains("tipo de identificación") || 
-                   lowerMessage.contains("identificación")) {
-            return "Tipo Identificación";
-        } else if (lowerMessage.contains("nombre")) {
+        } else if (lowerMessage.contains("no se permite el campo género")) {
+            return "Género";
+        } else if (lowerMessage.contains("no se permite el campo apellidos")) {
+            return "Apellidos";
+        } else if (lowerMessage.contains("no se permite el campo nombres")) {
             return "Nombres";
+        } else if (lowerMessage.contains("género")) {
+            return "Género";
+        } else if (lowerMessage.contains("apellidos")) {
+            return "Apellidos";
         } else if (lowerMessage.contains("razón social")) {
             return "Razón Social";
+        } else if (lowerMessage.contains("nombres")) {
+            return "Nombres";
+        } else if (lowerMessage.contains("tipo de persona") ||
+                lowerMessage.contains("persona natural") ||
+                lowerMessage.contains("persona jurídica")) {
+            return "Tipo Persona";
+        } else if (lowerMessage.contains("tipo de identificación") ||
+                lowerMessage.contains("identificación")) {
+            return "Tipo Identificación";
         } else {
             return "Reglas Negocio";
         }
