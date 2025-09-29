@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ErrorResponse;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
