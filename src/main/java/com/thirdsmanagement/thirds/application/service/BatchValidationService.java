@@ -3,7 +3,6 @@ package com.thirdsmanagement.thirds.application.service;
 import com.thirdsmanagement.thirds.application.ports.output.GeographyOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.*;
-import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
@@ -161,7 +160,30 @@ public class BatchValidationService {
      */
     private void validateBasicFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
-        // Validar campos requeridos usando métodos utilitarios
+        // Validar campos básicos comunes
+        validateCommonRequiredFields(excelData, errors, columnMap);
+        
+        // Validar campos específicos por tipo de persona
+        if (excelData.getPersonType() != null) {
+            if (excelData.getPersonType().isNatural()) {
+                validateNaturalPersonFields(excelData, errors, columnMap);
+            } else if (excelData.getPersonType().isJuridica()) {
+                validateLegalEntityFields(excelData, errors, columnMap);
+            }
+        }
+        
+        // Validar geografía completa obligatoria
+        validateCompleteGeographyRequired(excelData, errors, columnMap);
+
+        // Validar formatos usando ValidationUtils centralizado
+        validateFieldFormats(excelData, errors, columnMap);
+    }
+
+    /**
+     * Valida campos requeridos comunes para todos los tipos de persona.
+     */
+    private void validateCommonRequiredFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
         if (!ValidationUtils.hasContent(excelData.getTypeIdName())) {
             errors.add(ErrorMappingUtils.createRequiredFieldError(
                     excelData.getRowNumber(), "Tipo Identificación", columnMap));
@@ -177,7 +199,7 @@ public class BatchValidationService {
                     excelData.getRowNumber(), "Tipo Persona", columnMap));
         }
 
-        // Validar campos de contacto requeridos
+        // Campos de contacto requeridos para todos
         if (!ValidationUtils.hasContent(excelData.getAddress())) {
             errors.add(ErrorMappingUtils.createRequiredFieldError(
                     excelData.getRowNumber(), "Dirección", columnMap));
@@ -193,7 +215,71 @@ public class BatchValidationService {
                     excelData.getRowNumber(), "Email", columnMap));
         }
 
-        // Validar formatos usando ValidationUtils centralizado
+       
+        if (excelData.getThirdTypesNames() == null || excelData.getThirdTypesNames().isEmpty()) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Tipos de Tercero", columnMap));
+        }
+    }
+
+    /**
+     * Valida campos específicos requeridos para personas naturales.
+     */
+    private void validateNaturalPersonFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
+        if (!ValidationUtils.hasContent(excelData.getNames())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Nombres", columnMap));
+        }
+
+        if (!ValidationUtils.hasContent(excelData.getLastNames())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Apellidos", columnMap));
+        }
+
+        if (excelData.getGender() == null) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Género", columnMap));
+        }
+    }
+
+    /**
+     * Valida campos específicos requeridos para personas jurídicas.
+     */
+    private void validateLegalEntityFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
+        if (!ValidationUtils.hasContent(excelData.getSocialReason())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Razón Social", columnMap));
+        }
+    }
+
+    /**
+     * Valida que la geografía completa sea obligatoria (país, departamento, ciudad).
+     */
+    private void validateCompleteGeographyRequired(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
+        if (!ValidationUtils.hasContent(excelData.getCountryName())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "País", columnMap));
+        }
+
+        if (!ValidationUtils.hasContent(excelData.getStateName())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Departamento", columnMap));
+        }
+
+        if (!ValidationUtils.hasContent(excelData.getCityName())) {
+            errors.add(ErrorMappingUtils.createRequiredFieldError(
+                    excelData.getRowNumber(), "Ciudad", columnMap));
+        }
+    }
+
+    /**
+     * Valida formatos de campos.
+     */
+    private void validateFieldFormats(ThirdExcelData excelData, List<ImportErrorDetail> errors,
+            Map<String, Integer> columnMap) {
         if (ValidationUtils.hasContent(excelData.getEmail()) && !ValidationUtils.isValidEmail(excelData.getEmail())) {
             errors.add(ErrorMappingUtils.createInvalidEmailError(
                     excelData.getRowNumber(), excelData.getEmail(), columnMap));
@@ -242,7 +328,8 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida datos geográficos con completitud y existencia.
+     * Valida datos geográficos - jerarquía y existencia.
+     * La completitud ya se valida en validateCompleteGeographyRequired().
      */
     private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -250,29 +337,8 @@ public class BatchValidationService {
         boolean hasState = ValidationUtils.hasContent(excelData.getStateName());
         boolean hasCity = ValidationUtils.hasContent(excelData.getCityName());
 
-        // Validar completitud geográfica
-        if ((hasState || hasCity) && !hasCountry) {
-            errors.add(ErrorMappingUtils.createError(excelData.getRowNumber(), "País", null,
-                    ImportConstants.ErrorCodes.MISSING_COUNTRY_FOR_GEOGRAPHY,
-                    "El país es obligatorio cuando se especifica departamento o ciudad",
-                    ImportErrorType.VALIDATION_ERROR, columnMap));
-            return;
-        }
-
-        if (hasCity && !hasState) {
-            errors.add(ErrorMappingUtils.createError(excelData.getRowNumber(), "Departamento", null,
-                    ImportConstants.ErrorCodes.MISSING_STATE_FOR_CITY,
-                    "El departamento es obligatorio cuando se especifica ciudad",
-                    ImportErrorType.VALIDATION_ERROR, columnMap));
-            return;
-        }
-
-        if (hasState && !hasCity) {
-            errors.add(ErrorMappingUtils.createMissingCityError(excelData.getRowNumber(), columnMap));
-            return;
-        }
-
-        // Validar existencia usando encapsulación
+        // Solo validar existencia si los campos están presentes
+        
         if (hasCountry && !cache.hasCountry(excelData.getCountryName())) {
             errors.add(ErrorMappingUtils.createInvalidReferenceError(
                     excelData.getRowNumber(),

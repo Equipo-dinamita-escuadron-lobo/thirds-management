@@ -80,7 +80,7 @@ public final class ErrorMappingUtils {
      */
     public static ImportErrorDetail createInvalidEmailError(int rowNumber, String emailValue,
             Map<String, Integer> columnMap) {
-        return createError(rowNumber, ImportConstants.OptionalHeaders.EMAIL, emailValue,
+        return createError(rowNumber, ImportConstants.EMAIL_COLUMN, emailValue,
                 ImportConstants.ErrorCodes.INVALID_EMAIL_FORMAT,
                 "El formato del correo electrónico no es válido",
                 ImportErrorType.FORMAT_ERROR,
@@ -97,7 +97,7 @@ public final class ErrorMappingUtils {
      */
     public static ImportErrorDetail createInvalidPhoneError(int rowNumber, String phoneValue,
             Map<String, Integer> columnMap) {
-        return createError(rowNumber, ImportConstants.OptionalHeaders.PHONE, phoneValue,
+        return createError(rowNumber, ImportConstants.PHONE_COLUMN, phoneValue,
                 ImportConstants.ErrorCodes.INVALID_PHONE_FORMAT,
                 "El formato del número de teléfono no es válido",
                 ImportErrorType.FORMAT_ERROR,

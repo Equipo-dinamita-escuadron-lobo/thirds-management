@@ -31,9 +31,10 @@ public final class ImportConstants {
     // ===== ENCABEZADOS DE EXCEL =====
     
     /**
-     * Encabezados básicos requeridos en orden fijo para importación de terceros.
+     * Encabezados requeridos para importación de terceros.
+     * Todos los campos son obligatorios según el tipo de persona.
      */
-    public static final String[] BASIC_REQUIRED_HEADERS = {
+    public static final String[] REQUIRED_HEADERS = {
         "Tipo Identificación", 
         "Número Identificación", 
         "Dígito Verificación", 
@@ -43,25 +44,29 @@ public final class ImportConstants {
         "Razón Social", 
         "Género", 
         "Estado",
+        "Tipos de Tercero",
+        "País",
+        "Departamento",
+        "Ciudad",
         "Dirección",
         "Teléfono",
         "Email"
     };
     
+    
+    // ===== NOMBRES DE COLUMNAS =====
+    
     /**
-     * Encabezados opcionales que pueden aparecer en el Excel.
+     * Nombres de columnas para mapeo directo.
      */
-    public static final class OptionalHeaders {
-        public static final String TYPES = "Tipos de Tercero";
-        public static final String COUNTRY = "País";
-        public static final String STATE = "Departamento";  
-        public static final String CITY = "Ciudad";
-        public static final String ADDRESS = "Dirección";
-        public static final String PHONE = "Teléfono";
-        public static final String EMAIL = "Email";
-        
-        private OptionalHeaders() {}
-    }
+    public static final String TYPES_COLUMN = "Tipos de Tercero";
+    public static final String COUNTRY_COLUMN = "País";
+    public static final String STATE_COLUMN = "Departamento";  
+    public static final String CITY_COLUMN = "Ciudad";
+    public static final String ADDRESS_COLUMN = "Dirección";
+    public static final String PHONE_COLUMN = "Teléfono";
+    public static final String EMAIL_COLUMN = "Email";
+    
 
     // ===== CONFIGURACIÓN DE PROCESAMIENTO =====
     

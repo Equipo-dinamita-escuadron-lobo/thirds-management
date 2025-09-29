@@ -153,7 +153,7 @@ public class ExcelParsingService {
         }
 
         // Validar que existan los encabezados básicos requeridos
-        for (String requiredHeader : ImportConstants.BASIC_REQUIRED_HEADERS) {
+        for (String requiredHeader : ImportConstants.REQUIRED_HEADERS) {
             if (!foundHeaders.contains(requiredHeader)) {
                 errors.add(ImportErrorDetail.builder()
                         .rowNumber(1)
@@ -226,12 +226,12 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos opcionales de una fila (solo si están presentes).
+     * Parsea los campos adicionales de una fila.
      */
     private void parseOptionalFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
         // Tipos de tercero
-        Integer typesColumn = columnMap.get(ImportConstants.OptionalHeaders.TYPES);
+        Integer typesColumn = columnMap.get(ImportConstants.TYPES_COLUMN);
         if (typesColumn != null) {
             builder.thirdTypesNames(parseThirdTypes(getCellValueAsString(row, typesColumn)));
         }
@@ -241,26 +241,26 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos geográficos opcionales.
+     * Parsea los campos geográficos (ahora obligatorios).
      */
     private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
-        Integer countryColumn = columnMap.get(ImportConstants.OptionalHeaders.COUNTRY);
+        Integer countryColumn = columnMap.get(ImportConstants.COUNTRY_COLUMN);
         if (countryColumn != null) {
             builder.countryName(getCellValueAsString(row, countryColumn));
         }
 
-        Integer stateColumn = columnMap.get(ImportConstants.OptionalHeaders.STATE);
+        Integer stateColumn = columnMap.get(ImportConstants.STATE_COLUMN);
         if (stateColumn != null) {
             builder.stateName(getCellValueAsString(row, stateColumn));
         }
 
-        Integer cityColumn = columnMap.get(ImportConstants.OptionalHeaders.CITY);
+        Integer cityColumn = columnMap.get(ImportConstants.CITY_COLUMN);
         if (cityColumn != null) {
             builder.cityName(getCellValueAsString(row, cityColumn));
         }
 
-        Integer addressColumn = columnMap.get(ImportConstants.OptionalHeaders.ADDRESS);
+        Integer addressColumn = columnMap.get(ImportConstants.ADDRESS_COLUMN);
         if (addressColumn != null) {
             builder.address(getCellValueAsString(row, addressColumn));
         }

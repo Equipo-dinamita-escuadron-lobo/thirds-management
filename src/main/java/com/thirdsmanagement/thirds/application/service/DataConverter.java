@@ -91,21 +91,22 @@ public class DataConverter {
 
     /**
      * Resuelve geografía desde cache.
+     * Todos los campos geográficos son obligatorios.
      */
     private GeographyData resolveGeographyFromCache(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         String countryCode = null;
         String stateCode = null;
         String cityCode = null;
 
-        // Resolver país desde cache
+      
         if (excelData.getCountryName() != null && !excelData.getCountryName().trim().isEmpty()) {
             if (cache.hasCountry(excelData.getCountryName().trim())) {                
-                countryCode = "COL";
+                countryCode = "COL"; // Por ahora solo Colombia
             }
         }
 
-        // Resolver estado desde cache
-        if ("COL".equals(countryCode) && 
+        
+        if (countryCode != null && 
             excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty()) {
             State state = cache.getState(excelData.getStateName().trim());
             if (state != null) {
@@ -113,20 +114,15 @@ public class DataConverter {
             }
         }
 
-        // Resolver ciudad desde cache
+       
         if (stateCode != null && 
             excelData.getCityName() != null && !excelData.getCityName().trim().isEmpty()) {
             if (cache.hasCity(excelData.getCityName().trim(), stateCode)) {
-                // Obtener el código de la ciudad desde el cache
                 City city = cache.getCity(excelData.getCityName().trim(), stateCode);
                 if (city != null) {
                     cityCode = city.getCityCode();
                 }
             }
-        } else if (stateCode != null) {
-            // Si hay departamento pero no ciudad, mantener cityCode como null
-            // para que la validación en BatchValidationService pueda detectar el error
-            cityCode = null;
         }
 
         return new GeographyData(countryCode, stateCode, cityCode);
