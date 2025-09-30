@@ -36,8 +36,6 @@ public class ExportThirdService implements ExportThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
     private final IdOutputPort idOutputPort;
     private final ExcelValidationService excelValidationService;
-    
-
 
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
         // Validar que el tipo de tercero existe si se especifica
@@ -47,43 +45,43 @@ public class ExportThirdService implements ExportThirdUseCase {
                 throw new ThirdTypeForeignKeyViolationException(request.getThirdTypeId().toString());
             }
         }
-        
+
         // Crear un Pageable que obtenga todos los registros (tamaño grande)
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
-        
+
         // Si se especifica un estado específico (activos o inactivos)
         if (request.getStatus() != null) {
             Page<Third> page = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, request.getStatus());
             List<Third> thirds = page.getContent();
-            
+
             // Si también se especifica un ID de tipo de tercero, filtrar adicionalmente
             if (request.getThirdTypeId() != null) {
                 return thirds.stream()
-                    .filter(third -> third.getThirdTypes().stream()
-                        .anyMatch(type -> type.getThirdTypeId().equals(request.getThirdTypeId())))
-                    .collect(Collectors.toList());
+                        .filter(third -> third.getThirdTypes().stream()
+                                .anyMatch(type -> type.getThirdTypeId().equals(request.getThirdTypeId())))
+                        .collect(Collectors.toList());
             }
-            
+
             return thirds;
         }
-        
-        // Si se especifica un ID de tipo de tercero pero no estado, usar método sin filtro de estado
+
+        // Si se especifica un ID de tipo de tercero pero no estado, usar método sin
+        // filtro de estado
         if (request.getThirdTypeId() != null) {
-            Page<Third> page = thirdOutputPort.getAllThirdsByTypeIdWithoutStateFilter(request.getEntId(), pageable, request.getThirdTypeId());
+            Page<Third> page = thirdOutputPort.getAllThirdsByTypeIdWithoutStateFilter(request.getEntId(), pageable,
+                    request.getThirdTypeId());
             return page.getContent();
         }
-        
+
         // Si no se especifica filtro, obtener explícitamente activos e inactivos
         Page<Third> activePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, true);
         Page<Third> inactivePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, false);
-        
+
         List<Third> allThirds = activePage.getContent();
         allThirds.addAll(inactivePage.getContent());
-        
+
         return allThirds;
     }
-
-
 
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -132,18 +130,18 @@ public class ExportThirdService implements ExportThirdUseCase {
         createHeaderCell(headerRow, colIndex++, "Razón Social", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Género", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Estado", headerStyle);
-        
+
         // Encabezados opcionales
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             createHeaderCell(headerRow, colIndex++, "Tipos de Tercero", headerStyle);
         }
-        
+
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
             createHeaderCell(headerRow, colIndex++, "País", headerStyle);
             createHeaderCell(headerRow, colIndex++, "Departamento", headerStyle);
             createHeaderCell(headerRow, colIndex++, "Ciudad", headerStyle);
         }
-        
+
         createHeaderCell(headerRow, colIndex++, "Dirección", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Teléfono", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Email", headerStyle);
@@ -155,23 +153,27 @@ public class ExportThirdService implements ExportThirdUseCase {
         cell.setCellStyle(style);
     }
 
-    private void fillData(Sheet sheet, List<Third> thirds, CellStyle dataStyle, CellStyle dateStyle, ThirdExportRequest request) {
+    private void fillData(Sheet sheet, List<Third> thirds, CellStyle dataStyle, CellStyle dateStyle,
+            ThirdExportRequest request) {
         int rowIndex = 1;
-        
+
         for (Third third : thirds) {
             Row row = sheet.createRow(rowIndex++);
             int colIndex = 0;
 
             // Datos básicos
-            createDataCell(row, colIndex++, third.getTypeId() != null ? third.getTypeId().getTypeIdname() : "", dataStyle);
+            createDataCell(row, colIndex++, third.getTypeId() != null ? third.getTypeId().getTypeIdname() : "",
+                    dataStyle);
             createDataCell(row, colIndex++, third.getIdNumber(), dataStyle);
             createDataCell(row, colIndex++, third.getVerificationNumber(), dataStyle);
-            createDataCell(row, colIndex++, third.getPersonType() != null ? third.getPersonType().getCode() : "", dataStyle);
+            createDataCell(row, colIndex++, third.getPersonType() != null ? third.getPersonType().getCode() : "",
+                    dataStyle);
             createDataCell(row, colIndex++, third.getNames(), dataStyle);
             createDataCell(row, colIndex++, third.getLastNames(), dataStyle);
             createDataCell(row, colIndex++, third.getSocialReason(), dataStyle);
             createDataCell(row, colIndex++, third.getGender() != null ? third.getGender().toString() : "", dataStyle);
-            createDataCell(row, colIndex++, third.getState() != null && third.getState() ? "ACTIVO" : "INACTIVO", dataStyle);
+            createDataCell(row, colIndex++, third.getState() != null && third.getState() ? "ACTIVO" : "INACTIVO",
+                    dataStyle);
 
             // Datos opcionales
             if (Boolean.TRUE.equals(request.getIncludeTypes())) {
@@ -182,9 +184,12 @@ public class ExportThirdService implements ExportThirdUseCase {
             }
 
             if (Boolean.TRUE.equals(request.getIncludeCities())) {
-                createDataCell(row, colIndex++, third.getCountry() != null ? third.getCountry().getCountryName() : "", dataStyle);
-                createDataCell(row, colIndex++, third.getProvince() != null ? third.getProvince().getStateName() : "", dataStyle);
-                createDataCell(row, colIndex++, third.getCity() != null ? third.getCity().getCityName() : "", dataStyle);
+                createDataCell(row, colIndex++, third.getCountry() != null ? third.getCountry().getCountryName() : "",
+                        dataStyle);
+                createDataCell(row, colIndex++, third.getProvince() != null ? third.getProvince().getStateName() : "",
+                        dataStyle);
+                createDataCell(row, colIndex++, third.getCity() != null ? third.getCity().getCityName() : "",
+                        dataStyle);
             }
 
             createDataCell(row, colIndex++, third.getAddress(), dataStyle);
@@ -195,7 +200,7 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private void createDataCell(Row row, int colIndex, Object value, CellStyle style) {
         Cell cell = row.createCell(colIndex);
-        
+
         if (value == null) {
             cell.setCellValue("");
         } else if (value instanceof Number) {
@@ -203,7 +208,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         } else {
             cell.setCellValue(value.toString());
         }
-        
+
         cell.setCellStyle(style);
     }
 
@@ -211,21 +216,21 @@ public class ExportThirdService implements ExportThirdUseCase {
         for (int i = 0; i < columnCount; i++) {
             // Primero aplicar el auto-sizing basado en el contenido
             sheet.autoSizeColumn(i);
-            
+
             // Obtener el ancho calculado automáticamente
             int autoWidth = sheet.getColumnWidth(i);
-            
+
             // Establecer límites razonables
-            int minWidth = 1500;  // Ancho mínimo más pequeño
+            int minWidth = 1500; // Ancho mínimo más pequeño
             int maxWidth = 25000; // Ancho máximo más generoso
-            
+
             // Aplicar los límites
             if (autoWidth < minWidth) {
                 sheet.setColumnWidth(i, minWidth);
             } else if (autoWidth > maxWidth) {
                 sheet.setColumnWidth(i, maxWidth);
             }
-            
+
             // Agregar un pequeño padding al ancho calculado para mejor legibilidad
             int finalWidth = Math.min(Math.max(autoWidth + 500, minWidth), maxWidth);
             sheet.setColumnWidth(i, finalWidth);
@@ -234,31 +239,32 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private int getColumnCount(ThirdExportRequest request) {
         int count = 9; // Columnas básicas (incluye Estado)
-        
+
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             count++;
         }
-        
+
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
             count += 3;
         }
-        
+
         return count + 3; // Dirección, teléfono, email
     }
 
     /**
-     * Exporta una plantilla de terceros con validaciones de datos (listas desplegables).
+     * Exporta una plantilla de terceros con validaciones de datos (listas
+     * desplegables).
      */
     @Override
     public Resource exportThirdTemplateWithValidations(String entId) {
-        
+
         try {
             byte[] templateData = generateTemplateWithValidations(entId);
             return new ByteArrayResource(templateData);
-            
+
         } catch (Exception e) {
-            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, 
-                "Error al generar plantilla", e);
+            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
+                    "Error al generar plantilla", e);
         }
     }
 
@@ -268,21 +274,21 @@ public class ExportThirdService implements ExportThirdUseCase {
      */
     @Override
     public Resource exportThirdsWithValidations(ThirdExportRequest exportRequest) {
-        
+
         try {
             // Obtener datos según filtros
             List<Third> thirds = getFilteredThirds(exportRequest);
-            
+
             // Validar que existan terceros para exportar
             if (thirds == null || thirds.isEmpty()) {
                 throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_NO_DATA);
             }
-            
+
             // Generar archivo Excel con datos y validaciones
             byte[] excelData = generateExcelFileWithValidations(thirds, exportRequest);
-            
+
             return new ByteArrayResource(excelData);
-            
+
         } catch (ThirdExportException e) {
             // Re-lanzar excepciones de negocio sin modificar
             throw e;
@@ -290,29 +296,28 @@ public class ExportThirdService implements ExportThirdUseCase {
             // Re-lanzar excepciones de tipo de tercero sin modificar
             throw e;
         } catch (Exception e) {
-            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR, 
-                "Error al generar archivo de exportación", e);
+            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
+                    "Error al generar archivo de exportación", e);
         }
     }
 
-
     private byte[] generateTemplateWithValidations(String entId) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("Plantilla_Terceros");
-            
+
             // Crear estilos
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle templateStyle = createTemplateStyle(workbook);
 
             // Crear encabezados
             ThirdExportRequest templateRequest = ThirdExportRequest.builder()
-                .entId(entId)
-                .includeTypes(true)
-                .includeCities(true)
-                .build();
-            
+                    .entId(entId)
+                    .includeTypes(true)
+                    .includeCities(true)
+                    .build();
+
             createHeaders(sheet, headerStyle, templateRequest);
 
             // Crear filas de ejemplo con estilos
@@ -332,7 +337,6 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
-
     private CellStyle createTemplateStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -346,7 +350,8 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
-    private void createTemplateRows(Sheet sheet, CellStyle templateStyle, ThirdExportRequest request, int numberOfRows) {
+    private void createTemplateRows(Sheet sheet, CellStyle templateStyle, ThirdExportRequest request,
+            int numberOfRows) {
         for (int i = 1; i <= numberOfRows; i++) {
             Row row = sheet.createRow(i);
             int colIndex = 0;
@@ -385,7 +390,7 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private void createEmptyTemplateRow(Row row, ThirdExportRequest request, CellStyle templateStyle) {
         int colIndex = 0;
-        
+
         // Crear celdas vacías con el mismo estilo
         int basicColumns = 9; // Columnas básicas incluye Estado
         for (int i = 0; i < basicColumns; i++) {
@@ -417,38 +422,38 @@ public class ExportThirdService implements ExportThirdUseCase {
     private void applyValidationsToTemplate(Sheet sheet, String entId, ThirdExportRequest request) {
         int startRow = 1; // Después del encabezado
         int endRow = 1000; // Permitir muchas filas para la plantilla
-        
+
         // Aplicar validaciones básicas
         excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
-        
+
         // Aplicar validaciones de tipos si están incluidos
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             int typesColumnIndex = getTypesColumnIndex(request);
             excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
         }
-        
+
         // Aplicar validaciones geográficas si están incluidas
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
             int[] geoColumns = getGeographyColumnIndexes(request);
-            excelValidationService.applyGeographyValidations(sheet, startRow, endRow, 
-                geoColumns[0], geoColumns[1], geoColumns[2]);
+            excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
+                    geoColumns[0], geoColumns[1], geoColumns[2]);
         }
     }
 
-
     private int getTypesColumnIndex(ThirdExportRequest request) {
-        // Los tipos de tercero aparecen después de las columnas básicas (9 columnas incluye Estado)
+        // Los tipos de tercero aparecen después de las columnas básicas (9 columnas
+        // incluye Estado)
         return 9;
     }
 
     private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
         int baseIndex = 9; // Columnas básicas (incluye Estado)
-        
+
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             baseIndex++; // Agregar columna de tipos
         }
-        
-        return new int[]{baseIndex, baseIndex + 1, baseIndex + 2}; // País, Departamento, Ciudad
+
+        return new int[] { baseIndex, baseIndex + 1, baseIndex + 2 }; // País, Departamento, Ciudad
     }
 
     /**
@@ -456,10 +461,10 @@ public class ExportThirdService implements ExportThirdUseCase {
      */
     private byte[] generateExcelFileWithValidations(List<Third> thirds, ThirdExportRequest request) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 
             Sheet sheet = workbook.createSheet("Terceros");
-            
+
             // Crear estilos (reutilizando métodos existentes)
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle dataStyle = createDataStyle(workbook);
@@ -486,26 +491,27 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     /**
      * Aplica validaciones de datos a una hoja con datos existentes.
-     * Reutiliza la lógica de applyValidationsToTemplate pero ajustada para datos reales.
+     * Reutiliza la lógica de applyValidationsToTemplate pero ajustada para datos
+     * reales.
      */
     private void applyValidationsToDataSheet(Sheet sheet, String entId, ThirdExportRequest request, int dataRowCount) {
         int startRow = 1; // Después del encabezado
         int endRow = Math.max(dataRowCount + 100, 1000); // Datos existentes + filas adicionales para edición
-        
+
         // Aplicar validaciones básicas (reutilizando método existente)
         excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
-        
-        // Aplicar validaciones de tipos si están incluidos 
+
+        // Aplicar validaciones de tipos si están incluidos
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
             int typesColumnIndex = getTypesColumnIndex(request);
             excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
         }
-        
+
         // Aplicar validaciones geográficas si están incluidas
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
             int[] geoColumns = getGeographyColumnIndexes(request);
-            excelValidationService.applyGeographyValidations(sheet, startRow, endRow, 
-                geoColumns[0], geoColumns[1], geoColumns[2]);
+            excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
+                    geoColumns[0], geoColumns[1], geoColumns[2]);
         }
     }
 }

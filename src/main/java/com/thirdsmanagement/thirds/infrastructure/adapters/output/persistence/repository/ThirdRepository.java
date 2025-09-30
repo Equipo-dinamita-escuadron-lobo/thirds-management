@@ -1,6 +1,8 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,5 +57,30 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
             "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
     Page<ThirdEntity> getAllThirdsByTypeIdWithoutStateFilter(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
             Pageable page);
+
+    @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId")
+    boolean existsByTypeIdTiIdAndEntId(@Param("typeIdCode") String typeIdCode, @Param("entId") String entId);
+
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId")
+    long countByEntId(@Param("entId") String entId);
+
+    @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
+            "WHERE t.entId = :entId " +
+            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
+            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
+    long countByEntIdAndThirdTypeId(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId);
+
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
+    long countByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state);
+
+    /**
+     * Encuentra números de identificación que ya existen en la base de datos para importaciones masivas. 
+     * 
+     * @param idNumbers lista de números de identificación a verificar
+     * @param entId ID de la empresa
+     * @return lista de números de identificación que ya existen
+     */
+    @Query("SELECT t.idNumber FROM ThirdEntity t WHERE t.idNumber IN :idNumbers AND t.entId = :entId")
+    List<Long> findExistingIdNumbers(@Param("idNumbers") Set<Long> idNumbers, @Param("entId") String entId);
 
 }

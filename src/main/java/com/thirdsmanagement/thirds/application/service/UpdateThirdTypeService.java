@@ -30,16 +30,16 @@ public class UpdateThirdTypeService implements UpdateThirdTypeUseCase {
     @Override
     public ThirdType updateThirdType(ThirdType thirdType) {
         ThirdType updatedThirdType = idOutputPort.updateThirdType(thirdType);
-        
+
         // Publicar evento de actualización
         ThirdTypeUpdatedEvent event = ThirdTypeUpdatedEvent.builder()
                 .thirdTypeId(updatedThirdType.getThirdTypeId())
                 .thirdTypeName(updatedThirdType.getThirdTypeName())
                 .entId(updatedThirdType.getEntId())
                 .build();
-        
+
         thirdTypeEventPublisher.publishThirdTypeUpdatedEvent(event);
-        
+
         return updatedThirdType;
     }
 }

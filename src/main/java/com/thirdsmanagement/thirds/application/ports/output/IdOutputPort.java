@@ -79,4 +79,43 @@ public interface IdOutputPort {
      * @return El tipo de tercero completo o null si no existe
      */
     ThirdType getThirdTypeById(Long thirdTypeId, String entId);
+    
+    /**
+     * Obtiene un tipo de tercero completo por su ID.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El tipo de tercero completo o null si no existe
+     */
+    ThirdType getThirdTypeById(Long thirdTypeId);
+    
+    /**
+     * Elimina un tipo de tercero del sistema.
+     * @param thirdTypeId El ID del tipo de tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    boolean deleteThirdType(Long thirdTypeId, String entId);
+    
+    /**
+     * Verifica si un tipo de tercero está siendo utilizado por terceros existentes.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return true si está en uso, false en caso contrario
+     */
+    boolean isThirdTypeInUse(Long thirdTypeId, String entId);
+    
+    /**
+     * Elimina un tipo de identificación del sistema.
+     * @param typeIdId El ID del tipo de identificación a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    boolean deleteTypeId(Long typeIdId, String entId);
+    
+    /**
+     * Verifica si un tipo de identificación está siendo utilizado por terceros existentes.
+     * @param typeIdId El ID del tipo de identificación
+     * @param entId El ID de la empresa
+     * @return true si está en uso, false en caso contrario
+     */
+    boolean isTypeIdInUse(Long typeIdId, String entId);
 }

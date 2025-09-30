@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,15 @@ public interface ThirdOutputPort {
      * @return True si existe, false en caso contrario
      */
     boolean existThirdById(long id, String entId);
+    
+    /**
+     * Encuentra qué números de identificación ya existen en la base de datos.
+     * 
+     * @param idNumbers conjunto de números de identificación a verificar
+     * @param entId el id de la empresa
+     * @return conjunto de números de identificación que ya existen
+     */
+    Set<Long> findExistingIdNumbers(Set<Long> idNumbers, String entId);
     
     /**
      * Cambia el estado de un tercero.
@@ -94,4 +104,35 @@ public interface ThirdOutputPort {
      * @return La pagina de terceros filtrados por ID de tipo (activos e inactivos)
      */
     Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId);
+    
+    /**
+     * Elimina un tercero del sistema junto con sus asociaciones.
+     * @param thirdId El ID del tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    boolean deleteThird(Long thirdId, String entId);
+    
+    /**
+     * Cuenta el total de terceros por empresa.
+     * @param entId El id de la empresa
+     * @return El número total de terceros
+     */
+    long countAllThirdsByEntId(String entId);
+    
+    /**
+     * Cuenta el total de terceros filtrados por tipo.
+     * @param entId El id de la empresa
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El número total de terceros del tipo especificado
+     */
+    long countAllThirdsByType(String entId, Long thirdTypeId);
+    
+    /**
+     * Cuenta el total de terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param isActive El estado del tercero
+     * @return El número total de terceros con el estado especificado
+     */
+    long countAllThirdsByStatus(String entId, boolean isActive);
 }

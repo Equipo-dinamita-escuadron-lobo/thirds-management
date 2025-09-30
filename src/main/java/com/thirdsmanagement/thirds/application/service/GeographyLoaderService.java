@@ -12,7 +12,8 @@ import java.util.List;
 
 /**
  * Service to load complete geography data from codes.
- * Used by persistence layer to reconstruct full geography objects from database strings.
+ * Used by persistence layer to reconstruct full geography objects from database
+ * strings.
  */
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class GeographyLoaderService {
 
     /**
      * Loads complete Country object from country code.
+     * 
      * @param countryCode the country code
      * @return complete Country object or null if not found
      */
@@ -29,7 +31,7 @@ public class GeographyLoaderService {
         if (countryCode == null || countryCode.trim().isEmpty()) {
             return null;
         }
-        
+
         try {
             List<Country> countries = geographyOutputPort.getAllActiveCountries();
             return countries.stream()
@@ -47,27 +49,28 @@ public class GeographyLoaderService {
 
     /**
      * Loads complete State object from state and country codes.
-     * @param stateCode the state code
+     * 
+     * @param stateCode   the state code
      * @param countryCode the country code
      * @return complete State object or null if not found
      */
     public State loadStateByCode(String stateCode, String countryCode) {
-        if (stateCode == null || stateCode.trim().isEmpty() || 
-            countryCode == null || countryCode.trim().isEmpty()) {
+        if (stateCode == null || stateCode.trim().isEmpty() ||
+                countryCode == null || countryCode.trim().isEmpty()) {
             return null;
         }
-        
+
         try {
             // Load the country first
             Country country = loadCountryByCode(countryCode);
-            
+
             // Load states for the country
             List<State> states = geographyOutputPort.getStatesByCountry(countryCode.trim().toUpperCase());
             State state = states.stream()
                     .filter(s -> s.getStateCode().equals(stateCode.trim()))
                     .findFirst()
                     .orElse(null);
-                    
+
             if (state != null && country != null) {
                 // Set the country reference in the state
                 return State.builder()
@@ -77,7 +80,7 @@ public class GeographyLoaderService {
                         .country(country)
                         .build();
             }
-            
+
             return null;
         } catch (Exception e) {
             // If geography service fails, return basic object with codes only
@@ -92,29 +95,31 @@ public class GeographyLoaderService {
 
     /**
      * Loads complete City object from city, state and country codes.
-     * @param cityCode the city code
-     * @param stateCode the state code
+     * 
+     * @param cityCode    the city code
+     * @param stateCode   the state code
      * @param countryCode the country code
      * @return complete City object or null if not found
      */
     public City loadCityByCode(String cityCode, String stateCode, String countryCode) {
-        if (cityCode == null || cityCode.trim().isEmpty() || 
-            stateCode == null || stateCode.trim().isEmpty() || 
-            countryCode == null || countryCode.trim().isEmpty()) {
+        if (cityCode == null || cityCode.trim().isEmpty() ||
+                stateCode == null || stateCode.trim().isEmpty() ||
+                countryCode == null || countryCode.trim().isEmpty()) {
             return null;
         }
-        
+
         try {
             // Load the state first (which includes country)
             State state = loadStateByCode(stateCode, countryCode);
-            
+
             // Load cities for the state
-            List<City> cities = geographyOutputPort.getCitiesByState(stateCode.trim(), countryCode.trim().toUpperCase());
+            List<City> cities = geographyOutputPort.getCitiesByState(stateCode.trim(),
+                    countryCode.trim().toUpperCase());
             City city = cities.stream()
                     .filter(c -> c.getCityCode().equals(cityCode.trim()))
                     .findFirst()
                     .orElse(null);
-                    
+
             if (city != null && state != null) {
                 // Set the state reference in the city
                 return City.builder()
@@ -125,7 +130,7 @@ public class GeographyLoaderService {
                         .state(state)
                         .build();
             }
-            
+
             return null;
         } catch (Exception e) {
             // If geography service fails, return basic object with codes only

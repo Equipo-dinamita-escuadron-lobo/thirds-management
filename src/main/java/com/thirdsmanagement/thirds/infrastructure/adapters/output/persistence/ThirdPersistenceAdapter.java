@@ -1,6 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
 
-import java.util.List;
+import java.util.*;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,6 +28,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViol
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Component;
  * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
  * Proporciona métodos para guardar y obtener los terceros.
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ThirdPersistenceAdapter implements ThirdOutputPort{
@@ -424,4 +427,113 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             }
         }
     }
+    
+    /**
+     * Elimina un tercero del sistema junto con sus asociaciones.
+     * El tercero es la entidad raíz, por lo que sus asociaciones se eliminan automáticamente.
+     * @param thirdId El ID del tercero a eliminar
+     * @param entId El ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    @Override
+    @Transactional
+    public boolean deleteThird(Long thirdId, String entId) {
+        if (thirdId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            // Buscar el tercero por ID y empresa
+            Optional<ThirdEntity> thirdEntity = thirdRepository.findByThIdAndEntId(thirdId, entId);
+            
+            if (thirdEntity.isPresent()) {
+                // Eliminar las asociaciones del tercero
+                List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdId);
+                if (!relations.isEmpty()) {
+                    thirdsAndTypesRepository.deleteAll(relations);
+                }
+                
+                // Eliminar el tercero
+                thirdRepository.delete(thirdEntity.get());
+                return true;
+            }
+            
+            return false;
+            
+        } catch (Exception e) {
+            return false;
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+
+    /**
+     * Cuenta el total de terceros por empresa.
+     * @param entId El id de la empresa
+     * @return El número total de terceros
+     */
+    @Override
+    public long countAllThirdsByEntId(String entId) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        return thirdRepository.countByEntId(entId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por tipo.
+     * @param entId El id de la empresa
+     * @param thirdTypeId El ID del tipo de tercero
+     * @return El número total de terceros del tipo especificado
+     */
+    @Override
+    public long countAllThirdsByType(String entId, Long thirdTypeId) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        if (thirdTypeId == null) {
+            throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
+        }
+        return thirdRepository.countByEntIdAndThirdTypeId(entId, thirdTypeId);
+    }
+
+    /**
+     * Cuenta el total de terceros filtrados por estado.
+     * @param entId El id de la empresa
+     * @param isActive El estado del tercero
+     * @return El número total de terceros con el estado especificado
+     */
+    @Override
+    public long countAllThirdsByStatus(String entId, boolean isActive) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        return thirdRepository.countByEntIdAndState(entId, isActive);
+    }
+
+    /**
+     * Encuentra qué números de identificación ya existen en la base de datos.
+     * 
+     * @param idNumbers conjunto de números de identificación a verificar
+     * @param entId el id de la empresa
+     * @return conjunto de números de identificación que ya existen
+     */
+    @Override
+    public Set<Long> findExistingIdNumbers(Set<Long> idNumbers, String entId) {
+        if (idNumbers == null || idNumbers.isEmpty()) {
+            return Collections.emptySet();
+        }
+        
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+
+        // Usar consulta batch optimizada del repositorio
+        List<Long> existingList = thirdRepository.findExistingIdNumbers(idNumbers, entId);
+        return new HashSet<>(existingList);
+    }
+    
 }

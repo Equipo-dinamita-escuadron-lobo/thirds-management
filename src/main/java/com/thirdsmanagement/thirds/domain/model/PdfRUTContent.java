@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.ports.input;
+package com.thirdsmanagement.thirds.domain.model;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.exceptions;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

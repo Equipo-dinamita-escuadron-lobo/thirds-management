@@ -81,9 +81,6 @@ public class ExcelValidationService {
                 .collect(Collectors.toList());
     }
 
-
-
-
     /**
      * Obtiene todos los departamentos de Colombia.
      */
@@ -126,114 +123,118 @@ public class ExcelValidationService {
      */
     public void applyThirdValidations(Sheet sheet, String entId, int startRow, int endRow) {
         // Columna 0: Tipo de Identificación
-        applyDropdownValidation(sheet, 0, startRow, endRow, 
-            getTypeIdOptions(entId), 
-            "Seleccione un tipo de identificación válido");
-        
+        applyDropdownValidation(sheet, 0, startRow, endRow,
+                getTypeIdOptions(entId),
+                "Seleccione un tipo de identificación válido");
+
         // Columna 3: Tipo de Persona
-        applyDropdownValidation(sheet, 3, startRow, endRow, 
-            getPersonTypeOptions(), 
-            "Seleccione NATURAL o JURIDICA");
-        
+        applyDropdownValidation(sheet, 3, startRow, endRow,
+                getPersonTypeOptions(),
+                "Seleccione NATURAL o JURIDICA");
+
         // Columna 7: Género
-        applyDropdownValidation(sheet, 7, startRow, endRow, 
-            getGenderOptions(), 
-            "Seleccione MASCULINO, FEMENINO u OTRO");
-        
+        applyDropdownValidation(sheet, 7, startRow, endRow,
+                getGenderOptions(),
+                "Seleccione MASCULINO, FEMENINO u OTRO");
+
         // Columna 8: Estado
-        applyDropdownValidation(sheet, 8, startRow, endRow, 
-            getStatusOptions(), 
-            "Seleccione ACTIVO o INACTIVO");
+        applyDropdownValidation(sheet, 8, startRow, endRow,
+                getStatusOptions(),
+                "Seleccione ACTIVO o INACTIVO");
     }
 
     /**
      * Aplica validaciones para terceros con tipos incluidos.
      */
-    public void applyThirdValidationsWithTypes(Sheet sheet, String entId, int startRow, int endRow, int typesColumnIndex) {
+    public void applyThirdValidationsWithTypes(Sheet sheet, String entId, int startRow, int endRow,
+            int typesColumnIndex) {
         // Aplicar validaciones básicas
         applyThirdValidations(sheet, entId, startRow, endRow);
-        
+
         // Columna de Tipos de Tercero (posición variable)
-        applyDropdownValidation(sheet, typesColumnIndex, startRow, endRow, 
-            getThirdTypeOptions(entId), 
-            "Seleccione tipos de tercero válidos separados por coma");
+        applyDropdownValidation(sheet, typesColumnIndex, startRow, endRow,
+                getThirdTypeOptions(entId),
+                "Seleccione tipos de tercero válidos separados por coma");
     }
 
     /**
      * Aplica validaciones geográficas para terceros con ciudades incluidas.
      */
-    public void applyGeographyValidations(Sheet sheet, int startRow, int endRow, 
-                                        int countryColumnIndex, int stateColumnIndex, int cityColumnIndex) {
+    public void applyGeographyValidations(Sheet sheet, int startRow, int endRow,
+            int countryColumnIndex, int stateColumnIndex, int cityColumnIndex) {
         try {
             // País - usar referencia a hoja
-            applyReferenceBasedValidation(sheet, countryColumnIndex, startRow, endRow, 
-                "Datos_Referencia", "$A$2:$A$100", 
-                "Seleccione un país válido");
-            
-            // Departamento/Estado - validación dependiente del país usando rangos con nombre
+            applyReferenceBasedValidation(sheet, countryColumnIndex, startRow, endRow,
+                    "Datos_Referencia", "$A$2:$A$100",
+                    "Seleccione un país válido");
+
+            // Departamento/Estado - validación dependiente del país usando rangos con
+            // nombre
             applyStateValidationWithNamedRanges(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow);
-            
-            // Ciudad - validación dependiente del departamento usando rangos con nombre directos
+
+            // Ciudad - validación dependiente del departamento usando rangos con nombre
+            // directos
             applyCityValidationWithNamedRanges(sheet, cityColumnIndex, stateColumnIndex, startRow, endRow);
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error al aplicar validaciones geográficas", e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error al aplicar validaciones geográficas", e);
         }
     }
 
     /**
      * Aplica validación de lista desplegable a una columna específica.
      */
-    public void applyDropdownValidation(Sheet sheet, int columnIndex, int startRow, int endRow, 
-                                      List<String> options, String errorMessage) {
+    public void applyDropdownValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
+            List<String> options, String errorMessage) {
         if (options == null || options.isEmpty()) {
             return;
         }
 
         try {
-            
+
             XSSFSheet xssfSheet = (XSSFSheet) sheet;
             XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
-            
+
             // Crear el rango de celdas donde aplicar la validación
             CellRangeAddressList addressList = new CellRangeAddressList(startRow, endRow, columnIndex, columnIndex);
-            
+
             // Crear la lista de opciones
             String[] optionsArray = options.toArray(new String[0]);
             DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(optionsArray);
-            
+
             // Crear la validación
             DataValidation validation = validationHelper.createValidation(constraint, addressList);
-            
+
             // Configurar propiedades de la validación
             validation.setShowErrorBox(true);
             validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
             validation.createErrorBox("Error de Validación", errorMessage);
-            
+
             // Mostrar lista desplegable
             validation.setShowPromptBox(true);
             validation.createPromptBox("Selección", "Seleccione una opción de la lista");
-            
+
             // Aplicar la validación a la hoja
             sheet.addValidationData(validation);
-            
+
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error al aplicar validación en columna " + columnIndex, e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error al aplicar validación en columna " + columnIndex, e);
         }
     }
 
     /**
-     * Crea una hoja separada con los datos de referencia para las listas desplegables.
+     * Crea una hoja separada con los datos de referencia para las listas
+     * desplegables.
      */
     public void createReferenceDataSheet(Workbook workbook, String entId) {
         Sheet refSheet = workbook.createSheet("Datos_Referencia");
-        
+
         // Ocultar la hoja de referencia
         workbook.setSheetHidden(workbook.getSheetIndex(refSheet), true);
-        
+
         int rowIndex = 0;
-        
+
         // Crear encabezados
         Row headerRow = refSheet.createRow(rowIndex++);
         headerRow.createCell(0).setCellValue("Países");
@@ -241,33 +242,33 @@ public class ExcelValidationService {
         headerRow.createCell(2).setCellValue("Tipos_ID");
         headerRow.createCell(3).setCellValue("Tipos_Tercero");
         headerRow.createCell(4).setCellValue("Estados");
-        
+
         // Llenar datos de países
         List<String> countries = getCountryOptions();
         fillColumnData(refSheet, 0, countries);
-        
+
         // Llenar datos de departamentos
         List<String> states = getColombianStates();
         fillColumnData(refSheet, 1, states);
-        
+
         // Llenar datos de tipos de ID
         List<String> idTypes = getTypeIdOptions(entId);
         fillColumnData(refSheet, 2, idTypes);
-        
+
         // Llenar datos de tipos de tercero
         List<String> thirdTypes = getThirdTypeOptions(entId);
         fillColumnData(refSheet, 3, thirdTypes);
-        
+
         // Llenar datos de campo estado
         List<String> statusOptions = getStatusOptions();
         fillColumnData(refSheet, 4, statusOptions);
-        
+
         // Crear columnas separadas para departamentos de cada país
         createNamedRangesForStatesByCountry(workbook, refSheet);
-        
+
         // Crear columnas separadas para ciudades de cada departamento
         createNamedRangesForCitiesByState(workbook, refSheet);
-        
+
         // Crear tabla de mapeo para la validación dependiente
         createDepartmentMappingTable(refSheet);
     }
@@ -282,11 +283,11 @@ public class ExcelValidationService {
             if (row == null) {
                 row = sheet.createRow(i + 1);
             }
-            
+
             Cell cell = row.createCell(columnIndex);
             cell.setCellValue(data.get(i));
         }
-        
+
         // Ajustar ancho de columna
         sheet.autoSizeColumn(columnIndex);
     }
@@ -294,69 +295,71 @@ public class ExcelValidationService {
     /**
      * Aplica validación usando referencias a celdas de otra hoja.
      */
-    public void applyReferenceBasedValidation(Sheet sheet, int columnIndex, int startRow, int endRow, 
-                                            String referenceSheetName, String referenceRange, String errorMessage) {
+    public void applyReferenceBasedValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
+            String referenceSheetName, String referenceRange, String errorMessage) {
         try {
             XSSFSheet xssfSheet = (XSSFSheet) sheet;
             XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
-            
+
             CellRangeAddressList addressList = new CellRangeAddressList(startRow, endRow, columnIndex, columnIndex);
-            
+
             // Crear referencia a otra hoja: 'NombreHoja'!$A$1:$A$100
             String formula = "'" + referenceSheetName + "'!" + referenceRange;
             DataValidationConstraint constraint = validationHelper.createFormulaListConstraint(formula);
-            
+
             DataValidation validation = validationHelper.createValidation(constraint, addressList);
-            
+
             validation.setShowErrorBox(true);
             validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
             validation.createErrorBox("Error de Validación", errorMessage);
-            
+
             validation.setShowPromptBox(true);
             validation.createPromptBox("Selección", "Seleccione una opción de la lista");
-            
+
             sheet.addValidationData(validation);
-            
+
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error aplicando validación de referencia: " + e.getMessage(), e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error aplicando validación de referencia: " + e.getMessage(), e);
         }
     }
-
 
     /**
      * Crea rangos con nombre para los departamentos de cada país.
      */
     private void createNamedRangesForStatesByCountry(Workbook workbook, Sheet referenceSheet) {
         List<String> countries = getCountryOptions();
-        processGeographicalEntities(workbook, referenceSheet, countries, 4, 
-                                   "país", "Estados_", this::getStatesByCountryName);
+        processGeographicalEntities(workbook, referenceSheet, countries, 4,
+                "país", "Estados_", this::getStatesByCountryName);
     }
 
     /**
-     * Crea rangos con nombre para las ciudades de cada departamento en la hoja de referencia.
+     * Crea rangos con nombre para las ciudades de cada departamento en la hoja de
+     * referencia.
      * Organiza las ciudades en columnas consecutivas para facilitar OFFSET.
      */
     private void createNamedRangesForCitiesByState(Workbook workbook, Sheet referenceSheet) {
         List<String> states = getColombianStates();
-        // Calcular la columna inicial después de las columnas básicas (A-D) y las columnas de departamentos por país
+        // Calcular la columna inicial después de las columnas básicas (A-D) y las
+        // columnas de departamentos por país
         List<String> countries = getCountryOptions();
         int stateColumnsUsed = (int) countries.stream()
                 .mapToLong(country -> getStatesByCountryName(country).isEmpty() ? 0 : 1)
                 .sum();
         int startColumn = 4 + stateColumnsUsed; // Empezar después de las columnas básicas y las de departamentos
-        
-        processGeographicalEntitiesWithCustomNormalization(workbook, referenceSheet, states, 
-                                                          startColumn, "departamento", null, 
-                                                          this::getCitiesByStateName);
+
+        processGeographicalEntitiesWithCustomNormalization(workbook, referenceSheet, states,
+                startColumn, "departamento", null,
+                this::getCitiesByStateName);
     }
 
     /**
-     * Versión especializada para ciudades que usa normalización específica para rangos.
+     * Versión especializada para ciudades que usa normalización específica para
+     * rangos.
      */
-    private int processGeographicalEntitiesWithCustomNormalization(Workbook workbook, Sheet referenceSheet, 
-                                                                 List<String> entities, int startColumn, String entityType, 
-                                                                 String prefix, java.util.function.Function<String, List<String>> dataProvider) {
+    private int processGeographicalEntitiesWithCustomNormalization(Workbook workbook, Sheet referenceSheet,
+            List<String> entities, int startColumn, String entityType,
+            String prefix, java.util.function.Function<String, List<String>> dataProvider) {
         Row headerRow = referenceSheet.getRow(0);
         if (headerRow == null) {
             headerRow = referenceSheet.createRow(0);
@@ -368,7 +371,8 @@ public class ExcelValidationService {
 
             if (!data.isEmpty()) {
                 try {
-                    // Usar normalización específica para rangos (debe coincidir con fórmulas INDIRECT)
+                    // Usar normalización específica para rangos (debe coincidir con fórmulas
+                    // INDIRECT)
                     String normalizedName = StringNormalizer.normalizeForExcelNamedRange(entityName);
 
                     if (normalizedName.isEmpty() || normalizedName.length() > 255) {
@@ -383,8 +387,8 @@ public class ExcelValidationService {
                     currentColumn++;
 
                 } catch (Exception e) {
-                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                        "Error creando datos para " + entityType + " '" + entityName + "'", e);
+                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                            "Error creando datos para " + entityType + " '" + entityName + "'", e);
                 }
             }
         }
@@ -408,28 +412,28 @@ public class ExcelValidationService {
                     .sorted()
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error obteniendo ciudades para departamento '" + stateName + "'", e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error obteniendo ciudades para departamento '" + stateName + "'", e);
         }
     }
 
     /**
-     * Aplica validación de departamentos usando rangos con nombre directos con INDIRECT.
+     * Aplica validación de departamentos usando rangos con nombre directos con
+     * INDIRECT.
      */
     public void applyStateValidationWithNamedRanges(Sheet sheet, int stateColumnIndex, int countryColumnIndex,
-                                                    int startRow, int endRow) {
-        applyDependentValidation(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow, "Estados_", "departamento");
+            int startRow, int endRow) {
+        applyDependentValidation(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow, "Estados_",
+                "departamento");
     }
 
     /**
      * Aplica validación de ciudades usando rangos con nombre directos con INDIRECT.
      */
     public void applyCityValidationWithNamedRanges(Sheet sheet, int cityColumnIndex, int stateColumnIndex,
-                                                  int startRow, int endRow) {
+            int startRow, int endRow) {
         applyDependentValidation(sheet, cityColumnIndex, stateColumnIndex, startRow, endRow, null, "ciudad");
     }
-
-
 
     /**
      * Convierte un índice de columna numérico a letra (A, B, C, etc.).
@@ -445,22 +449,22 @@ public class ExcelValidationService {
 
     /**
      * Crea una fórmula INDIRECT con normalización de caracteres especiales.
-     * Delega la construcción de la fórmula al StringNormalizer para mantener consistencia.
+     * Delega la construcción de la fórmula al StringNormalizer para mantener
+     * consistencia.
      */
     private String buildNormalizedIndirectFormula(String cellReference, String prefix) {
         return StringNormalizer.buildNormalizedIndirectFormula(cellReference, prefix);
     }
 
-
     /**
      * Configura las propiedades comunes de una validación de datos.
      */
-    private void configureDataValidation(DataValidation validation, String errorTitle, String errorMessage, 
-                                       String promptTitle, String promptMessage) {
+    private void configureDataValidation(DataValidation validation, String errorTitle, String errorMessage,
+            String promptTitle, String promptMessage) {
         validation.setShowErrorBox(true);
         validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
         validation.createErrorBox(errorTitle, errorMessage);
-        
+
         validation.setShowPromptBox(true);
         validation.createPromptBox(promptTitle, promptMessage);
     }
@@ -468,14 +472,15 @@ public class ExcelValidationService {
     /**
      * Aplica validación dependiente usando INDIRECT con configuración común.
      */
-    private void applyDependentValidation(Sheet sheet, int targetColumnIndex, int sourceColumnIndex, 
-                                        int startRow, int endRow, String prefix, String validationType) {
+    private void applyDependentValidation(Sheet sheet, int targetColumnIndex, int sourceColumnIndex,
+            int startRow, int endRow, String prefix, String validationType) {
         try {
             XSSFSheet xssfSheet = (XSSFSheet) sheet;
             XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
 
             for (int row = startRow; row <= endRow; row++) {
-                CellRangeAddressList addressList = new CellRangeAddressList(row, row, targetColumnIndex, targetColumnIndex);
+                CellRangeAddressList addressList = new CellRangeAddressList(row, row, targetColumnIndex,
+                        targetColumnIndex);
 
                 String sourceColumnLetter = getColumnLetter(sourceColumnIndex);
                 String cellRef = sourceColumnLetter + (row + 1);
@@ -486,17 +491,17 @@ public class ExcelValidationService {
 
                 String errorMessage = "Seleccione un valor válido para la selección anterior";
                 String promptMessage = "Los valores disponibles dependen de la selección anterior";
-                
-                configureDataValidation(validation, "Error de Validación", errorMessage, 
-                                      "Selección", promptMessage);
+
+                configureDataValidation(validation, "Error de Validación", errorMessage,
+                        "Selección", promptMessage);
 
                 sheet.addValidationData(validation);
             }
 
-
         } catch (Exception e) {
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
-                "Error al aplicar validación dependiente de " + validationType + " en columna " + targetColumnIndex, e);
+                    "Error al aplicar validación dependiente de " + validationType + " en columna " + targetColumnIndex,
+                    e);
         }
     }
 
@@ -513,17 +518,17 @@ public class ExcelValidationService {
             namedRange.setRefersToFormula(rangeFormula);
 
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error específico creando rango '" + rangeName + "'", e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error específico creando rango '" + rangeName + "'", e);
         }
     }
 
     /**
      * Procesa y crea rangos con nombre para una lista de entidades geográficas.
      */
-    private int processGeographicalEntities(Workbook workbook, Sheet referenceSheet, List<String> entities, 
-                                          int startColumn, String entityType, String prefix, 
-                                          java.util.function.Function<String, List<String>> dataProvider) {
+    private int processGeographicalEntities(Workbook workbook, Sheet referenceSheet, List<String> entities,
+            int startColumn, String entityType, String prefix,
+            java.util.function.Function<String, List<String>> dataProvider) {
         Row headerRow = referenceSheet.getRow(0);
         if (headerRow == null) {
             headerRow = referenceSheet.createRow(0);
@@ -549,8 +554,8 @@ public class ExcelValidationService {
                     currentColumn++;
 
                 } catch (Exception e) {
-                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                        "Error creando datos para " + entityType + " '" + entityName + "'", e);
+                    throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                            "Error creando datos para " + entityType + " '" + entityName + "'", e);
                 }
             }
         }
@@ -558,42 +563,40 @@ public class ExcelValidationService {
         return currentColumn;
     }
 
-
     /**
-     * Crea una tabla de mapeo entre nombres originales de departamentos y nombres de rangos normalizados.
+     * Crea una tabla de mapeo entre nombres originales de departamentos y nombres
+     * de rangos normalizados.
      */
     private void createDepartmentMappingTable(Sheet referenceSheet) {
         try {
             List<String> states = getColombianStates();
             int mappingColumn = 38; // Columna AM (después de todas las ciudades)
-            
+
             // Crear encabezado para la tabla de mapeo
             Row headerRow = referenceSheet.getRow(0);
             if (headerRow == null) {
                 headerRow = referenceSheet.createRow(0);
             }
             headerRow.createCell(mappingColumn).setCellValue("Mapeo_Rangos");
-            
+
             // Llenar la tabla de mapeo
             for (int i = 0; i < states.size(); i++) {
                 String originalName = states.get(i);
                 String normalizedName = StringNormalizer.normalizeForExcel(originalName);
-                
+
                 Row row = referenceSheet.getRow(i + 1);
                 if (row == null) {
                     row = referenceSheet.createRow(i + 1);
                 }
-                
+
                 // Columna AM: nombre del rango normalizado
                 row.createCell(mappingColumn).setCellValue(normalizedName);
             }
-            
-            
+
         } catch (Exception e) {
-            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR, 
-                "Error creando tabla de mapeo", e);
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error creando tabla de mapeo", e);
         }
     }
-
 
 }
