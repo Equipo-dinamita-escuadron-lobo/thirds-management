@@ -61,7 +61,6 @@ public class BatchValidationService {
                 }
 
             } catch (Exception e) {
-                log.error("Error validando registro en fila {}: {}", excelData.getRowNumber(), e.getMessage());
                 errors.add(ImportErrorDetail.builder()
                         .rowNumber(excelData.getRowNumber())
                         .errorCode("VALIDATION_SYSTEM_ERROR")

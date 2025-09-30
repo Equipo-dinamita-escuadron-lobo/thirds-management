@@ -164,8 +164,7 @@ public class ExcelParsingService {
                         .build());
             }
         }
-
-        log.debug("Columnas detectadas: {}", columnMap.keySet());
+        
         return columnMap;
     }
 

@@ -464,7 +464,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             return false;
             
         } catch (Exception e) {
-            log.error("Error al eliminar tercero con ID: {} para empresa: {}", thirdId, entId, e);
             return false;
         } finally {
             TenantContext.setTenantId(currentTenant);

@@ -27,7 +27,6 @@ public class SqlExecutionService {
      */
     public void executeSqlFile(String sqlFilePath) {
         try {
-            log.debug("Ejecutando archivo SQL: {}", sqlFilePath);
             
             ClassPathResource resource = new ClassPathResource(sqlFilePath);
             validateResource(resource, sqlFilePath);
@@ -35,10 +34,8 @@ public class SqlExecutionService {
             String sqlContent = readSqlContent(resource);
             executeSqlStatements(sqlContent);
             
-            log.debug("Archivo {} ejecutado exitosamente", sqlFilePath);
             
         } catch (Exception e) {
-            log.error("Error ejecutando archivo SQL {}: {}", sqlFilePath, e.getMessage());
             throw new RuntimeException("Error cargando datos desde archivo: " + sqlFilePath, e);
         }
     }

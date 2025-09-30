@@ -107,7 +107,6 @@ public class ImportThirdService implements ImportThirdUseCase {
      */
     private BatchProcessingResult processInBatches(List<ThirdExcelData> uniqueRecords) {
         if (uniqueRecords.isEmpty()) {
-            log.debug("No hay registros únicos para procesar");
             return new BatchProcessingResult(0, 0, 0);
         }
 
