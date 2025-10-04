@@ -127,6 +127,11 @@ public class ExcelValidationService {
                 getTypeIdOptions(entId),
                 "Seleccione un tipo de identificación válido");
 
+        // Columna 2: Dígito Verificación (solo un dígito 0-9)
+        applyNumericRangeValidation(sheet, 2, startRow, endRow, 0, 9,
+                "Dígito Verificación",
+                "El dígito de verificación debe ser un número entre 0 y 9");
+
         // Columna 3: Tipo de Persona
         applyDropdownValidation(sheet, 3, startRow, endRow,
                 getPersonTypeOptions(),
@@ -223,6 +228,58 @@ public class ExcelValidationService {
         } catch (Exception e) {
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
                     "Error al aplicar validación en columna " + columnIndex, e);
+        }
+    }
+
+    /**
+     * Aplica validación de rango numérico a una columna específica.
+     * 
+     * @param sheet        hoja de Excel
+     * @param columnIndex  índice de la columna
+     * @param startRow     fila inicial
+     * @param endRow       fila final
+     * @param minValue     valor mínimo permitido
+     * @param maxValue     valor máximo permitido
+     * @param fieldName    nombre del campo para mensajes
+     * @param errorMessage mensaje de error personalizado
+     */
+    public void applyNumericRangeValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
+            int minValue, int maxValue, String fieldName, String errorMessage) {
+        try {
+            XSSFSheet xssfSheet = (XSSFSheet) sheet;
+            XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
+
+            // Crear el rango de celdas donde aplicar la validación
+            CellRangeAddressList addressList = new CellRangeAddressList(startRow, endRow, columnIndex, columnIndex);
+
+            // Crear restricción numérica entre minValue y maxValue
+            DataValidationConstraint constraint = validationHelper.createIntegerConstraint(
+                    DataValidationConstraint.OperatorType.BETWEEN,
+                    String.valueOf(minValue),
+                    String.valueOf(maxValue));
+
+            // Crear la validación
+            DataValidation validation = validationHelper.createValidation(constraint, addressList);
+
+            // Configurar propiedades de la validación
+            validation.setShowErrorBox(true);
+            validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+            validation.createErrorBox("Error de Validación", errorMessage);
+
+            // Mostrar mensaje de ayuda
+            validation.setShowPromptBox(true);
+            validation.createPromptBox(fieldName, 
+                    "Ingrese un número entre " + minValue + " y " + maxValue);
+
+            // Permitir celdas vacías (campo opcional)
+            validation.setEmptyCellAllowed(true);
+
+            // Aplicar la validación a la hoja
+            sheet.addValidationData(validation);
+
+        } catch (Exception e) {
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error al aplicar validación numérica en columna " + columnIndex, e);
         }
     }
 
