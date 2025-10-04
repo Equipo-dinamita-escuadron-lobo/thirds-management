@@ -20,14 +20,9 @@ public class ListTypeIdService implements ListTypeIdUseCase {
      * 
      * @param entId el ID de la empresa
      * @return lista de tipos de identificación disponibles
-     * @throws IllegalArgumentException si el ID de empresa es inválido
      */
     @Override
     public List<TypeId> getAllTypeId(String entId) {
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
-
         return idOutputPort.getAllTypeIds(entId);
     }
 

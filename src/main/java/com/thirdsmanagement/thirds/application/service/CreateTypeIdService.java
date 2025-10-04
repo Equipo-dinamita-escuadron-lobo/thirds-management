@@ -18,15 +18,9 @@ public class CreateTypeIdService implements CreateTypeIdUseCase {
      * 
      * @param typeId el tipo de identificación a crear
      * @return el tipo de identificación creado con su ID asignado
-     * @throws IllegalArgumentException si el tipo de identificación es null o tiene
-     *                                  datos inválidos
      */
     @Override
     public TypeId createTypeId(TypeId typeId) {
-        if (typeId == null) {
-            throw new IllegalArgumentException("El tipo de identificación no puede ser null");
-        }
-
         // Guardar el tipo de identificación
         TypeId createdTypeId = idOutputPort.saveTypeId(typeId);
 

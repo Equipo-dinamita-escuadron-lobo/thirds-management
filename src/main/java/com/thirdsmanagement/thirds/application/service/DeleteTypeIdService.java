@@ -28,45 +28,20 @@ public class DeleteTypeIdService implements DeleteTypeIdUseCase {
      * @param typeIdId el ID del tipo de identificación a eliminar
      * @param entId    el ID de la empresa
      * @return true si se eliminó correctamente
-     * @throws TypeIdNotFound           si el tipo de identificación no existe
-     * @throws TypeIdInUseException     si el tipo de identificación está siendo
-     *                                  utilizado
-     * @throws IllegalArgumentException si los parámetros son inválidos
+     * @throws TypeIdNotFound       si el tipo de identificación no existe
+     * @throws TypeIdInUseException si el tipo de identificación está siendo utilizado
      */
     @Override
     @Transactional
     public boolean deleteTypeId(Long typeIdId, String entId) {
-
-        // Validar parámetros de entrada
-        validateInputParameters(typeIdId, entId);
-
-        // Verificar que el tipo de identificación existe
+        // Verificar que el tipo de identificación existe (validación de negocio)
         TypeId typeId = validateTypeIdExists(typeIdId, entId);
 
-        // Verificar que el tipo de identificación no esté siendo utilizado
+        // Verificar que el tipo de identificación no esté siendo utilizado (validación de negocio)
         validateTypeIdNotInUse(typeIdId, entId, typeId.getTypeId());
 
         // Proceder con la eliminación
-        boolean deleted = idOutputPort.deleteTypeId(typeIdId, entId);
-
-        return deleted;
-    }
-
-    /**
-     * Valida que los parámetros de entrada no sean null o inválidos.
-     * 
-     * @param typeIdId el ID del tipo de identificación
-     * @param entId    el ID de la empresa
-     * @throws IllegalArgumentException si algún parámetro es inválido
-     */
-    private void validateInputParameters(Long typeIdId, String entId) {
-        if (typeIdId == null) {
-            throw new IllegalArgumentException("El ID del tipo de identificación no puede ser null");
-        }
-
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
+        return idOutputPort.deleteTypeId(typeIdId, entId);
     }
 
     /**
