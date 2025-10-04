@@ -517,6 +517,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     /**
      * Actualiza el estado de todos los terceros de una empresa de forma masiva.
      * Utiliza una query nativa optimizada para mejor performance.
+     * Bean Validation en el controlador garantiza que los parámetros no son null.
      * 
      * @param entId El id de la empresa
      * @param newState El nuevo estado (true para activo, false para inactivo)
@@ -525,21 +526,10 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Override
     @Transactional
     public int bulkUpdateThirdState(String entId, Boolean newState) {
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
-        if (newState == null) {
-            throw new IllegalArgumentException("El nuevo estado no puede ser null");
-        }
-        
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
-            int updatedCount = thirdRepository.bulkUpdateStateByEntId(entId, newState);
-                        
-            return updatedCount;
-            
+            return thirdRepository.bulkUpdateStateByEntId(entId, newState);
         } finally {
             TenantContext.setTenantId(currentTenant);
         }

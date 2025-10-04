@@ -23,38 +23,15 @@ public class BulkChangeThirdStateService implements BulkChangeThirdStateUseCase 
     /**
      * Cambia el estado de todos los terceros de una empresa.
      * Operación transaccional que garantiza atomicidad.
+     * Bean Validation en el controlador garantiza que los parámetros son válidos.
      * 
      * @param entId ID de la empresa
      * @param newState Nuevo estado (true para activo, false para inactivo)
      * @return Cantidad de terceros actualizados
-     * @throws IllegalArgumentException si los parámetros son inválidos
      */
     @Override
     @Transactional
     public int changeAllThirdsState(String entId, Boolean newState) {
-        // Validar parámetros de entrada
-        validateParameters(entId, newState);
-                
-        // Ejecutar cambio de estado masivo
-        int updatedCount = thirdOutputPort.bulkUpdateThirdState(entId, newState);       
-        
-        return updatedCount;
-    }
-
-    /**
-     * Valida los parámetros de entrada.
-     * 
-     * @param entId ID de la empresa
-     * @param newState Nuevo estado
-     * @throws IllegalArgumentException si algún parámetro es inválido
-     */
-    private void validateParameters(String entId, Boolean newState) {
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa es obligatorio");
-        }
-        
-        if (newState == null) {
-            throw new IllegalArgumentException("El nuevo estado es obligatorio");
-        }
+        return thirdOutputPort.bulkUpdateThirdState(entId, newState);
     }
 }
