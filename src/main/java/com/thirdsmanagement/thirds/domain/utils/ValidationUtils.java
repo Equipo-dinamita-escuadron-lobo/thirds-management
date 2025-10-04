@@ -162,7 +162,9 @@ public final class ValidationUtils {
         String lowerMessage = errorMessage.toLowerCase();
 
         // Casos específicos primero (más específicos)
-        if (lowerMessage.contains("nit")) {
+        if (lowerMessage.contains("dígito de verificación") || lowerMessage.contains("digito de verificacion")) {
+            return "Dígito Verificación";
+        } else if (lowerMessage.contains("nit")) {
             return "Número Identificación";
         } else if (lowerMessage.contains("no se permite el campo género")) {
             return "Género";

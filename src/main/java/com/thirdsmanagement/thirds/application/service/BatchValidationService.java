@@ -402,6 +402,13 @@ public class BatchValidationService {
                 errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
             }
 
+            // Validar dígito de verificación según tipo de persona
+            try {
+                thirdValidationService.validateVerificationDigit(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
         } catch (Exception e) {
             // Error crítico al construir el objeto Third
             errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));

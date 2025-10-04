@@ -272,6 +272,8 @@ public final class ErrorMappingUtils {
         return switch (fieldName) {
             case "Número Identificación" ->
                 excelData.getIdNumber() != null ? excelData.getIdNumber().toString() : null;
+            case "Dígito Verificación" ->
+                excelData.getVerificationNumber() != null ? excelData.getVerificationNumber().toString() : null;
             case "Tipo Persona" ->
                 excelData.getPersonType() != null ? excelData.getPersonType().toString() : null;
             case "Tipo Identificación" -> excelData.getTypeIdName();
