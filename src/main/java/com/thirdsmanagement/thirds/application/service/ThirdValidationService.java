@@ -34,8 +34,8 @@ public class ThirdValidationService {
         boolean hasSocialReason = third.getSocialReason() != null && !third.getSocialReason().trim().isEmpty();
 
         if (third.getPersonType().isNatural()) {
-            // Para persona natural: nombres, apellidos y género son obligatorios
-            if (!hasNames || !hasLastNames || !hasGender) {
+            // Para persona natural: nombres y apellidos son obligatorios (género es opcional)
+            if (!hasNames || !hasLastNames) {
                 throw ThirdPersonTypeValidationException.forNaturalPersonMissingFields();
             }
 

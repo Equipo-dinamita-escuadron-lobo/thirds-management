@@ -224,6 +224,7 @@ public class BatchValidationService {
 
     /**
      * Valida campos específicos requeridos para personas naturales.
+     * Género es opcional.
      */
     private void validateNaturalPersonFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -237,10 +238,6 @@ public class BatchValidationService {
                     excelData.getRowNumber(), "Apellidos", columnMap));
         }
 
-        if (excelData.getGender() == null) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Género", columnMap));
-        }
     }
 
     /**
@@ -255,24 +252,13 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida que la geografía completa sea obligatoria (país, departamento, ciudad).
+     * Valida geografía (ahora opcional para ambos tipos de persona).
+     * Ya no se valida como campo obligatorio.
      */
     private void validateCompleteGeographyRequired(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
-        if (!ValidationUtils.hasContent(excelData.getCountryName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "País", columnMap));
-        }
-
-        if (!ValidationUtils.hasContent(excelData.getStateName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Departamento", columnMap));
-        }
-
-        if (!ValidationUtils.hasContent(excelData.getCityName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Ciudad", columnMap));
-        }
+        // Geografía es opcional - no se valida como requerida
+        // La validación de existencia se hace en validateGeography() si se proporcionan datos
     }
 
     /**
