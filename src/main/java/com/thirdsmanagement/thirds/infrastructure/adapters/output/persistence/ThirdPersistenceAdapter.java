@@ -537,10 +537,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             TenantContext.setTenantId(currentTenant);
             
             int updatedCount = thirdRepository.bulkUpdateStateByEntId(entId, newState);
-            
-            log.debug("Actualización masiva de estado completada. Empresa: {}, Nuevo estado: {}, Registros actualizados: {}", 
-                    entId, newState, updatedCount);
-            
+                        
             return updatedCount;
             
         } finally {

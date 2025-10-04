@@ -34,13 +34,9 @@ public class BulkChangeThirdStateService implements BulkChangeThirdStateUseCase 
     public int changeAllThirdsState(String entId, Boolean newState) {
         // Validar parámetros de entrada
         validateParameters(entId, newState);
-        
-        log.info("Iniciando cambio de estado masivo para empresa: {} - Nuevo estado: {}", entId, newState);
-        
+                
         // Ejecutar cambio de estado masivo
-        int updatedCount = thirdOutputPort.bulkUpdateThirdState(entId, newState);
-        
-        log.info("Cambio de estado masivo completado. Terceros actualizados: {}", updatedCount);
+        int updatedCount = thirdOutputPort.bulkUpdateThirdState(entId, newState);       
         
         return updatedCount;
     }
