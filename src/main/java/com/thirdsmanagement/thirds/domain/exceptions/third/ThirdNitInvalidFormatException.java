@@ -30,9 +30,20 @@ public class ThirdNitInvalidFormatException extends BaseBusinessException {
     }
 
     /**
-     * Constructor con mensaje personalizado.
+     * Constructor con NIT y mensaje personalizado.
+     * 
+     * @param nitNumber el número de NIT que no cumple con el formato
+     * @param customMessage mensaje personalizado de error
+     */
+    public ThirdNitInvalidFormatException(String nitNumber, String customMessage) {
+        super(ThirdsErrorCode.THIRD_NIT_INVALID_FORMAT, customMessage);
+    }
+
+    /**
+     * Constructor con mensaje personalizado y causa.
      * 
      * @param message mensaje personalizado de error
+     * @param cause causa del error
      */
     public ThirdNitInvalidFormatException(String message, Throwable cause) {
         super(ThirdsErrorCode.THIRD_NIT_INVALID_FORMAT, message, cause);

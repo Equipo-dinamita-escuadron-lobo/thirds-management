@@ -122,6 +122,23 @@ public final class ErrorMappingUtils {
     }
 
     /**
+     * Crea un error de formato de NIT inválido (debe tener exactamente 9 dígitos).
+     * 
+     * @param rowNumber  número de fila
+     * @param nitValue   valor del NIT inválido
+     * @param columnMap  mapa de columnas
+     * @return error de formato de NIT
+     */
+    public static ImportErrorDetail createInvalidNitLengthError(int rowNumber, String nitValue,
+            Map<String, Integer> columnMap) {
+        return createError(rowNumber, "Número Identificación", nitValue,
+                "INVALID_NIT_LENGTH",
+                "El NIT debe tener exactamente 9 dígitos",
+                ImportErrorType.FORMAT_ERROR,
+                columnMap);
+    }
+
+    /**
      * Crea un error de referencia inválida para datos maestros.
      * 
      * @param rowNumber     número de fila

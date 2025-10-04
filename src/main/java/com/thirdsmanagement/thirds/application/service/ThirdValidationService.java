@@ -94,7 +94,7 @@ public class ThirdValidationService {
 
     /**
      * Valida que el formato del NIT sea correcto para personas jurídicas.
-     * El NIT debe empezar por 8 o 9.
+     * El NIT debe tener exactamente 9 dígitos y empezar por 8 o 9.
      * 
      * @param third el tercero a validar
      * @throws ThirdNitInvalidFormatException si el NIT no tiene el formato correcto
@@ -120,8 +120,16 @@ public class ThirdValidationService {
 
         String nitNumber = third.getIdNumber().toString();
 
+        // Validar que tenga exactamente 9 dígitos
+        if (nitNumber.length() != 9) {
+            throw new ThirdNitInvalidFormatException(nitNumber, 
+                "El NIT debe tener exactamente 9 dígitos. Valor proporcionado: " + nitNumber + " (" + nitNumber.length() + " dígitos)");
+        }
+
+        // Validar que empiece por 8 o 9
         if (!nitNumber.startsWith("8") && !nitNumber.startsWith("9")) {
-            throw new ThirdNitInvalidFormatException(nitNumber);
+            throw new ThirdNitInvalidFormatException(nitNumber,
+                "El NIT debe empezar por 8 o 9. Valor proporcionado: " + nitNumber);
         }
     }
 

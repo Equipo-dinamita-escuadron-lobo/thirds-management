@@ -105,22 +105,38 @@ public final class ValidationUtils {
      * Valida que el dígito de verificación sea un solo dígito (0-9).
      * 
      * @param verificationNumber el número de verificación a validar
-     * @return true si es un dígito válido (0-9), false en caso contrario
+     * @return true si es válido (null o un dígito 0-9), false en caso contrario
      */
     public static boolean isValidVerificationDigit(Long verificationNumber) {
         if (verificationNumber == null) {
             return true; // null es válido (opcional)
         }
+        
         // Debe ser un número entre 0 y 9 (un solo dígito)
         return verificationNumber >= 0 && verificationNumber <= 9;
     }
 
-    // ===== VALIDACIONES DE COMPATIBILIDAD =====
+    /**
+     * Valida que el NIT tenga exactamente 9 dígitos.
+     * 
+     * @param nitNumber el número de NIT a validar
+     * @return true si tiene exactamente 9 dígitos, false en caso contrario
+     */
+    public static boolean isValidNitLength(Long nitNumber) {
+        if (nitNumber == null) {
+            return false;
+        }
+        
+        String nitString = nitNumber.toString();
+        return nitString.length() == 9;
+    }
+
+    // ===== VALIDACIONES DE COMPATIBILIDAD ======
 
     /**
      * Verifica si un mensaje de excepción indica un error de duplicado.
      * 
-     * @param errorMessage el mensaje de error a analizar
+{{ ... }}
      * @return true si es un error de duplicado, false en caso contrario
      */
     public static boolean isDuplicateError(String errorMessage) {
