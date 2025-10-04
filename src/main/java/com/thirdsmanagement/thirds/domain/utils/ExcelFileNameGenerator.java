@@ -26,9 +26,10 @@ public class ExcelFileNameGenerator {
      * 
      * @param entId ID de la empresa
      * @param companyName Nombre de la empresa (opcional)
-     * @return nombre del archivo con timestamp y empresa si aplica
+     * @param status Estado de los terceros exportados (true=activos, false=inactivos, null=todos)
+     * @return nombre del archivo con timestamp, empresa y estado si aplica
      */
-    public String generateExportFileName(String entId, String companyName) {
+    public String generateExportFileName(String entId, String companyName, Boolean status) {
         String timestamp = generateTimestamp();
         StringBuilder fileName = new StringBuilder("Terceros");
         
@@ -36,6 +37,12 @@ public class ExcelFileNameGenerator {
         if (companyName != null && !companyName.trim().isEmpty()) {
             String normalizedCompanyName = normalizeForFileName(companyName);
             fileName.append("_").append(normalizedCompanyName);
+        }
+        
+        // Agregar estado si se especifica
+        if (status != null) {
+            String statusText = status ? "activos" : "inactivos";
+            fileName.append("_").append(statusText);
         }
         
         fileName.append("_").append(timestamp).append(".xlsx");

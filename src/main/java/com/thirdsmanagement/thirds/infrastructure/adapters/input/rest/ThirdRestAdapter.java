@@ -288,7 +288,7 @@ public class ThirdRestAdapter {
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        String filename = fileNameGenerator.generateExportFileName(entId, companyName);
+        String filename = fileNameGenerator.generateExportFileName(entId, companyName, statusBoolean);
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
