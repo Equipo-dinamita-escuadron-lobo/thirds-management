@@ -342,7 +342,7 @@ public class ExportThirdService implements ExportThirdUseCase {
                 createTemplateCell(row, colIndex++, "ACTIVO", templateStyle);
 
                 if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                    createTemplateCell(row, colIndex++, "Cliente, Proveedor", templateStyle);
                 }
 
                 if (Boolean.TRUE.equals(request.getIncludeCities())) {

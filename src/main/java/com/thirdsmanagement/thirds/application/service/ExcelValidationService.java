@@ -145,6 +145,7 @@ public class ExcelValidationService {
 
     /**
      * Aplica validaciones para terceros con tipos incluidos.
+     * Permite múltiples tipos de tercero separados por comas.
      */
     public void applyThirdValidationsWithTypes(Sheet sheet, String entId, int startRow, int endRow,
             int typesColumnIndex) {
@@ -152,9 +153,11 @@ public class ExcelValidationService {
         applyThirdValidations(sheet, entId, startRow, endRow);
 
         // Columna de Tipos de Tercero (posición variable)
-        applyDropdownValidation(sheet, typesColumnIndex, startRow, endRow,
+        
+        applyMultiSelectValidation(sheet, typesColumnIndex, startRow, endRow,
                 getThirdTypeOptions(entId),
-                "Seleccione tipos de tercero válidos separados por coma");
+                "Tipos de Tercero",
+                "Ingrese uno o más tipos separados por coma. Tipos disponibles: ");
     }
 
     /**
@@ -561,6 +564,54 @@ public class ExcelValidationService {
         }
 
         return currentColumn;
+    }
+
+    /**
+     * Aplica validación que permite múltiples valores separados por comas.
+     * Muestra un mensaje informativo con los valores válidos disponibles.
+     */
+    public void applyMultiSelectValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
+            List<String> options, String fieldName, String promptPrefix) {
+        if (options == null || options.isEmpty()) {
+            return;
+        }
+
+        try {
+            XSSFSheet xssfSheet = (XSSFSheet) sheet;
+            XSSFDataValidationHelper validationHelper = new XSSFDataValidationHelper(xssfSheet);
+
+            // Crear el rango de celdas donde aplicar la validación
+            CellRangeAddressList addressList = new CellRangeAddressList(startRow, endRow, columnIndex, columnIndex);
+
+            // Usar validación de texto personalizada que permite cualquier entrada
+            // pero muestra mensaje informativo con las opciones disponibles
+            DataValidationConstraint constraint = validationHelper.createCustomConstraint("TRUE");
+
+            // Crear la validación
+            DataValidation validation = validationHelper.createValidation(constraint, addressList);
+
+            // Configurar mensaje de ayuda con las opciones disponibles
+            validation.setShowPromptBox(true);
+            String availableOptions = String.join(", ", options);
+            String promptMessage = promptPrefix + availableOptions + ". Separe múltiples valores con comas (,)";
+            
+            // Limitar longitud del mensaje si es muy largo
+            if (promptMessage.length() > 255) {
+                promptMessage = promptPrefix + "Ver hoja 'Datos_Referencia' para opciones completas. Separe múltiples valores con comas (,)";
+            }
+            
+            validation.createPromptBox(fieldName, promptMessage);
+
+            // No configurar error box para permitir entrada libre
+            validation.setShowErrorBox(false);
+
+            // Aplicar la validación a la hoja
+            sheet.addValidationData(validation);
+
+        } catch (Exception e) {
+            throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error al aplicar validación multi-selección en columna " + columnIndex, e);
+        }
     }
 
     /**
