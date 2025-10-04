@@ -54,15 +54,12 @@ public class ThirdCreateRequest {
     @Builder.Default
     private Boolean state = true;
     
-    @NotBlank(message = "El código del país no puede estar vacío")
     @Size(max = 3, message = "El código del país no puede exceder los 3 caracteres")
     private String countryCode;
 
-    @NotBlank(message = "El código del estado no puede estar vacío") 
     @Size(max = 10, message = "El código del estado no puede exceder los 10 caracteres")
     private String stateCode;
 
-    @NotBlank(message = "El código de la ciudad no puede estar vacío")
     @Size(max = 10, message = "El código de la ciudad no puede exceder los 10 caracteres") 
     private String cityCode; 
 
