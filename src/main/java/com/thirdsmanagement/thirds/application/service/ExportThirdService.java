@@ -41,15 +41,20 @@ public class ExportThirdService implements ExportThirdUseCase {
         // Si se especifica un estado específico (activos o inactivos)
         if (request.getStatus() != null) {
             Page<Third> page = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, request.getStatus());
-            return page.getContent();
+            return page != null ? page.getContent() : new java.util.ArrayList<>();
         }
 
         // Si no se especifica filtro, obtener explícitamente activos e inactivos
         Page<Third> activePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, true);
         Page<Third> inactivePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, false);
 
-        List<Third> allThirds = activePage.getContent();
-        allThirds.addAll(inactivePage.getContent());
+        List<Third> allThirds = new java.util.ArrayList<>();
+        if (activePage != null && activePage.getContent() != null) {
+            allThirds.addAll(activePage.getContent());
+        }
+        if (inactivePage != null && inactivePage.getContent() != null) {
+            allThirds.addAll(inactivePage.getContent());
+        }
 
         return allThirds;
     }
