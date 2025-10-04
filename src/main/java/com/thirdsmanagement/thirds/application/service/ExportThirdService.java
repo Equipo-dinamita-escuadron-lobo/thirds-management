@@ -101,7 +101,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         // Encabezados básicos con indicativos de requerimiento
         createHeaderCell(headerRow, colIndex++, "Tipo Identificación\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Número Identificación\n(Requerido)", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "DV\n(Requerido para persona jurídica con NIT)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Dígito Verificación\n(Requerido para persona jurídica con NIT)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Tipo Persona\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Nombres\n(Requerido para persona natural)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Apellidos\n(Requerido para persona natural)", headerStyle);
