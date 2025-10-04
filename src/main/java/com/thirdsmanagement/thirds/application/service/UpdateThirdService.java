@@ -79,7 +79,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
         // Validar que los ThirdTypes existen
         validateThirdTypesExist(third);
 
-        // Geography validation and retrieval (solo si se proporcionan códigos)
+
         Country country = third.getCountry();
         State state = third.getProvince();
         City city = third.getCity();
