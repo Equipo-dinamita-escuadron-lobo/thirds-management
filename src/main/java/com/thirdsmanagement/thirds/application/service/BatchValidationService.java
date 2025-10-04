@@ -131,6 +131,7 @@ public class BatchValidationService {
 
     /**
      * Valida un registro individual usando los datos pre-cargados.
+     * Ejecuta TODAS las validaciones para mostrar todos los errores del registro.
      */
     private ValidationResult validateSingleRecord(ThirdExcelData excelData, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -142,8 +143,9 @@ public class BatchValidationService {
         // 2. Validaciones de referencias (tipos, geografía)
         validateReferences(excelData, errors, cache, columnMap);
 
-        // 3. Validaciones de reglas de negocio (solo si no hay errores básicos)
-        if (errors.isEmpty()) {
+        // 3. Validaciones de reglas de negocio (SIEMPRE ejecutar para mostrar todos los errores)
+        // Solo omitir si faltan datos críticos para construir el objeto Third
+        if (canBuildThirdObject(excelData)) {
             validateBusinessRules(excelData, errors, cache, columnMap);
         }
 
@@ -372,20 +374,48 @@ public class BatchValidationService {
 
     /**
      * Valida reglas de negocio reutilizando el servicio existente.
+     * Captura CADA excepción individualmente para mostrar todos los errores.
      */
     private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             ReferenceDataCache cache, Map<String, Integer> columnMap) {
         try {
-
             Third third = convertToThird(excelData, cache);
 
-            thirdValidationService.validatePersonTypeConsistency(third);
-            thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
-            thirdValidationService.validateNitFormat(third);
+            // Validar consistencia de tipo de persona (nombres/apellidos vs razón social)
+            try {
+                thirdValidationService.validatePersonTypeConsistency(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
+            // Validar compatibilidad TypeId-PersonType
+            try {
+                thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
+            // Validar formato de NIT para personas jurídicas
+            try {
+                thirdValidationService.validateNitFormat(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
 
         } catch (Exception e) {
+            // Error crítico al construir el objeto Third
             errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
         }
+    }
+
+    /**
+     * Verifica si se puede construir un objeto Third con los datos disponibles.
+     * Requiere al menos: personType, typeId y idNumber.
+     */
+    private boolean canBuildThirdObject(ThirdExcelData excelData) {
+        return excelData.getPersonType() != null 
+                && ValidationUtils.hasContent(excelData.getTypeIdName())
+                && excelData.getIdNumber() != null;
     }
 
     /**
