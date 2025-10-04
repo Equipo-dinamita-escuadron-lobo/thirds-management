@@ -135,4 +135,12 @@ public interface ThirdOutputPort {
      * @return El número total de terceros con el estado especificado
      */
     long countAllThirdsByStatus(String entId, boolean isActive);
+    
+    /**
+     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
+     * @param entId El id de la empresa
+     * @param newState El nuevo estado (true para activo, false para inactivo)
+     * @return La cantidad de terceros actualizados
+     */
+    int bulkUpdateThirdState(String entId, Boolean newState);
 }

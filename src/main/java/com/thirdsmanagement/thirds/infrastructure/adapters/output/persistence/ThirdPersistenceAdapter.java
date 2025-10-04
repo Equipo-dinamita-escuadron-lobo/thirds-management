@@ -515,6 +515,40 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
+     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
+     * Utiliza una query nativa optimizada para mejor performance.
+     * 
+     * @param entId El id de la empresa
+     * @param newState El nuevo estado (true para activo, false para inactivo)
+     * @return La cantidad de terceros actualizados
+     */
+    @Override
+    @Transactional
+    public int bulkUpdateThirdState(String entId, Boolean newState) {
+        if (entId == null || entId.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
+        }
+        if (newState == null) {
+            throw new IllegalArgumentException("El nuevo estado no puede ser null");
+        }
+        
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            
+            int updatedCount = thirdRepository.bulkUpdateStateByEntId(entId, newState);
+            
+            log.debug("Actualización masiva de estado completada. Empresa: {}, Nuevo estado: {}, Registros actualizados: {}", 
+                    entId, newState, updatedCount);
+            
+            return updatedCount;
+            
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+
+    /**
      * Encuentra qué números de identificación ya existen en la base de datos.
      * 
      * @param idNumbers conjunto de números de identificación a verificar
