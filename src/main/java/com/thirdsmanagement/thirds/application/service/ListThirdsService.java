@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
-import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.RequiredArgsConstructor;
@@ -22,23 +21,15 @@ public class ListThirdsService implements ListThirdsUseCase {
      * 
      * @param entId    el ID de la empresa
      * @param pageable información de paginación
-     * @return página de terceros encontrados
+     * @return página de terceros encontrados 
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound            si no se encuentran terceros para la empresa
      */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
         validateEnterpriseId(entId);
         validatePageable(pageable);
 
-        Page<Third> result = thirdOutputPort.getAllThirdsBy(entId, pageable);
-
-        // Verificar si hay registros totales para la empresa, no solo en esta página
-        if (result.getTotalElements() == 0) {
-            throw new ThirdNotFound("No se encontraron terceros para la empresa con ID: " + entId);
-        }
-
-        return result;
+        return thirdOutputPort.getAllThirdsBy(entId, pageable);
     }
 
     /**
@@ -48,10 +39,8 @@ public class ListThirdsService implements ListThirdsUseCase {
      * @param entId       el ID de la empresa
      * @param pageable    información de paginación
      * @param thirdTypeId el ID del tipo de tercero
-     * @return página de terceros filtrados por tipo
+     * @return página de terceros filtrados por tipo (puede estar vacía si no hay datos)
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound            si no se encuentran terceros del tipo
-     *                                  especificado
      */
     @Override
     public Page<Third> getAllThirdsByType(String entId, Pageable pageable, Long thirdTypeId) {
@@ -59,16 +48,7 @@ public class ListThirdsService implements ListThirdsUseCase {
         validatePageable(pageable);
         validateThirdTypeId(thirdTypeId);
 
-        Page<Third> result = thirdOutputPort.getAllThirdsByTypeId(entId, pageable, thirdTypeId);
-
-        // Verificar si hay registros totales para el filtro, no solo en esta página
-        if (result.getTotalElements() == 0) {
-            throw new ThirdNotFound(
-                    "No se encontro un tercero con ID de tipo de tercero '" + thirdTypeId + "' para la empresa con ID: "
-                            + entId);
-        }
-
-        return result;
+        return thirdOutputPort.getAllThirdsByTypeId(entId, pageable, thirdTypeId);
     }
 
     /**
@@ -79,25 +59,15 @@ public class ListThirdsService implements ListThirdsUseCase {
      * @param pageable información de paginación
      * @param isActive el estado del tercero (true para activos, false para
      *                 inactivos)
-     * @return página de terceros filtrados por estado
+     * @return página de terceros filtrados por estado (puede estar vacía si no hay datos)
      * @throws IllegalArgumentException si los parámetros son inválidos
-     * @throws ThirdNotFound            si no se encuentran terceros
      */
     @Override
     public Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive) {
         validateEnterpriseId(entId);
         validatePageable(pageable);
 
-        Page<Third> result = thirdOutputPort.getAllThirdsByStatus(entId, pageable, isActive);
-
-        // Verificar si hay registros totales para el filtro, no solo en esta página
-        if (result.getTotalElements() == 0) {
-            String statusMessage = isActive ? "activos" : "inactivos";
-            throw new ThirdNotFound(
-                    "No se encontraron terceros " + statusMessage + " para la empresa con ID: " + entId);
-        }
-
-        return result;
+        return thirdOutputPort.getAllThirdsByStatus(entId, pageable, isActive);
     }
 
     /**
