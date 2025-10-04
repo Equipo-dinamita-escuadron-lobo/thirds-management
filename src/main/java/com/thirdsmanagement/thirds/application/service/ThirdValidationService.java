@@ -3,8 +3,11 @@ package com.thirdsmanagement.thirds.application.service;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNitInvalidFormatException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdPersonTypeValidationException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.VerificationDigitNotAllowedException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.VerificationDigitRequiredException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdTypeIdPersonTypeIncompatibilityException;
 import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 
 import org.springframework.stereotype.Component;
 
@@ -106,7 +109,7 @@ public class ThirdValidationService {
             return;
         }
 
-        String typeIdCode = third.getTypeId().getTypeId().trim().toUpperCase();
+        String typeIdCode = ValidationUtils.normalizeForComparison(third.getTypeId().getTypeId());
         if (!"NIT".equals(typeIdCode)) {
             return;
         }
@@ -119,6 +122,41 @@ public class ThirdValidationService {
 
         if (!nitNumber.startsWith("8") && !nitNumber.startsWith("9")) {
             throw new ThirdNitInvalidFormatException(nitNumber);
+        }
+    }
+
+    /**
+     * Valida el dígito de verificación según el tipo de persona.
+     * - Personas jurídicas con NIT: dígito de verificación OBLIGATORIO
+     * - Personas jurídicas con otro tipo de ID: dígito de verificación OPCIONAL
+     * - Personas naturales: dígito de verificación NO PERMITIDO
+     * 
+     * @param third el tercero a validar
+     * @throws VerificationDigitNotAllowedException si es persona natural y tiene dígito de verificación
+     * @throws VerificationDigitRequiredException si es persona jurídica con NIT y no tiene dígito de verificación
+     */
+    public void validateVerificationDigit(Third third) {
+        // Validar que el tipo de persona no sea null
+        if (third.getPersonType() == null) {
+            return;
+        }
+
+        boolean hasVerificationDigit = third.getVerificationNumber() != null;
+
+        // REGLA 1: Personas naturales NO pueden tener dígito de verificación
+        if (third.getPersonType().isNatural() && hasVerificationDigit) {
+            throw new VerificationDigitNotAllowedException(third.getPersonType().name());
+        }
+
+        // REGLA 2: Personas jurídicas con NIT DEBEN tener dígito de verificación
+        if (third.getPersonType().isJuridica()) {
+            if (third.getTypeId() != null && third.getTypeId().getTypeId() != null) {
+                String typeIdCode = ValidationUtils.normalizeForComparison(third.getTypeId().getTypeId());
+                
+                if ("NIT".equals(typeIdCode) && !hasVerificationDigit) {
+                    throw new VerificationDigitRequiredException(typeIdCode);
+                }
+            }
         }
     }
 }
