@@ -140,8 +140,7 @@ public final class ErrorMappingUtils {
         String fieldValue = getFieldValueFromExcelData(excelData, fieldName);
 
         return createError(excelData.getRowNumber(), fieldName, fieldValue,
-                ImportConstants.ErrorCodes.BUSINESS_RULE_VIOLATION,
-                "Violación de regla de negocio: " + exception.getMessage(),
+                ImportConstants.ErrorCodes.BUSINESS_RULE_VIOLATION, exception.getMessage(),
                 ImportErrorType.BUSINESS_RULE_ERROR,
                 columnMap);
     }
