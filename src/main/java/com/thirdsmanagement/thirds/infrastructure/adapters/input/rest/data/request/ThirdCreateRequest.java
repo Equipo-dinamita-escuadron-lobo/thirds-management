@@ -9,6 +9,8 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -50,7 +52,11 @@ public class ThirdCreateRequest {
     private String socialReason; 
     private eThirdGender gender;
     private Long idNumber;
+    
+    @Min(value = 0, message = "El dígito de verificación debe estar entre 0 y 9")
+    @Max(value = 9, message = "El dígito de verificación debe estar entre 0 y 9")
     private Long verificationNumber; 
+    
     @Builder.Default
     private Boolean state = true;
     
