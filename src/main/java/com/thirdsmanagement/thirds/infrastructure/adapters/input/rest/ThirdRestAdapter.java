@@ -19,6 +19,7 @@ import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
@@ -277,7 +278,7 @@ public class ThirdRestAdapter {
             @RequestParam(required = false) String companyName) {
         
         // Convertir status de String a Boolean, manejando strings vacíos
-        Boolean statusBoolean = parseStatusParameter(status);
+        Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
@@ -293,20 +294,6 @@ public class ThirdRestAdapter {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelFile);
-    }
-    
-    /**
-     * Convierte el parámetro status de String a Boolean.
-     * Maneja strings vacíos y null como null.
-     * 
-     * @param status el valor del parámetro status
-     * @return Boolean o null
-     */
-    private Boolean parseStatusParameter(String status) {
-        if (status == null || status.trim().isEmpty()) {
-            return null;
-        }
-        return Boolean.parseBoolean(status);
     }
 
     /**

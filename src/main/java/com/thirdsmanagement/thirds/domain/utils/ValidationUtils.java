@@ -214,4 +214,21 @@ public final class ValidationUtils {
         }
         return phone.replaceAll("[^+0-9]", "");
     }
+
+    // ===== CONVERSIONES DE PARÁMETROS =====
+
+    /**
+     * Convierte un parámetro String a Boolean.
+     * Maneja strings vacíos y null como null.
+     * Útil para parámetros opcionales de endpoints REST.
+     * 
+     * @param value el valor del parámetro como String
+     * @return Boolean o null si el valor es null o vacío
+     */
+    public static Boolean parseOptionalBoolean(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return null;
+        }
+        return Boolean.parseBoolean(value);
+    }
 }
