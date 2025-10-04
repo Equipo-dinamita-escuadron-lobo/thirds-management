@@ -81,25 +81,38 @@ public final class ValidationUtils {
      * @param value          la cadena a verificar
      * @param expectedLength la longitud esperada
      * @return true si la longitud coincide, false en caso contrario
-     */
     public static boolean hasLength(String value, int expectedLength) {
         return value != null && value.trim().length() == expectedLength;
     }
 
     /**
-     * Verifica si una cadena está dentro de un rango de longitud.
+     * Verifica si un valor tiene una longitud válida dentro de un rango.
      * 
-     * @param value     la cadena a verificar
-     * @param minLength longitud mínima (inclusiva)
-     * @param maxLength longitud máxima (inclusiva)
-     * @return true si está en el rango, false en caso contrario
+     * @param value     el valor a validar
+     * @param minLength longitud mínima permitida
+     * @param maxLength longitud máxima permitida
+     * @return true si la longitud está dentro del rango, false en caso contrario
      */
-    public static boolean hasLengthBetween(String value, int minLength, int maxLength) {
+    public static boolean isValidLength(String value, int minLength, int maxLength) {
         if (value == null) {
             return false;
         }
         int length = value.trim().length();
         return length >= minLength && length <= maxLength;
+    }
+
+    /**
+     * Valida que el dígito de verificación sea un solo dígito (0-9).
+     * 
+     * @param verificationNumber el número de verificación a validar
+     * @return true si es un dígito válido (0-9), false en caso contrario
+     */
+    public static boolean isValidVerificationDigit(Long verificationNumber) {
+        if (verificationNumber == null) {
+            return true; // null es válido (opcional)
+        }
+        // Debe ser un número entre 0 y 9 (un solo dígito)
+        return verificationNumber >= 0 && verificationNumber <= 9;
     }
 
     // ===== VALIDACIONES DE COMPATIBILIDAD =====

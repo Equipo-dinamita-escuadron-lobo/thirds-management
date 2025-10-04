@@ -290,6 +290,15 @@ public class BatchValidationService {
             errors.add(ErrorMappingUtils.createInvalidPhoneError(
                     excelData.getRowNumber(), excelData.getPhoneNumber(), columnMap));
         }
+
+        // Validar formato de dígito de verificación (debe ser un solo dígito 0-9)
+        if (!ValidationUtils.isValidVerificationDigit(excelData.getVerificationNumber())) {
+            String verificationValue = excelData.getVerificationNumber() != null 
+                    ? excelData.getVerificationNumber().toString() 
+                    : null;
+            errors.add(ErrorMappingUtils.createInvalidVerificationDigitError(
+                    excelData.getRowNumber(), verificationValue, columnMap));
+        }
     }
 
     /**

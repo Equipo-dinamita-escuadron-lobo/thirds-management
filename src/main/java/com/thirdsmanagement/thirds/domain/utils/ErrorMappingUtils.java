@@ -105,6 +105,23 @@ public final class ErrorMappingUtils {
     }
 
     /**
+     * Crea un error de formato de dígito de verificación inválido.
+     * 
+     * @param rowNumber          número de fila
+     * @param verificationValue  valor del dígito de verificación inválido
+     * @param columnMap          mapa de columnas
+     * @return error de formato de dígito de verificación
+     */
+    public static ImportErrorDetail createInvalidVerificationDigitError(int rowNumber, String verificationValue,
+            Map<String, Integer> columnMap) {
+        return createError(rowNumber, "Dígito Verificación", verificationValue,
+                "INVALID_VERIFICATION_DIGIT_FORMAT",
+                "El dígito de verificación debe ser un solo dígito (0-9)",
+                ImportErrorType.FORMAT_ERROR,
+                columnMap);
+    }
+
+    /**
      * Crea un error de referencia inválida para datos maestros.
      * 
      * @param rowNumber     número de fila
