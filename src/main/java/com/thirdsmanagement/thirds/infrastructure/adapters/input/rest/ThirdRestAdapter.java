@@ -267,31 +267,46 @@ public class ThirdRestAdapter {
 
     /**
      * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por ID de tipo de tercero, estado (activos/inactivos) e incluye toda la información.
+     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluye toda la información.
      * El nombre de la empresa se puede incluir en el nombre del archivo.
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
-            @RequestParam(required = false) Long thirdTypeId,
-            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName) {
+        
+        // Convertir status de String a Boolean, manejando strings vacíos
+        Boolean statusBoolean = parseStatusParameter(status);
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
-                .thirdTypeId(thirdTypeId)
-                .status(status)  // filtro por estado: true=activos, false=inactivos, null=todos
+                .status(statusBoolean)  // filtro por estado: true=activos, false=inactivos, null=todos
                 .includeTypes(true)  // incluir tipos
                 .includeCities(true) // incluir geografía
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        String filename = fileNameGenerator.generateExportFileName(entId, companyName, thirdTypeId);
+        String filename = fileNameGenerator.generateExportFileName(entId, companyName);
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(excelFile);
+    }
+    
+    /**
+     * Convierte el parámetro status de String a Boolean.
+     * Maneja strings vacíos y null como null.
+     * 
+     * @param status el valor del parámetro status
+     * @return Boolean o null
+     */
+    private Boolean parseStatusParameter(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return null;
+        }
+        return Boolean.parseBoolean(status);
     }
 
     /**

@@ -1,11 +1,9 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
-import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdExportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
-import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
@@ -34,42 +32,15 @@ import java.util.stream.Collectors;
 public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
-    private final IdOutputPort idOutputPort;
     private final ExcelValidationService excelValidationService;
 
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Validar que el tipo de tercero existe si se especifica
-        if (request.getThirdTypeId() != null) {
-            ThirdType thirdType = idOutputPort.getThirdTypeById(request.getThirdTypeId(), request.getEntId());
-            if (thirdType == null) {
-                throw new ThirdTypeForeignKeyViolationException(request.getThirdTypeId().toString());
-            }
-        }
-
         // Crear un Pageable que obtenga todos los registros (tamaño grande)
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
         // Si se especifica un estado específico (activos o inactivos)
         if (request.getStatus() != null) {
             Page<Third> page = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, request.getStatus());
-            List<Third> thirds = page.getContent();
-
-            // Si también se especifica un ID de tipo de tercero, filtrar adicionalmente
-            if (request.getThirdTypeId() != null) {
-                return thirds.stream()
-                        .filter(third -> third.getThirdTypes().stream()
-                                .anyMatch(type -> type.getThirdTypeId().equals(request.getThirdTypeId())))
-                        .collect(Collectors.toList());
-            }
-
-            return thirds;
-        }
-
-        // Si se especifica un ID de tipo de tercero pero no estado, usar método sin
-        // filtro de estado
-        if (request.getThirdTypeId() != null) {
-            Page<Third> page = thirdOutputPort.getAllThirdsByTypeIdWithoutStateFilter(request.getEntId(), pageable,
-                    request.getThirdTypeId());
             return page.getContent();
         }
 
@@ -291,9 +262,6 @@ public class ExportThirdService implements ExportThirdUseCase {
 
         } catch (ThirdExportException e) {
             // Re-lanzar excepciones de negocio sin modificar
-            throw e;
-        } catch (ThirdTypeForeignKeyViolationException e) {
-            // Re-lanzar excepciones de tipo de tercero sin modificar
             throw e;
         } catch (Exception e) {
             throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,

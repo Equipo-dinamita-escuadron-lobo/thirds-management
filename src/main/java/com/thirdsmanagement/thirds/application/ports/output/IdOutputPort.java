@@ -75,14 +75,6 @@ public interface IdOutputPort {
     /**
      * Obtiene un tipo de tercero completo por su ID.
      * @param thirdTypeId El ID del tipo de tercero
-     * @param entId El ID de la empresa
-     * @return El tipo de tercero completo o null si no existe
-     */
-    ThirdType getThirdTypeById(Long thirdTypeId, String entId);
-    
-    /**
-     * Obtiene un tipo de tercero completo por su ID.
-     * @param thirdTypeId El ID del tipo de tercero
      * @return El tipo de tercero completo o null si no existe
      */
     ThirdType getThirdTypeById(Long thirdTypeId);
