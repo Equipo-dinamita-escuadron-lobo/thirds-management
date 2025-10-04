@@ -72,6 +72,8 @@ public class ExportThirdService implements ExportThirdUseCase {
         style.setBorderRight(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setWrapText(true);
         return style;
     }
 
@@ -96,31 +98,34 @@ public class ExportThirdService implements ExportThirdUseCase {
         Row headerRow = sheet.createRow(0);
         int colIndex = 0;
 
-        // Encabezados básicos
-        createHeaderCell(headerRow, colIndex++, "Tipo Identificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Número Identificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Dígito Verificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Tipo Persona", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Nombres", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Apellidos", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Razón Social", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Género", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Estado", headerStyle);
+        // Encabezados básicos con indicativos de requerimiento
+        createHeaderCell(headerRow, colIndex++, "Tipo Identificación\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Número Identificación\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "DV\n(Requerido para persona jurídica con NIT)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Tipo Persona\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Nombres\n(Requerido para persona natural)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Apellidos\n(Requerido para persona natural)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Razón Social\n(Requerido para persona jurídica)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Género\n(Opcional)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Estado\n(No se requiere)", headerStyle);
 
         // Encabezados opcionales
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            createHeaderCell(headerRow, colIndex++, "Tipos de Tercero", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Tipos de Tercero\n(Requerido)", headerStyle);
         }
 
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            createHeaderCell(headerRow, colIndex++, "País", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Departamento", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Ciudad", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "País\n(Opcional)", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Departamento\n(Opcional)", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Ciudad\n(Opcional)", headerStyle);
         }
 
-        createHeaderCell(headerRow, colIndex++, "Dirección", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Teléfono", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Email", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Dirección\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Teléfono\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Email\n(Requerido)", headerStyle);
+        
+        // Ajustar altura de la fila de encabezados para mostrar múltiples líneas
+        headerRow.setHeightInPoints(35);
     }
 
     private void createHeaderCell(Row row, int colIndex, String value, CellStyle style) {
