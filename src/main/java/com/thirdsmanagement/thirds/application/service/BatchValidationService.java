@@ -131,6 +131,7 @@ public class BatchValidationService {
 
     /**
      * Valida un registro individual usando los datos pre-cargados.
+     * Ejecuta TODAS las validaciones para mostrar todos los errores del registro.
      */
     private ValidationResult validateSingleRecord(ThirdExcelData excelData, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -142,8 +143,9 @@ public class BatchValidationService {
         // 2. Validaciones de referencias (tipos, geografía)
         validateReferences(excelData, errors, cache, columnMap);
 
-        // 3. Validaciones de reglas de negocio (solo si no hay errores básicos)
-        if (errors.isEmpty()) {
+        // 3. Validaciones de reglas de negocio (SIEMPRE ejecutar para mostrar todos los errores)
+        // Solo omitir si faltan datos críticos para construir el objeto Third
+        if (canBuildThirdObject(excelData)) {
             validateBusinessRules(excelData, errors, cache, columnMap);
         }
 
@@ -222,6 +224,7 @@ public class BatchValidationService {
 
     /**
      * Valida campos específicos requeridos para personas naturales.
+     * Género es opcional.
      */
     private void validateNaturalPersonFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -235,10 +238,6 @@ public class BatchValidationService {
                     excelData.getRowNumber(), "Apellidos", columnMap));
         }
 
-        if (excelData.getGender() == null) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Género", columnMap));
-        }
     }
 
     /**
@@ -253,24 +252,13 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida que la geografía completa sea obligatoria (país, departamento, ciudad).
+     * Valida geografía (ahora opcional para ambos tipos de persona).
+     * Ya no se valida como campo obligatorio.
      */
     private void validateCompleteGeographyRequired(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
-        if (!ValidationUtils.hasContent(excelData.getCountryName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "País", columnMap));
-        }
-
-        if (!ValidationUtils.hasContent(excelData.getStateName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Departamento", columnMap));
-        }
-
-        if (!ValidationUtils.hasContent(excelData.getCityName())) {
-            errors.add(ErrorMappingUtils.createRequiredFieldError(
-                    excelData.getRowNumber(), "Ciudad", columnMap));
-        }
+        // Geografía es opcional - no se valida como requerida
+        // La validación de existencia se hace en validateGeography() si se proporcionan datos
     }
 
     /**
@@ -287,6 +275,15 @@ public class BatchValidationService {
                 && !ValidationUtils.isValidPhoneNumber(excelData.getPhoneNumber())) {
             errors.add(ErrorMappingUtils.createInvalidPhoneError(
                     excelData.getRowNumber(), excelData.getPhoneNumber(), columnMap));
+        }
+
+        // Validar formato de dígito de verificación (debe ser un solo dígito 0-9)
+        if (!ValidationUtils.isValidVerificationDigit(excelData.getVerificationNumber())) {
+            String verificationValue = excelData.getVerificationNumber() != null 
+                    ? excelData.getVerificationNumber().toString() 
+                    : null;
+            errors.add(ErrorMappingUtils.createInvalidVerificationDigitError(
+                    excelData.getRowNumber(), verificationValue, columnMap));
         }
     }
 
@@ -372,20 +369,55 @@ public class BatchValidationService {
 
     /**
      * Valida reglas de negocio reutilizando el servicio existente.
+     * Captura CADA excepción individualmente para mostrar todos los errores.
      */
     private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             ReferenceDataCache cache, Map<String, Integer> columnMap) {
         try {
-
             Third third = convertToThird(excelData, cache);
 
-            thirdValidationService.validatePersonTypeConsistency(third);
-            thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
-            thirdValidationService.validateNitFormat(third);
+            // Validar consistencia de tipo de persona (nombres/apellidos vs razón social)
+            try {
+                thirdValidationService.validatePersonTypeConsistency(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
+            // Validar compatibilidad TypeId-PersonType
+            try {
+                thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
+            // Validar formato de NIT para personas jurídicas
+            try {
+                thirdValidationService.validateNitFormat(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
+
+            // Validar dígito de verificación según tipo de persona
+            try {
+                thirdValidationService.validateVerificationDigit(third);
+            } catch (Exception e) {
+                errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
+            }
 
         } catch (Exception e) {
+            // Error crítico al construir el objeto Third
             errors.add(ErrorMappingUtils.createBusinessRuleError(excelData, e, columnMap));
         }
+    }
+
+    /**
+     * Verifica si se puede construir un objeto Third con los datos disponibles.
+     * Requiere al menos: personType, typeId y idNumber.
+     */
+    private boolean canBuildThirdObject(ThirdExcelData excelData) {
+        return excelData.getPersonType() != null 
+                && ValidationUtils.hasContent(excelData.getTypeIdName())
+                && excelData.getIdNumber() != null;
     }
 
     /**

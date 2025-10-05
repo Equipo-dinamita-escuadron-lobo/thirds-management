@@ -9,6 +9,7 @@ import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
+import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -145,8 +146,11 @@ public class ExcelParsingService {
                 if (headerValue != null) {
                     String header = headerValue.trim();
                     if (!header.isEmpty()) {
-                        columnMap.put(header, i);
-                        foundHeaders.add(header);
+                        // Normalizar el encabezado: extraer solo el nombre del campo
+                        // eliminando el texto entre paréntesis y saltos de línea
+                        String normalizedHeader = StringNormalizer.normalizeHeaderName(header);
+                        columnMap.put(normalizedHeader, i);
+                        foundHeaders.add(normalizedHeader);
                     }
                 }
             }

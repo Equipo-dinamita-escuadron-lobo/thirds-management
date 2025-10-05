@@ -3,20 +3,13 @@ package com.thirdsmanagement.thirds.domain.utils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.domain.model.ThirdType;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Utilidad para generar nombres de archivos Excel de terceros.
  */
 @Component
-@RequiredArgsConstructor
 public class ExcelFileNameGenerator {
-    
-    private final IdOutputPort idOutputPort;
     
     /**
      * Genera nombre de archivo para plantilla de terceros.
@@ -33,10 +26,10 @@ public class ExcelFileNameGenerator {
      * 
      * @param entId ID de la empresa
      * @param companyName Nombre de la empresa (opcional)
-     * @param thirdTypeId ID del tipo de tercero (opcional)
-     * @return nombre del archivo con timestamp, empresa y tipo si aplica
+     * @param status Estado de los terceros exportados (true=activos, false=inactivos, null=todos)
+     * @return nombre del archivo con timestamp, empresa y estado si aplica
      */
-    public String generateExportFileName(String entId, String companyName, Long thirdTypeId) {
+    public String generateExportFileName(String entId, String companyName, Boolean status) {
         String timestamp = generateTimestamp();
         StringBuilder fileName = new StringBuilder("Terceros");
         
@@ -46,27 +39,14 @@ public class ExcelFileNameGenerator {
             fileName.append("_").append(normalizedCompanyName);
         }
         
-        // Agregar tipo de tercero si se proporciona
-        if (thirdTypeId != null) {
-            String typeName = getThirdTypeName(thirdTypeId, entId);
-            String fileTypeName = normalizeForFileName(typeName);
-            fileName.append("_").append(fileTypeName);
+        // Agregar estado si se especifica
+        if (status != null) {
+            String statusText = status ? "activos" : "inactivos";
+            fileName.append("_").append(statusText);
         }
         
         fileName.append("_").append(timestamp).append(".xlsx");
         return fileName.toString();
-    }
-    
-    /**
-     * Obtiene el nombre del tipo de tercero.
-     * 
-     * @param thirdTypeId ID del tipo de tercero
-     * @param entId ID de la empresa
-     * @return nombre normalizado del tipo o fallback con ID
-     */
-    private String getThirdTypeName(Long thirdTypeId, String entId) {
-        ThirdType thirdType = idOutputPort.getThirdTypeById(thirdTypeId, entId);
-        return thirdType != null ? thirdType.getNormalizedName() : "Tipo_" + thirdTypeId;
     }
     
     /**

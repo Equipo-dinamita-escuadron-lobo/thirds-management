@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.thirdsmanagement.thirds.application.ports.input.ListGeographyUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.GeographyOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.geography.CountryNotFoundException;
-import com.thirdsmanagement.thirds.domain.exceptions.geography.GeographyInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.geography.StateNotFoundException;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
@@ -33,10 +32,7 @@ public class ListGeographyService implements ListGeographyUseCase {
 
     @Override
     public List<State> getStatesByCountry(String countryCode) {
-        if (countryCode == null || countryCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código del país no puede ser null o vacío");
-        }
-
+        // Validar jerarquía geográfica 
         if (!geographyOutputPort.existsActiveCountry(countryCode)) {
             throw new CountryNotFoundException("El país con código '" + countryCode + "' no existe");
         }
@@ -46,14 +42,7 @@ public class ListGeographyService implements ListGeographyUseCase {
 
     @Override
     public List<City> getCitiesByState(String stateCode, String countryCode) {
-        if (stateCode == null || stateCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código del estado no puede ser null o vacío");
-        }
-
-        if (countryCode == null || countryCode.trim().isEmpty()) {
-            throw new GeographyInvalidDataException("El código del país no puede ser null o vacío");
-        }
-
+        // Validar jerarquía geográfica
         if (!geographyOutputPort.existsActiveCountry(countryCode)) {
             throw new CountryNotFoundException("El país con código '" + countryCode + "' no existe");
         }

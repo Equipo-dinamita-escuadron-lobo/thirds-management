@@ -28,48 +28,24 @@ public class DeleteThirdTypeService implements DeleteThirdTypeUseCase {
      * @param thirdTypeId el ID del tipo de tercero a eliminar
      * @param entId       el ID de la empresa
      * @return true si se eliminó correctamente
-     * @throws ThirdTypeNotFound        si el tipo de tercero no existe
-     * @throws ThirdTypeInUseException  si el tipo de tercero está siendo utilizado
-     * @throws IllegalArgumentException si los parámetros son inválidos
+     * @throws ThirdTypeNotFound       si el tipo de tercero no existe
+     * @throws ThirdTypeInUseException si el tipo de tercero está siendo utilizado
      */
     @Override
     @Transactional
     public boolean deleteThirdType(Long thirdTypeId, String entId) {
-
-        // Validar parámetros de entrada
-        validateInputParameters(thirdTypeId, entId);
-
-        // Verificar que el tipo de tercero existe
+        // Verificar que el tipo de tercero existe (validación de negocio)
         ThirdType thirdType = validateThirdTypeExists(thirdTypeId, entId);
 
-        // Verificar que el tipo de tercero no esté siendo utilizado
+        // Verificar que el tipo de tercero no esté siendo utilizado (validación de negocio)
         validateThirdTypeNotInUse(thirdTypeId, entId, thirdType.getThirdTypeName());
 
         // Proceder con la eliminación
-        boolean deleted = idOutputPort.deleteThirdType(thirdTypeId, entId);
-
-        return deleted;
+        return idOutputPort.deleteThirdType(thirdTypeId, entId);
     }
 
     /**
-     * Valida que los parámetros de entrada no sean null o inválidos.
-     * 
-     * @param thirdTypeId el ID del tipo de tercero
-     * @param entId       el ID de la empresa
-     * @throws IllegalArgumentException si algún parámetro es inválido
-     */
-    private void validateInputParameters(Long thirdTypeId, String entId) {
-        if (thirdTypeId == null) {
-            throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
-        }
-
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
-    }
-
-    /**
-     * Valida que el tipo de tercero existe en el sistema.
+     * Valida que el tipo de tercero existe en el sistema (validación de negocio).
      * 
      * @param thirdTypeId el ID del tipo de tercero
      * @param entId       el ID de la empresa

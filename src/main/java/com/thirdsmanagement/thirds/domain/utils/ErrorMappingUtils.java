@@ -105,6 +105,40 @@ public final class ErrorMappingUtils {
     }
 
     /**
+     * Crea un error de formato de dígito de verificación inválido.
+     * 
+     * @param rowNumber          número de fila
+     * @param verificationValue  valor del dígito de verificación inválido
+     * @param columnMap          mapa de columnas
+     * @return error de formato de dígito de verificación
+     */
+    public static ImportErrorDetail createInvalidVerificationDigitError(int rowNumber, String verificationValue,
+            Map<String, Integer> columnMap) {
+        return createError(rowNumber, "Dígito Verificación", verificationValue,
+                "INVALID_VERIFICATION_DIGIT_FORMAT",
+                "El dígito de verificación debe ser un solo dígito (0-9)",
+                ImportErrorType.FORMAT_ERROR,
+                columnMap);
+    }
+
+    /**
+     * Crea un error de formato de NIT inválido (debe tener exactamente 9 dígitos).
+     * 
+     * @param rowNumber  número de fila
+     * @param nitValue   valor del NIT inválido
+     * @param columnMap  mapa de columnas
+     * @return error de formato de NIT
+     */
+    public static ImportErrorDetail createInvalidNitLengthError(int rowNumber, String nitValue,
+            Map<String, Integer> columnMap) {
+        return createError(rowNumber, "Número Identificación", nitValue,
+                "INVALID_NIT_LENGTH",
+                "El NIT debe tener exactamente 9 dígitos",
+                ImportErrorType.FORMAT_ERROR,
+                columnMap);
+    }
+
+    /**
      * Crea un error de referencia inválida para datos maestros.
      * 
      * @param rowNumber     número de fila
@@ -140,8 +174,7 @@ public final class ErrorMappingUtils {
         String fieldValue = getFieldValueFromExcelData(excelData, fieldName);
 
         return createError(excelData.getRowNumber(), fieldName, fieldValue,
-                ImportConstants.ErrorCodes.BUSINESS_RULE_VIOLATION,
-                "Violación de regla de negocio: " + exception.getMessage(),
+                ImportConstants.ErrorCodes.BUSINESS_RULE_VIOLATION, exception.getMessage(),
                 ImportErrorType.BUSINESS_RULE_ERROR,
                 columnMap);
     }
@@ -272,6 +305,8 @@ public final class ErrorMappingUtils {
         return switch (fieldName) {
             case "Número Identificación" ->
                 excelData.getIdNumber() != null ? excelData.getIdNumber().toString() : null;
+            case "Dígito Verificación" ->
+                excelData.getVerificationNumber() != null ? excelData.getVerificationNumber().toString() : null;
             case "Tipo Persona" ->
                 excelData.getPersonType() != null ? excelData.getPersonType().toString() : null;
             case "Tipo Identificación" -> excelData.getTypeIdName();

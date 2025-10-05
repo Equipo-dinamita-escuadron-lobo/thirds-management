@@ -515,6 +515,27 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
+     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
+     * Utiliza una query nativa optimizada para mejor performance.
+     * Bean Validation en el controlador garantiza que los parámetros no son null.
+     * 
+     * @param entId El id de la empresa
+     * @param newState El nuevo estado (true para activo, false para inactivo)
+     * @return La cantidad de terceros actualizados
+     */
+    @Override
+    @Transactional
+    public int bulkUpdateThirdState(String entId, Boolean newState) {
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+            return thirdRepository.bulkUpdateStateByEntId(entId, newState);
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+
+    /**
      * Encuentra qué números de identificación ya existen en la base de datos.
      * 
      * @param idNumbers conjunto de números de identificación a verificar

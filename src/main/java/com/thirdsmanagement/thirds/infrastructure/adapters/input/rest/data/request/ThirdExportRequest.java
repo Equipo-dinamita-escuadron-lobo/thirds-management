@@ -31,12 +31,6 @@ public class ThirdExportRequest {
     private Boolean status;
 
     /**
-     * ID específico de tipo de tercero para filtrar.
-     * Si es null, se incluyen todos los tipos.
-     */
-    private Long thirdTypeId;
-
-    /**
      * Lista de IDs específicos de terceros a exportar.
      * Si está vacía o es null, se aplican los otros filtros.
      */

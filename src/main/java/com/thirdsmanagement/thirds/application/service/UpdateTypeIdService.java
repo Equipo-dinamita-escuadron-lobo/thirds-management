@@ -21,23 +21,9 @@ public class UpdateTypeIdService implements UpdateTypeIdUseCase {
      * 
      * @param typeId el tipo de identificación con los datos actualizados
      * @return el tipo de identificación actualizado
-     * @throws IllegalArgumentException si el typeId es null o no tiene datos
-     *                                  válidos
      */
     @Override
     public TypeId updateTypeId(TypeId typeId) {
-        if (typeId == null) {
-            throw new IllegalArgumentException("El tipo de identificación no puede ser null");
-        }
-
-        if (typeId.getTypeId() == null || typeId.getTypeId().trim().isEmpty()) {
-            throw new IllegalArgumentException("El código del tipo de identificación no puede estar vacío");
-        }
-
-        if (typeId.getEntId() == null || typeId.getEntId().trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede estar vacío");
-        }
-
         // Actualizar el tipo de identificación
         TypeId updatedTypeId = idOutputPort.updateTypeId(typeId);
 

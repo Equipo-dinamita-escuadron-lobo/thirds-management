@@ -1,11 +1,9 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
-import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdExportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
-import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
@@ -34,51 +32,29 @@ import java.util.stream.Collectors;
 public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
-    private final IdOutputPort idOutputPort;
     private final ExcelValidationService excelValidationService;
 
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Validar que el tipo de tercero existe si se especifica
-        if (request.getThirdTypeId() != null) {
-            ThirdType thirdType = idOutputPort.getThirdTypeById(request.getThirdTypeId(), request.getEntId());
-            if (thirdType == null) {
-                throw new ThirdTypeForeignKeyViolationException(request.getThirdTypeId().toString());
-            }
-        }
-
         // Crear un Pageable que obtenga todos los registros (tamaño grande)
         Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
         // Si se especifica un estado específico (activos o inactivos)
         if (request.getStatus() != null) {
             Page<Third> page = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, request.getStatus());
-            List<Third> thirds = page.getContent();
-
-            // Si también se especifica un ID de tipo de tercero, filtrar adicionalmente
-            if (request.getThirdTypeId() != null) {
-                return thirds.stream()
-                        .filter(third -> third.getThirdTypes().stream()
-                                .anyMatch(type -> type.getThirdTypeId().equals(request.getThirdTypeId())))
-                        .collect(Collectors.toList());
-            }
-
-            return thirds;
-        }
-
-        // Si se especifica un ID de tipo de tercero pero no estado, usar método sin
-        // filtro de estado
-        if (request.getThirdTypeId() != null) {
-            Page<Third> page = thirdOutputPort.getAllThirdsByTypeIdWithoutStateFilter(request.getEntId(), pageable,
-                    request.getThirdTypeId());
-            return page.getContent();
+            return page != null ? page.getContent() : new java.util.ArrayList<>();
         }
 
         // Si no se especifica filtro, obtener explícitamente activos e inactivos
         Page<Third> activePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, true);
         Page<Third> inactivePage = thirdOutputPort.getAllThirdsByStatus(request.getEntId(), pageable, false);
 
-        List<Third> allThirds = activePage.getContent();
-        allThirds.addAll(inactivePage.getContent());
+        List<Third> allThirds = new java.util.ArrayList<>();
+        if (activePage != null && activePage.getContent() != null) {
+            allThirds.addAll(activePage.getContent());
+        }
+        if (inactivePage != null && inactivePage.getContent() != null) {
+            allThirds.addAll(inactivePage.getContent());
+        }
 
         return allThirds;
     }
@@ -96,6 +72,8 @@ public class ExportThirdService implements ExportThirdUseCase {
         style.setBorderRight(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setWrapText(true);
         return style;
     }
 
@@ -120,31 +98,34 @@ public class ExportThirdService implements ExportThirdUseCase {
         Row headerRow = sheet.createRow(0);
         int colIndex = 0;
 
-        // Encabezados básicos
-        createHeaderCell(headerRow, colIndex++, "Tipo Identificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Número Identificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Dígito Verificación", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Tipo Persona", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Nombres", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Apellidos", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Razón Social", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Género", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Estado", headerStyle);
+        // Encabezados básicos con indicativos de requerimiento
+        createHeaderCell(headerRow, colIndex++, "Tipo Identificación\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Número Identificación\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Dígito Verificación\n(Requerido para persona jurídica con NIT)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Tipo Persona\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Nombres\n(Requerido para persona natural)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Apellidos\n(Requerido para persona natural)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Razón Social\n(Requerido para persona jurídica)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Género\n(Opcional)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Estado\n(No se requiere)", headerStyle);
 
         // Encabezados opcionales
         if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            createHeaderCell(headerRow, colIndex++, "Tipos de Tercero", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Tipos de Tercero\n(Requerido)", headerStyle);
         }
 
         if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            createHeaderCell(headerRow, colIndex++, "País", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Departamento", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Ciudad", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "País\n(Opcional)", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Departamento\n(Opcional)", headerStyle);
+            createHeaderCell(headerRow, colIndex++, "Ciudad\n(Opcional)", headerStyle);
         }
 
-        createHeaderCell(headerRow, colIndex++, "Dirección", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Teléfono", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Email", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Dirección\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Teléfono\n(Requerido)", headerStyle);
+        createHeaderCell(headerRow, colIndex++, "Email\n(Requerido)", headerStyle);
+        
+        // Ajustar altura de la fila de encabezados para mostrar múltiples líneas
+        headerRow.setHeightInPoints(35);
     }
 
     private void createHeaderCell(Row row, int colIndex, String value, CellStyle style) {
@@ -292,9 +273,6 @@ public class ExportThirdService implements ExportThirdUseCase {
         } catch (ThirdExportException e) {
             // Re-lanzar excepciones de negocio sin modificar
             throw e;
-        } catch (ThirdTypeForeignKeyViolationException e) {
-            // Re-lanzar excepciones de tipo de tercero sin modificar
-            throw e;
         } catch (Exception e) {
             throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
                     "Error al generar archivo de exportación", e);
@@ -369,7 +347,7 @@ public class ExportThirdService implements ExportThirdUseCase {
                 createTemplateCell(row, colIndex++, "ACTIVO", templateStyle);
 
                 if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
+                    createTemplateCell(row, colIndex++, "Cliente, Proveedor", templateStyle);
                 }
 
                 if (Boolean.TRUE.equals(request.getIncludeCities())) {

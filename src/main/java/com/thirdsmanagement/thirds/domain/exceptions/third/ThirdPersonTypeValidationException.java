@@ -38,7 +38,7 @@ public class ThirdPersonTypeValidationException extends BaseBusinessException {
      */
     public static ThirdPersonTypeValidationException forNaturalPersonMissingFields() {
         return new ThirdPersonTypeValidationException(
-            "Para personas naturales son obligatorios: nombres, apellidos y género. " +
+            "Para personas naturales son obligatorios: nombres y apellidos. " +
             "La razón social debe estar vacía."
         );
     }

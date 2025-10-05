@@ -52,11 +52,20 @@ public class CreateThirdService implements CreateThirdUseCase {
         // Validar formato de NIT para personas jurídicas
         thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
 
-        // Geography validation and retrieval
-        Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
-        Country country = (Country) geography[0];
-        State state = (State) geography[1];
-        City city = (City) geography[2];
+        // Validar dígito de verificación según tipo de persona
+        thirdValidationService.validateVerificationDigit(thirdWithCompleteTypeId);
+
+  
+        Country country = null;
+        State state = null;
+        City city = null;
+        
+        if (countryCode != null && stateCode != null && cityCode != null) {
+            Object[] geography = geographyValidationService.validateAndGetGeography(countryCode, stateCode, cityCode);
+            country = (Country) geography[0];
+            state = (State) geography[1];
+            city = (City) geography[2];
+        }
 
         // Normalization of names and geography assignment usando el tercero con TypeId
         // completo

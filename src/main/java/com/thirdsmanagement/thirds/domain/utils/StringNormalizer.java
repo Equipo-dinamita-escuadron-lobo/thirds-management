@@ -212,6 +212,33 @@ public final class StringNormalizer {
     }
 
     /**
+     * Normaliza el nombre de un encabezado de Excel eliminando texto entre paréntesis y saltos de línea.
+     * Útil para procesar encabezados con indicativos de requerimiento.
+     * 
+     * Ejemplo: "Tipo Identificación\n(Requerido)" -> "Tipo Identificación"
+     * Ejemplo: "Dígito Verificación\n(Requerido para persona jurídica con NIT)" -> "Dígito Verificación"
+     *
+     * @param headerName nombre del encabezado original
+     * @return nombre normalizado sin indicativos de requerimiento ni saltos de línea
+     */
+    public static String normalizeHeaderName(String headerName) {
+        if (headerName == null) {
+            return null;
+        }
+        
+        // Eliminar saltos de línea y caracteres de retorno de carro
+        String normalized = headerName.replaceAll("[\n\r]+", " ");
+        
+        // Eliminar texto entre paréntesis (indicativos de requerimiento)
+        normalized = normalized.replaceAll("\\s*\\([^)]*\\)\\s*", "");
+        
+        // Limpiar espacios múltiples y trim
+        normalized = normalized.replaceAll("\\s+", " ").trim();
+        
+        return normalized;
+    }
+
+    /**
      * Capitaliza la primera letra de una cadena.
      *
      * @param input el texto a capitalizar

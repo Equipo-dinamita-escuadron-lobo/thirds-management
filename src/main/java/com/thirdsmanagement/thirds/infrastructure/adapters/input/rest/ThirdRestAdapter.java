@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.thirdsmanagement.thirds.application.ports.input.BulkChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
@@ -19,10 +20,12 @@ import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.BulkStateChangeResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
@@ -43,6 +46,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,6 +69,7 @@ public class ThirdRestAdapter {
     private final ListThirdsUseCase listThirdsUseCase;
     private final GetThirdUseCase getThirdUseCase;
     private final ChangeThirdStateUseCase changeThirdStateUseCase;
+    private final BulkChangeThirdStateUseCase bulkChangeThirdStateUseCase;
     private final DeleteThirdUseCase deleteThirdUseCase;
     private final ExportThirdUseCase exportThirdUseCase;
     private final ImportThirdUseCase importThirdUseCase;
@@ -114,7 +119,7 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Cambia el estado de un tercero.
+     * Cambia el estado de un tercero individual.
      * @param thId ID del tercero.
      * @param entId ID de la empresa.
      * @return Respuesta con el resultado de la operación.
@@ -126,6 +131,35 @@ public class ThirdRestAdapter {
         Boolean result = changeThirdStateUseCase.changeThirdState(thId, entId);
 
         return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
+    }
+
+    /**
+     * Cambia el estado de todos los terceros de una empresa de forma masiva.
+     * Permite activar o inactivar todos los terceros en una sola operación.
+     * 
+     * @param entId ID de la empresa
+     * @param newState Nuevo estado (true para activo, false para inactivo)
+     * @return Respuesta con la cantidad de terceros actualizados
+     */
+    @PatchMapping("/allState")
+    public ResponseEntity<BulkStateChangeResponse> changeAllThirdsState(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
+        
+        log.info("Solicitud de cambio de estado masivo - Empresa: {}, Nuevo estado: {}", entId, newState);
+        
+        int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
+        
+        String message = String.format("Se actualizaron %d terceros al estado %s", 
+                updatedCount, newState ? "activo" : "inactivo");
+        
+        BulkStateChangeResponse response = BulkStateChangeResponse.builder()
+                .updatedCount(updatedCount)
+                .newState(newState)
+                .message(message)
+                .build();
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
@@ -267,26 +301,27 @@ public class ThirdRestAdapter {
 
     /**
      * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por ID de tipo de tercero, estado (activos/inactivos) e incluye toda la información.
+     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluye toda la información.
      * El nombre de la empresa se puede incluir en el nombre del archivo.
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
-            @RequestParam(required = false) Long thirdTypeId,
-            @RequestParam(required = false) Boolean status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName) {
+        
+        // Convertir status de String a Boolean, manejando strings vacíos
+        Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
-                .thirdTypeId(thirdTypeId)
-                .status(status)  // filtro por estado: true=activos, false=inactivos, null=todos
+                .status(statusBoolean)  // filtro por estado: true=activos, false=inactivos, null=todos
                 .includeTypes(true)  // incluir tipos
                 .includeCities(true) // incluir geografía
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        String filename = fileNameGenerator.generateExportFileName(entId, companyName, thirdTypeId);
+        String filename = fileNameGenerator.generateExportFileName(entId, companyName, statusBoolean);
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")

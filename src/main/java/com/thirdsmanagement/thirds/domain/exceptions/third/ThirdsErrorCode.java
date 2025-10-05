@@ -24,7 +24,9 @@ public enum ThirdsErrorCode implements ErrorCodeDefinition {
     EXCEL_REFERENCE_SHEET_ERROR("EXCEL_REFERENCE_SHEET_ERROR", "Error al crear hoja de referencia en Excel"),
     THIRD_PERSON_TYPE_VALIDATION_ERROR("THIRD_PERSON_TYPE_VALIDATION_ERROR", "Error de validación de tipo de persona"),
     THIRD_TYPE_ID_PERSON_TYPE_INCOMPATIBILITY("THIRD_TYPE_ID_PERSON_TYPE_INCOMPATIBILITY", "Incompatibilidad entre tipo de identificación y tipo de persona"),
-    THIRD_NIT_INVALID_FORMAT("THIRD_NIT_INVALID_FORMAT", "El NIT debe empezar por 8 o 9 para personas jurídicas");
+    THIRD_NIT_INVALID_FORMAT("THIRD_NIT_INVALID_FORMAT", "El NIT debe empezar por 8 o 9 para personas jurídicas"),
+    THIRD_VERIFICATION_DIGIT_NOT_ALLOWED("THIRD_VERIFICATION_DIGIT_NOT_ALLOWED", "El dígito de verificación solo se permite para personas jurídicas"),
+    THIRD_VERIFICATION_DIGIT_REQUIRED("THIRD_VERIFICATION_DIGIT_REQUIRED", "El dígito de verificación es obligatorio para personas jurídicas");
 
     private final String code;
     private final String message;
