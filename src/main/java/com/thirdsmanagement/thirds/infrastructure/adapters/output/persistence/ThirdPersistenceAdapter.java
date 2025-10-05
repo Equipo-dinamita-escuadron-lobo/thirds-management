@@ -225,51 +225,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
 
-    /**
-     * Obtiene todos los terceros filtrados por tipo de tercero.
-     * @param entId El ID de la empresa.
-     * @param page El objeto Pageable para la paginación.
-     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente").
-     * @return Una página de objetos Third que representan los terceros filtrados por tipo.
-     */
-    @Override
-    public Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType) {
-        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByType(entId, thirdType, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
-
-    /**
-     * Obtiene todos los terceros filtrados por ID de tipo de tercero.
-     * @param entId El id de la empresa.
-     * @param page El pageable object.
-     * @param thirdTypeId El ID del tipo de tercero.
-     * @return Una página de objetos Third que representan los terceros filtrados por ID de tipo.
-     */
-    @Override
-    public Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId) {
-        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByTypeId(entId, thirdTypeId, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
-
-    /**
-     * Obtiene todos los terceros filtrados por ID de tipo de tercero sin filtro de estado.
-     * @param entId El id de la empresa.
-     * @param page El pageable object.
-     * @param thirdTypeId El ID del tipo de tercero.
-     * @return Una página de objetos Third que representan los terceros filtrados por ID de tipo (activos e inactivos).
-     */
-    @Override
-    public Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId) {
-        Page<ThirdEntity> pageEntities = thirdRepository.getAllThirdsByTypeIdWithoutStateFilter(entId, thirdTypeId, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
-
 
     /**
      * Convierte un objeto ThirdEntity a un objeto Third.
@@ -382,22 +337,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Obtiene una página de terceros filtrados por estado y el identificador de entidad.
-     * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
-     * @param page El objeto Pageable que contiene la información de paginación.
-     * @param isActive El estado del tercero (true para activos, false para inactivos).
-     * @return Una página de objetos Third que representan los terceros filtrados por estado.
-     */
-    @Override
-    public Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive) {
-        Boolean state = isActive;
-        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByStatus(entId, state, page);
-        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
-
-        return pageThirds;
-    }
-    
-    /**
      * Actualiza las relaciones de tipos de tercero para un tercero específico.
      * Elimina todas las relaciones existentes y crea las nuevas.
      * @param thirdId ID del tercero
@@ -481,37 +420,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
         }
         return thirdRepository.countByEntId(entId);
-    }
-
-    /**
-     * Cuenta el total de terceros filtrados por tipo.
-     * @param entId El id de la empresa
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return El número total de terceros del tipo especificado
-     */
-    @Override
-    public long countAllThirdsByType(String entId, Long thirdTypeId) {
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
-        if (thirdTypeId == null) {
-            throw new IllegalArgumentException("El ID del tipo de tercero no puede ser null");
-        }
-        return thirdRepository.countByEntIdAndThirdTypeId(entId, thirdTypeId);
-    }
-
-    /**
-     * Cuenta el total de terceros filtrados por estado.
-     * @param entId El id de la empresa
-     * @param isActive El estado del tercero
-     * @return El número total de terceros con el estado especificado
-     */
-    @Override
-    public long countAllThirdsByStatus(String entId, boolean isActive) {
-        if (entId == null || entId.trim().isEmpty()) {
-            throw new IllegalArgumentException("El ID de la empresa no puede ser null o vacío");
-        }
-        return thirdRepository.countByEntIdAndState(entId, isActive);
     }
 
     /**

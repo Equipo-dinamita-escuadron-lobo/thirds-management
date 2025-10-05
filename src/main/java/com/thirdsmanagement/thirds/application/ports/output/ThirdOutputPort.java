@@ -69,43 +69,6 @@ public interface ThirdOutputPort {
     
     
     /**
-     * Obtiene todos los terceros filtrados por tipo de tercero.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @param thirdType El tipo de tercero (ej: "Proveedor", "Cliente")
-     * @return La pagina de terceros filtrados por tipo
-     */
-    Page<Third> getAllThirdsByType(String entId, Pageable page, String thirdType);
-    
-    /**
-     * Obtiene todos los terceros filtrados por ID de tipo de tercero.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return La pagina de terceros filtrados por ID de tipo
-     */
-    Page<Third> getAllThirdsByTypeId(String entId, Pageable page, Long thirdTypeId);
-    
-    
-    /**
-     * Obtiene todos los terceros filtrados por estado.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @param isActive El estado del tercero (true para activos, false para inactivos)
-     * @return La pagina de terceros filtrados por estado
-     */
-    Page<Third> getAllThirdsByStatus(String entId, Pageable page, boolean isActive);
-    
-    /**
-     * Obtiene todos los terceros filtrados por ID de tipo de tercero sin filtro de estado.
-     * @param entId El id de la empresa
-     * @param page El pageable object
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return La pagina de terceros filtrados por ID de tipo (activos e inactivos)
-     */
-    Page<Third> getAllThirdsByTypeIdWithoutStateFilter(String entId, Pageable page, Long thirdTypeId);
-    
-    /**
      * Elimina un tercero del sistema junto con sus asociaciones.
      * @param thirdId El ID del tercero a eliminar
      * @param entId El ID de la empresa
@@ -119,22 +82,6 @@ public interface ThirdOutputPort {
      * @return El número total de terceros
      */
     long countAllThirdsByEntId(String entId);
-    
-    /**
-     * Cuenta el total de terceros filtrados por tipo.
-     * @param entId El id de la empresa
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return El número total de terceros del tipo especificado
-     */
-    long countAllThirdsByType(String entId, Long thirdTypeId);
-    
-    /**
-     * Cuenta el total de terceros filtrados por estado.
-     * @param entId El id de la empresa
-     * @param isActive El estado del tercero
-     * @return El número total de terceros con el estado especificado
-     */
-    long countAllThirdsByStatus(String entId, boolean isActive);
     
     /**
      * Actualiza el estado de todos los terceros de una empresa de forma masiva.
