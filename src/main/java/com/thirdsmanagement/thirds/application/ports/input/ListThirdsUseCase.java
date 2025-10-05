@@ -15,27 +15,7 @@ public interface ListThirdsUseCase {
      * @param pageable El objeto pageable
      * @return La página de terceros
      */
-    Page<Third> getAllThirdsBy(String entId,Pageable pageable);
-    
-    
-    /**
-     * Obtiene todos los terceros filtrados por tipo de tercero.
-     * @param entId El id de la empresa
-     * @param pageable El objeto pageable
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return La página de terceros filtrados por tipo
-     */
-    Page<Third> getAllThirdsByType(String entId, Pageable pageable, Long thirdTypeId);
-    
-    
-    /**
-     * Obtiene todos los terceros filtrados por estado.
-     * @param entId El id de la empresa
-     * @param pageable El objeto pageable
-     * @param isActive El estado del tercero (true para activos, false para inactivos)
-     * @return La página de terceros filtrados por estado
-     */
-    Page<Third> getAllThirdsByStatus(String entId, Pageable pageable, boolean isActive);
+    Page<Third> getAllThirdsBy(String entId, Pageable pageable);
     
     /**
      * Cuenta el total de terceros por empresa.
@@ -43,20 +23,4 @@ public interface ListThirdsUseCase {
      * @return El número total de terceros
      */
     long countAllThirdsByEntId(String entId);
-    
-    /**
-     * Cuenta el total de terceros filtrados por tipo.
-     * @param entId El id de la empresa
-     * @param thirdTypeId El ID del tipo de tercero
-     * @return El número total de terceros del tipo especificado
-     */
-    long countAllThirdsByType(String entId, Long thirdTypeId);
-    
-    /**
-     * Cuenta el total de terceros filtrados por estado.
-     * @param entId El id de la empresa
-     * @param isActive El estado del tercero
-     * @return El número total de terceros con el estado especificado
-     */
-    long countAllThirdsByStatus(String entId, boolean isActive);
 }

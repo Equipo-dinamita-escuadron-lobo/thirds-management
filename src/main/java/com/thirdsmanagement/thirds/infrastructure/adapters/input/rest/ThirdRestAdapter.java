@@ -218,55 +218,6 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Obtiene una lista de terceros filtrados por estado con paginación flexible.
-     * Si no se especifican parámetros de paginación, retorna todos los terceros del estado especificado.
-     * @param entId Id de la empresa.
-     * @param numPage Número de página (opcional).
-     * @param size Tamaño de página (opcional).
-     * @param isActive Estado del tercero (true para activos, false para inactivos).
-     * @return Respuesta con la lista de terceros filtrados por estado.
-     */
-    @GetMapping("/inactive")
-    public ResponseEntity<Page<Third>> getThirdsByStatus(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
-            @RequestParam(required = false) Optional<Integer> numPage,
-            @RequestParam(required = false) Optional<Integer> size,
-            @NotNull(message = "isActive es requerido") @RequestParam boolean isActive) {
-
-        long totalRecords = listThirdsUseCase.countAllThirdsByStatus(entId, isActive);
-        Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
-
-        Page<Third> page = listThirdsUseCase.getAllThirdsByStatus(entId, pageable, isActive);
-
-        return new ResponseEntity<>(page, HttpStatus.OK);
-
-    }
-
-    /**
-     * Obtiene una lista de terceros filtrados por tipo de tercero con paginación flexible.
-     * Si no se especifican parámetros de paginación, retorna todos los terceros del tipo especificado.
-     * @param entId Id de la empresa.
-     * @param numPage Número de página (opcional).
-     * @param size Tamaño de página (opcional).
-     * @param thirdTypeId ID del tipo de tercero.
-     * @return Respuesta con la lista de terceros filtrados por tipo.
-     */
-    @GetMapping("/by-type")
-    public ResponseEntity<Page<Third>> getThirdsByType(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
-            @RequestParam(required = false) Optional<Integer> numPage,
-            @RequestParam(required = false) Optional<Integer> size,
-            @NotNull(message = "thirdTypeId es requerido") @RequestParam Long thirdTypeId) {
-
-        long totalRecords = listThirdsUseCase.countAllThirdsByType(entId, thirdTypeId);
-        Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
-
-        Page<Third> page = listThirdsUseCase.getAllThirdsByType(entId, pageable, thirdTypeId);
-
-        return new ResponseEntity<>(page, HttpStatus.OK);
-    }
-
-    /**
      * Cargar un archivo PDF y extraer su contenido RUT.
      * @param file el archivo PDF que se va a cargar.
      * @return ResponseEntity con el contenido extraído del PDF en caso de éxito,

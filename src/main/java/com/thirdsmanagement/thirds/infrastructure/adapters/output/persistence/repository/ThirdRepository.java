@@ -34,45 +34,11 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
-    Page<ThirdEntity> getThirdsByStatus(@Param("entId") String entId, @Param("state") Boolean state, Pageable page);
-
-    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
-            "WHERE t.entId = :entId AND t.state = true " +
-            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
-            "INNER JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
-            "WHERE tat.thId = t.thId AND tt.ttName = :thirdType)")
-    Page<ThirdEntity> getThirdsByType(@Param("entId") String entId, @Param("thirdType") String thirdType,
-            Pageable page);
-
-    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
-            "WHERE t.entId = :entId AND t.state = true " +
-            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
-            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
-    Page<ThirdEntity> getThirdsByTypeId(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
-            Pageable page);
-
-    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
-            "WHERE t.entId = :entId " +
-            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
-            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
-    Page<ThirdEntity> getAllThirdsByTypeIdWithoutStateFilter(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId,
-            Pageable page);
-
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId")
     boolean existsByTypeIdTiIdAndEntId(@Param("typeIdCode") String typeIdCode, @Param("entId") String entId);
 
     @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId")
     long countByEntId(@Param("entId") String entId);
-
-    @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
-            "WHERE t.entId = :entId " +
-            "AND EXISTS (SELECT 1 FROM ThirdsAndTypesEntity tat " +
-            "WHERE tat.thId = t.thId AND tat.ttId = :thirdTypeId)")
-    long countByEntIdAndThirdTypeId(@Param("entId") String entId, @Param("thirdTypeId") Long thirdTypeId);
-
-    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
-    long countByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state);
 
     /**
      * Actualiza el estado de todos los terceros de una empresa de forma masiva.
@@ -82,7 +48,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      * @param newState Nuevo estado (true para activo, false para inactivo)
      * @return Cantidad de registros actualizados
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE ThirdEntity t SET t.state = :newState WHERE t.entId = :entId")
     int bulkUpdateStateByEntId(@Param("entId") String entId, @Param("newState") Boolean newState);
 

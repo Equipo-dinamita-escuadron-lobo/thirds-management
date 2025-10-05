@@ -7,8 +7,8 @@ Sistema de gestión integral de terceros con soporte para personas naturales y j
 ## 📋 Tabla de Contenidos
 
 - [Características Principales](#-características-principales)
-- [Arquitectura](-arquitectura)
-- [Configuración](-configuración)
+- [Arquitectura](#️-arquitectura)
+- [Configuración](#️-configuración)
 - [API REST](#-api-rest)
 - [Validaciones de Negocio](#-validaciones-de-negocio)
 - [Importación y Exportación](#-importación-y-exportación)
