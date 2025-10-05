@@ -48,7 +48,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      * @param newState Nuevo estado (true para activo, false para inactivo)
      * @return Cantidad de registros actualizados
      */
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE ThirdEntity t SET t.state = :newState WHERE t.entId = :entId")
     int bulkUpdateStateByEntId(@Param("entId") String entId, @Param("newState") Boolean newState);
 
