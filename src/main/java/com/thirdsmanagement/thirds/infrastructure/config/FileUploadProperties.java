@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.config;
+package com.thirdsmanagement.thirds.infrastructure.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

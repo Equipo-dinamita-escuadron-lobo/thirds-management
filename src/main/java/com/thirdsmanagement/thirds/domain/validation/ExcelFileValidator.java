@@ -1,7 +1,7 @@
 package com.thirdsmanagement.thirds.domain.validation;
 
-import com.thirdsmanagement.thirds.domain.config.FileUploadProperties;
 import com.thirdsmanagement.thirds.domain.exceptions.third.FileValidationException;
+import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

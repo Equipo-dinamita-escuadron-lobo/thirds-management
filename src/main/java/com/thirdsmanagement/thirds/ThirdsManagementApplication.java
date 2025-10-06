@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
-import com.thirdsmanagement.thirds.domain.config.FileUploadProperties;
+import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
 
 /**
  * Clase principal de la aplicación.
