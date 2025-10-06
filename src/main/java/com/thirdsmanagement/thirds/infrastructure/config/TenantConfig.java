@@ -8,8 +8,8 @@ import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.async.TenantAwareTaskDecorator;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.async.TenantAwareTaskDecorator;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 
 import jakarta.annotation.PreDestroy;
 

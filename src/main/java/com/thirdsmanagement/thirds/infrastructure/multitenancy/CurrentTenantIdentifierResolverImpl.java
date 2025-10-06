@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy;
+package com.thirdsmanagement.thirds.infrastructure.multitenancy;
 
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomi
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 
 import java.util.Map;
 
