@@ -19,28 +19,7 @@ public final class ExcelUtils {
     }
 
     // ===== VALIDACIONES DE ARCHIVO =====
-
-    /**
-     * Valida el formato básico de un archivo Excel.
-     * 
-     * @param file el archivo a validar
-     * @throws IllegalArgumentException si el archivo no es válido
-     */
-    public static void validateExcelFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.FILE_EMPTY);
-        }
-
-        if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.FILE_TOO_LARGE);
-        }
-
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || !isValidExcelExtension(fileName)) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.INVALID_FILE_FORMAT);
-        }
-    }
-
+  
     /**
      * Verifica si un archivo tiene una extensión Excel válida.
      * 

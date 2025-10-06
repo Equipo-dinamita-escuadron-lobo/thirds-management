@@ -2,7 +2,10 @@ package com.thirdsmanagement.thirds;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+import com.thirdsmanagement.thirds.domain.config.FileUploadProperties;
 
 /**
  * Clase principal de la aplicación.
@@ -10,6 +13,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableConfigurationProperties(FileUploadProperties.class)
 public class ThirdsManagementApplication {
 	/**
 	 * Método principal de la aplicación.

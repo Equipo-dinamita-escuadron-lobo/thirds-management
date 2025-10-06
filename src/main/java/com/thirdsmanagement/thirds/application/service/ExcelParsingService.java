@@ -10,13 +10,13 @@ import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+import com.thirdsmanagement.thirds.domain.validation.ExcelFileValidator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -30,39 +30,14 @@ import java.util.*;
  * terceros.
  * Maneja la lectura, validación de formato y conversión de datos desde Excel.
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ExcelParsingService {
 
     private static final int HEADER_ROW_INDEX = 0;
     private static final int DATA_START_ROW_INDEX = 1;
-
-    /**
-     * Valida el formato básico del archivo Excel.
-     * 
-     * @param file archivo Excel a validar
-     * @throws ThirdImportException si el archivo no es válido
-     */
-    public void validateExcelFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw ThirdImportException.forEmptyFile("archivo no especificado");
-        }
-
-        if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
-            throw ThirdImportException.forFileSizeExceeded(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    ImportConstants.MAX_FILE_SIZE);
-        }
-
-        String filename = file.getOriginalFilename();
-        if (filename == null || !filename.toLowerCase().endsWith(".xlsx")) {
-            throw ThirdImportException.forInvalidExcelFile(
-                    filename,
-                    "El archivo debe tener extensión .xlsx");
-        }
-    }
+    
+    private final ExcelFileValidator excelFileValidator;
 
     /**
      * Parsea el archivo Excel y extrae los datos de terceros.
@@ -72,7 +47,7 @@ public class ExcelParsingService {
      * @return lista de terceros parseados y lista de errores encontrados
      */
     public ExcelParsingResult parseExcelFile(MultipartFile file, String entId) {
-        validateExcelFile(file);
+        excelFileValidator.validate(file);
 
         List<ThirdExcelData> thirdsData = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
