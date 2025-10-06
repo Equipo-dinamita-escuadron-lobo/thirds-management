@@ -7,7 +7,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.config.GeographyDataConfig;
+import com.thirdsmanagement.thirds.infrastructure.config.GeographyDataConfig;
 
 import java.io.IOException;
 import java.util.*;

@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.config;
+package com.thirdsmanagement.thirds.infrastructure.config;
 
 import org.springframework.stereotype.Component;
 

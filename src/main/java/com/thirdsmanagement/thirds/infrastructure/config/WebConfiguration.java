@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.config;
+package com.thirdsmanagement.thirds.infrastructure.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
