@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.security;
+package com.thirdsmanagement.thirds.infrastructure.security;
 
 /**
  * Interfaz para utilidades relacionadas con JWT.

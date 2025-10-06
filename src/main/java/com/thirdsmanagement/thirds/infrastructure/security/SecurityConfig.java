@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.security;
+package com.thirdsmanagement.thirds.infrastructure.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
