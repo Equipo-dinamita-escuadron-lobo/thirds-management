@@ -8,7 +8,7 @@ package com.thirdsmanagement.thirds.domain.utils;
 public final class ImportConstants {
 
     private ImportConstants() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("ImportConstants es una clase de utilidad y no debe ser instanciada");
     }
 
     // ===== CONFIGURACIÓN DE ARCHIVOS =====

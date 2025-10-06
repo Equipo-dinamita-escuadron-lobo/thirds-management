@@ -15,7 +15,7 @@ import java.util.*;
 public final class ExcelUtils {
 
     private ExcelUtils() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("ExcelUtils es una clase de utilidad y no debe ser instanciada");
     }
 
     // ===== VALIDACIONES DE ARCHIVO =====
