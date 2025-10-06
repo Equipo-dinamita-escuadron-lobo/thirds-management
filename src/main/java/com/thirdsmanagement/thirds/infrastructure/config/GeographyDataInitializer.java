@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.service.GeographyFileDiscoveryService;
 import com.thirdsmanagement.thirds.domain.exceptions.geography.GeographyDataInitializationException;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.SqlExecutionService;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.CountryRepository;
+import com.thirdsmanagement.thirds.infrastructure.persistence.SqlExecutionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

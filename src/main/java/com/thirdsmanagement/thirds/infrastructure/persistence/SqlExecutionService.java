@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
+package com.thirdsmanagement.thirds.infrastructure.persistence;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
