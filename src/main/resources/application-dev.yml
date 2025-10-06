@@ -48,7 +48,7 @@ management:
         enabled: true
 
 file-upload:
-  max-size: 10485760
+  max-size: 52428800
   allowed-extensions:
     excel:
       - ".xlsx"
