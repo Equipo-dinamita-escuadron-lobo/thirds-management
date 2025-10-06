@@ -15,7 +15,6 @@ import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
 import com.thirdsmanagement.thirds.domain.utils.ExcelFileNameGenerator;
-import com.thirdsmanagement.thirds.domain.utils.PaginationHelper;
 import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
@@ -30,7 +29,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
-
+import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -78,7 +77,6 @@ public class ThirdRestAdapter {
     private final CreateThirdService createThirdService;
     private final UpdateThirdService updateThirdService;
     private final ExcelFileNameGenerator fileNameGenerator;
-    private final PaginationHelper paginationHelper;
 
     /**
      * Crea un tercero.
@@ -209,7 +207,7 @@ public class ThirdRestAdapter {
             @RequestParam(required = false) Optional<Integer> size) {
 
         long totalRecords = listThirdsUseCase.countAllThirdsByEntId(entId);
-        Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
 
