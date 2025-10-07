@@ -1,8 +1,10 @@
-package com.thirdsmanagement.thirds.domain.utils;
+package com.thirdsmanagement.thirds.infrastructure.utils;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 
 import java.io.IOException;
 import java.util.*;
