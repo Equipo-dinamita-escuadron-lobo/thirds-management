@@ -72,6 +72,27 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
+    /**
+     * Crea estilo para encabezados de columnas opcionales (fondo gris claro).
+     */
+    private CellStyle createOptionalHeaderStyle(Workbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        font.setColor(IndexedColors.BLACK.getIndex());
+        style.setFont(font);
+        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setWrapText(true);
+        return style;
+    }
+
     private CellStyle createDataStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
@@ -90,10 +111,11 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     private void createHeaders(Sheet sheet, CellStyle headerStyle, ThirdExportRequest request) {
+        CellStyle optionalHeaderStyle = createOptionalHeaderStyle(sheet.getWorkbook());
         Row headerRow = sheet.createRow(0);
         int colIndex = 0;
 
-        // Encabezados básicos con indicativos de requerimiento
+        // Encabezados básicos requeridos con indicativos de requerimiento
         createHeaderCell(headerRow, colIndex++, "Tipo Identificación\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Número Identificación\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Dígito Verificación\n(Requerido para persona jurídica con NIT)", headerStyle);
@@ -101,20 +123,22 @@ public class ExportThirdService implements ExportThirdUseCase {
         createHeaderCell(headerRow, colIndex++, "Nombres\n(Requerido para persona natural)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Apellidos\n(Requerido para persona natural)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Razón Social\n(Requerido para persona jurídica)", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Género\n(Opcional)", headerStyle);
-        createHeaderCell(headerRow, colIndex++, "Estado\n(No se requiere)", headerStyle);
+        
+        // Género - OPCIONAL (siempre presente)
+        createHeaderCell(headerRow, colIndex++, "Género\n(Opcional)", optionalHeaderStyle);
+        
+        // Estado - Con estilo gris por ser campo no editable
+        createHeaderCell(headerRow, colIndex++, "Estado\n(No se requiere)", optionalHeaderStyle);
 
-        // Encabezados opcionales
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            createHeaderCell(headerRow, colIndex++, "Tipos de Tercero\n(Requerido)", headerStyle);
-        }
+        // Tipos de tercero - SIEMPRE incluido (no opcional)
+        createHeaderCell(headerRow, colIndex++, "Tipos de Tercero\n(Requerido)", headerStyle);
 
-        if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            createHeaderCell(headerRow, colIndex++, "País\n(Opcional)", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Departamento\n(Opcional)", headerStyle);
-            createHeaderCell(headerRow, colIndex++, "Ciudad\n(Opcional)", headerStyle);
-        }
+        // Campos geográficos - OPCIONALES (siempre presentes)
+        createHeaderCell(headerRow, colIndex++, "País\n(Opcional)", optionalHeaderStyle);
+        createHeaderCell(headerRow, colIndex++, "Departamento\n(Opcional)", optionalHeaderStyle);
+        createHeaderCell(headerRow, colIndex++, "Ciudad\n(Opcional)", optionalHeaderStyle);
 
+        // Campos de contacto requeridos
         createHeaderCell(headerRow, colIndex++, "Dirección\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Teléfono\n(Requerido)", headerStyle);
         createHeaderCell(headerRow, colIndex++, "Email\n(Requerido)", headerStyle);
@@ -137,7 +161,7 @@ public class ExportThirdService implements ExportThirdUseCase {
             Row row = sheet.createRow(rowIndex++);
             int colIndex = 0;
 
-            // Datos básicos
+            // Datos básicos requeridos
             createDataCell(row, colIndex++, third.getTypeId() != null ? third.getTypeId().getTypeIdname() : "",
                     dataStyle);
             createDataCell(row, colIndex++, third.getIdNumber(), dataStyle);
@@ -147,27 +171,44 @@ public class ExportThirdService implements ExportThirdUseCase {
             createDataCell(row, colIndex++, third.getNames(), dataStyle);
             createDataCell(row, colIndex++, third.getLastNames(), dataStyle);
             createDataCell(row, colIndex++, third.getSocialReason(), dataStyle);
-            createDataCell(row, colIndex++, third.getGender() != null ? third.getGender().toString() : "", dataStyle);
+            
+            // Género - Campo opcional (siempre presente)
+            if (Boolean.TRUE.equals(request.getIncludeGender()) && third.getGender() != null) {
+                createDataCell(row, colIndex++, third.getGender().toString(), dataStyle);
+            } else {
+                createDataCell(row, colIndex++, "", dataStyle);
+            }
+            
+            // Estado
             createDataCell(row, colIndex++, third.getState() != null && third.getState() ? "ACTIVO" : "INACTIVO",
                     dataStyle);
 
-            // Datos opcionales
-            if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-                String types = third.getThirdTypes().stream()
-                        .map(ThirdType::getThirdTypeName)
-                        .collect(Collectors.joining(", "));
-                createDataCell(row, colIndex++, types, dataStyle);
+            // Tipos de tercero - SIEMPRE incluido
+            String types = third.getThirdTypes().stream()
+                    .map(ThirdType::getThirdTypeName)
+                    .collect(Collectors.joining(", "));
+            createDataCell(row, colIndex++, types, dataStyle);
+
+            // Campos geográficos - Siempre presentes pero pueden estar vacíos
+            if (Boolean.TRUE.equals(request.getIncludeCountry()) && third.getCountry() != null) {
+                createDataCell(row, colIndex++, third.getCountry().getCountryName(), dataStyle);
+            } else {
+                createDataCell(row, colIndex++, "", dataStyle);
+            }
+            
+            if (Boolean.TRUE.equals(request.getIncludeState()) && third.getProvince() != null) {
+                createDataCell(row, colIndex++, third.getProvince().getStateName(), dataStyle);
+            } else {
+                createDataCell(row, colIndex++, "", dataStyle);
+            }
+            
+            if (Boolean.TRUE.equals(request.getIncludeCity()) && third.getCity() != null) {
+                createDataCell(row, colIndex++, third.getCity().getCityName(), dataStyle);
+            } else {
+                createDataCell(row, colIndex++, "", dataStyle);
             }
 
-            if (Boolean.TRUE.equals(request.getIncludeCities())) {
-                createDataCell(row, colIndex++, third.getCountry() != null ? third.getCountry().getCountryName() : "",
-                        dataStyle);
-                createDataCell(row, colIndex++, third.getProvince() != null ? third.getProvince().getStateName() : "",
-                        dataStyle);
-                createDataCell(row, colIndex++, third.getCity() != null ? third.getCity().getCityName() : "",
-                        dataStyle);
-            }
-
+            // Campos de contacto requeridos
             createDataCell(row, colIndex++, third.getAddress(), dataStyle);
             createDataCell(row, colIndex++, third.getPhoneNumber(), dataStyle);
             createDataCell(row, colIndex++, third.getEmail(), dataStyle);
@@ -214,17 +255,20 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     private int getColumnCount(ThirdExportRequest request) {
-        int count = 9; // Columnas básicas (incluye Estado)
+        // Columnas siempre presentes: 
+        // Tipo ID, Número ID, Dígito Verif, Tipo Persona, Nombres, Apellidos, Razón Social, Género, Estado
+        int count = 9;
 
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            count++;
-        }
+        // Tipos de tercero - SIEMPRE incluido
+        count++;
 
-        if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            count += 3;
-        }
+        // Geografía - SIEMPRE presente (3 columnas: País, Departamento, Ciudad)
+        count += 3;
 
-        return count + 3; // Dirección, teléfono, email
+        // Contacto - SIEMPRE presente (Dirección, Teléfono, Email)
+        count += 3;
+
+        return count; // Total: 16 columnas
     }
 
     /**
@@ -284,11 +328,13 @@ public class ExportThirdService implements ExportThirdUseCase {
             CellStyle headerStyle = createHeaderStyle(workbook);
             CellStyle templateStyle = createTemplateStyle(workbook);
 
-            // Crear encabezados
+            // Crear encabezados con todos los campos opcionales habilitados para plantilla
             ThirdExportRequest templateRequest = ThirdExportRequest.builder()
                     .entId(entId)
-                    .includeTypes(true)
-                    .includeCities(true)
+                    .includeGender(true)
+                    .includeCountry(true)
+                    .includeState(true)
+                    .includeCity(true)
                     .build();
 
             createHeaders(sheet, headerStyle, templateRequest);
@@ -338,18 +384,16 @@ public class ExportThirdService implements ExportThirdUseCase {
                 createTemplateCell(row, colIndex++, "Nombres", templateStyle);
                 createTemplateCell(row, colIndex++, "Apellidos", templateStyle);
                 createTemplateCell(row, colIndex++, "Razón Social", templateStyle);
-                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                createTemplateCell(row, colIndex++, "ACTIVO", templateStyle);
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle); // Género
+                createTemplateCell(row, colIndex++, "ACTIVO", templateStyle); // Estado
 
-                if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-                    createTemplateCell(row, colIndex++, "Cliente, Proveedor", templateStyle);
-                }
+                // Tipos de tercero - SIEMPRE incluido
+                createTemplateCell(row, colIndex++, "Cliente, Proveedor", templateStyle);
 
-                if (Boolean.TRUE.equals(request.getIncludeCities())) {
-                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                    createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle);
-                }
+                // Geografía - siempre presentes
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle); // País
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle); // Departamento
+                createTemplateCell(row, colIndex++, "Seleccionar...", templateStyle); // Ciudad
 
                 createTemplateCell(row, colIndex++, "Dirección ejemplo", templateStyle);
                 createTemplateCell(row, colIndex++, "3001234567", templateStyle);
@@ -365,25 +409,14 @@ public class ExportThirdService implements ExportThirdUseCase {
         int colIndex = 0;
 
         // Crear celdas vacías con el mismo estilo
-        int basicColumns = 9; // Columnas básicas incluye Estado
-        for (int i = 0; i < basicColumns; i++) {
+        // Columnas básicas: 9 (incluye Género y Estado)
+        // Tipos: 1 (siempre incluido)
+        // Geografía: 3 (siempre incluida)
+        // Contacto: 3 (siempre incluido)
+        // Total: 16 columnas
+        for (int i = 0; i < 16; i++) {
             createTemplateCell(row, colIndex++, "", templateStyle);
         }
-
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            createTemplateCell(row, colIndex++, "", templateStyle);
-        }
-
-        if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            createTemplateCell(row, colIndex++, "", templateStyle);
-            createTemplateCell(row, colIndex++, "", templateStyle);
-            createTemplateCell(row, colIndex++, "", templateStyle);
-        }
-
-        // Columnas finales: Dirección, Teléfono, Email
-        createTemplateCell(row, colIndex++, "", templateStyle);
-        createTemplateCell(row, colIndex++, "", templateStyle);
-        createTemplateCell(row, colIndex++, "", templateStyle);
     }
 
     private void createTemplateCell(Row row, int colIndex, String value, CellStyle style) {
@@ -399,33 +432,24 @@ public class ExportThirdService implements ExportThirdUseCase {
         // Aplicar validaciones básicas
         excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
 
-        // Aplicar validaciones de tipos si están incluidos
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            int typesColumnIndex = getTypesColumnIndex(request);
-            excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
-        }
+        // Aplicar validaciones de tipos (siempre incluidos)
+        int typesColumnIndex = getTypesColumnIndex(request);
+        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
 
-        // Aplicar validaciones geográficas si están incluidas
-        if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            int[] geoColumns = getGeographyColumnIndexes(request);
-            excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
-                    geoColumns[0], geoColumns[1], geoColumns[2]);
-        }
+        // Aplicar validaciones geográficas (siempre presentes)
+        int[] geoColumns = getGeographyColumnIndexes(request);
+        excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
+                geoColumns[0], geoColumns[1], geoColumns[2]);
     }
 
     private int getTypesColumnIndex(ThirdExportRequest request) {
-        // Los tipos de tercero aparecen después de las columnas básicas (9 columnas
-        // incluye Estado)
+        // Los tipos de tercero aparecen después de las columnas básicas (9 columnas incluye Género y Estado)
         return 9;
     }
 
     private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
-        int baseIndex = 9; // Columnas básicas (incluye Estado)
-
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            baseIndex++; // Agregar columna de tipos
-        }
-
+        // Después de columnas básicas (9) + tipos (1)
+        int baseIndex = 10;
         return new int[] { baseIndex, baseIndex + 1, baseIndex + 2 }; // País, Departamento, Ciudad
     }
 
@@ -474,17 +498,13 @@ public class ExportThirdService implements ExportThirdUseCase {
         // Aplicar validaciones básicas (reutilizando método existente)
         excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
 
-        // Aplicar validaciones de tipos si están incluidos
-        if (Boolean.TRUE.equals(request.getIncludeTypes())) {
-            int typesColumnIndex = getTypesColumnIndex(request);
-            excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
-        }
+        // Aplicar validaciones de tipos (siempre incluidos)
+        int typesColumnIndex = getTypesColumnIndex(request);
+        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
 
-        // Aplicar validaciones geográficas si están incluidas
-        if (Boolean.TRUE.equals(request.getIncludeCities())) {
-            int[] geoColumns = getGeographyColumnIndexes(request);
-            excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
-                    geoColumns[0], geoColumns[1], geoColumns[2]);
-        }
+        // Aplicar validaciones geográficas (siempre presentes)
+        int[] geoColumns = getGeographyColumnIndexes(request);
+        excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
+                geoColumns[0], geoColumns[1], geoColumns[2]);
     }
 }

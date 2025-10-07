@@ -36,15 +36,29 @@ public class ThirdExportRequest {
      */
     private List<Long> thirdIds;
 
+    // ===== CAMPOS OPCIONALES INDIVIDUALES =====
+    
     /**
-     * Incluir información de tipos asociados en la exportación.
+     * Incluir columna de género en la exportación.
      */
     @Builder.Default
-    private Boolean includeTypes = true;
+    private Boolean includeGender = false;
 
     /**
-     * Incluir información de ciudades en la exportación.
+     * Incluir columna de país en la exportación.
      */
     @Builder.Default
-    private Boolean includeCities = true;
+    private Boolean includeCountry = false;
+
+    /**
+     * Incluir columna de departamento en la exportación.
+     */
+    @Builder.Default
+    private Boolean includeState = false;
+
+    /**
+     * Incluir columna de ciudad en la exportación.
+     */
+    @Builder.Default
+    private Boolean includeCity = false;
 }

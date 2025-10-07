@@ -250,23 +250,37 @@ public class ThirdRestAdapter {
 
     /**
      * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluye toda la información.
+     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluir campos opcionales.
      * El nombre de la empresa se puede incluir en el nombre del archivo.
+     * 
+     * @param entId ID de la entidad
+     * @param status Estado de los terceros a exportar (true=activos, false=inactivos, null=todos)
+     * @param companyName Nombre de la empresa (opcional, para el nombre del archivo)
+     * @param includeGender Incluir columna de género (default: false)
+     * @param includeCountry Incluir columna de país (default: false)
+     * @param includeState Incluir columna de departamento (default: false)
+     * @param includeCity Incluir columna de ciudad (default: false)
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String companyName) {
+            @RequestParam(required = false) String companyName,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeGender,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeCountry,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeState,
+            @RequestParam(required = false, defaultValue = "false") Boolean includeCity) {
         
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
-                .status(statusBoolean)  // filtro por estado: true=activos, false=inactivos, null=todos
-                .includeTypes(true)  // incluir tipos
-                .includeCities(true) // incluir geografía
+                .status(statusBoolean)
+                .includeGender(includeGender)
+                .includeCountry(includeCountry)
+                .includeState(includeState)
+                .includeCity(includeCity)
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
