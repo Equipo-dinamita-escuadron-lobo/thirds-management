@@ -1,8 +1,8 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
-import com.thirdsmanagement.thirds.domain.model.ePersonType;
-import com.thirdsmanagement.thirds.domain.model.eThirdGender;
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;

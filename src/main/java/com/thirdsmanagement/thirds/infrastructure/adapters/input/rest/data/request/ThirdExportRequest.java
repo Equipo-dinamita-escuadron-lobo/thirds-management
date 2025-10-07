@@ -1,5 +1,8 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
+import com.thirdsmanagement.thirds.domain.enums.ExportableField;
+import com.thirdsmanagement.thirds.domain.model.ExportConfiguration;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,10 +10,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * DTO para solicitudes de exportación de terceros.
- * Permite filtrar los terceros que se van a exportar.
+ * Utiliza el patrón Builder para construcción flexible de configuraciones de exportación.
  */
 @Data
 @Builder
@@ -36,29 +40,21 @@ public class ThirdExportRequest {
      */
     private List<Long> thirdIds;
 
-    // ===== CAMPOS OPCIONALES INDIVIDUALES =====
-    
     /**
-     * Incluir columna de género en la exportación.
+     * Campos opcionales a incluir en la exportación.
+     * Utiliza ExportableField enum para mayor flexibilidad y extensibilidad.
      */
     @Builder.Default
-    private Boolean includeGender = false;
+    private Set<ExportableField> optionalFields = Set.of();
 
     /**
-     * Incluir columna de país en la exportación.
+     * Obtiene la configuración de exportación construida.
+     * 
+     * @return ExportConfiguration configurada con los campos opcionales
      */
-    @Builder.Default
-    private Boolean includeCountry = false;
-
-    /**
-     * Incluir columna de departamento en la exportación.
-     */
-    @Builder.Default
-    private Boolean includeState = false;
-
-    /**
-     * Incluir columna de ciudad en la exportación.
-     */
-    @Builder.Default
-    private Boolean includeCity = false;
+    public ExportConfiguration getExportConfiguration() {
+        return ExportConfiguration.builder()
+                .includeFields(optionalFields)
+                .build();
+    }
 }

@@ -249,38 +249,35 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluir campos opcionales.
-     * El nombre de la empresa se puede incluir en el nombre del archivo.
+     * Exporta terceros con validaciones a formato Excel.
+     * Utiliza configuración flexible de campos opcionales mediante ExportableField.
      * 
-     * @param entId ID de la entidad
-     * @param status Estado de los terceros a exportar (true=activos, false=inactivos, null=todos)
-     * @param companyName Nombre de la empresa (opcional, para el nombre del archivo)
-     * @param includeGender Incluir columna de género (default: false)
-     * @param includeCountry Incluir columna de país (default: false)
-     * @param includeState Incluir columna de departamento (default: false)
-     * @param includeCity Incluir columna de ciudad (default: false)
+     * Ejemplo de uso:
+     * GET /api/thirds/export/excel?entId=123&status=true&optionalFields=GENDER,COUNTRY,STATE,CITY
+     * 
+     * @param entId Identificador de la entidad (requerido)
+     * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
+     * @param companyName Nombre de la empresa para el nombre del archivo
+     * @param optionalFields Conjunto de campos opcionales a incluir (GENDER, COUNTRY, STATE, CITY)
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName,
-            @RequestParam(required = false, defaultValue = "false") Boolean includeGender,
-            @RequestParam(required = false, defaultValue = "false") Boolean includeCountry,
-            @RequestParam(required = false, defaultValue = "false") Boolean includeState,
-            @RequestParam(required = false, defaultValue = "false") Boolean includeCity) {
+            @RequestParam(required = false) java.util.Set<com.thirdsmanagement.thirds.domain.enums.ExportableField> optionalFields) {
         
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
+        // Si no se especifican campos opcionales, usar conjunto vacío
+        java.util.Set<com.thirdsmanagement.thirds.domain.enums.ExportableField> fields = 
+            optionalFields != null ? optionalFields : java.util.Set.of();
+        
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
                 .status(statusBoolean)
-                .includeGender(includeGender)
-                .includeCountry(includeCountry)
-                .includeState(includeState)
-                .includeCity(includeCity)
+                .optionalFields(fields)
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);

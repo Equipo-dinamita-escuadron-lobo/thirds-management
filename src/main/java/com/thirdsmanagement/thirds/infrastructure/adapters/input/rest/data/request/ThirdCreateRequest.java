@@ -3,8 +3,8 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.requ
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.thirdsmanagement.thirds.domain.model.ePersonType;
-import com.thirdsmanagement.thirds.domain.model.eThirdGender;
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
