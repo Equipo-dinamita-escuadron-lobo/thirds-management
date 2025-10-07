@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.domain.validation;
 import com.thirdsmanagement.thirds.domain.exceptions.third.FileValidationException;
 import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * Implementa validaciones de tamaño, extensión y tipo MIME para PDFs.
  */
 @Component
+@Qualifier("pdfFileValidator")
 @RequiredArgsConstructor
 public class PdfFileValidator implements FileValidator {
     

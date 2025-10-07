@@ -11,15 +11,17 @@ import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFormatException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
-import com.thirdsmanagement.thirds.domain.validation.PdfFileValidator;
-
-import lombok.RequiredArgsConstructor;
+import com.thirdsmanagement.thirds.domain.validation.FileValidator;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
-@RequiredArgsConstructor
 public class PdfRUTService {
     
-    private final PdfFileValidator pdfFileValidator;
+    private final FileValidator fileValidator;
+    
+    public PdfRUTService(@Qualifier("pdfFileValidator") FileValidator fileValidator) {
+        this.fileValidator = fileValidator;
+    }
 
     /**
      * Extrae el contenido de un archivo PDF de RUT.
@@ -42,7 +44,7 @@ public class PdfRUTService {
             throw new ThirdInvalidDataException("El archivo PDF no puede ser null o vacío");
         }
 
-        pdfFileValidator.validate(request.getFile());
+        fileValidator.validate(request.getFile());
         File tempFile = File.createTempFile("upload", ".pdf");
 
         // Transferir el archivo recibido a un archivo temporal

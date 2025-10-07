@@ -10,15 +10,15 @@ import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
-import com.thirdsmanagement.thirds.domain.validation.ExcelFileValidator;
+import com.thirdsmanagement.thirds.domain.validation.FileValidator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,13 +31,16 @@ import java.util.*;
  * Maneja la lectura, validación de formato y conversión de datos desde Excel.
  */
 @Service
-@RequiredArgsConstructor
 public class ExcelParsingService {
 
     private static final int HEADER_ROW_INDEX = 0;
     private static final int DATA_START_ROW_INDEX = 1;
     
-    private final ExcelFileValidator excelFileValidator;
+    private final FileValidator fileValidator;
+    
+    public ExcelParsingService(@Qualifier("excelFileValidator") FileValidator fileValidator) {
+        this.fileValidator = fileValidator;
+    }
 
     /**
      * Parsea el archivo Excel y extrae los datos de terceros.
@@ -47,7 +50,7 @@ public class ExcelParsingService {
      * @return lista de terceros parseados y lista de errores encontrados
      */
     public ExcelParsingResult parseExcelFile(MultipartFile file, String entId) {
-        excelFileValidator.validate(file);
+        fileValidator.validate(file);
 
         List<ThirdExcelData> thirdsData = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
