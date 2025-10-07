@@ -171,9 +171,6 @@ public class BatchValidationService {
                 validateLegalEntityFields(excelData, errors, columnMap);
             }
         }
-        
-        // Validar geografía completa obligatoria
-        validateCompleteGeographyRequired(excelData, errors, columnMap);
 
         // Validar formatos usando ValidationUtils centralizado
         validateFieldFormats(excelData, errors, columnMap);
@@ -252,16 +249,6 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida geografía (ahora opcional para ambos tipos de persona).
-     * Ya no se valida como campo obligatorio.
-     */
-    private void validateCompleteGeographyRequired(ThirdExcelData excelData, List<ImportErrorDetail> errors,
-            Map<String, Integer> columnMap) {
-        // Geografía es opcional - no se valida como requerida
-        // La validación de existencia se hace en validateGeography() si se proporcionan datos
-    }
-
-    /**
      * Valida formatos de campos.
      */
     private void validateFieldFormats(ThirdExcelData excelData, List<ImportErrorDetail> errors,
@@ -324,7 +311,7 @@ public class BatchValidationService {
 
     /**
      * Valida datos geográficos - jerarquía y existencia.
-     * La completitud ya se valida en validateCompleteGeographyRequired().
+     * La geografía es opcional, solo se valida la existencia si los datos están presentes.
      */
     private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
