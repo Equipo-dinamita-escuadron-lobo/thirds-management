@@ -67,6 +67,17 @@ public interface ThirdOutputPort {
      */
     Page<Third> getAllThirdsBy(String entId, Pageable page);
     
+    /**
+     * Obtiene todos los terceros filtrados por estado.
+     * Optimizado para exportación con filtro de estado en BD.
+     * 
+     * @param entId El id de la empresa
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param page El pageable object
+     * @return La pagina de terceros filtrados por estado
+     */
+    Page<Third> getAllThirdsByState(String entId, Boolean state, Pageable page);
+    
     
     /**
      * Elimina un tercero del sistema junto con sus asociaciones.

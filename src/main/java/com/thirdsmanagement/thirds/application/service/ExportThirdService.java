@@ -34,24 +34,28 @@ public class ExportThirdService implements ExportThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
     private final ExcelValidationService excelValidationService;
 
+    /**
+     * Obtiene terceros filtrados aplicando el filtro en la base de datos.
+     * OPTIMIZADO: El filtro por estado se ejecuta en SQL, no en memoria.
+     * 
+     * @param request solicitud de exportación con filtros
+     * @return lista de terceros filtrados
+     */
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Crear un Pageable que obtenga todos los registros (tamaño grande)
-        Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
+        // Usar un tamaño razonable para paginación (no Integer.MAX_VALUE)
+        // Para exportación, obtener todos en una sola página
+        Pageable pageable = PageRequest.of(0, 50000); // Límite razonable para exportación
 
-        // Obtener todos los terceros (sin filtro de estado en este método)
-        // El filtrado por estado se manejará en el método que llama a este
-        Page<Third> page = thirdOutputPort.getAllThirdsBy(request.getEntId(), pageable);
+        Page<Third> page;
         
-        List<Third> allThirds = page != null ? page.getContent() : new java.util.ArrayList<>();
-        
-        // Aplicar filtro de estado si se especifica
+        // Delegar filtro de estado a la base de datos
         if (request.getStatus() != null) {
-            return allThirds.stream()
-                    .filter(third -> third.getState() != null && third.getState().equals(request.getStatus()))
-                    .collect(java.util.stream.Collectors.toList());
+            page = thirdOutputPort.getAllThirdsByState(request.getEntId(), request.getStatus(), pageable);
+        } else {
+            page = thirdOutputPort.getAllThirdsBy(request.getEntId(), pageable);
         }
         
-        return allThirds;
+        return page != null ? page.getContent() : new java.util.ArrayList<>();
     }
 
     private CellStyle createHeaderStyle(Workbook workbook) {

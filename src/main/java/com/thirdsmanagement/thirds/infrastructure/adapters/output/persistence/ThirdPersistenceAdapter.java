@@ -224,6 +224,23 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    /**
+     * Obtiene todos los terceros de una empresa filtrados por estado.
+     * Optimizado para exportación: el filtro se aplica en BD, no en memoria.
+     * 
+     * @param entId El identificador de la entidad
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param page El objeto Pageable que contiene la información de paginación
+     * @return Una página de objetos Third filtrados por estado
+     */
+    @Override
+    public Page<Third> getAllThirdsByState(String entId, Boolean state, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByEntIdAndState(entId, state, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
 
 
     /**
