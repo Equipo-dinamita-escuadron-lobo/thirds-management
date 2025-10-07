@@ -11,7 +11,8 @@ import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFormatException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
-import com.thirdsmanagement.thirds.domain.validation.FileValidator;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.validation.FileValidator;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service

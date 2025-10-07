@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.validation;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.validation;
 
 import org.springframework.web.multipart.MultipartFile;
 

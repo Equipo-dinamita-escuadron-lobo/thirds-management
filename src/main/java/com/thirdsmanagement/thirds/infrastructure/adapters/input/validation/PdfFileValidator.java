@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.validation;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.validation;
 
 import com.thirdsmanagement.thirds.domain.exceptions.third.FileValidationException;
 import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
@@ -10,13 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 /**
- * Validador específico para archivos Excel (.xlsx, .xls).
- * Implementa validaciones de tamaño, extensión y tipo MIME para Excel.
+ * Validador específico para archivos PDF.
+ * Implementa validaciones de tamaño, extensión y tipo MIME para PDFs.
  */
 @Component
-@Qualifier("excelFileValidator")
+@Qualifier("pdfFileValidator")
 @RequiredArgsConstructor
-public class ExcelFileValidator implements FileValidator {
+public class PdfFileValidator implements FileValidator {
     
     private final FileUploadProperties fileProperties;
     
@@ -26,6 +26,7 @@ public class ExcelFileValidator implements FileValidator {
         validateNotEmpty(file);
         validateSize(file);
         validateExtension(file);
+        validateMimeType(file);
     }
     
     private void validateNotNull(MultipartFile file) {
@@ -71,15 +72,42 @@ public class ExcelFileValidator implements FileValidator {
         }
     }
     
+    private void validateMimeType(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            throw FileValidationException.forInvalidMimeType(
+                file.getOriginalFilename(), 
+                "null", 
+                getSupportedMimeTypes()
+            );
+        }
+        
+        boolean validMimeType = false;
+        for (String mimeType : getSupportedMimeTypes()) {
+            if (contentType.equals(mimeType)) {
+                validMimeType = true;
+                break;
+            }
+        }
+        
+        if (!validMimeType) {
+            throw FileValidationException.forInvalidMimeType(
+                file.getOriginalFilename(), 
+                contentType, 
+                getSupportedMimeTypes()
+            );
+        }
+    }
+    
     @Override
     public String[] getSupportedMimeTypes() {
-        List<String> mimeTypes = fileProperties.getAllowedMimeTypes().get("excel");
+        List<String> mimeTypes = fileProperties.getAllowedMimeTypes().get("pdf");
         return mimeTypes != null ? mimeTypes.toArray(new String[0]) : new String[0];
     }
     
     @Override
     public String[] getSupportedExtensions() {
-        List<String> extensions = fileProperties.getAllowedExtensions().get("excel");
+        List<String> extensions = fileProperties.getAllowedExtensions().get("pdf");
         return extensions != null ? extensions.toArray(new String[0]) : new String[0];
     }
 }

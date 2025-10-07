@@ -10,7 +10,7 @@ import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
-import com.thirdsmanagement.thirds.domain.validation.FileValidator;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.validation.FileValidator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
