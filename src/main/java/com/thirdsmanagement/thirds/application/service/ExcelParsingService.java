@@ -187,22 +187,22 @@ public class ExcelParsingService {
             Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
         builder.typeIdName(getCellValueAsString(row, columnMap.get("Tipo Identificación")));
         builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber,
-                "Número Identificación", errors));
+                "Número Identificación", errors, columnMap));
         builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber,
-                "Dígito Verificación", errors));
+                "Dígito Verificación", errors, columnMap));
         builder.personType(parseEnum(getCellValueAsString(row, columnMap.get("Tipo Persona")),
-                ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType));
+                ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType, columnMap));
         builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
         builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
         builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
         builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")),
-                eThirdGender.class, "Género", rowNumber, errors, this::mapGender));
-        builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
+                eThirdGender.class, "Género", rowNumber, errors, this::mapGender, columnMap));
+        builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors, columnMap));
         
         // Campos de contacto ahora requeridos
         builder.address(getCellValueAsString(row, columnMap.get("Dirección")));
         builder.phoneNumber(parsePhoneNumber(getCellValueAsString(row, columnMap.get("Teléfono")), 
-                rowNumber, errors));
+                rowNumber, errors, columnMap));
         builder.email(getCellValueAsString(row, columnMap.get("Email")));
     }
 
@@ -253,7 +253,7 @@ public class ExcelParsingService {
      */
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
             int rowNumber, List<ImportErrorDetail> errors,
-            java.util.function.Function<String, T> mapper) {
+            java.util.function.Function<String, T> mapper, Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
@@ -261,25 +261,25 @@ public class ExcelParsingService {
         try {
             T result = mapper.apply(value.trim().toUpperCase());
             if (result == null) {
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(rowNumber)
-                        .columnName(fieldName)
-                        .fieldValue(value)
-                        .errorCode(ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName))
-                        .errorMessage(fieldName + " inválido: " + value)
-                        .errorType(ImportErrorType.VALIDATION_ERROR)
-                        .build());
+                errors.add(ErrorMappingUtils.createError(
+                        rowNumber, 
+                        fieldName, 
+                        value,
+                        ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName),
+                        fieldName + " inválido: " + value,
+                        ImportErrorType.VALIDATION_ERROR,
+                        columnMap));
             }
             return result;
         } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName(fieldName)
-                    .fieldValue(value)
-                    .errorCode(ErrorMappingUtils.generateParsingErrorCode(fieldName))
-                    .errorMessage("Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage())
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    fieldName,
+                    value,
+                    ErrorMappingUtils.generateParsingErrorCode(fieldName),
+                    "Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage(),
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return null;
         }
     }
@@ -347,7 +347,7 @@ public class ExcelParsingService {
      * Obtiene el valor de una celda como Long.
      */
     private Long getCellValueAsLong(Row row, Integer columnIndex, int rowNumber, String fieldName,
-            List<ImportErrorDetail> errors) {
+            List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
         if (columnIndex == null) {
             return null;
         }
@@ -368,15 +368,14 @@ public class ExcelParsingService {
                     return null;
             }
         } catch (NumberFormatException e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnNumber(columnIndex + 1)
-                    .columnName(fieldName)
-                    .fieldValue(cell.toString())
-                    .errorCode("INVALID_NUMBER_FORMAT")
-                    .errorMessage("Formato numérico inválido en " + fieldName)
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    fieldName,
+                    cell.toString(),
+                    "INVALID_NUMBER_FORMAT",
+                    "Formato numérico inválido en " + fieldName,
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return null;
         }
     }
@@ -384,7 +383,8 @@ public class ExcelParsingService {
     /**
      * Parsea el estado desde String.
      */
-    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors) {
+    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors, 
+            Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return true; // Por defecto activo
         }
@@ -403,25 +403,25 @@ public class ExcelParsingService {
                 case "0":
                     return false;
                 default:
-                    errors.add(ImportErrorDetail.builder()
-                            .rowNumber(rowNumber)
-                            .columnName("Estado")
-                            .fieldValue(value)
-                            .errorCode("INVALID_STATE")
-                            .errorMessage("Estado inválido: " + value)
-                            .errorType(ImportErrorType.VALIDATION_ERROR)
-                            .build());
+                    errors.add(ErrorMappingUtils.createError(
+                            rowNumber,
+                            "Estado",
+                            value,
+                            "INVALID_STATE",
+                            "Estado inválido: " + value,
+                            ImportErrorType.VALIDATION_ERROR,
+                            columnMap));
                     return true; // Por defecto activo en caso de error
             }
         } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName("Estado")
-                    .fieldValue(value)
-                    .errorCode("STATE_PARSING_ERROR")
-                    .errorMessage("Error parseando estado: " + e.getMessage())
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    "Estado",
+                    value,
+                    "STATE_PARSING_ERROR",
+                    "Error parseando estado: " + e.getMessage(),
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return true;
         }
     }
@@ -431,7 +431,8 @@ public class ExcelParsingService {
      * Elimina espacios automáticamente y retorna el número limpio.
      * La validación de formato se realiza en BatchValidationService.
      */
-    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors) {
+    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors, 
+            Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
