@@ -1,10 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.thirdsmanagement.thirds.domain.enums.ePersonType;
 
@@ -94,14 +90,6 @@ public class ThirdEntity {
 
     @Column(name = "th_email")
     private String email; 
-
-    @Column(name = "th_created_at")
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
-    @Column(name = "th_updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 
     @TenantId
     @Column(name = "tenant_id")

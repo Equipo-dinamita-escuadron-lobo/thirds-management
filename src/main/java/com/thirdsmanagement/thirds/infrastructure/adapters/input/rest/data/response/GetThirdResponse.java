@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.enums.ePersonType;
@@ -45,7 +44,4 @@ public class GetThirdResponse {
     private String address;
     private String phoneNumber; 
     private String email; 
-
-    private LocalDate creationDate;
-    private LocalDate updateDate;
 }

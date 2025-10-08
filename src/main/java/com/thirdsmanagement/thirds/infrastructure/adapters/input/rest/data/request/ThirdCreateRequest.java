@@ -1,6 +1,5 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import com.thirdsmanagement.thirds.domain.enums.ePersonType;
@@ -78,8 +77,5 @@ public class ThirdCreateRequest {
     @NotBlank(message = "El correo electrónico no puede estar vacío")
     @Email(message = "El correo electrónico debe tener un formato válido")
     private String email; 
-
-    private LocalDate creationDate;
-    private LocalDate updateDate;
 }
 

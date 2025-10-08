@@ -278,7 +278,7 @@ entId: EMP001
 **Características:**
 - Formato profesional con estilos
 - Filtros avanzados (estado, tipos, IDs específicos)
-- Inclusión opcional de tipos de tercero y geografía
+- Inclusión opcional de demografía
 - Columnas auto-ajustadas
 - Nombre de archivo con timestamp
 
@@ -307,9 +307,7 @@ entId: EMP001
   "city": City,                    // Ciudad
   "address": String,               // Dirección
   "phoneNumber": String,           // Teléfono
-  "email": String,                 // Email
-  "creationDate": LocalDate,       // Fecha de creación
-  "updateDate": LocalDate          // Fecha de actualización
+  "email": String                 // Email
 }
 ```
 
