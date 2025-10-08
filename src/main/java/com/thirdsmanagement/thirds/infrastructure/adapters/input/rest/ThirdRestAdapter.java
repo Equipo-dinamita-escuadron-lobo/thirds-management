@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 import com.thirdsmanagement.thirds.application.ports.input.BulkChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
@@ -16,6 +17,7 @@ import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
+import com.thirdsmanagement.thirds.domain.enums.ExportableField;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
@@ -144,8 +146,6 @@ public class ThirdRestAdapter {
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
         
-        log.info("Solicitud de cambio de estado masivo - Empresa: {}, Nuevo estado: {}", entId, newState);
-        
         int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
         
         String message = String.format("Se actualizaron %d terceros al estado %s", 
@@ -252,9 +252,6 @@ public class ThirdRestAdapter {
      * Exporta terceros con validaciones a formato Excel.
      * Utiliza configuración flexible de campos opcionales mediante ExportableField.
      * 
-     * Ejemplo de uso:
-     * GET /api/thirds/export/excel?entId=123&status=true&optionalFields=GENDER,COUNTRY,STATE,CITY
-     * 
      * @param entId Identificador de la entidad (requerido)
      * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
      * @param companyName Nombre de la empresa para el nombre del archivo
@@ -265,14 +262,13 @@ public class ThirdRestAdapter {
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName,
-            @RequestParam(required = false) java.util.Set<com.thirdsmanagement.thirds.domain.enums.ExportableField> optionalFields) {
+            @RequestParam(required = false) Set<ExportableField> optionalFields) {
         
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
         // Si no se especifican campos opcionales, usar conjunto vacío
-        java.util.Set<com.thirdsmanagement.thirds.domain.enums.ExportableField> fields = 
-            optionalFields != null ? optionalFields : java.util.Set.of();
+        Set<ExportableField> fields = optionalFields != null ? optionalFields : Set.of();
         
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)

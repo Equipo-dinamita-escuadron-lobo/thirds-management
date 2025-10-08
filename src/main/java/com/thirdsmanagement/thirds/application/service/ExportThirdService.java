@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -37,27 +39,45 @@ public class ExportThirdService implements ExportThirdUseCase {
     private final ExcelValidationService excelValidationService;
 
     /**
+     * Tamaño de página óptimo para exportación.
+     * Balance entre rendimiento y uso de memoria.
+     */
+    private static final int EXPORT_PAGE_SIZE = 5000;
+
+    /**
      * Obtiene terceros filtrados aplicando el filtro en la base de datos.
-     * OPTIMIZADO: El filtro por estado se ejecuta en SQL, no en memoria.
+     * Utiliza paginación automática para exportar TODOS los registros sin límite,
+     * optimizando el uso de memoria mediante procesamiento por lotes.
      * 
      * @param request solicitud de exportación con filtros
-     * @return lista de terceros filtrados
+     * @return lista completa de terceros filtrados
      */
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
-        // Usar un tamaño razonable para paginación (no Integer.MAX_VALUE)
-        // Para exportación, obtener todos en una sola página
-        Pageable pageable = PageRequest.of(0, 50000); // Límite razonable para exportación
-
+        List<Third> allThirds = new ArrayList<>();
+        int currentPage = 0;
         Page<Third> page;
+                
+        do {
+            // Crear pageable para la página actual
+            Pageable pageable = PageRequest.of(currentPage, EXPORT_PAGE_SIZE);
+            
+            // Obtener página según filtros
+            if (request.getStatus() != null) {
+                page = thirdOutputPort.getAllThirdsByState(request.getEntId(), request.getStatus(), pageable);
+            } else {
+                page = thirdOutputPort.getAllThirdsBy(request.getEntId(), pageable);
+            }
+            
+            // Agregar contenido de esta página a la lista total
+            if (page != null && page.hasContent()) {
+                allThirds.addAll(page.getContent());
+            }
+            
+            currentPage++;
+            
+        } while (page != null && page.hasNext());
         
-        // Delegar filtro de estado a la base de datos
-        if (request.getStatus() != null) {
-            page = thirdOutputPort.getAllThirdsByState(request.getEntId(), request.getStatus(), pageable);
-        } else {
-            page = thirdOutputPort.getAllThirdsBy(request.getEntId(), pageable);
-        }
-        
-        return page != null ? page.getContent() : new java.util.ArrayList<>();
+        return allThirds;
     }
 
     private CellStyle createHeaderStyle(Workbook workbook) {
@@ -132,7 +152,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         createHeaderCell(headerRow, colIndex++, "Razón Social\n(Requerido para persona jurídica)", headerStyle);
         
         // Género - OPCIONAL (solo si está configurado)
-        if (config.includes(com.thirdsmanagement.thirds.domain.enums.ExportableField.GENDER)) {
+        if (config.includes(ExportableField.GENDER)) {
             createHeaderCell(headerRow, colIndex++, "Género\n(Opcional)", optionalHeaderStyle);
         }
         
@@ -143,13 +163,13 @@ public class ExportThirdService implements ExportThirdUseCase {
         createHeaderCell(headerRow, colIndex++, "Tipos de Tercero\n(Requerido)", headerStyle);
 
         // Campos geográficos - OPCIONALES (solo si están configurados)
-        if (config.includes(com.thirdsmanagement.thirds.domain.enums.ExportableField.COUNTRY)) {
+        if (config.includes(ExportableField.COUNTRY)) {
             createHeaderCell(headerRow, colIndex++, "País\n(Opcional)", optionalHeaderStyle);
         }
-        if (config.includes(com.thirdsmanagement.thirds.domain.enums.ExportableField.STATE)) {
+        if (config.includes(ExportableField.STATE)) {
             createHeaderCell(headerRow, colIndex++, "Departamento\n(Opcional)", optionalHeaderStyle);
         }
-        if (config.includes(com.thirdsmanagement.thirds.domain.enums.ExportableField.CITY)) {
+        if (config.includes(ExportableField.CITY)) {
             createHeaderCell(headerRow, colIndex++, "Ciudad\n(Opcional)", optionalHeaderStyle);
         }
 
@@ -360,7 +380,7 @@ public class ExportThirdService implements ExportThirdUseCase {
             // Crear encabezados con todos los campos opcionales habilitados para plantilla
             ThirdExportRequest templateRequest = ThirdExportRequest.builder()
                     .entId(entId)
-                    .optionalFields(java.util.Set.of(
+                    .optionalFields(Set.of(
                         ExportableField.GENDER,
                         ExportableField.COUNTRY,
                         ExportableField.STATE,
