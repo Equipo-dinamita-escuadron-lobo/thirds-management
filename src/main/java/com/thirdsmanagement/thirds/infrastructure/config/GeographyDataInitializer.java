@@ -1,11 +1,11 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.config;
+package com.thirdsmanagement.thirds.infrastructure.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.service.GeographyFileDiscoveryService;
 import com.thirdsmanagement.thirds.domain.exceptions.geography.GeographyDataInitializationException;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.SqlExecutionService;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.SqlScriptRunner;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.CountryRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class GeographyDataInitializer implements CommandLineRunner {
 
     private final CountryRepository countryRepository;
     private final GeographyFileDiscoveryService fileDiscoveryService;
-    private final SqlExecutionService sqlExecutionService;
+    private final SqlScriptRunner sqlScriptRunner;
 
     @Override
     public void run(String... args) throws Exception {
@@ -69,7 +69,7 @@ public class GeographyDataInitializer implements CommandLineRunner {
     private void executeGeographyFiles(List<String> sqlFiles) {
         for (String sqlFile : sqlFiles) {
             try {
-                sqlExecutionService.executeSqlFile(sqlFile);
+                sqlScriptRunner.executeSqlFile(sqlFile);
             } catch (Exception e) {
                 throw new GeographyDataInitializationException(
                         "Error al procesar archivo de datos geográficos: " + sqlFile, e);

@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
+
 /**
  * Modelo que representa los datos de un tercero parseados desde Excel.
  * Contiene los datos en formato raw antes de ser convertidos a entidades de dominio.

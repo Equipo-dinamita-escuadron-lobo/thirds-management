@@ -1,8 +1,8 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.async;
+package com.thirdsmanagement.thirds.infrastructure.multitenancy.async;
 
 import org.springframework.core.task.TaskDecorator;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 
 /**
  * Decorador de tareas que preserva el contexto del tenant en operaciones asíncronas.

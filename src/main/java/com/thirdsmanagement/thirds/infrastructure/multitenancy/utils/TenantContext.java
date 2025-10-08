@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils;
+package com.thirdsmanagement.thirds.infrastructure.multitenancy.utils;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -9,7 +9,7 @@ import java.text.Normalizer;
 public final class StringNormalizer {
 
     private StringNormalizer() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("StringNormalizer es una clase de utilidad y no debe ser instanciada");
     }
 
     /**

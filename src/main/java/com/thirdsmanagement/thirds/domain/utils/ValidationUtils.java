@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public final class ValidationUtils {
 
     private ValidationUtils() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("ValidationUtils es una clase de utilidad y no debe ser instanciada");
     }
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(ImportConstants.ValidationPatterns.EMAIL_PATTERN);

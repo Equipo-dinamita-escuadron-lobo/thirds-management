@@ -1,8 +1,10 @@
-package com.thirdsmanagement.thirds.domain.utils;
+package com.thirdsmanagement.thirds.infrastructure.utils;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,32 +17,11 @@ import java.util.*;
 public final class ExcelUtils {
 
     private ExcelUtils() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("ExcelUtils es una clase de utilidad y no debe ser instanciada");
     }
 
     // ===== VALIDACIONES DE ARCHIVO =====
-
-    /**
-     * Valida el formato básico de un archivo Excel.
-     * 
-     * @param file el archivo a validar
-     * @throws IllegalArgumentException si el archivo no es válido
-     */
-    public static void validateExcelFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.FILE_EMPTY);
-        }
-
-        if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.FILE_TOO_LARGE);
-        }
-
-        String fileName = file.getOriginalFilename();
-        if (fileName == null || !isValidExcelExtension(fileName)) {
-            throw new IllegalArgumentException(ImportConstants.ErrorMessages.INVALID_FILE_FORMAT);
-        }
-    }
-
+  
     /**
      * Verifica si un archivo tiene una extensión Excel válida.
      * 

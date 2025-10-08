@@ -1,5 +1,8 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
 
+import com.thirdsmanagement.thirds.domain.enums.ExportableField;
+import com.thirdsmanagement.thirds.domain.model.ExportConfiguration;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,10 +10,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * DTO para solicitudes de exportación de terceros.
- * Permite filtrar los terceros que se van a exportar.
+ * Utiliza el patrón Builder para construcción flexible de configuraciones de exportación.
  */
 @Data
 @Builder
@@ -37,14 +41,20 @@ public class ThirdExportRequest {
     private List<Long> thirdIds;
 
     /**
-     * Incluir información de tipos asociados en la exportación.
+     * Campos opcionales a incluir en la exportación.
+     * Utiliza ExportableField enum para mayor flexibilidad y extensibilidad.
      */
     @Builder.Default
-    private Boolean includeTypes = true;
+    private Set<ExportableField> optionalFields = Set.of();
 
     /**
-     * Incluir información de ciudades en la exportación.
+     * Obtiene la configuración de exportación construida.
+     * 
+     * @return ExportConfiguration configurada con los campos opcionales
      */
-    @Builder.Default
-    private Boolean includeCities = true;
+    public ExportConfiguration getExportConfiguration() {
+        return ExportConfiguration.builder()
+                .includeFields(optionalFields)
+                .build();
+    }
 }

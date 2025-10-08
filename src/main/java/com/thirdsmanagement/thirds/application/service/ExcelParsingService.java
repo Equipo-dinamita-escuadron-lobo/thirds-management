@@ -1,8 +1,8 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
-import com.thirdsmanagement.thirds.domain.model.ePersonType;
-import com.thirdsmanagement.thirds.domain.model.eThirdGender;
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
@@ -10,15 +10,15 @@ import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
 import com.thirdsmanagement.thirds.domain.utils.ImportConstants;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.validation.FileValidator;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,38 +30,16 @@ import java.util.*;
  * terceros.
  * Maneja la lectura, validación de formato y conversión de datos desde Excel.
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ExcelParsingService {
 
     private static final int HEADER_ROW_INDEX = 0;
     private static final int DATA_START_ROW_INDEX = 1;
-
-    /**
-     * Valida el formato básico del archivo Excel.
-     * 
-     * @param file archivo Excel a validar
-     * @throws ThirdImportException si el archivo no es válido
-     */
-    public void validateExcelFile(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw ThirdImportException.forEmptyFile("archivo no especificado");
-        }
-
-        if (file.getSize() > ImportConstants.MAX_FILE_SIZE) {
-            throw ThirdImportException.forFileSizeExceeded(
-                    file.getOriginalFilename(),
-                    file.getSize(),
-                    ImportConstants.MAX_FILE_SIZE);
-        }
-
-        String filename = file.getOriginalFilename();
-        if (filename == null || !filename.toLowerCase().endsWith(".xlsx")) {
-            throw ThirdImportException.forInvalidExcelFile(
-                    filename,
-                    "El archivo debe tener extensión .xlsx");
-        }
+    
+    private final FileValidator fileValidator;
+    
+    public ExcelParsingService(@Qualifier("excelFileValidator") FileValidator fileValidator) {
+        this.fileValidator = fileValidator;
     }
 
     /**
@@ -72,7 +50,7 @@ public class ExcelParsingService {
      * @return lista de terceros parseados y lista de errores encontrados
      */
     public ExcelParsingResult parseExcelFile(MultipartFile file, String entId) {
-        validateExcelFile(file);
+        fileValidator.validate(file);
 
         List<ThirdExcelData> thirdsData = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
@@ -157,6 +135,8 @@ public class ExcelParsingService {
         }
 
         // Validar que existan los encabezados básicos requeridos
+        // Los headers opcionales (Género, País, Departamento, Ciudad) no se validan
+        // para permitir compatibilidad con archivos exportados usando el patrón Builder
         for (String requiredHeader : ImportConstants.REQUIRED_HEADERS) {
             if (!foundHeaders.contains(requiredHeader)) {
                 errors.add(ImportErrorDetail.builder()
@@ -209,22 +189,28 @@ public class ExcelParsingService {
             Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
         builder.typeIdName(getCellValueAsString(row, columnMap.get("Tipo Identificación")));
         builder.idNumber(getCellValueAsLong(row, columnMap.get("Número Identificación"), rowNumber,
-                "Número Identificación", errors));
+                "Número Identificación", errors, columnMap));
         builder.verificationNumber(getCellValueAsLong(row, columnMap.get("Dígito Verificación"), rowNumber,
-                "Dígito Verificación", errors));
+                "Dígito Verificación", errors, columnMap));
         builder.personType(parseEnum(getCellValueAsString(row, columnMap.get("Tipo Persona")),
-                ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType));
+                ePersonType.class, "Tipo Persona", rowNumber, errors, this::mapPersonType, columnMap));
         builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
         builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
         builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
-        builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")),
-                eThirdGender.class, "Género", rowNumber, errors, this::mapGender));
-        builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors));
+        
+        // Género - OPCIONAL (solo si la columna existe en el archivo)
+        Integer genderColumn = columnMap.get("Género");
+        if (genderColumn != null) {
+            builder.gender(parseEnum(getCellValueAsString(row, genderColumn),
+                    eThirdGender.class, "Género", rowNumber, errors, this::mapGender, columnMap));
+        }
+        
+        builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors, columnMap));
         
         // Campos de contacto ahora requeridos
         builder.address(getCellValueAsString(row, columnMap.get("Dirección")));
         builder.phoneNumber(parsePhoneNumber(getCellValueAsString(row, columnMap.get("Teléfono")), 
-                rowNumber, errors));
+                rowNumber, errors, columnMap));
         builder.email(getCellValueAsString(row, columnMap.get("Email")));
     }
 
@@ -244,7 +230,8 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos geográficos (ahora obligatorios).
+     * Parsea los campos geográficos (opcionales, solo si existen en el archivo).
+     * Compatible con el patrón Builder de exportación.
      */
     private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
@@ -275,7 +262,7 @@ public class ExcelParsingService {
      */
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
             int rowNumber, List<ImportErrorDetail> errors,
-            java.util.function.Function<String, T> mapper) {
+            java.util.function.Function<String, T> mapper, Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }
@@ -283,25 +270,25 @@ public class ExcelParsingService {
         try {
             T result = mapper.apply(value.trim().toUpperCase());
             if (result == null) {
-                errors.add(ImportErrorDetail.builder()
-                        .rowNumber(rowNumber)
-                        .columnName(fieldName)
-                        .fieldValue(value)
-                        .errorCode(ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName))
-                        .errorMessage(fieldName + " inválido: " + value)
-                        .errorType(ImportErrorType.VALIDATION_ERROR)
-                        .build());
+                errors.add(ErrorMappingUtils.createError(
+                        rowNumber, 
+                        fieldName, 
+                        value,
+                        ErrorMappingUtils.generateInvalidFieldErrorCode(fieldName),
+                        fieldName + " inválido: " + value,
+                        ImportErrorType.VALIDATION_ERROR,
+                        columnMap));
             }
             return result;
         } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName(fieldName)
-                    .fieldValue(value)
-                    .errorCode(ErrorMappingUtils.generateParsingErrorCode(fieldName))
-                    .errorMessage("Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage())
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    fieldName,
+                    value,
+                    ErrorMappingUtils.generateParsingErrorCode(fieldName),
+                    "Error parseando " + fieldName.toLowerCase() + ": " + e.getMessage(),
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return null;
         }
     }
@@ -369,7 +356,7 @@ public class ExcelParsingService {
      * Obtiene el valor de una celda como Long.
      */
     private Long getCellValueAsLong(Row row, Integer columnIndex, int rowNumber, String fieldName,
-            List<ImportErrorDetail> errors) {
+            List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
         if (columnIndex == null) {
             return null;
         }
@@ -390,15 +377,14 @@ public class ExcelParsingService {
                     return null;
             }
         } catch (NumberFormatException e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnNumber(columnIndex + 1)
-                    .columnName(fieldName)
-                    .fieldValue(cell.toString())
-                    .errorCode("INVALID_NUMBER_FORMAT")
-                    .errorMessage("Formato numérico inválido en " + fieldName)
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    fieldName,
+                    cell.toString(),
+                    "INVALID_NUMBER_FORMAT",
+                    "Formato numérico inválido en " + fieldName,
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return null;
         }
     }
@@ -406,7 +392,8 @@ public class ExcelParsingService {
     /**
      * Parsea el estado desde String.
      */
-    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors) {
+    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors, 
+            Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return true; // Por defecto activo
         }
@@ -425,25 +412,25 @@ public class ExcelParsingService {
                 case "0":
                     return false;
                 default:
-                    errors.add(ImportErrorDetail.builder()
-                            .rowNumber(rowNumber)
-                            .columnName("Estado")
-                            .fieldValue(value)
-                            .errorCode("INVALID_STATE")
-                            .errorMessage("Estado inválido: " + value)
-                            .errorType(ImportErrorType.VALIDATION_ERROR)
-                            .build());
+                    errors.add(ErrorMappingUtils.createError(
+                            rowNumber,
+                            "Estado",
+                            value,
+                            "INVALID_STATE",
+                            "Estado inválido: " + value,
+                            ImportErrorType.VALIDATION_ERROR,
+                            columnMap));
                     return true; // Por defecto activo en caso de error
             }
         } catch (Exception e) {
-            errors.add(ImportErrorDetail.builder()
-                    .rowNumber(rowNumber)
-                    .columnName("Estado")
-                    .fieldValue(value)
-                    .errorCode("STATE_PARSING_ERROR")
-                    .errorMessage("Error parseando estado: " + e.getMessage())
-                    .errorType(ImportErrorType.FORMAT_ERROR)
-                    .build());
+            errors.add(ErrorMappingUtils.createError(
+                    rowNumber,
+                    "Estado",
+                    value,
+                    "STATE_PARSING_ERROR",
+                    "Error parseando estado: " + e.getMessage(),
+                    ImportErrorType.FORMAT_ERROR,
+                    columnMap));
             return true;
         }
     }
@@ -453,7 +440,8 @@ public class ExcelParsingService {
      * Elimina espacios automáticamente y retorna el número limpio.
      * La validación de formato se realiza en BatchValidationService.
      */
-    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors) {
+    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors, 
+            Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }

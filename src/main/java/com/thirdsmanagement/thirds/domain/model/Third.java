@@ -12,6 +12,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

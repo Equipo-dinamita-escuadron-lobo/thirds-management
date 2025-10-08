@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 import com.thirdsmanagement.thirds.application.ports.input.BulkChangeThirdStateUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
@@ -14,10 +15,9 @@ import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.application.service.CreateThirdService;
-import com.thirdsmanagement.thirds.domain.utils.ExcelFileNameGenerator;
-import com.thirdsmanagement.thirds.domain.utils.PaginationHelper;
 import com.thirdsmanagement.thirds.application.service.PdfRUTService;
 import com.thirdsmanagement.thirds.application.service.UpdateThirdService;
+import com.thirdsmanagement.thirds.domain.enums.ExportableField;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
@@ -30,7 +30,8 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.respo
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
-
+import com.thirdsmanagement.thirds.infrastructure.utils.ExcelFileNameGenerator;
+import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -78,7 +79,6 @@ public class ThirdRestAdapter {
     private final CreateThirdService createThirdService;
     private final UpdateThirdService updateThirdService;
     private final ExcelFileNameGenerator fileNameGenerator;
-    private final PaginationHelper paginationHelper;
 
     /**
      * Crea un tercero.
@@ -146,8 +146,6 @@ public class ThirdRestAdapter {
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
         
-        log.info("Solicitud de cambio de estado masivo - Empresa: {}, Nuevo estado: {}", entId, newState);
-        
         int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
         
         String message = String.format("Se actualizaron %d terceros al estado %s", 
@@ -209,7 +207,7 @@ public class ThirdRestAdapter {
             @RequestParam(required = false) Optional<Integer> size) {
 
         long totalRecords = listThirdsUseCase.countAllThirdsByEntId(entId);
-        Pageable pageable = paginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
 
         Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
 
@@ -251,24 +249,31 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Exporta terceros existentes.
-     * Permite filtrar opcionalmente por estado (activos/inactivos) e incluye toda la información.
-     * El nombre de la empresa se puede incluir en el nombre del archivo.
+     * Exporta terceros con validaciones a formato Excel.
+     * Utiliza configuración flexible de campos opcionales mediante ExportableField.
+     * 
+     * @param entId Identificador de la entidad (requerido)
+     * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
+     * @param companyName Nombre de la empresa para el nombre del archivo
+     * @param optionalFields Conjunto de campos opcionales a incluir (GENDER, COUNTRY, STATE, CITY)
      */
     @GetMapping("/export/excel")
     public ResponseEntity<Resource> exportThirdsWithValidations(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String companyName) {
+            @RequestParam(required = false) String companyName,
+            @RequestParam(required = false) Set<ExportableField> optionalFields) {
         
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
         
+        // Si no se especifican campos opcionales, usar conjunto vacío
+        Set<ExportableField> fields = optionalFields != null ? optionalFields : Set.of();
+        
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
-                .status(statusBoolean)  // filtro por estado: true=activos, false=inactivos, null=todos
-                .includeTypes(true)  // incluir tipos
-                .includeCities(true) // incluir geografía
+                .status(statusBoolean)
+                .optionalFields(fields)
                 .build();
         
         Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);

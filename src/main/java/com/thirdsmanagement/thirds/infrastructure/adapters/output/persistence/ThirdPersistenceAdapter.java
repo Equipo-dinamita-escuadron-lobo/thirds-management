@@ -19,8 +19,8 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.ma
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.utils.TenantContext;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
@@ -219,6 +219,23 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable page) {
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    /**
+     * Obtiene todos los terceros de una empresa filtrados por estado.
+     * Optimizado para exportación: el filtro se aplica en BD, no en memoria.
+     * 
+     * @param entId El identificador de la entidad
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param page El objeto Pageable que contiene la información de paginación
+     * @return Una página de objetos Third filtrados por estado
+     */
+    @Override
+    public Page<Third> getAllThirdsByState(String entId, Boolean state, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsByEntIdAndState(entId, state, page);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
 
         return pageThirds;

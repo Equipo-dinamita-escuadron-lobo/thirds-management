@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.domain.utils;
+package com.thirdsmanagement.thirds.infrastructure.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

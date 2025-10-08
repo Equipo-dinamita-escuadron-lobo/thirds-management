@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,12 +13,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Servicio para ejecución de archivos SQL.
+ * Adaptador de salida para ejecución de scripts SQL desde archivos.
+ * Utilizado principalmente para inicialización de datos desde el classpath.
  */
-@Service
+@Component
 @RequiredArgsConstructor
 @Slf4j
-public class SqlExecutionService {
+public class SqlScriptRunner {
     
     private final JdbcTemplate jdbcTemplate;
     

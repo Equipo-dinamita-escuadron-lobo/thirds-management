@@ -14,7 +14,7 @@ import java.util.Map;
 public final class ErrorMappingUtils {
 
     private ErrorMappingUtils() {
-        // Clase utilitaria - constructor privado
+        throw new UnsupportedOperationException("ErrorMappingUtils es una clase de utilidad y no debe ser instanciada");
     }
 
     // ===== CREACIÓN DE ERRORES =====

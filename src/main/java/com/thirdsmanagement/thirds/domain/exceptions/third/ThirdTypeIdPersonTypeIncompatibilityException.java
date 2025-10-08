@@ -1,7 +1,7 @@
 package com.thirdsmanagement.thirds.domain.exceptions.third;
 
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
-import com.thirdsmanagement.thirds.domain.model.ePersonType;
 
 /**
  * Excepción que se lanza cuando hay incompatibilidad entre el tipo de identificación y el tipo de persona.

@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.thirdsmanagement.thirds.domain.model.ePersonType;
+import com.thirdsmanagement.thirds.domain.enums.ePersonType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

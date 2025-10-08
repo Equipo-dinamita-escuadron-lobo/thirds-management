@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.async;
+package com.thirdsmanagement.thirds.infrastructure.multitenancy.async;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Configuration;

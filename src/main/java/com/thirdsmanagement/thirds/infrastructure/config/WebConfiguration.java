@@ -1,10 +1,10 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.config;
+package com.thirdsmanagement.thirds.infrastructure.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.multitenancy.interceptor.TenantInterceptor;
+import com.thirdsmanagement.thirds.infrastructure.multitenancy.interceptor.TenantInterceptor;
 
 import lombok.RequiredArgsConstructor;
 

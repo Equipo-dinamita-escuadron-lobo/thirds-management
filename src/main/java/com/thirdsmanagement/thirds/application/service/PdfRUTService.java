@@ -9,12 +9,20 @@ import org.springframework.stereotype.Service;
 
 import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
 import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFormatException;
-import com.thirdsmanagement.thirds.domain.exceptions.third.PdfRutInvalidFileTypeException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.validation.FileValidator;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 
 @Service
 public class PdfRUTService {
+    
+    private final FileValidator fileValidator;
+    
+    public PdfRUTService(@Qualifier("pdfFileValidator") FileValidator fileValidator) {
+        this.fileValidator = fileValidator;
+    }
 
     /**
      * Extrae el contenido de un archivo PDF de RUT.
@@ -25,7 +33,6 @@ public class PdfRUTService {
      *                                        archivo PDF
      * @throws ThirdInvalidDataException      si el request es null o el archivo es
      *                                        inválido
-     * @throws PdfRutInvalidFileTypeException si el archivo no es de tipo PDF
      * @throws PdfRutInvalidFormatException   si el PDF no tiene el formato válido
      *                                        de RUT
      */
@@ -38,8 +45,7 @@ public class PdfRUTService {
             throw new ThirdInvalidDataException("El archivo PDF no puede ser null o vacío");
         }
 
-        // Validar que el archivo sea de tipo PDF
-        validatePdfFileType(request);
+        fileValidator.validate(request.getFile());
         File tempFile = File.createTempFile("upload", ".pdf");
 
         // Transferir el archivo recibido a un archivo temporal
@@ -198,31 +204,4 @@ public class PdfRUTService {
     public static String[] splitBySpaceAndUpperCase(String input) {
         return input.split("(?<=\\s)(?=[A-Z])");
     }
-
-    /**
-     * Valida que el archivo sea de tipo PDF válido.
-     * 
-     * @param request objeto con la información del archivo
-     * @throws PdfRutInvalidFileTypeException si el archivo no es de tipo PDF
-     */
-    private void validatePdfFileType(PdfRUTContent request) {
-        String originalFilename = request.getFile().getOriginalFilename();
-        String contentType = request.getFile().getContentType();
-
-        // Validar extensión del archivo
-        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".pdf")) {
-            throw new PdfRutInvalidFileTypeException("El archivo debe tener extensión .pdf");
-        }
-
-        // Validar content type
-        if (contentType == null || !contentType.equals("application/pdf")) {
-            throw new PdfRutInvalidFileTypeException("El archivo debe ser de tipo PDF (application/pdf)");
-        }
-
-        // Validar que el archivo tenga contenido
-        if (request.getFile().getSize() == 0) {
-            throw new PdfRutInvalidFileTypeException("El archivo PDF está vacío");
-        }
-    }
-
 }
