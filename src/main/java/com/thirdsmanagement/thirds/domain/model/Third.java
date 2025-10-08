@@ -1,13 +1,11 @@
 package com.thirdsmanagement.thirds.domain.model;
 
-import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -85,11 +83,6 @@ public class Third {
     @Size(max = 150, message = "El correo electrónico no puede exceder los 150 caracteres")
     private String email;
 
-    @PastOrPresent(message = "La fecha de creación debe ser en el pasado o presente")
-    private LocalDate creationDate;
-    @PastOrPresent(message = "La fecha de actualización debe ser en el pasado o presente")
-    private LocalDate updateDate;
-
     @JsonIgnore
     public boolean isActive() {
         return Boolean.TRUE.equals(state);
@@ -97,12 +90,10 @@ public class Third {
 
     public void activate() {
         this.state = true;
-        this.updateDate = LocalDate.now();
     }
 
     public void deactivate() {
         this.state = false;
-        this.updateDate = LocalDate.now();
     }
 
     public boolean isLegalEntity() {
@@ -111,9 +102,5 @@ public class Third {
 
     public boolean isNaturalPerson() {
         return ePersonType.Natural.equals(personType);
-    }
-
-    public void markAsUpdated() {
-        this.updateDate = LocalDate.now();
     }
 }

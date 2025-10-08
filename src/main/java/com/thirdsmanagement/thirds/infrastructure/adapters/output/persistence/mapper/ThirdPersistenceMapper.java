@@ -27,8 +27,6 @@ public interface ThirdPersistenceMapper {
      */
     @Mapping(target = "typeId", ignore = true)
     @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "creationDate", ignore = true)
-    @Mapping(target = "updateDate", ignore = true)
     @Mapping(target = "country", expression = "java(mapCountryToString(third.getCountry()))")
     @Mapping(target = "province", expression = "java(mapStateToString(third.getProvince()))")
     @Mapping(target = "city", expression = "java(mapCityToString(third.getCity()))")

@@ -137,8 +137,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 .address(third.getAddress())
                 .phoneNumber(third.getPhoneNumber())
                 .email(third.getEmail())
-                .creationDate(third.getCreationDate())
-                .updateDate(third.getUpdateDate())
                 .build();
     }
 
