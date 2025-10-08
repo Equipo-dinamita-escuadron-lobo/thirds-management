@@ -22,7 +22,7 @@ public final class ImportConstants {
     
     /**
      * Encabezados requeridos para importación de terceros.
-     * Todos los campos son obligatorios según el tipo de persona.
+     * Campos mínimos obligatorios para cualquier tipo de importación.
      */
     public static final String[] REQUIRED_HEADERS = {
         "Tipo Identificación", 
@@ -32,15 +32,22 @@ public final class ImportConstants {
         "Nombres", 
         "Apellidos", 
         "Razón Social", 
-        "Género", 
         "Estado",
         "Tipos de Tercero",
-        "País",
-        "Departamento",
-        "Ciudad",
         "Dirección",
         "Teléfono",
         "Email"
+    };
+    
+    /**
+     * Encabezados opcionales para importación de terceros.
+     * Estos campos pueden estar presentes o ausentes en el archivo Excel.
+     */
+    public static final String[] OPTIONAL_HEADERS = {
+        "Género",
+        "País",
+        "Departamento",
+        "Ciudad"
     };
     
     

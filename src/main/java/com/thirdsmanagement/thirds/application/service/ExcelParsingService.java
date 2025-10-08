@@ -135,6 +135,8 @@ public class ExcelParsingService {
         }
 
         // Validar que existan los encabezados básicos requeridos
+        // Los headers opcionales (Género, País, Departamento, Ciudad) no se validan
+        // para permitir compatibilidad con archivos exportados usando el patrón Builder
         for (String requiredHeader : ImportConstants.REQUIRED_HEADERS) {
             if (!foundHeaders.contains(requiredHeader)) {
                 errors.add(ImportErrorDetail.builder()
@@ -195,8 +197,14 @@ public class ExcelParsingService {
         builder.names(getCellValueAsString(row, columnMap.get("Nombres")));
         builder.lastNames(getCellValueAsString(row, columnMap.get("Apellidos")));
         builder.socialReason(getCellValueAsString(row, columnMap.get("Razón Social")));
-        builder.gender(parseEnum(getCellValueAsString(row, columnMap.get("Género")),
-                eThirdGender.class, "Género", rowNumber, errors, this::mapGender, columnMap));
+        
+        // Género - OPCIONAL (solo si la columna existe en el archivo)
+        Integer genderColumn = columnMap.get("Género");
+        if (genderColumn != null) {
+            builder.gender(parseEnum(getCellValueAsString(row, genderColumn),
+                    eThirdGender.class, "Género", rowNumber, errors, this::mapGender, columnMap));
+        }
+        
         builder.state(parseState(getCellValueAsString(row, columnMap.get("Estado")), rowNumber, errors, columnMap));
         
         // Campos de contacto ahora requeridos
@@ -222,7 +230,8 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos geográficos (ahora obligatorios).
+     * Parsea los campos geográficos (opcionales, solo si existen en el archivo).
+     * Compatible con el patrón Builder de exportación.
      */
     private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
