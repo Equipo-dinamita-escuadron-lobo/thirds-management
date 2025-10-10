@@ -17,6 +17,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TypeIdUpdateRequest {
 
+    private Long id;
+
     @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
 

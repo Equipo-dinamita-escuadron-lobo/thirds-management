@@ -350,7 +350,16 @@ public class ExportThirdService implements ExportThirdUseCase {
 
             // Validar que existan terceros para exportar
             if (thirds == null || thirds.isEmpty()) {
-                throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_NO_DATA);
+                // Determinar el código de error específico según el filtro de estado
+                ThirdsErrorCode errorCode;
+                if (exportRequest.getStatus() != null) {
+                    errorCode = exportRequest.getStatus() 
+                        ? ThirdsErrorCode.THIRD_EXPORT_NO_ACTIVE_DATA 
+                        : ThirdsErrorCode.THIRD_EXPORT_NO_INACTIVE_DATA;
+                } else {
+                    errorCode = ThirdsErrorCode.THIRD_EXPORT_NO_DATA;
+                }
+                throw new ThirdExportException(errorCode);
             }
 
             // Generar archivo Excel con datos y validaciones

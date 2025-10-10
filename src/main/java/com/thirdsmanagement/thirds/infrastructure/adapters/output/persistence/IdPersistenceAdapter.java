@@ -196,6 +196,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
         // Crear el modelo normalizado para actualizar
         TypeId normalizedTypeIdModel = TypeId.builder()
+                .id(currentEntity.getId()) 
                 .typeId(normalizedTypeId)
                 .typeIdname(normalizedTypeIdName)
                 .entId(typeId.getEntId())
