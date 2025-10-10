@@ -12,7 +12,7 @@ spring:
   servlet:
     multipart:
       max-file-size: 5MB
-      max-request-size: 10MB
+      max-request-size: 8MB
       enabled: true
       file-size-threshold: 2KB
       resolve-lazily: false
@@ -36,7 +36,7 @@ server:
     threads:
       max: 200
       min-spare: 10
-    max-http-form-post-size: 10MB
+    max-http-form-post-size: 8MB
 
 eureka:
   instance:
