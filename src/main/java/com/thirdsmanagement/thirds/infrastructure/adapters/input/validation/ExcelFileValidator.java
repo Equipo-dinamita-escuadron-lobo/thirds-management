@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.validation;
 
 import com.thirdsmanagement.thirds.domain.exceptions.third.FileValidationException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.FileSizeExceededException;
 import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,11 +43,7 @@ public class ExcelFileValidator implements FileValidator {
     
     private void validateSize(MultipartFile file) {
         if (file.getSize() > fileProperties.getMaxSize()) {
-            throw FileValidationException.forSizeExceeded(
-                file.getOriginalFilename(), 
-                file.getSize(), 
-                fileProperties.getMaxSize()
-            );
+            throw new FileSizeExceededException(fileProperties.getMaxSize());
         }
     }
     

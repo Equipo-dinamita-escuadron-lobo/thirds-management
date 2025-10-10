@@ -8,11 +8,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.FileSizeExceededException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ErrorResponse;
 
 import jakarta.validation.ConstraintViolation;
@@ -232,6 +234,24 @@ public class GlobalExceptionHandler {
         return null;
     }
 
+    /**
+     * Maneja excepciones cuando un archivo excede el tamaño máximo permitido.
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(
+            MaxUploadSizeExceededException ex, WebRequest request) {
+
+        // Extraer el tamaño máximo permitido
+        long maxSize = ex.getMaxUploadSize();
+        
+        // Crear excepción personalizada
+        FileSizeExceededException customEx = new FileSizeExceededException(
+            maxSize > 0 ? maxSize : 5242880
+        );
+
+        return handleBusinessExceptions(customEx, request);
+    }
+
     private HttpStatus mapStatusFromErrorCode(String code) {
         if (code == null) {
             return HttpStatus.BAD_REQUEST;
@@ -245,6 +265,9 @@ public class GlobalExceptionHandler {
         }
         if (upper.contains("PDF_RUT_INVALID_FORMAT") || upper.contains("INVALID_FORMAT")) {
             return HttpStatus.BAD_REQUEST;
+        }
+        if (upper.contains("FILE_SIZE_EXCEEDED")) {
+            return HttpStatus.PAYLOAD_TOO_LARGE;
         }
         return HttpStatus.BAD_REQUEST;
     }
