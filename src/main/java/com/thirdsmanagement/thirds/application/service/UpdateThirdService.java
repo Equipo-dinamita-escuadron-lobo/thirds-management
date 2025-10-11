@@ -11,10 +11,12 @@ import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
+import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final ThirdValidationService thirdValidationService;
     private final TypeIdLoaderService typeIdLoaderService;
     private final IdOutputPort idOutputPort;
+    private final ThirdRepository thirdRepository;
 
     /**
      * Actualiza un tercero existente con validación opcional de geografía.
@@ -76,6 +79,9 @@ public class UpdateThirdService implements UpdateThirdUseCase {
 
         // Validar que los ThirdTypes existen
         validateThirdTypesExist(third);
+
+        // Validar que no exista otro tercero con el mismo idNumber
+        validateDuplicateThirdOnUpdate(third.getThId(), third.getIdNumber(), third.getEntId());
 
 
         Country country = third.getCountry();
@@ -158,6 +164,30 @@ public class UpdateThirdService implements UpdateThirdUseCase {
 
             if (!idOutputPort.existsThirdTypeById(thirdType.getThirdTypeId())) {
                 throw new ThirdTypeForeignKeyViolationException(thirdType.getThirdTypeId().toString());
+            }
+        }
+    }
+
+    /**
+     * Valida que no exista otro tercero con el mismo número de identificación al actualizar.
+     * Solo valida si el idNumber cambió respecto al tercero original.
+     * 
+     * @param thId     el ID del tercero que se está actualizando
+     * @param newIdNumber el nuevo número de identificación
+     * @param entId    el ID de la entidad
+     * @throws ThirdNotFound            si el tercero original no existe
+     * @throws ThirdAlreadyExistsException si ya existe otro tercero con el mismo idNumber
+     */
+    private void validateDuplicateThirdOnUpdate(Long thId, Long newIdNumber, String entId) {
+        // Obtener el tercero original para comparar el idNumber
+        Third originalThird = thirdOutputPort.getThirdById(thId, entId)
+                .orElseThrow(() -> new ThirdNotFound("El tercero con ID " + thId + " no existe"));
+
+        // Solo validar si el idNumber cambió
+        if (!originalThird.getIdNumber().equals(newIdNumber)) {
+            // Verificar si el nuevo idNumber ya existe en otro tercero
+            if (thirdRepository.existThirdBy(newIdNumber, entId)) {
+                throw new ThirdAlreadyExistsException(newIdNumber.toString());
             }
         }
     }
