@@ -9,6 +9,14 @@ spring:
     hibernate:
       ddl-auto: ${DB_HIBERNATE_DDL_AUTO:create-drop}
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 8MB
+      enabled: true
+      file-size-threshold: 2KB
+      resolve-lazily: false
+
   h2:
     console:
       enabled: false
@@ -22,6 +30,13 @@ spring:
           
 server:
   port: ${PORT:0}
+  tomcat:
+    connection-timeout: 60000
+    max-connections: 10000
+    threads:
+      max: 200
+      min-spare: 10
+    max-http-form-post-size: 8MB
 
 eureka:
   instance:
@@ -48,7 +63,7 @@ management:
         enabled: true
 
 file-upload:
-  max-size: 52428800
+  max-size: 5242880
   allowed-extensions:
     excel:
       - ".xlsx"
