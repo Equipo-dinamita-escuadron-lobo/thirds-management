@@ -3,6 +3,10 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
@@ -450,5 +454,69 @@ public class IdPersistenceAdapter implements IdOutputPort {
         } finally {
             TenantContext.setTenantId(currentTenant);
         }
+    }
+
+    /**
+     * Obtiene todos los tipos de identificación con paginación y ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación
+     */
+    @Override
+    public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(sortField).descending()
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findAllByTientIdPageable(entId, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Busca tipos de identificación por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación que coinciden
+     */
+    @Override
+    public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(sortField).descending()
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findByTientIdAndSearch(entId, search, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Cuenta tipos de identificación por empresa.
+     * @param entId El id de la empresa
+     * @return Cantidad de tipos de identificación
+     */
+    @Override
+    public long countByEntId(String entId) {
+        return typeIdRepository.countByTientId(entId);
+    }
+
+    /**
+     * Cuenta tipos de identificación por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de identificación que coinciden
+     */
+    @Override
+    public long countByEntIdAndSearch(String entId, String search) {
+        return typeIdRepository.countByTientIdAndSearch(entId, search);
     }
 }

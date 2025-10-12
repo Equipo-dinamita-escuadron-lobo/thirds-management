@@ -1,5 +1,9 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
 
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +30,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.reque
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdTypeResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
+import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -88,11 +93,43 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(typeId, HttpStatus.CREATED);
     }
 
+    /**
+     * Obtiene una lista de tipos de identificación con paginación flexible, búsqueda y ordenamiento.
+     * Si no se especifican parámetros de paginación, retorna todos los tipos de identificación.
+     * 
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortField Campo de ordenamiento (opcional, default: "tiName")
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @param search Término de búsqueda (opcional)
+     * @return Respuesta con la lista de tipos de identificación
+     */
     @GetMapping("/typeid")
-    public ResponseEntity<List<TypeId>> ListTypeId(
-            @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
-        List<TypeId> typeIds = listTypeIdUseCase.getAllTypeId(entId);
-        return new ResponseEntity<>(typeIds, HttpStatus.OK);
+    public ResponseEntity<Page<TypeId>> ListTypeId(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "tiName") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String search) {
+
+        // Contar total de registros (con o sin filtro)
+        long totalRecords = (search != null && !search.trim().isEmpty())
+            ? listTypeIdUseCase.countByEntIdAndSearch(entId, search)
+            : listTypeIdUseCase.countByEntId(entId);
+
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+
+        // Obtener página de datos (con o sin filtro)
+        Page<TypeId> page = (search != null && !search.trim().isEmpty())
+            ? listTypeIdUseCase.findByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder)
+            : listTypeIdUseCase.getAllTypeIdsWithSort(entId, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
     @PostMapping("/typeid/update")
