@@ -36,6 +36,36 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
     Page<ThirdEntity> getThirdsByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state, Pageable page);
 
+    /**
+     * Busca terceros por empresa y término de búsqueda.
+     * Busca en: nombres, apellidos, razón social, número de identificación.
+     * 
+     * @param entId ID de la empresa
+     * @param search Término de búsqueda
+     * @param page Paginación con ordenamiento
+     * @return Página de terceros que coinciden con la búsqueda
+     */
+    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND " +
+           "(LOWER(t.names) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.lastNames) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.socialReason) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "CAST(t.idNumber AS string) LIKE CONCAT('%', :search, '%'))")
+    Page<ThirdEntity> findByEntIdAndSearch(@Param("entId") String entId, @Param("search") String search, Pageable page);
+
+    /**
+     * Cuenta terceros por empresa y término de búsqueda.
+     * 
+     * @param entId ID de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de terceros que coinciden
+     */
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND " +
+           "(LOWER(t.names) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.lastNames) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.socialReason) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "CAST(t.idNumber AS string) LIKE CONCAT('%', :search, '%'))")
+    long countByEntIdAndSearch(@Param("entId") String entId, @Param("search") String search);
+
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.idNumber = :idNumber AND t.entId = :entId")
     boolean existThirdBy(@Param("idNumber") Long idNumber, @Param("entId") String entId);
 

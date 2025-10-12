@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import java.util.Set;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.GeographyLoaderService;
@@ -478,6 +480,65 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         // Usar consulta batch optimizada del repositorio
         List<Long> existingList = thirdRepository.findExistingIdNumbers(idNumbers, entId);
         return new HashSet<>(existingList);
+    }
+
+    /**
+     * Busca terceros por empresa y término de búsqueda con ordenamiento.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de terceros que coinciden con la búsqueda
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Third> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder) 
+            ? Sort.by(sortField).descending() 
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdEntity> pageEntities = thirdRepository.findByEntIdAndSearch(entId, search, pageable);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+        
+        return pageThirds;
+    }
+
+    /**
+     * Cuenta terceros por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de terceros que coinciden
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long countByEntIdAndSearch(String entId, String search) {
+        return thirdRepository.countByEntIdAndSearch(entId, search);
+    }
+
+    /**
+     * Obtiene todos los terceros con ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de terceros ordenados
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder) 
+            ? Sort.by(sortField).descending() 
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, pageable);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+        
+        return pageThirds;
     }
     
 }
