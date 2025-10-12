@@ -89,7 +89,7 @@ public class BatchValidationService {
         Map<String, TypeId> typeIds = idOutputPort.getAllTypeIds(entId).stream()
                 .filter(typeId -> typeId.getStatus() != null && typeId.getStatus())
                 .collect(Collectors.toMap(
-                        typeId -> StringNormalizer.normalizeCode(typeId.getTypeIdname()),
+                        typeId -> StringNormalizer.normalizeCode(typeId.getTypeId()),
                         typeId -> typeId,
                         (existing, replacement) -> existing));
 

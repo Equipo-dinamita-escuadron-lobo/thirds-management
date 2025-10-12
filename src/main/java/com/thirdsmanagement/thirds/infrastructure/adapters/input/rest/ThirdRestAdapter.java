@@ -193,26 +193,42 @@ public class ThirdRestAdapter {
     }
 
     /**
-     * Obtiene una lista de terceros con paginación flexible.
+     * Obtiene una lista de terceros con paginación flexible, búsqueda y ordenamiento.
      * Si no se especifican parámetros de paginación, retorna todos los terceros.
-     * @param entId Id de la empresa.
-     * @param numPage Número de página (opcional).
-     * @param size Tamaño de página (opcional).
-     * @return Respuesta con la lista de terceros.
+     * 
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortField Campo de ordenamiento (opcional, default: "names")
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @param search Término de búsqueda (opcional)
+     * @return Respuesta con la lista de terceros
      */
     @GetMapping("/")
     public ResponseEntity<Page<Third>> getThirdsList(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) Optional<Integer> numPage,
-            @RequestParam(required = false) Optional<Integer> size) {
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "names") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String search) {
 
-        long totalRecords = listThirdsUseCase.countAllThirdsByEntId(entId);
+        // Contar total de registros (con o sin filtro)
+        long totalRecords = (search != null && !search.trim().isEmpty())
+            ? listThirdsUseCase.countByEntIdAndSearch(entId, search)
+            : listThirdsUseCase.countAllThirdsByEntId(entId);
+
+        // Crear Pageable flexible
         Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
 
-        Page<Third> page = listThirdsUseCase.getAllThirdsBy(entId, pageable);
+        // Obtener página de datos (con o sin filtro)
+        Page<Third> page = (search != null && !search.trim().isEmpty())
+            ? listThirdsUseCase.findByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder)
+            : listThirdsUseCase.getAllThirdsByWithSort(entId, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
-
     }
 
     /**
