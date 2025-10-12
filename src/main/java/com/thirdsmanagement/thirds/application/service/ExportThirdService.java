@@ -495,32 +495,50 @@ public class ExportThirdService implements ExportThirdUseCase {
         int startRow = 1; // Después del encabezado
         int endRow = 1000; // Permitir muchas filas para la plantilla
 
-        // Aplicar validaciones básicas
-        excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
-
-        // Aplicar validaciones de tipos (siempre incluidos)
+        // Calcular índices dinámicos de columnas
+        int genderColumnIndex = getGenderColumnIndex(request);
+        int stateColumnIndex = getStateColumnIndex(request);
         int typesColumnIndex = getTypesColumnIndex(request);
-        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
-
-        // Aplicar validaciones geográficas (siempre presentes)
         int[] geoColumns = getGeographyColumnIndexes(request);
+
+        // Aplicar validaciones con índices dinámicos
+        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow,
+                genderColumnIndex, stateColumnIndex, typesColumnIndex);
+
+        // Aplicar validaciones geográficas
         excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
                 geoColumns[0], geoColumns[1], geoColumns[2]);
     }
 
+    /**
+     * Calcula el índice de la columna Género.
+     * @return índice de columna o -1 si no está incluido
+     */
+    private int getGenderColumnIndex(ThirdExportRequest request) {
+        ExportConfiguration config = request.getExportConfiguration();
+        // Género está en la columna 7 si está incluido
+        return config.includes(ExportableField.GENDER) ? 7 : -1;
+    }
+
+    /**
+     * Calcula el índice de la columna Estado.
+     * @return índice de columna (dinámico según si género está incluido)
+     */
+    private int getStateColumnIndex(ThirdExportRequest request) {
+        ExportConfiguration config = request.getExportConfiguration();
+        // Estado está en columna 7 si género NO está incluido, o en columna 8 si sí está
+        return config.includes(ExportableField.GENDER) ? 8 : 7;
+    }
+
+    /**
+     * Calcula el índice de la columna Tipos de Tercero.
+     * @return índice de columna (dinámico según si género está incluido)
+     */
     private int getTypesColumnIndex(ThirdExportRequest request) {
         ExportConfiguration config = request.getExportConfiguration();
-        
-        // Los tipos de tercero aparecen después de las columnas básicas
-        // Básicas: 7 (sin género) + Estado (1) = 8
-        int index = 8;
-        
-        // Si género está incluido, suma 1
-        if (config.includes(ExportableField.GENDER)) {
-            index++;
-        }
-        
-        return index;
+        // Tipos de tercero aparece después de Estado
+        // Columnas básicas: 0-6 (7 columnas) + Género (opcional) + Estado = 8 o 9
+        return config.includes(ExportableField.GENDER) ? 9 : 8;
     }
 
     private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
@@ -589,15 +607,17 @@ public class ExportThirdService implements ExportThirdUseCase {
         int startRow = 1; // Después del encabezado
         int endRow = Math.max(dataRowCount + 100, 1000); // Datos existentes + filas adicionales para edición
 
-        // Aplicar validaciones básicas (reutilizando método existente)
-        excelValidationService.applyThirdValidations(sheet, entId, startRow, endRow);
-
-        // Aplicar validaciones de tipos (siempre incluidos)
+        // Calcular índices dinámicos de columnas
+        int genderColumnIndex = getGenderColumnIndex(request);
+        int stateColumnIndex = getStateColumnIndex(request);
         int typesColumnIndex = getTypesColumnIndex(request);
-        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow, typesColumnIndex);
-
-        // Aplicar validaciones geográficas (siempre presentes)
         int[] geoColumns = getGeographyColumnIndexes(request);
+
+        // Aplicar validaciones con índices dinámicos
+        excelValidationService.applyThirdValidationsWithTypes(sheet, entId, startRow, endRow,
+                genderColumnIndex, stateColumnIndex, typesColumnIndex);
+
+        // Aplicar validaciones geográficas
         excelValidationService.applyGeographyValidations(sheet, startRow, endRow,
                 geoColumns[0], geoColumns[1], geoColumns[2]);
     }

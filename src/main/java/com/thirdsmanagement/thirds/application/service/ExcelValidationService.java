@@ -120,30 +120,41 @@ public class ExcelValidationService {
 
     /**
      * Aplica todas las validaciones de datos a una hoja de Excel para terceros.
+     * Los índices de columna son dinámicos según la configuración de exportación.
+     * 
+     * @param sheet hoja de Excel
+     * @param entId ID de la empresa
+     * @param startRow fila inicial
+     * @param endRow fila final
+     * @param genderColumnIndex índice de la columna Género (-1 si no está incluida)
+     * @param stateColumnIndex índice de la columna Estado
      */
-    public void applyThirdValidations(Sheet sheet, String entId, int startRow, int endRow) {
-        // Columna 0: Tipo de Identificación
+    public void applyThirdValidations(Sheet sheet, String entId, int startRow, int endRow,
+            int genderColumnIndex, int stateColumnIndex) {
+        // Columna 0: Tipo de Identificación (siempre fija)
         applyDropdownValidation(sheet, 0, startRow, endRow,
                 getTypeIdOptions(entId),
                 "Seleccione un tipo de identificación válido");
 
-        // Columna 2: Dígito Verificación (solo un dígito 0-9)
+        // Columna 2: Dígito Verificación (siempre fija)
         applyNumericRangeValidation(sheet, 2, startRow, endRow, 0, 9,
                 "Dígito Verificación",
                 "El dígito de verificación debe ser un número entre 0 y 9");
 
-        // Columna 3: Tipo de Persona
+        // Columna 3: Tipo de Persona (siempre fija)
         applyDropdownValidation(sheet, 3, startRow, endRow,
                 getPersonTypeOptions(),
                 "Seleccione NATURAL o JURIDICA");
 
-        // Columna 7: Género
-        applyDropdownValidation(sheet, 7, startRow, endRow,
-                getGenderOptions(),
-                "Seleccione MASCULINO, FEMENINO u OTRO");
+        // Género - OPCIONAL (solo si está incluido en la exportación)
+        if (genderColumnIndex >= 0) {
+            applyDropdownValidation(sheet, genderColumnIndex, startRow, endRow,
+                    getGenderOptions(),
+                    "Seleccione MASCULINO, FEMENINO u OTRO");
+        }
 
-        // Columna 8: Estado
-        applyDropdownValidation(sheet, 8, startRow, endRow,
+        // Estado - posición dinámica según si género está incluido
+        applyDropdownValidation(sheet, stateColumnIndex, startRow, endRow,
                 getStatusOptions(),
                 "Seleccione ACTIVO o INACTIVO");
     }
@@ -151,14 +162,21 @@ public class ExcelValidationService {
     /**
      * Aplica validaciones para terceros con tipos incluidos.
      * Permite múltiples tipos de tercero separados por comas.
+     * 
+     * @param sheet hoja de Excel
+     * @param entId ID de la empresa
+     * @param startRow fila inicial
+     * @param endRow fila final
+     * @param genderColumnIndex índice de la columna Género (-1 si no está incluida)
+     * @param stateColumnIndex índice de la columna Estado
+     * @param typesColumnIndex índice de la columna Tipos de Tercero
      */
     public void applyThirdValidationsWithTypes(Sheet sheet, String entId, int startRow, int endRow,
-            int typesColumnIndex) {
-        // Aplicar validaciones básicas
-        applyThirdValidations(sheet, entId, startRow, endRow);
+            int genderColumnIndex, int stateColumnIndex, int typesColumnIndex) {
+        // Aplicar validaciones básicas con índices dinámicos
+        applyThirdValidations(sheet, entId, startRow, endRow, genderColumnIndex, stateColumnIndex);
 
         // Columna de Tipos de Tercero (posición variable)
-        
         applyMultiSelectValidation(sheet, typesColumnIndex, startRow, endRow,
                 getThirdTypeOptions(entId),
                 "Tipos de Tercero",
@@ -167,22 +185,34 @@ public class ExcelValidationService {
 
     /**
      * Aplica validaciones geográficas para terceros con ciudades incluidas.
+     * Solo aplica validaciones si los índices de columna son válidos (>= 0).
+     * 
+     * @param sheet hoja de Excel
+     * @param startRow fila inicial
+     * @param endRow fila final
+     * @param countryColumnIndex índice de columna País (-1 si no está incluido)
+     * @param stateColumnIndex índice de columna Departamento (-1 si no está incluido)
+     * @param cityColumnIndex índice de columna Ciudad (-1 si no está incluido)
      */
     public void applyGeographyValidations(Sheet sheet, int startRow, int endRow,
             int countryColumnIndex, int stateColumnIndex, int cityColumnIndex) {
         try {
-            // País - usar referencia a hoja
-            applyReferenceBasedValidation(sheet, countryColumnIndex, startRow, endRow,
-                    "Datos_Referencia", "$A$2:$A$100",
-                    "Seleccione un país válido");
+            // País - solo aplicar si está incluido en la exportación
+            if (countryColumnIndex >= 0) {
+                applyReferenceBasedValidation(sheet, countryColumnIndex, startRow, endRow,
+                        "Datos_Referencia", "$A$2:$A$100",
+                        "Seleccione un país válido");
+            }
 
-            // Departamento/Estado - validación dependiente del país usando rangos con
-            // nombre
-            applyStateValidationWithNamedRanges(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow);
+            // Departamento/Estado - solo aplicar si está incluido Y si País también está incluido
+            if (stateColumnIndex >= 0 && countryColumnIndex >= 0) {
+                applyStateValidationWithNamedRanges(sheet, stateColumnIndex, countryColumnIndex, startRow, endRow);
+            }
 
-            // Ciudad - validación dependiente del departamento usando rangos con nombre
-            // directos
-            applyCityValidationWithNamedRanges(sheet, cityColumnIndex, stateColumnIndex, startRow, endRow);
+            // Ciudad - solo aplicar si está incluido Y si Departamento también está incluido
+            if (cityColumnIndex >= 0 && stateColumnIndex >= 0) {
+                applyCityValidationWithNamedRanges(sheet, cityColumnIndex, stateColumnIndex, startRow, endRow);
+            }
         } catch (Exception e) {
             throw new ExcelValidationException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
                     "Error al aplicar validaciones geográficas", e);
