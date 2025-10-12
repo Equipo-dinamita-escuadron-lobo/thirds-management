@@ -37,7 +37,7 @@ public class ExcelValidationService {
     public List<String> getTypeIdOptions(String entId) {
         return idOutputPort.getAllTypeIds(entId).stream()
                 .filter(typeId -> typeId.getStatus() != null && typeId.getStatus())
-                .map(TypeId::getTypeIdname)
+                .map(TypeId::getTypeId)
                 .collect(Collectors.toList());
     }
 

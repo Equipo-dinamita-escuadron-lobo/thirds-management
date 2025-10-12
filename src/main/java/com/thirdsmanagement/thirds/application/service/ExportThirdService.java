@@ -198,7 +198,7 @@ public class ExportThirdService implements ExportThirdUseCase {
             int colIndex = 0;
 
             // Datos básicos requeridos
-            createDataCell(row, colIndex++, third.getTypeId() != null ? third.getTypeId().getTypeIdname() : "",
+            createDataCell(row, colIndex++, third.getTypeId() != null ? third.getTypeId().getTypeId() : "",
                     dataStyle);
             createDataCell(row, colIndex++, third.getIdNumber(), dataStyle);
             createDataCell(row, colIndex++, third.getVerificationNumber(), dataStyle);
