@@ -35,7 +35,6 @@ import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import java.util.List;
 
 /**
  * Controlador REST para la configuración de terceros.
@@ -67,14 +66,42 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(createdThirdType), HttpStatus.CREATED);
     }
 
+    /**
+     * Obtiene una lista de tipos de tercero con paginación flexible, búsqueda y ordenamiento.
+     * Si no se especifican parámetros de paginación, retorna todos los tipos de tercero.
+     * Solo se ordena por nombre (ttName).
+     * 
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @param search Término de búsqueda (opcional)
+     * @return Respuesta con la lista de tipos de tercero
+     */
     @GetMapping("/thirdtype")
-    public ResponseEntity<List<ThirdTypeResponse>> getThirdType(
-            @NotNull(message = "Third Id not be empty") @RequestParam("entId") String entId) {
+    public ResponseEntity<Page<ThirdType>> getThirdType(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String search) {
 
-        List<ThirdType> thirdTypes = listThirdTypeUseCase.getAllThirdTypes(entId);
+        // Contar total de registros (con o sin filtro)
+        long totalRecords = (search != null && !search.trim().isEmpty())
+            ? listThirdTypeUseCase.countThirdTypesByEntIdAndSearch(entId, search)
+            : listThirdTypeUseCase.countThirdTypesByEntId(entId);
 
-        return new ResponseEntity<>(idRestMapper.toThirdTypeResponseList(thirdTypes), HttpStatus.OK);
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
 
+        // Obtener página de datos (con o sin filtro) - siempre ordenado por ttName
+        Page<ThirdType> page = (search != null && !search.trim().isEmpty())
+            ? listThirdTypeUseCase.findThirdTypesByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                    pageable.getPageSize(), "ttName", sortOrder)
+            : listThirdTypeUseCase.getAllThirdTypesWithSort(entId, pageable.getPageNumber(),
+                    pageable.getPageSize(), "ttName", sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
     @PostMapping("/thirdtype/update")

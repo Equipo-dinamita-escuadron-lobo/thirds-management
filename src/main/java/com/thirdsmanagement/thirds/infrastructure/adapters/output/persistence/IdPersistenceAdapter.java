@@ -519,4 +519,68 @@ public class IdPersistenceAdapter implements IdOutputPort {
     public long countByEntIdAndSearch(String entId, String search) {
         return typeIdRepository.countByTientIdAndSearch(entId, search);
     }
+
+    /**
+     * Obtiene todos los tipos de tercero con paginación y ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de tercero
+     */
+    @Override
+    public Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(sortField).descending()
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findAllByTtentIdPageable(entId, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toThirdType);
+    }
+
+    /**
+     * Busca tipos de tercero por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de tercero que coinciden
+     */
+    @Override
+    public Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(sortField).descending()
+            : Sort.by(sortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findByTtentIdAndSearch(entId, search, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toThirdType);
+    }
+
+    /**
+     * Cuenta tipos de tercero por empresa.
+     * @param entId El id de la empresa
+     * @return Cantidad de tipos de tercero
+     */
+    @Override
+    public long countThirdTypesByEntId(String entId) {
+        return thirdTypeRepository.countByTtentId(entId);
+    }
+
+    /**
+     * Cuenta tipos de tercero por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de tercero que coinciden
+     */
+    @Override
+    public long countThirdTypesByEntIdAndSearch(String entId, String search) {
+        return thirdTypeRepository.countByTtentIdAndSearch(entId, search);
+    }
 }
