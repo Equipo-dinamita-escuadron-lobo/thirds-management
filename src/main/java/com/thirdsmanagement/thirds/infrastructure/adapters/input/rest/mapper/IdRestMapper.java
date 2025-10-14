@@ -56,6 +56,7 @@ public interface IdRestMapper {
      * @param typeIdUpdateRequest Objeto de tipo {@link TypeIdUpdateRequest}.
      * @return Objeto de tipo {@link TypeId}.
      */
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "typeIdname", source = "typeIdname")
     @Mapping(target = "entId", source = "entId")
     @Mapping(target = "typeId", source = "typeId")
