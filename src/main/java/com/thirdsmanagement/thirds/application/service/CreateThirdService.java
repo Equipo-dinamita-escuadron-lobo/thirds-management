@@ -5,6 +5,7 @@ import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
@@ -39,17 +40,18 @@ public class CreateThirdService implements CreateThirdUseCase {
     @Override
     @Transactional
     public Third createThird(Third third, String countryCode, String stateCode, String cityCode) {
-        // Validar consistencia de tipo de persona
+       
         thirdValidationService.validatePersonTypeConsistency(third);
 
-        // Cargar TypeId completo y validar compatibilidad
         Third thirdWithCompleteTypeId = typeIdLoaderService.loadCompleteTypeId(third);
         thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
 
-        // Validar formato de NIT para personas jurídicas
+        if (thirdWithCompleteTypeId.getTypeId() != null && !Boolean.TRUE.equals(thirdWithCompleteTypeId.getTypeId().getStatus())) {
+            throw new TypeIdInvalidDataException("El tipo de identificación seleccionado está inactivo");
+        }
+
         thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
 
-        // Validar dígito de verificación según tipo de persona
         thirdValidationService.validateVerificationDigit(thirdWithCompleteTypeId);
 
         Country country = null;
@@ -63,7 +65,6 @@ public class CreateThirdService implements CreateThirdUseCase {
             city = (City) geography[2];
         }
 
-        // Normalizar nombres y asignar geografía
         Third normalizedThird = Third.builder()
                 .entId(thirdWithCompleteTypeId.getEntId())
                 .personType(thirdWithCompleteTypeId.getPersonType())
@@ -87,7 +88,6 @@ public class CreateThirdService implements CreateThirdUseCase {
                 .city(city)
                 .build();
 
-        // Validar duplicados y guardar
         validateDuplicateThird(normalizedThird.getIdNumber(), normalizedThird.getEntId());
 
         Third createdThird = thirdOutputPort.saveThird(normalizedThird);
