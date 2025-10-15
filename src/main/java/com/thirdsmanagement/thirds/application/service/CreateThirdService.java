@@ -1,15 +1,19 @@
 package com.thirdsmanagement.thirds.application.service;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
+import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 
@@ -27,6 +31,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final ThirdGeographyValidationService geographyValidationService;
     private final ThirdValidationService thirdValidationService;
     private final TypeIdLoaderService typeIdLoaderService;
+    private final IdOutputPort idOutputPort;
 
     /**
      * Crea un tercero con validación geográfica desde códigos proporcionados.
@@ -53,6 +58,8 @@ public class CreateThirdService implements CreateThirdUseCase {
         thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
 
         thirdValidationService.validateVerificationDigit(thirdWithCompleteTypeId);
+
+        validateThirdTypesExistAndActive(third);
 
         Country country = null;
         State state = null;
@@ -106,6 +113,35 @@ public class CreateThirdService implements CreateThirdUseCase {
     private void validateDuplicateThird(Long idNumber, String entId) {
         if (thirdRepository.existThirdBy(idNumber, entId)) {
             throw new ThirdAlreadyExistsException(idNumber.toString());
+        }
+    }
+
+    /**
+     * Valida que todos los ThirdTypes existen en el sistema y están activos.
+     *
+     * @param third el tercero que contiene los ThirdTypes a validar
+     * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
+     * @throws ThirdInvalidDataException si algún ThirdType está inactivo
+     */
+    private void validateThirdTypesExistAndActive(Third third) {
+        if (third.getThirdTypes() == null || third.getThirdTypes().isEmpty()) {
+            throw new ThirdInvalidDataException("Los tipos de tercero no pueden estar vacíos");
+        }
+
+        for (ThirdType thirdType : third.getThirdTypes()) {
+            if (thirdType.getThirdTypeId() == null) {
+                throw new ThirdInvalidDataException("El ID del tipo de tercero no puede ser null");
+            }
+
+            if (!idOutputPort.existsThirdTypeById(thirdType.getThirdTypeId())) {
+                throw new ThirdTypeForeignKeyViolationException(thirdType.getThirdTypeId().toString());
+            }
+
+            // Validar que el ThirdType esté activo
+            ThirdType completeThirdType = idOutputPort.getThirdTypeById(thirdType.getThirdTypeId());
+            if (!Boolean.TRUE.equals(completeThirdType.getStatus())) {
+                throw new ThirdInvalidDataException("El tipo de tercero '" + completeThirdType.getThirdTypeName() + "' está inactivo");
+            }
         }
     }
 }

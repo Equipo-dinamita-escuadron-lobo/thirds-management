@@ -142,10 +142,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     }
 
     /**
-     * Valida que todos los ThirdTypes existen en el sistema.
-     * 
+     * Valida que todos los ThirdTypes existen en el sistema y están activos.
+     *
      * @param third el tercero que contiene los ThirdTypes a validar
      * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
+     * @throws ThirdInvalidDataException si algún ThirdType está inactivo
      */
     private void validateThirdTypesExist(Third third) {
         if (third.getThirdTypes() == null || third.getThirdTypes().isEmpty()) {
@@ -159,6 +160,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
 
             if (!idOutputPort.existsThirdTypeById(thirdType.getThirdTypeId())) {
                 throw new ThirdTypeForeignKeyViolationException(thirdType.getThirdTypeId().toString());
+            }
+
+            ThirdType completeThirdType = idOutputPort.getThirdTypeById(thirdType.getThirdTypeId());
+            if (!Boolean.TRUE.equals(completeThirdType.getStatus())) {
+                throw new ThirdInvalidDataException("El tipo de tercero '" + completeThirdType.getThirdTypeName() + "' está inactivo");
             }
         }
     }
