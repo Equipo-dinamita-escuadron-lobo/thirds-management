@@ -48,7 +48,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
@@ -473,9 +472,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findAllByTientIdPageable(entId, pageable);
@@ -495,9 +495,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findByTientIdAndSearch(entId, search, pageable);
@@ -588,5 +589,26 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @Override
     public long countThirdTypesByEntIdAndSearch(String entId, String search) {
         return thirdTypeRepository.countByTtentIdAndSearch(entId, search);
+    }
+
+    /**
+     * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en TypeIdEntity.
+     * @param sortField Campo de ordenamiento del modelo
+     * @return Campo de ordenamiento de la entidad
+     */
+    private String mapTypeIdSortField(String sortField) {
+        if (sortField == null || sortField.trim().isEmpty()) {
+            return "tiName"; // Default
+        }
+        switch (sortField.toLowerCase()) {
+            case "typeid":
+                return "tiId";
+            case "typeidname":
+                return "tiName";
+            case "status":
+                return "status";
+            default:
+                return "tiName"; // Default
+        }
     }
 }
