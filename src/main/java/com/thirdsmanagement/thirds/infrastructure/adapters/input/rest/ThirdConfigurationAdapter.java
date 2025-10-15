@@ -226,4 +226,42 @@ public class ThirdConfigurationAdapter {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
+    /**
+     * Obtiene una lista de tipos de tercero activos con paginación flexible, búsqueda y ordenamiento.
+     * Si no se especifican parámetros de paginación, retorna todos los tipos de tercero activos.
+     * Solo se ordena por nombre (ttName).
+     * 
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @param search Término de búsqueda (opcional)
+     * @return Respuesta con la lista de tipos de tercero activos
+     */
+    @GetMapping("/thirdtype-active")
+    public ResponseEntity<Page<ThirdType>> getActiveThirdType(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String search) {
+
+        // Contar total de registros activos (con o sin filtro)
+        long totalRecords = (search != null && !search.trim().isEmpty())
+            ? listThirdTypeUseCase.countActiveThirdTypesByEntIdAndSearch(entId, search)
+            : listThirdTypeUseCase.countActiveThirdTypesByEntId(entId);
+
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+
+        // Obtener página de datos activos (con o sin filtro) - siempre ordenado por ttName
+        Page<ThirdType> page = (search != null && !search.trim().isEmpty())
+            ? listThirdTypeUseCase.findActiveThirdTypesByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                    pageable.getPageSize(), "ttName", sortOrder)
+            : listThirdTypeUseCase.getAllActiveThirdTypesWithSort(entId, pageable.getPageNumber(),
+                    pageable.getPageSize(), "ttName", sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
 }

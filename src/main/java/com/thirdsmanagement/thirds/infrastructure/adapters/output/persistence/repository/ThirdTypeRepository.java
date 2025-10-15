@@ -79,4 +79,47 @@ public interface ThirdTypeRepository extends JpaRepository<ThirdTypeEntity,Long>
     @Query("SELECT COUNT(tt) FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId AND " +
            "LOWER(tt.ttName) LIKE LOWER(CONCAT('%', :search, '%'))")
     long countByTtentIdAndSearch(@Param("ttentId") String ttentId, @Param("search") String search);
+    
+    /**
+     * Obtiene todos los tipos de tercero activos con paginación y ordenamiento.
+     * 
+     * @param ttentId ID de la empresa
+     * @param pageable Paginación con ordenamiento
+     * @return Página de tipos de tercero activos
+     */
+    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId AND tt.status = true")
+    Page<ThirdTypeEntity> findActiveByTtentIdPageable(@Param("ttentId") String ttentId, Pageable pageable);
+    
+    /**
+     * Busca tipos de tercero activos por empresa y término de búsqueda.
+     * Busca en: nombre (ttName).
+     * 
+     * @param ttentId ID de la empresa
+     * @param search Término de búsqueda
+     * @param pageable Paginación con ordenamiento
+     * @return Página de tipos de tercero activos que coinciden con la búsqueda
+     */
+    @Query("SELECT tt FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId AND tt.status = true AND " +
+           "LOWER(tt.ttName) LIKE LOWER(CONCAT('%', :search, '%'))")
+    Page<ThirdTypeEntity> findActiveByTtentIdAndSearch(@Param("ttentId") String ttentId, @Param("search") String search, Pageable pageable);
+    
+    /**
+     * Cuenta tipos de tercero activos por empresa.
+     * 
+     * @param ttentId ID de la empresa
+     * @return Cantidad de tipos de tercero activos
+     */
+    @Query("SELECT COUNT(tt) FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId AND tt.status = true")
+    long countActiveByTtentId(@Param("ttentId") String ttentId);
+    
+    /**
+     * Cuenta tipos de tercero activos por empresa y término de búsqueda.
+     * 
+     * @param ttentId ID de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de tercero activos que coinciden
+     */
+    @Query("SELECT COUNT(tt) FROM ThirdTypeEntity tt WHERE tt.ttentId = :ttentId AND tt.status = true AND " +
+           "LOWER(tt.ttName) LIKE LOWER(CONCAT('%', :search, '%'))")
+    long countActiveByTtentIdAndSearch(@Param("ttentId") String ttentId, @Param("search") String search);
 }
