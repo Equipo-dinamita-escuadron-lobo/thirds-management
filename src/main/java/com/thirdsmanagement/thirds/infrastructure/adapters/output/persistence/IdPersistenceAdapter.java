@@ -179,10 +179,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
         
-        // Verificar que el tipo de identificación existe
-        Optional<TypeIdEntity> existingEntity = typeIdRepository.findByTiIdAndTientId(normalizedTypeId, typeId.getEntId());
+        // Verificar que el tipo de identificación existe por ID
+        Optional<TypeIdEntity> existingEntity = typeIdRepository.findById(typeId.getId());
         if (existingEntity.isEmpty()) {
-            throw new TypeIdNotFound("No se encontró el tipo de identificación con código '" + normalizedTypeId + "'");
+            throw new TypeIdNotFound("No se encontró el tipo de identificación con ID '" + typeId.getId() + "'");
         }
 
         TypeIdEntity currentEntity = existingEntity.get();
@@ -190,6 +190,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
         // Validar que pertenece a la misma entidad
         if (!currentEntity.getTientId().equals(typeId.getEntId())) {
             throw new TypeIdInvalidDataException("El tipo de identificación no pertenece a la entidad especificada");
+        }
+
+        // Validar que no exista otro typeId con el mismo código (case-insensitive) excluyendo el actual
+        if (!currentEntity.getTiId().equals(normalizedTypeId) &&
+            typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
+            throw new TypeIdAlreadyExists("Ya existe un tipo de identificación con el código '" + typeId.getTypeId() + "'");
         }
 
         // Validar que no exista otro typeIdname similar (case-insensitive) excluyendo el actual
