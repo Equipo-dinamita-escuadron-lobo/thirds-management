@@ -91,4 +91,49 @@ public interface TypeIdRepository extends JpaRepository<TypeIdEntity,Long>{
            "(LOWER(t.tiId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(t.tiName) LIKE LOWER(CONCAT('%', :search, '%')))")
     long countByTientIdAndSearch(@Param("tientId") String tientId, @Param("search") String search);
+    
+    /**
+     * Cuenta tipos de identificación activos por empresa y término de búsqueda.
+     * 
+     * @param tientId ID de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de identificación activos que coinciden
+     */
+    @Query("SELECT COUNT(t) FROM TypeIdEntity t WHERE t.tientId = :tientId AND t.status = true AND " +
+           "(LOWER(t.tiId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.tiName) LIKE LOWER(CONCAT('%', :search, '%')))")
+    long countActiveByTientIdAndSearch(@Param("tientId") String tientId, @Param("search") String search);
+    
+    /**
+     * Obtiene todos los tipos de identificación activos con paginación y ordenamiento.
+     * 
+     * @param tientId ID de la empresa
+     * @param pageable Paginación con ordenamiento
+     * @return Página de tipos de identificación activos
+     */
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tientId = :tientId AND t.status = true")
+    Page<TypeIdEntity> findActiveByTientIdPageable(@Param("tientId") String tientId, Pageable pageable);
+    
+    /**
+     * Busca tipos de identificación activos por empresa y término de búsqueda.
+     * Busca en: código (tiId) y nombre (tiName).
+     * 
+     * @param tientId ID de la empresa
+     * @param search Término de búsqueda
+     * @param pageable Paginación con ordenamiento
+     * @return Página de tipos de identificación activos que coinciden con la búsqueda
+     */
+    @Query("SELECT t FROM TypeIdEntity t WHERE t.tientId = :tientId AND t.status = true AND " +
+           "(LOWER(t.tiId) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(t.tiName) LIKE LOWER(CONCAT('%', :search, '%')))")
+    Page<TypeIdEntity> findActiveByTientIdAndSearch(@Param("tientId") String tientId, @Param("search") String search, Pageable pageable);
+    
+    /**
+     * Cuenta tipos de identificación activos por empresa.
+     * 
+     * @param tientId ID de la empresa
+     * @return Cantidad de tipos de identificación activos
+     */
+    @Query("SELECT COUNT(t) FROM TypeIdEntity t WHERE t.tientId = :tientId AND t.status = true")
+    long countActiveByTientId(@Param("tientId") String tientId);
 }

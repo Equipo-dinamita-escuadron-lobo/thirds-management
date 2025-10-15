@@ -495,9 +495,10 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Override
     @Transactional(readOnly = true)
     public Page<Third> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapThirdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder) 
-            ? Sort.by(sortField).descending() 
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending() 
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ThirdEntity> pageEntities = thirdRepository.findByEntIdAndSearch(entId, search, pageable);
@@ -530,15 +531,36 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Override
     @Transactional(readOnly = true)
     public Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapThirdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder) 
-            ? Sort.by(sortField).descending() 
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending() 
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ThirdEntity> pageEntities = thirdRepository.getThirdsBy(entId, pageable);
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
         
         return pageThirds;
+    }
+
+    /**
+     * Mapea el campo de ordenamiento del modelo Third al campo correspondiente en ThirdEntity.
+     * Solo permite ordenamiento por nombre/razón social y número de identificación.
+     * @param sortField Campo de ordenamiento del modelo
+     * @return Campo de ordenamiento de la entidad
+     */
+    private String mapThirdSortField(String sortField) {
+        if (sortField == null || sortField.trim().isEmpty()) {
+            return "names"; // Default
+        }
+        switch (sortField.toLowerCase()) {
+            case "names":
+                return "names";
+            case "idnumber":
+                return "idNumber";
+            default:
+                return "names"; // Default para cualquier otro campo
+        }
     }
     
 }

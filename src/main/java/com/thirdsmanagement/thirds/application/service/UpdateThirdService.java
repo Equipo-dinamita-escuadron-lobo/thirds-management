@@ -15,6 +15,7 @@ import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsExc
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
 
@@ -56,31 +57,27 @@ public class UpdateThirdService implements UpdateThirdUseCase {
             throw new IllegalArgumentException("El ID del tercero no puede ser null para actualizar");
         }
 
-        // Validar que el tercero existe
         if (!thirdOutputPort.existThirdById(third.getThId(), third.getEntId())) {
             throw new ThirdNotFound("El tercero con ID " + third.getThId() + " no existe");
         }
 
-        // Validar consistencia de tipo de persona
         thirdValidationService.validatePersonTypeConsistency(third);
 
-        // Validar existencia y cargar TypeId completo
         validateTypeIdExists(third);
         Third thirdWithCompleteTypeId = typeIdLoaderService.loadCompleteTypeId(third);
 
-        // Validar compatibilidad entre TypeId y PersonType
+        if (!Boolean.TRUE.equals(thirdWithCompleteTypeId.getTypeId().getStatus())) {
+            throw new TypeIdInvalidDataException("El tipo de identificación debe estar activo para actualizar un tercero");
+        }
+
         thirdValidationService.validateTypeIdPersonTypeCompatibility(thirdWithCompleteTypeId);
 
-        // Validar formato de NIT para personas jurídicas
         thirdValidationService.validateNitFormat(thirdWithCompleteTypeId);
 
-        // Validar dígito de verificación según tipo de persona
         thirdValidationService.validateVerificationDigit(thirdWithCompleteTypeId);
 
-        // Validar que los ThirdTypes existen
         validateThirdTypesExist(third);
 
-        // Validar que no exista otro tercero con el mismo idNumber
         validateDuplicateThirdOnUpdate(third.getThId(), third.getIdNumber(), third.getEntId());
 
 
@@ -95,7 +92,6 @@ public class UpdateThirdService implements UpdateThirdUseCase {
             city = (City) geography[2];
         }
 
-        // Normalizar nombres y asignar geografía
         Third normalizedThird = Third.builder()
                 .thId(thirdWithCompleteTypeId.getThId())
                 .entId(thirdWithCompleteTypeId.getEntId())
@@ -120,7 +116,6 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                 .city(city)
                 .build();
 
-        // Actualizar el tercero
         Third updatedThird = thirdOutputPort.updateThird(normalizedThird);
 
         // Publicar evento de actualización
@@ -147,10 +142,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     }
 
     /**
-     * Valida que todos los ThirdTypes existen en el sistema.
-     * 
+     * Valida que todos los ThirdTypes existen en el sistema y están activos.
+     *
      * @param third el tercero que contiene los ThirdTypes a validar
      * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
+     * @throws ThirdInvalidDataException si algún ThirdType está inactivo
      */
     private void validateThirdTypesExist(Third third) {
         if (third.getThirdTypes() == null || third.getThirdTypes().isEmpty()) {
@@ -164,6 +160,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
 
             if (!idOutputPort.existsThirdTypeById(thirdType.getThirdTypeId())) {
                 throw new ThirdTypeForeignKeyViolationException(thirdType.getThirdTypeId().toString());
+            }
+
+            ThirdType completeThirdType = idOutputPort.getThirdTypeById(thirdType.getThirdTypeId());
+            if (!Boolean.TRUE.equals(completeThirdType.getStatus())) {
+                throw new ThirdInvalidDataException("El tipo de tercero '" + completeThirdType.getThirdTypeName() + "' está inactivo");
             }
         }
     }

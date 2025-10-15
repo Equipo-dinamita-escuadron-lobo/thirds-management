@@ -48,7 +48,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final ThirdRepository thirdRepository;
     private final ThirdTypeRepository thirdTypeRepository;
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
@@ -473,9 +472,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findAllByTientIdPageable(entId, pageable);
@@ -495,9 +495,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
      */
     @Override
     public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findByTientIdAndSearch(entId, search, pageable);
@@ -588,5 +589,179 @@ public class IdPersistenceAdapter implements IdOutputPort {
     @Override
     public long countThirdTypesByEntIdAndSearch(String entId, String search) {
         return thirdTypeRepository.countByTtentIdAndSearch(entId, search);
+    }
+
+    /**
+     * Obtiene todos los tipos de identificación activos con paginación y ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación activos
+     */
+    @Override
+    public Page<TypeId> getAllActiveTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdPageable(entId, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Busca tipos de identificación activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación activos que coinciden
+     */
+    @Override
+    public Page<TypeId> findActiveByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdAndSearch(entId, search, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Cuenta tipos de identificación activos por empresa.
+     * @param entId El id de la empresa
+     * @return Cantidad de tipos de identificación activos
+     */
+    @Override
+    public long countActiveByEntId(String entId) {
+        return typeIdRepository.countActiveByTientId(entId);
+    }
+
+    /**
+     * Cuenta tipos de identificación activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de identificación activos que coinciden
+     */
+    @Override
+    public long countActiveByEntIdAndSearch(String entId, String search) {
+        return typeIdRepository.countActiveByTientIdAndSearch(entId, search);
+    }
+
+    /**
+     * Obtiene todos los tipos de tercero activos con paginación y ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de tercero activos
+     */
+    @Override
+    public Page<ThirdType> getAllActiveThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapThirdTypeSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findActiveByTtentIdPageable(entId, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toThirdType);
+    }
+
+    /**
+     * Busca tipos de tercero activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de tercero activos que coinciden
+     */
+    @Override
+    public Page<ThirdType> findActiveThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapThirdTypeSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findActiveByTtentIdAndSearch(entId, search, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toThirdType);
+    }
+
+    /**
+     * Cuenta tipos de tercero activos por empresa.
+     * @param entId El id de la empresa
+     * @return Cantidad de tipos de tercero activos
+     */
+    @Override
+    public long countActiveThirdTypesByEntId(String entId) {
+        return thirdTypeRepository.countActiveByTtentId(entId);
+    }
+
+    /**
+     * Cuenta tipos de tercero activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de tercero activos que coinciden
+     */
+    @Override
+    public long countActiveThirdTypesByEntIdAndSearch(String entId, String search) {
+        return thirdTypeRepository.countActiveByTtentIdAndSearch(entId, search);
+    }
+
+    /**
+     * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en TypeIdEntity.
+     * @param sortField Campo de ordenamiento del modelo
+     * @return Campo de ordenamiento de la entidad
+     */
+    private String mapTypeIdSortField(String sortField) {
+        if (sortField == null || sortField.trim().isEmpty()) {
+            return "tiName"; // Default
+        }
+        switch (sortField.toLowerCase()) {
+            case "typeid":
+                return "tiId";
+            case "typeidname":
+                return "tiName";
+            case "status":
+                return "status";
+            default:
+                return "tiName"; // Default
+        }
+    }
+
+    /**
+     * Mapea el campo de ordenamiento del modelo ThirdType al campo correspondiente en ThirdTypeEntity.
+     * @param sortField Campo de ordenamiento del modelo
+     * @return Campo de ordenamiento de la entidad
+     */
+    private String mapThirdTypeSortField(String sortField) {
+        if (sortField == null || sortField.trim().isEmpty()) {
+            return "ttName"; // Default
+        }
+        switch (sortField.toLowerCase()) {
+            case "thirdtype":
+                return "ttId";
+            case "thirdtypename":
+                return "ttName";
+            case "status":
+                return "status";
+            default:
+                return "ttName"; // Default
+        }
     }
 }
