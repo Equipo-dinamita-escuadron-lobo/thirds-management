@@ -592,6 +592,72 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
+     * Obtiene todos los tipos de identificación activos con paginación y ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación activos
+     */
+    @Override
+    public Page<TypeId> getAllActiveTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdPageable(entId, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Busca tipos de identificación activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de tipos de identificación activos que coinciden
+     */
+    @Override
+    public Page<TypeId> findActiveByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapTypeIdSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdAndSearch(entId, search, pageable);
+        
+        return entityPage.map(idPersistenceMapper::toTypeId);
+    }
+
+    /**
+     * Cuenta tipos de identificación activos por empresa.
+     * @param entId El id de la empresa
+     * @return Cantidad de tipos de identificación activos
+     */
+    @Override
+    public long countActiveByEntId(String entId) {
+        return typeIdRepository.countActiveByTientId(entId);
+    }
+
+    /**
+     * Cuenta tipos de identificación activos por empresa y término de búsqueda.
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @return Cantidad de tipos de identificación activos que coinciden
+     */
+    @Override
+    public long countActiveByEntIdAndSearch(String entId, String search) {
+        return typeIdRepository.countActiveByTientIdAndSearch(entId, search);
+    }
+
+    /**
      * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en TypeIdEntity.
      * @param sortField Campo de ordenamiento del modelo
      * @return Campo de ordenamiento de la entidad
