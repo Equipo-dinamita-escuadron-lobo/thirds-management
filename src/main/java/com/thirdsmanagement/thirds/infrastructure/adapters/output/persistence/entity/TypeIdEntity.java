@@ -1,10 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.thirdsmanagement.thirds.domain.model.PersonClassification;
 
@@ -53,13 +49,6 @@ public class TypeIdEntity {
     @Column(name = "tenant_id")
     private String tenantId;
 
-    @Column(name = "ti_created_at")
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
-    @Column(name = "ti_updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 
     @Builder.Default
     @Column(name = "ti_status")

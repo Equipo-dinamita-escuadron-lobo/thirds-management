@@ -1,16 +1,12 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
-import org.hibernate.annotations.UpdateTimestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,13 +42,6 @@ public class ThirdTypeEntity {
     @Column(name = "tenant_id")
     private String tenantId;
 
-    @Column(name = "tt_created_at")
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
-    @Column(name = "tt_updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updateDate;
 
     @Builder.Default
     @Column(name = "tt_status")

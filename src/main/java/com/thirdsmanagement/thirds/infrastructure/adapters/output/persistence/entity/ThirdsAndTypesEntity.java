@@ -1,10 +1,6 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -51,11 +47,4 @@ public class ThirdsAndTypesEntity {
     @JoinColumn(name = "tt_id", insertable = false, updatable = false)
     private ThirdTypeEntity thirdType;
 
-    @Column(name = "created_at")
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 }

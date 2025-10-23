@@ -217,7 +217,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
         
         // Preservar datos de auditoría
         typeIdEntity.setTenantId(currentEntity.getTenantId());
-        typeIdEntity.setCreationDate(currentEntity.getCreationDate());
 
         typeIdRepository.save(typeIdEntity);
         return idPersistenceMapper.toTypeId(typeIdEntity);
@@ -275,7 +274,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
         ThirdTypeEntity thirdTypeEntity = idPersistenceMapper.toThirdTypeEntity(normalizedThirdTypeModel);
 
         thirdTypeEntity.setTenantId(currentEntity.getTenantId());
-        thirdTypeEntity.setCreationDate(currentEntity.getCreationDate());
 
         thirdTypeRepository.save(thirdTypeEntity);
         return idPersistenceMapper.toThirdType(thirdTypeEntity);
