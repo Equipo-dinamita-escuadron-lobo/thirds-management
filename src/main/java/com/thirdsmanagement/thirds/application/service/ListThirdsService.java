@@ -80,4 +80,31 @@ public class ListThirdsService implements ListThirdsUseCase {
     public Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
         return thirdOutputPort.getAllThirdsByWithSort(entId, page, size, sortField, sortOrder);
     }
+
+    /**
+     * Obtiene todos los terceros activos con ordenamiento.
+     *
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de terceros activos ordenados
+     */
+    @Override
+    public Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        return thirdOutputPort.getAllActiveThirdsByWithSort(entId, page, size, sortField, sortOrder);
+    }
+
+    /**
+     * Cuenta el total de terceros activos por empresa.
+     *
+     * @param entId el ID de la empresa
+     * @return el número total de terceros activos
+     */
+    @Override
+    public long countActiveThirdsByEntId(String entId) {
+        return thirdOutputPort.countActiveThirdsByEntId(entId);
+    }
+
 }

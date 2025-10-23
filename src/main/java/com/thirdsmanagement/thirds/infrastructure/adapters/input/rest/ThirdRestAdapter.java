@@ -232,6 +232,37 @@ public class ThirdRestAdapter {
     }
 
     /**
+     * Obtiene una lista de terceros activos con paginación flexible y ordenamiento.
+     *
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortField Campo de ordenamiento (opcional, default: "names")
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @return Respuesta con la lista de terceros activos
+     */
+    @GetMapping("/findAllActive")
+    public ResponseEntity<Page<Third>> getActiveThirds(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "names") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        // Contar total de registros activos
+        long totalRecords = listThirdsUseCase.countActiveThirdsByEntId(entId);
+
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+
+        // Obtener página de datos activos
+        Page<Third> page = listThirdsUseCase.getAllActiveThirdsByWithSort(entId, pageable.getPageNumber(),
+                pageable.getPageSize(), sortField, sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+    /**
      * Cargar un archivo PDF y extraer su contenido RUT.
      * @param file el archivo PDF que se va a cargar.
      * @return ResponseEntity con el contenido extraído del PDF en caso de éxito,
