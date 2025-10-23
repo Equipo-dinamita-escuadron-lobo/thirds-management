@@ -544,6 +544,44 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
+     * Obtiene todos los terceros activos con ordenamiento.
+     *
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de terceros activos ordenados
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        String entitySortField = mapThirdSortField(sortField);
+        Sort sort = "desc".equalsIgnoreCase(sortOrder)
+            ? Sort.by(entitySortField).descending()
+            : Sort.by(entitySortField).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ThirdEntity> pageEntities = thirdRepository.getActiveThirdsBy(entId, pageable);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    /**
+     * Cuenta el total de terceros activos por empresa.
+     *
+     * @param entId el ID de la empresa
+     * @return el número total de terceros activos
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long countActiveThirdsByEntId(String entId) {
+        return thirdRepository.countActiveByEntId(entId);
+    }
+
+
+    /**
      * Mapea el campo de ordenamiento del modelo Third al campo correspondiente en ThirdEntity.
      * Solo permite ordenamiento por nombre/razón social y número de identificación.
      * @param sortField Campo de ordenamiento del modelo

@@ -104,4 +104,24 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t.idNumber FROM ThirdEntity t WHERE t.idNumber IN :idNumbers AND t.entId = :entId")
     List<Long> findExistingIdNumbers(@Param("idNumbers") Set<Long> idNumbers, @Param("entId") String entId);
 
+    /**
+     * Obtiene todos los terceros activos de una empresa.
+     *
+     * @param entId ID de la empresa
+     * @param page Paginación con ordenamiento
+     * @return Página de terceros activos
+     */
+    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
+    Page<ThirdEntity> getActiveThirdsBy(@Param("entId") String entId, Pageable page);
+
+
+    /**
+     * Cuenta el total de terceros activos por empresa.
+     *
+     * @param entId ID de la empresa
+     * @return Cantidad total de terceros activos
+     */
+    @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
+    long countActiveByEntId(@Param("entId") String entId);
+
 }

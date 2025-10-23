@@ -54,4 +54,23 @@ public interface ListThirdsUseCase {
      * @return Página de terceros ordenados
      */
     Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
+
+    /**
+     * Obtiene todos los terceros activos con ordenamiento.
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @param sortField Campo de ordenamiento
+     * @param sortOrder Orden (asc/desc)
+     * @return Página de terceros activos ordenados
+     */
+    Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
+
+    /**
+     * Cuenta el total de terceros activos por empresa.
+     * @param entId El id de la empresa
+     * @return El número total de terceros activos
+     */
+    long countActiveThirdsByEntId(String entId);
+
 }
