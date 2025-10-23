@@ -43,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/thirds/configuration")
 @RequiredArgsConstructor
-public class ThirdConfigurationAdapter {
+public class ThirdConfigurationRestAdapter {
 
     private final CreateThirdTypeUseCase createThirdTypeUseCase;
     private final ListThirdTypeUseCase listThirdTypeUseCase;
