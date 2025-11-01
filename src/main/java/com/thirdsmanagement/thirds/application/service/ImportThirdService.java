@@ -36,7 +36,7 @@ public class ImportThirdService implements ImportThirdUseCase {
     // Configuración fija según requerimientos del usuario
     private static final boolean SKIP_DUPLICATES = true; // Omitir duplicados automáticamente
     private static final boolean CONTINUE_ON_ERROR = false; // Parar en primer error
-    private static final int MAX_BATCH_SIZE = 1000; // Máximo registros por lote
+    private static final int MAX_BATCH_SIZE = 500; // Máximo registros por lote
 
     /**
      * Orquesta el proceso completo de importación.
@@ -110,7 +110,6 @@ public class ImportThirdService implements ImportThirdUseCase {
             return new BatchProcessingResult(0, 0, 0);
         }
 
-        // Pre-cargar cache una sola vez para todo el procesamiento
         String entId = uniqueRecords.get(0).getEntId();
         BatchValidationService.ReferenceDataCache cache = batchValidationService.preloadReferenceData(entId);
 
