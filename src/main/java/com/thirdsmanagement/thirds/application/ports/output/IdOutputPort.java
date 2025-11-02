@@ -206,27 +206,13 @@ public interface IdOutputPort {
     long countActiveByEntId(String entId);
     
     /**
-     * Obtiene todos los tipos de tercero activos con paginación y ordenamiento.
+     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos
+     * @return Página de tipos de tercero activos ordenados por nombre
      */
-    Page<ThirdType> getAllActiveThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
-    /**
-     * Busca tipos de tercero activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos que coinciden
-     */
-    Page<ThirdType> findActiveThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
+    Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size);
     
     /**
      * Cuenta tipos de tercero activos por empresa.
@@ -234,12 +220,4 @@ public interface IdOutputPort {
      * @return Cantidad de tipos de tercero activos
      */
     long countActiveThirdTypesByEntId(String entId);
-    
-    /**
-     * Cuenta tipos de tercero activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de tercero activos que coinciden
-     */
-    long countActiveThirdTypesByEntIdAndSearch(String entId, String search);
 }
