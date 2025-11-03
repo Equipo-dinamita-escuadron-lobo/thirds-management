@@ -37,14 +37,16 @@ import lombok.RequiredArgsConstructor;
 /**
  * Clase adaptador de persistencia para la entidad Id.
  * Implementa la interfaz {@link IdOutputPort}.
- * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y {@link TypeIdRepository} para las operaciones de persistencia.
+ * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y
+ * {@link TypeIdRepository} para las operaciones de persistencia.
  * Utiliza {@link IdPersistenceMapper} para mapear las entidades y los modelos.
- * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos de identificación.
+ * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos
+ * de identificación.
  */
 @Component
 @RequiredArgsConstructor
 public class IdPersistenceAdapter implements IdOutputPort {
-    
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -53,10 +55,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final TypeIdRepository typeIdRepository;
     private final IdPersistenceMapper idPersistenceMapper;
-    
 
     /**
      * Guarda un tipo de tercero.
+     * 
      * @param thirdType Tipo de tercero a guardar.
      * @return Tipo de tercero guardado.
      */
@@ -74,6 +76,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Obtiene todos los tipos de terceros.
+     * 
      * @param entId Id de la entidad.
      * @return Lista de tipos de terceros.
      */
@@ -84,6 +87,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Guarda un tipo de identificación.
+     * 
      * @param typeId Tipo de identificación a guardar.
      * @return Tipo de identificación guardado.
      */
@@ -108,16 +112,18 @@ public class IdPersistenceAdapter implements IdOutputPort {
         // Normalizar valores para validaciones
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
-        
+
         if (typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
-            throw new TypeIdAlreadyExists("Ya existe un tipo de identificación con el código '" + normalizedTypeId + "'");
+            throw new TypeIdAlreadyExists(
+                    "Ya existe un tipo de identificación con el código '" + normalizedTypeId + "'");
         }
 
-        // Validar que no exista un typeIdname similar (case-insensitive) usando el nombre normalizado
+        // Validar que no exista un typeIdname similar (case-insensitive) usando el
+        // nombre normalizado
         if (typeIdRepository.existsByTiNameIgnoreCaseAndTientId(normalizedTypeIdName, typeId.getEntId())) {
             throw new TypeIdNameAlreadyExistsException(typeId.getTypeIdname());
         }
-        
+
         // Crear el modelo normalizado para guardar
         TypeId normalizedTypeIdModel = TypeId.builder()
                 .typeId(normalizedTypeId)
@@ -143,6 +149,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Obtiene todos los tipos de identificación.
+     * 
      * @param entId Id de la entidad.
      * @return Lista de tipos de identificación.
      */
@@ -153,6 +160,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Actualiza un tipo de identificación.
+     * 
      * @param typeId Tipo de identificación a actualizar.
      * @return Tipo de identificación actualizado.
      */
@@ -177,7 +185,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
         // Normalizar valores para validaciones
         String normalizedTypeId = StringNormalizer.normalizeCode(typeId.getTypeId());
         String normalizedTypeIdName = StringNormalizer.normalizePreservingCase(typeId.getTypeIdname());
-        
+
         // Verificar que el tipo de identificación existe por ID
         Optional<TypeIdEntity> existingEntity = typeIdRepository.findById(typeId.getId());
         if (existingEntity.isEmpty()) {
@@ -185,27 +193,30 @@ public class IdPersistenceAdapter implements IdOutputPort {
         }
 
         TypeIdEntity currentEntity = existingEntity.get();
-        
+
         // Validar que pertenece a la misma entidad
         if (!currentEntity.getTientId().equals(typeId.getEntId())) {
             throw new TypeIdInvalidDataException("El tipo de identificación no pertenece a la entidad especificada");
         }
 
-        // Validar que no exista otro typeId con el mismo código (case-insensitive) excluyendo el actual
+        // Validar que no exista otro typeId con el mismo código (case-insensitive)
+        // excluyendo el actual
         if (!currentEntity.getTiId().equals(normalizedTypeId) &&
-            typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
-            throw new TypeIdAlreadyExists("Ya existe un tipo de identificación con el código '" + typeId.getTypeId() + "'");
+                typeIdRepository.existsByTiIdAndTientId(normalizedTypeId, typeId.getEntId())) {
+            throw new TypeIdAlreadyExists(
+                    "Ya existe un tipo de identificación con el código '" + typeId.getTypeId() + "'");
         }
 
-        // Validar que no exista otro typeIdname similar (case-insensitive) excluyendo el actual
+        // Validar que no exista otro typeIdname similar (case-insensitive) excluyendo
+        // el actual
         if (!currentEntity.getTiName().equalsIgnoreCase(normalizedTypeIdName) &&
-            typeIdRepository.existsByTiNameIgnoreCaseAndTientId(normalizedTypeIdName, typeId.getEntId())) {
+                typeIdRepository.existsByTiNameIgnoreCaseAndTientId(normalizedTypeIdName, typeId.getEntId())) {
             throw new TypeIdNameAlreadyExistsException(typeId.getTypeIdname());
         }
 
         // Crear el modelo normalizado para actualizar
         TypeId normalizedTypeIdModel = TypeId.builder()
-                .id(currentEntity.getId()) 
+                .id(currentEntity.getId())
                 .typeId(normalizedTypeId)
                 .typeIdname(normalizedTypeIdName)
                 .entId(typeId.getEntId())
@@ -214,7 +225,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 .build();
 
         TypeIdEntity typeIdEntity = idPersistenceMapper.toTypeIdEntity(normalizedTypeIdModel);
-        
+
         // Preservar datos de auditoría
         typeIdEntity.setTenantId(currentEntity.getTenantId());
 
@@ -224,6 +235,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Actualiza un tipo de tercero.
+     * 
      * @param thirdType Tipo de tercero a actualizar.
      * @return Tipo de tercero actualizado.
      */
@@ -243,23 +255,25 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
         // Normalizar el nombre para validaciones
         String normalizedThirdTypeName = StringNormalizer.normalizePreservingCase(thirdType.getThirdTypeName());
-        
+
         // Verificar que el tipo de tercero existe
         Optional<ThirdTypeEntity> existingEntity = thirdTypeRepository.findById(thirdType.getThirdTypeId());
         if (existingEntity.isEmpty()) {
-            throw new ThirdTypeNotFound("No se encontró el tipo de tercero con ID '" + thirdType.getThirdTypeId() + "'");
+            throw new ThirdTypeNotFound(
+                    "No se encontró el tipo de tercero con ID '" + thirdType.getThirdTypeId() + "'");
         }
 
         ThirdTypeEntity currentEntity = existingEntity.get();
-        
+
         // Validar que pertenece a la misma entidad
         if (!currentEntity.getTtentId().equals(thirdType.getEntId())) {
             throw new ThirdTypeInvalidDataException("El tipo de tercero no pertenece a la entidad especificada");
         }
 
-        // Validar que no exista otro thirdTypeName similar (case-insensitive) excluyendo el actual
+        // Validar que no exista otro thirdTypeName similar (case-insensitive)
+        // excluyendo el actual
         if (!currentEntity.getTtName().equalsIgnoreCase(normalizedThirdTypeName) &&
-            thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId(normalizedThirdTypeName, thirdType.getEntId())) {
+                thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId(normalizedThirdTypeName, thirdType.getEntId())) {
             throw new ThirdTypeNameAlreadyExistsException(thirdType.getThirdTypeName());
         }
 
@@ -278,9 +292,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
         thirdTypeRepository.save(thirdTypeEntity);
         return idPersistenceMapper.toThirdType(thirdTypeEntity);
     }
-    
+
     /**
      * Verifica si existe un tipo de identificación por su ID.
+     * 
      * @param typeIdId El ID del tipo de identificación
      * @return true si existe, false en caso contrario
      */
@@ -291,9 +306,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
         }
         return typeIdRepository.existsById(typeIdId);
     }
-    
+
     /**
      * Verifica si existe un tipo de tercero por su ID.
+     * 
      * @param thirdTypeId El ID del tipo de tercero
      * @return true si existe, false en caso contrario
      */
@@ -304,9 +320,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
         }
         return thirdTypeRepository.existsById(thirdTypeId);
     }
-    
+
     /**
      * Obtiene un tipo de identificación completo por su ID.
+     * 
      * @param typeIdId El ID del tipo de identificación
      * @return El tipo de identificación completo o null si no existe
      */
@@ -315,14 +332,15 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (typeIdId == null) {
             return null;
         }
-        
+
         return typeIdRepository.findById(typeIdId)
                 .map(idPersistenceMapper::toTypeId)
                 .orElse(null);
     }
-    
+
     /**
      * Obtiene un tipo de tercero completo por su ID.
+     * 
      * @param thirdTypeId El ID del tipo de tercero
      * @return El tipo de tercero completo o null si no existe
      */
@@ -331,16 +349,17 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (thirdTypeId == null) {
             return null;
         }
-        
+
         return thirdTypeRepository.findById(thirdTypeId)
                 .map(idPersistenceMapper::toThirdType)
                 .orElse(null);
     }
-    
+
     /**
      * Elimina un tipo de tercero del sistema.
+     * 
      * @param thirdTypeId El ID del tipo de tercero a eliminar
-     * @param entId El ID de la empresa
+     * @param entId       El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
      */
     @Override
@@ -348,20 +367,20 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
             return false;
         }
-        
+
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
+
             Optional<ThirdTypeEntity> thirdTypeEntity = thirdTypeRepository.findByTtIdAndTtentId(thirdTypeId, entId);
-            
+
             if (thirdTypeEntity.isPresent()) {
                 thirdTypeRepository.delete(thirdTypeEntity.get());
                 return true;
             }
-            
+
             return false;
-            
+
         } catch (Exception e) {
             // Log del error pero no lanzar excepción para mantener el contrato del método
             return false;
@@ -369,11 +388,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
             TenantContext.setTenantId(currentTenant);
         }
     }
-    
+
     /**
      * Verifica si un tipo de tercero está siendo utilizado por terceros existentes.
+     * 
      * @param thirdTypeId El ID del tipo de tercero
-     * @param entId El ID de la empresa
+     * @param entId       El ID de la empresa
      * @return true si está en uso, false en caso contrario
      */
     @Override
@@ -381,23 +401,24 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
             return false;
         }
-        
+
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
+
             // Verificar si existe algún tercero que use este tipo de tercero
             return thirdsAndTypesRepository.existsByTtId(thirdTypeId);
-            
+
         } finally {
             TenantContext.setTenantId(currentTenant);
         }
     }
-    
+
     /**
      * Elimina un tipo de identificación del sistema.
+     * 
      * @param typeIdId El ID del tipo de identificación a eliminar
-     * @param entId El ID de la empresa
+     * @param entId    El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
      */
     @Override
@@ -405,20 +426,20 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (typeIdId == null || entId == null || entId.trim().isEmpty()) {
             return false;
         }
-        
+
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
+
             Optional<TypeIdEntity> typeIdEntity = typeIdRepository.findById(typeIdId);
-            
+
             if (typeIdEntity.isPresent() && entId.equals(typeIdEntity.get().getTientId())) {
                 typeIdRepository.delete(typeIdEntity.get());
                 return true;
             }
-            
+
             return false;
-            
+
         } catch (Exception e) {
             // Log del error pero no lanzar excepción para mantener el contrato del método
             return false;
@@ -426,11 +447,13 @@ public class IdPersistenceAdapter implements IdOutputPort {
             TenantContext.setTenantId(currentTenant);
         }
     }
-    
+
     /**
-     * Verifica si un tipo de identificación está siendo utilizado por terceros existentes.
+     * Verifica si un tipo de identificación está siendo utilizado por terceros
+     * existentes.
+     * 
      * @param typeIdId El ID del tipo de identificación
-     * @param entId El ID de la empresa
+     * @param entId    El ID de la empresa
      * @return true si está en uso, false en caso contrario
      */
     @Override
@@ -438,22 +461,22 @@ public class IdPersistenceAdapter implements IdOutputPort {
         if (typeIdId == null || entId == null || entId.trim().isEmpty()) {
             return false;
         }
-        
+
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
+
             // Primero obtener el código del tipo de identificación
             Optional<TypeIdEntity> typeIdEntity = typeIdRepository.findById(typeIdId);
             if (typeIdEntity.isEmpty()) {
                 return false;
             }
-            
+
             String typeIdCode = typeIdEntity.get().getTiId();
-            
+
             // Verificar si existe algún tercero que use este tipo de identificación
             return thirdRepository.existsByTypeIdTiIdAndEntId(typeIdCode, entId);
-            
+
         } finally {
             TenantContext.setTenantId(currentTenant);
         }
@@ -461,9 +484,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Obtiene todos los tipos de identificación con paginación y ordenamiento.
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
+     * 
+     * @param entId     El id de la empresa
+     * @param page      Número de página
+     * @param size      Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de identificación
@@ -472,40 +496,43 @@ public class IdPersistenceAdapter implements IdOutputPort {
     public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
         String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
+                ? Sort.by(entitySortField).descending()
+                : Sort.by(entitySortField).ascending();
+
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findAllByTientIdPageable(entId, pageable);
-        
+
         return entityPage.map(idPersistenceMapper::toTypeId);
     }
 
     /**
      * Busca tipos de identificación por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
+     * 
+     * @param entId     El id de la empresa
+     * @param search    Término de búsqueda
+     * @param page      Número de página
+     * @param size      Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de identificación que coinciden
      */
     @Override
-    public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+    public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField,
+            String sortOrder) {
         String entitySortField = mapTypeIdSortField(sortField);
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
+                ? Sort.by(entitySortField).descending()
+                : Sort.by(entitySortField).ascending();
+
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findByTientIdAndSearch(entId, search, pageable);
-        
+
         return entityPage.map(idPersistenceMapper::toTypeId);
     }
 
     /**
      * Cuenta tipos de identificación por empresa.
+     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación
      */
@@ -516,7 +543,8 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Cuenta tipos de identificación por empresa y término de búsqueda.
-     * @param entId El id de la empresa
+     * 
+     * @param entId  El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de identificación que coinciden
      */
@@ -527,49 +555,54 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Obtiene todos los tipos de tercero con paginación y ordenamiento.
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
+     * 
+     * @param entId     El id de la empresa
+     * @param page      Número de página
+     * @param size      Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de tercero
      */
     @Override
-    public Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+    public Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField,
+            String sortOrder) {
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
-        
+                ? Sort.by(sortField).descending()
+                : Sort.by(sortField).ascending();
+
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findAllByTtentIdPageable(entId, pageable);
-        
+
         return entityPage.map(idPersistenceMapper::toThirdType);
     }
 
     /**
      * Busca tipos de tercero por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
+     * 
+     * @param entId     El id de la empresa
+     * @param search    Término de búsqueda
+     * @param page      Número de página
+     * @param size      Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de tercero que coinciden
      */
     @Override
-    public Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
+    public Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size,
+            String sortField, String sortOrder) {
         Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(sortField).descending()
-            : Sort.by(sortField).ascending();
-        
+                ? Sort.by(sortField).descending()
+                : Sort.by(sortField).ascending();
+
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findByTtentIdAndSearch(entId, search, pageable);
-        
+
         return entityPage.map(idPersistenceMapper::toThirdType);
     }
 
     /**
      * Cuenta tipos de tercero por empresa.
+     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero
      */
@@ -580,7 +613,8 @@ public class IdPersistenceAdapter implements IdOutputPort {
 
     /**
      * Cuenta tipos de tercero por empresa y término de búsqueda.
-     * @param entId El id de la empresa
+     * 
+     * @param entId  El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de tercero que coinciden
      */
@@ -590,52 +624,26 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de identificación activos con paginación y ordenamiento.
+     * Obtiene todos los tipos de identificación activos con paginación simple
+     * (ordenado por tiName asc).
+     * 
      * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación activos
+     * @param page  Número de página
+     * @param size  Tamaño de página
+     * @return Página de tipos de identificación activos ordenados por nombre
      */
     @Override
-    public Page<TypeId> getAllActiveTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
-        String entitySortField = mapTypeIdSortField(sortField);
-        Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
+    public Page<TypeId> getAllActiveTypeIds(String entId, int page, int size) {
+        Sort sort = Sort.by("tiName").ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdPageable(entId, pageable);
-        
-        return entityPage.map(idPersistenceMapper::toTypeId);
-    }
 
-    /**
-     * Busca tipos de identificación activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación activos que coinciden
-     */
-    @Override
-    public Page<TypeId> findActiveByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
-        String entitySortField = mapTypeIdSortField(sortField);
-        Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<TypeIdEntity> entityPage = typeIdRepository.findActiveByTientIdAndSearch(entId, search, pageable);
-        
         return entityPage.map(idPersistenceMapper::toTypeId);
     }
 
     /**
      * Cuenta tipos de identificación activos por empresa.
+     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación activos
      */
@@ -645,63 +653,24 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de identificación activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de identificación activos que coinciden
-     */
-    @Override
-    public long countActiveByEntIdAndSearch(String entId, String search) {
-        return typeIdRepository.countActiveByTientIdAndSearch(entId, search);
-    }
-
-    /**
-     * Obtiene todos los tipos de tercero activos con paginación y ordenamiento.
+     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos
+     * @return Página de tipos de tercero activos ordenados por nombre
      */
     @Override
-    public Page<ThirdType> getAllActiveThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
-        String entitySortField = mapThirdTypeSortField(sortField);
-        Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
+    public Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size) {
+        Sort sort = Sort.by("ttName").ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findActiveByTtentIdPageable(entId, pageable);
-        
-        return entityPage.map(idPersistenceMapper::toThirdType);
-    }
 
-    /**
-     * Busca tipos de tercero activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos que coinciden
-     */
-    @Override
-    public Page<ThirdType> findActiveThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
-        String entitySortField = mapThirdTypeSortField(sortField);
-        Sort sort = "desc".equalsIgnoreCase(sortOrder)
-            ? Sort.by(entitySortField).descending()
-            : Sort.by(entitySortField).ascending();
-        
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<ThirdTypeEntity> entityPage = thirdTypeRepository.findActiveByTtentIdAndSearch(entId, search, pageable);
-        
         return entityPage.map(idPersistenceMapper::toThirdType);
     }
 
     /**
      * Cuenta tipos de tercero activos por empresa.
+     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero activos
      */
@@ -711,18 +680,9 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de tercero activos por empresa y término de búsqueda.
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de tercero activos que coinciden
-     */
-    @Override
-    public long countActiveThirdTypesByEntIdAndSearch(String entId, String search) {
-        return thirdTypeRepository.countActiveByTtentIdAndSearch(entId, search);
-    }
-
-    /**
-     * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en TypeIdEntity.
+     * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en
+     * TypeIdEntity.
+     * 
      * @param sortField Campo de ordenamiento del modelo
      * @return Campo de ordenamiento de la entidad
      */
@@ -739,27 +699,6 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 return "status";
             default:
                 return "tiName"; // Default
-        }
-    }
-
-    /**
-     * Mapea el campo de ordenamiento del modelo ThirdType al campo correspondiente en ThirdTypeEntity.
-     * @param sortField Campo de ordenamiento del modelo
-     * @return Campo de ordenamiento de la entidad
-     */
-    private String mapThirdTypeSortField(String sortField) {
-        if (sortField == null || sortField.trim().isEmpty()) {
-            return "ttName"; // Default
-        }
-        switch (sortField.toLowerCase()) {
-            case "thirdtype":
-                return "ttId";
-            case "thirdtypename":
-                return "ttName";
-            case "status":
-                return "status";
-            default:
-                return "ttName"; // Default
         }
     }
 }

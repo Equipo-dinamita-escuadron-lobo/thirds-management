@@ -44,18 +44,16 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
 
     /**
-     * Obtiene todos los tipos de identificación activos con paginación y ordenamiento.
+     * Obtiene todos los tipos de identificación activos con paginación simple (ordenado por tiName asc).
      * 
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación activos
+     * @return Página de tipos de identificación activos ordenados por nombre
      */
     @Override
-    public Page<TypeId> getAllActiveTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
-        return idOutputPort.getAllActiveTypeIdsWithSort(entId, page, size, sortField, sortOrder);
+    public Page<TypeId> getAllActiveTypeIds(String entId, int page, int size) {
+        return idOutputPort.getAllActiveTypeIds(entId, page, size);
     }
 
     /**
@@ -73,23 +71,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
         return idOutputPort.findByEntIdAndSearch(entId, search, page, size, sortField, sortOrder);
     }
-
-    /**
-     * Busca tipos de identificación activos por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación activos que coinciden
-     */
-    @Override
-    public Page<TypeId> findActiveByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
-        return idOutputPort.findActiveByEntIdAndSearch(entId, search, page, size, sortField, sortOrder);
-    }
-
+    
     /**
      * Cuenta tipos de identificación por empresa.
      * 
@@ -100,7 +82,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     public long countByEntId(String entId) {
         return idOutputPort.countByEntId(entId);
     }
-
+    
     /**
      * Cuenta tipos de identificación activos por empresa.
      * 
@@ -111,7 +93,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     public long countActiveByEntId(String entId) {
         return idOutputPort.countActiveByEntId(entId);
     }
-
+    
     /**
      * Cuenta tipos de identificación por empresa y término de búsqueda.
      * 
@@ -122,18 +104,4 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     @Override
     public long countByEntIdAndSearch(String entId, String search) {
         return idOutputPort.countByEntIdAndSearch(entId, search);
-    }
-
-    /**
-     * Cuenta tipos de identificación activos por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de identificación activos que coinciden
-     */
-    @Override
-    public long countActiveByEntIdAndSearch(String entId, String search) {
-        return idOutputPort.countActiveByEntIdAndSearch(entId, search);
-    }
-
-}
+    }}

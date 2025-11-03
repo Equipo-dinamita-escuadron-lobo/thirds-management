@@ -83,18 +83,6 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
     
     /**
-     * Cuenta tipos de tercero activos por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de tercero activos que coinciden
-     */
-    @Override
-    public long countActiveThirdTypesByEntIdAndSearch(String entId, String search) {
-        return idOutputPort.countActiveThirdTypesByEntIdAndSearch(entId, search);
-    }
-    
-    /**
      * Cuenta tipos de tercero activos por empresa.
      * 
      * @param entId El id de la empresa
@@ -106,34 +94,16 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
     
     /**
-     * Obtiene todos los tipos de tercero activos con paginación y ordenamiento.
+     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
      * 
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos
+     * @return Página de tipos de tercero activos ordenados por nombre
      */
     @Override
-    public Page<ThirdType> getAllActiveThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
-        return idOutputPort.getAllActiveThirdTypesWithSort(entId, page, size, sortField, sortOrder);
-    }
-    
-    /**
-     * Busca tipos de tercero activos por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero activos que coinciden
-     */
-    @Override
-    public Page<ThirdType> findActiveThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
-        return idOutputPort.findActiveThirdTypesByEntIdAndSearch(entId, search, page, size, sortField, sortOrder);
+    public Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size) {
+        return idOutputPort.getAllActiveThirdTypes(entId, page, size);
     }
 
 }
