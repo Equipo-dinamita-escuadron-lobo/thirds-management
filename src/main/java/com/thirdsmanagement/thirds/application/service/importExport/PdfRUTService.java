@@ -2,6 +2,8 @@ package com.thirdsmanagement.thirds.application.service.importExport;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -46,7 +48,10 @@ public class PdfRUTService {
         }
 
         fileValidator.validate(request.getFile());
-        File tempFile = File.createTempFile("upload", ".pdf");
+        
+        // Crear archivo temporal en directorio seguro
+        Path tempDir = Files.createTempDirectory("pdf-processing-");
+        File tempFile = tempDir.resolve("upload.pdf").toFile();
 
         // Transferir el archivo recibido a un archivo temporal
         request.getFile().transferTo(tempFile);
@@ -117,7 +122,22 @@ public class PdfRUTService {
                         "El archivo PDF no tiene el formato válido de RUT de la DIAN o no se pudo procesar correctamente");
             }
         } finally {
-            tempFile.delete();
+            // Limpiar archivo y directorio temporal de forma segura
+            if (tempFile != null && tempFile.exists()) {
+                try {
+                    tempFile.delete();
+                } catch (Exception e) {
+                    // Log error but don't throw to avoid masking original exception
+                }
+            }
+            // Limpiar directorio temporal
+            if (tempDir != null) {
+                try {
+                    Files.deleteIfExists(tempDir);
+                } catch (Exception e) {
+                    // Log error but don't throw to avoid masking original exception
+                }
+            }
         }
     }
 
