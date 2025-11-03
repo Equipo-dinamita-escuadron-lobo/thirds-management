@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.controller;
 
 import java.util.List;
 
