@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.typeId;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.typeId;
 
 import com.thirdsmanagement.thirds.application.ports.input.DeleteTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
