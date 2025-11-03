@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/thirds/geography")
 @RequiredArgsConstructor
-public class GeographyRestAdapter {
+public class GeographyRestController {
 
     private final ListGeographyUseCase listGeographyUseCase;
     private final GeographyRestMapper geographyRestMapper;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/thirds/test")
-public class TestRestAdapter {
+public class TestRestController {
     /**
      * Verificar disponibilidad del servicio.
      * @return Una cadena de texto "pong" indicando que el servicio está disponible.

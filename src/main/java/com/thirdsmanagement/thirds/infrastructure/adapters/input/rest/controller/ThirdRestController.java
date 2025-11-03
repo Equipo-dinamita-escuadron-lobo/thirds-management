@@ -65,7 +65,7 @@ import org.springframework.http.MediaType;
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
 // @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
-public class ThirdRestAdapter {
+public class ThirdRestController {
 
     private final ListThirdsUseCase listThirdsUseCase;
     private final GetThirdUseCase getThirdUseCase;
