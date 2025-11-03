@@ -1,7 +1,7 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdImportRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdImportResponse;
 
 /**
  * Puerto de entrada para la importación masiva de terceros desde Excel.

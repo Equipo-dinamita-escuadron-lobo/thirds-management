@@ -13,9 +13,9 @@ import com.thirdsmanagement.thirds.application.ports.input.ListGeographyUseCase;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.CityResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.CountryResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.StateResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.CityResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.CountryResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.StateResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.GeographyRestMapper;
 
 import jakarta.validation.constraints.NotBlank;

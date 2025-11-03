@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,16 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO de respuesta para información de estados/departamentos.
+ * DTO de respuesta para información de países.
  */
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StateResponse {
+public class CountryResponse {
     
-    private String stateCode;
-    private String stateName;
     private String countryCode;
+    private String countryName;
 }

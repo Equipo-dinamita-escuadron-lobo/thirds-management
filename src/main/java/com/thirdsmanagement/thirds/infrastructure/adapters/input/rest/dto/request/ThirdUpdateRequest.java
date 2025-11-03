@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request;
 
 import java.util.Set;
 

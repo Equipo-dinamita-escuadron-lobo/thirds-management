@@ -2,8 +2,8 @@ package com.thirdsmanagement.thirds.application.service.importExport;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdImportRequest;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdImportResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdImportRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdImportResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

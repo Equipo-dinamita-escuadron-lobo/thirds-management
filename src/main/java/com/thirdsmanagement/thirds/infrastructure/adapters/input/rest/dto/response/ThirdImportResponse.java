@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;

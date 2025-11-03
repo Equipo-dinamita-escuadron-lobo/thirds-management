@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request;
 
 import com.thirdsmanagement.thirds.domain.model.PersonClassification;
 
@@ -10,17 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Clase que representa la petición de creación de un tipo de identificación.
- * Contiene la información necesaria para crear un nuevo tipo de identificación en el sistema.
- */
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TypeIdCreateRequest {
+public class TypeIdUpdateRequest {
 
+    private Long id;
 
     @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
@@ -32,9 +29,7 @@ public class TypeIdCreateRequest {
     @NotNull(message = "El nombre del tipo de identificación no puede estar vacío")
     private String typeIdname;
 
-    @Builder.Default
-    private Boolean status = true;
+    private Boolean status;
 
-    @NotNull(message = "La clasificación de persona no puede estar vacía")
     private PersonClassification classification;
 }

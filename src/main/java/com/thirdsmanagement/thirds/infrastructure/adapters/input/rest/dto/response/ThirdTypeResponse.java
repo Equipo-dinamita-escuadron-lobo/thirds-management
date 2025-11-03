@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response;
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
