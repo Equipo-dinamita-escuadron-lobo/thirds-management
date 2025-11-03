@@ -1,0 +1,80 @@
+package com.thirdsmanagement.thirds.application.service.typeId;
+
+import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
+import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
+import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.model.TypeId;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+/**
+ * Servicio para carga y validación de TypeId.
+ * Centraliza la lógica de carga completa de TypeId desde la base de datos.
+ */
+@Service
+@RequiredArgsConstructor
+public class TypeIdLoaderService {
+
+    private final IdOutputPort idOutputPort;
+
+    /**
+     * Carga el TypeId completo desde la base de datos si es necesario.
+     * Si el TypeId ya tiene todos los datos necesarios, lo retorna sin cambios.
+     * 
+     * @param third el tercero que puede tener un TypeId incompleto
+     * @return el tercero con el TypeId completo cargado
+     * @throws TypeIdForeignKeyViolationException si el TypeId no existe
+     */
+    public Third loadCompleteTypeId(Third third) {
+        if (third.getTypeId() == null || third.getTypeId().getId() == null) {
+            return third;
+        }
+
+        // Si el TypeId ya tiene código, no es necesario cargarlo
+        if (third.getTypeId().getTypeId() != null && !third.getTypeId().getTypeId().trim().isEmpty()) {
+            return third;
+        }
+
+        // Cargar TypeId completo desde la base de datos
+        TypeId completeTypeId = idOutputPort.getTypeIdById(third.getTypeId().getId());
+        if (completeTypeId == null) {
+            throw new TypeIdForeignKeyViolationException(third.getTypeId().getId().toString());
+        }
+
+        // Retornar tercero con TypeId completo
+        return Third.builder()
+                .thId(third.getThId())
+                .entId(third.getEntId())
+                .personType(third.getPersonType())
+                .typeId(completeTypeId)
+                .thirdTypes(third.getThirdTypes())
+                .names(third.getNames())
+                .lastNames(third.getLastNames())
+                .socialReason(third.getSocialReason())
+                .gender(third.getGender())
+                .idNumber(third.getIdNumber())
+                .verificationNumber(third.getVerificationNumber())
+                .state(third.getState())
+                .address(third.getAddress())
+                .phoneNumber(third.getPhoneNumber())
+                .email(third.getEmail())
+                .country(third.getCountry())
+                .province(third.getProvince())
+                .city(third.getCity())
+                .build();
+    }
+
+    /**
+     * Valida que el TypeId existe en la base de datos.
+     * 
+     * @param typeIdId el ID del TypeId a validar
+     * @return true si existe, false si no existe
+     */
+    public boolean existsTypeId(Long typeIdId) {
+        if (typeIdId == null) {
+            return false;
+        }
+        return idOutputPort.existsTypeIdById(typeIdId);
+    }
+}

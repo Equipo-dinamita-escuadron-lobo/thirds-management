@@ -1,0 +1,391 @@
+package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.controller;
+
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.Set;
+
+import com.thirdsmanagement.thirds.application.ports.input.BulkChangeThirdStateUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ExportThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.GetThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
+import com.thirdsmanagement.thirds.application.ports.output.PdfRUTContentOutput;
+import com.thirdsmanagement.thirds.application.service.importExport.PdfRUTService;
+import com.thirdsmanagement.thirds.application.service.third.CreateThirdService;
+import com.thirdsmanagement.thirds.application.service.third.UpdateThirdService;
+import com.thirdsmanagement.thirds.domain.enums.ExportableField;
+import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
+import com.thirdsmanagement.thirds.domain.model.Third;
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdExportRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdImportRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.BulkStateChangeResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ChangeThirdStateResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdImportResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
+import com.thirdsmanagement.thirds.infrastructure.utils.ExcelFileNameGenerator;
+import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+/**
+ * Controlador REST para la gestión de terceros.
+ * Este controlador expone endpoints para la creación, actualización, inactivación y listado de terceros.
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/thirds")
+@RequiredArgsConstructor
+// @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
+public class ThirdRestController {
+
+    private final ListThirdsUseCase listThirdsUseCase;
+    private final GetThirdUseCase getThirdUseCase;
+    private final ChangeThirdStateUseCase changeThirdStateUseCase;
+    private final BulkChangeThirdStateUseCase bulkChangeThirdStateUseCase;
+    private final DeleteThirdUseCase deleteThirdUseCase;
+    private final ExportThirdUseCase exportThirdUseCase;
+    private final ImportThirdUseCase importThirdUseCase;
+    private final ThirdRestMapper thirdRestMapper;
+    private final PdfRUTService pdfRUTService;
+    private final CreateThirdService createThirdService;
+    private final UpdateThirdService updateThirdService;
+    private final ExcelFileNameGenerator fileNameGenerator;
+
+    /**
+     * Crea un tercero.
+     * @param thirdCreateRequest Datos del tercero a crear.
+     * @return Respuesta con los datos del tercero creado.
+     */
+    @PostMapping("/")
+    public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
+
+        Third third = thirdRestMapper.toThird(thirdCreateRequest);
+
+        // Use geography validation service for proper geography integration
+        third = createThirdService.createThird(third, 
+                thirdCreateRequest.getCountryCode(), 
+                thirdCreateRequest.getStateCode(), 
+                thirdCreateRequest.getCityCode());
+
+        return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
+    }
+
+    /**
+     * Actualiza un tercero.
+     * @param thirdUpdateRequest Datos del tercero a actualizar.
+     * @return Respuesta con los datos del tercero actualizado.
+     */
+    @PostMapping("/update")
+    public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdUpdateRequest thirdUpdateRequest) {
+
+        Third third = thirdRestMapper.toThird(thirdUpdateRequest);
+
+        // Use geography validation service for proper geography integration
+        third = updateThirdService.updateThirdWithGeography(third,
+                thirdUpdateRequest.getCountryCode(),
+                thirdUpdateRequest.getStateCode(),
+                thirdUpdateRequest.getCityCode());
+
+        return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
+    }
+
+    /**
+     * Cambia el estado de un tercero individual.
+     * @param thId ID del tercero.
+     * @param entId ID de la empresa.
+     * @return Respuesta con el resultado de la operación.
+     */
+    @PutMapping("/")
+    public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
+            @NotNull(message = "thId es requerido") @RequestParam Long thId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
+        Boolean result = changeThirdStateUseCase.changeThirdState(thId, entId);
+
+        return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
+    }
+
+    /**
+     * Cambia el estado de todos los terceros de una empresa de forma masiva.
+     * Permite activar o inactivar todos los terceros en una sola operación.
+     * 
+     * @param entId ID de la empresa
+     * @param newState Nuevo estado (true para activo, false para inactivo)
+     * @return Respuesta con la cantidad de terceros actualizados
+     */
+    @PatchMapping("/allState")
+    public ResponseEntity<BulkStateChangeResponse> changeAllThirdsState(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
+        
+        int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
+        
+        String message = String.format("Se actualizaron %d terceros al estado %s", 
+                updatedCount, newState ? "activo" : "inactivo");
+        
+        BulkStateChangeResponse response = BulkStateChangeResponse.builder()
+                .updatedCount(updatedCount)
+                .newState(newState)
+                .message(message)
+                .build();
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * Obtiene un tercero por ID y empresa.
+     * @param thId ID del tercero.
+     * @param entId ID de la empresa.
+     * @return Respuesta con los datos del tercero.
+     */
+    @GetMapping("/third")
+    public ResponseEntity<Third> getThirdById(
+            @NotNull(message = "thId es requerido") @RequestParam Long thId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
+
+        Third third = getThirdUseCase.getThirdById(thId, entId);
+
+        return new ResponseEntity<>(third, HttpStatus.OK);
+    }
+
+    /**
+     * Verifica si existe un tercero.
+     * @param idNumber ID del tercero.
+     * @param entId ID de la empresa.
+     * @return Respuesta con el resultado de la verificación.
+     */
+    @GetMapping("/existBy")
+    public ResponseEntity<Boolean> existThirdById(
+            @NotNull(message = "idNumber es requerido") @RequestParam Long idNumber,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
+
+        boolean exists = getThirdUseCase.existThirdById(idNumber, entId);
+
+        return new ResponseEntity<>(exists, HttpStatus.OK);
+    }
+
+    /**
+     * Obtiene una lista de terceros con paginación flexible, búsqueda y ordenamiento.
+     * Si no se especifican parámetros de paginación, retorna todos los terceros.
+     * 
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortField Campo de ordenamiento (opcional, default: "names")
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @param search Término de búsqueda (opcional)
+     * @return Respuesta con la lista de terceros
+     */
+    @GetMapping("/")
+    public ResponseEntity<Page<Third>> getThirdsList(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "names") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder,
+            @RequestParam(required = false) String search) {
+
+        // Contar total de registros (con o sin filtro)
+        long totalRecords = (search != null && !search.trim().isEmpty())
+            ? listThirdsUseCase.countByEntIdAndSearch(entId, search)
+            : listThirdsUseCase.countAllThirdsByEntId(entId);
+
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+
+        // Obtener página de datos (con o sin filtro)
+        Page<Third> page = (search != null && !search.trim().isEmpty())
+            ? listThirdsUseCase.findByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder)
+            : listThirdsUseCase.getAllThirdsByWithSort(entId, pageable.getPageNumber(),
+                    pageable.getPageSize(), sortField, sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+    /**
+     * Obtiene una lista de terceros activos con paginación flexible y ordenamiento.
+     *
+     * @param entId Id de la empresa
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @param sortField Campo de ordenamiento (opcional, default: "names")
+     * @param sortOrder Orden asc/desc (opcional, default: "asc")
+     * @return Respuesta con la lista de terceros activos
+     */
+    @GetMapping("/findAllActive")
+    public ResponseEntity<Page<Third>> getActiveThirds(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size,
+            @RequestParam(defaultValue = "names") String sortField,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        // Contar total de registros activos
+        long totalRecords = listThirdsUseCase.countActiveThirdsByEntId(entId);
+
+        // Crear Pageable flexible
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+
+        // Obtener página de datos activos
+        Page<Third> page = listThirdsUseCase.getAllActiveThirdsByWithSort(entId, pageable.getPageNumber(),
+                pageable.getPageSize(), sortField, sortOrder);
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+    /**
+     * Cargar un archivo PDF y extraer su contenido RUT.
+     * @param file el archivo PDF que se va a cargar.
+     * @return ResponseEntity con el contenido extraído del PDF en caso de éxito,
+     *         o un ResponseEntity con un estado de error en caso de fallo.
+     */
+    @PostMapping("/content-PDF-RUT")
+    public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        PdfRUTContent request = new PdfRUTContent(file);
+        PdfRUTContentOutput response = pdfRUTService.extractContent(request);
+        return ResponseEntity.ok(response);
+    }
+
+
+    /**
+     * Exporta una plantilla de terceros.
+     */
+    @GetMapping("/template/excel")
+    public ResponseEntity<Resource> exportThirdTemplate(
+            @RequestParam String entId) {
+                
+        Resource templateFile = exportThirdUseCase.exportThirdTemplateWithValidations(entId);
+        String filename = fileNameGenerator.generateTemplateFileName();
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(templateFile);
+    }
+
+    /**
+     * Exporta terceros con validaciones a formato Excel.
+     * Utiliza configuración flexible de campos opcionales mediante ExportableField.
+     * 
+     * @param entId Identificador de la entidad (requerido)
+     * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
+     * @param companyName Nombre de la empresa para el nombre del archivo
+     * @param optionalFields Conjunto de campos opcionales a incluir (GENDER, COUNTRY, STATE, CITY)
+     */
+    @GetMapping("/export/excel")
+    public ResponseEntity<Resource> exportThirdsWithValidations(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String companyName,
+            @RequestParam(required = false) Set<ExportableField> optionalFields) {
+        
+        // Convertir status de String a Boolean, manejando strings vacíos
+        Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
+        
+        // Si no se especifican campos opcionales, usar conjunto vacío
+        Set<ExportableField> fields = optionalFields != null ? optionalFields : Set.of();
+        
+        ThirdExportRequest exportRequest = ThirdExportRequest.builder()
+                .entId(entId)
+                .status(statusBoolean)
+                .optionalFields(fields)
+                .build();
+        
+        Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
+        String filename = fileNameGenerator.generateExportFileName(entId, companyName, statusBoolean);
+        
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(excelFile);
+    }
+
+    /**
+     * Importa terceros masivamente desde un archivo Excel.
+     * Procesa el archivo, valida datos y crea los terceros en el sistema.
+     * 
+     * Comportamiento:
+     * - Los duplicados se omiten automáticamente (usabilidad)
+     * - Se procesan archivos grandes sin límite de lote específico
+     * - La importación se detiene al primer error crítico de validación
+     * - Permite reimportar el mismo archivo omitiendo registros existentes
+     * 
+     * @param entId ID de la empresa
+     * @param file Archivo Excel con los terceros a importar
+     * @return Respuesta con estadísticas detalladas incluyendo duplicados omitidos
+     */
+    @PostMapping("/import/excel")
+    public ResponseEntity<ThirdImportResponse> importThirdsFromExcel(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotNull(message = "El archivo Excel es obligatorio") @RequestParam("file") MultipartFile file) {
+
+        ThirdImportRequest importRequest = ThirdImportRequest.builder()
+                .entId(entId)
+                .excelFile(file)
+                .fileName(file.getOriginalFilename())
+                .build();
+
+        ThirdImportResponse response = importThirdUseCase.importThirdsFromExcel(importRequest);
+
+        // Determinar código de respuesta HTTP basado en el estado
+        HttpStatus status = switch (response.getStatus()) {
+            case COMPLETED -> HttpStatus.OK;
+            case COMPLETED_WITH_ERRORS -> HttpStatus.ACCEPTED;
+            case FAILED -> HttpStatus.BAD_REQUEST;
+            default -> HttpStatus.INTERNAL_SERVER_ERROR;
+        };
+
+        return new ResponseEntity<>(response, status);
+    }
+
+
+    /**
+     * Elimina un tercero del sistema.
+     * Valida que el tercero no tenga dependencias antes de eliminarlo.
+     * @param thirdId ID del tercero a eliminar
+     * @param entId ID de la empresa
+     * @return Respuesta con el resultado de la eliminación
+     */
+    @DeleteMapping("/delete")
+    public ResponseEntity<Boolean> deleteThird(
+            @NotNull(message = "thirdId es requerido") @RequestParam Long thirdId,
+            @NotNull(message = "entId es requerido") @RequestParam String entId) {
+        
+        boolean deleted = deleteThirdUseCase.deleteThird(thirdId, entId);
+                
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
+    }
+
+}

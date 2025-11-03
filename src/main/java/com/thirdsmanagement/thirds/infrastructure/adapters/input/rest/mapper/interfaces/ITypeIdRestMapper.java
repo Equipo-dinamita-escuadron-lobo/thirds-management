@@ -1,7 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.interfaces;
 
 import com.thirdsmanagement.thirds.domain.model.TypeId;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.TypeIdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.TypeIdCreateRequest;
 
 import java.util.List;
 

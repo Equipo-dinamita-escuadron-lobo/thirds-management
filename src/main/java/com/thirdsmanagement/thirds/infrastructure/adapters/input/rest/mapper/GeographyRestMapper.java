@@ -7,9 +7,9 @@ import org.mapstruct.Mapper;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.CityResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.CountryResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.StateResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.CityResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.CountryResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.StateResponse;
 
 /**
  * Mapper para convertir entre modelos de dominio geográfico y DTOs de respuesta REST.

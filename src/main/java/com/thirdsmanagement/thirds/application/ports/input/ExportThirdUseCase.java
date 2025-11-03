@@ -1,7 +1,8 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdExportRequest;
 import org.springframework.core.io.Resource;
+
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdExportRequest;
 
 /**
  * Caso de uso para exportar terceros en formato Excel.
