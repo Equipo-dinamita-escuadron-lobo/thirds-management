@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.application.ports.input.DeleteThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;

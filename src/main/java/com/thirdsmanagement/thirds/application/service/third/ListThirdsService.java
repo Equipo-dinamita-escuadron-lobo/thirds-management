@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

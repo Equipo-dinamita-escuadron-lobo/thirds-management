@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

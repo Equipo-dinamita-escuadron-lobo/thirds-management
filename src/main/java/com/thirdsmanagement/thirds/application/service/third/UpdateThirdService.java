@@ -1,8 +1,9 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.application.service.TypeIdLoaderService;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 import com.thirdsmanagement.thirds.domain.model.City;
