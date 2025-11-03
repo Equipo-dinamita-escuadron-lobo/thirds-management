@@ -1,14 +1,13 @@
-package com.thirdsmanagement.thirds.application.service.third;
+package com.thirdsmanagement.thirds.application.service.importExport;
 
 import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
+import com.thirdsmanagement.thirds.application.service.importExport.BatchValidationService.BatchValidationResult;
+import com.thirdsmanagement.thirds.application.service.importExport.BatchValidationService.ReferenceDataCache;
+import com.thirdsmanagement.thirds.application.service.importExport.DuplicateDetectionService.DuplicateDetectionResult;
+import com.thirdsmanagement.thirds.application.service.importExport.ExcelParsingService.ExcelParsingResult;
+import com.thirdsmanagement.thirds.application.service.importExport.ImportResponseBuilder.ImportMetrics;
+import com.thirdsmanagement.thirds.application.service.third.BatchProcessor;
 import com.thirdsmanagement.thirds.application.service.third.BatchProcessor.BatchProcessingResult;
-import com.thirdsmanagement.thirds.application.service.third.ExcelParsingService.ExcelParsingResult;
-import com.thirdsmanagement.thirds.application.service.third.ImportResponseBuilder.ImportMetrics;
-import com.thirdsmanagement.thirds.application.service.third.validation.BatchValidationService;
-import com.thirdsmanagement.thirds.application.service.third.validation.DuplicateDetectionService;
-import com.thirdsmanagement.thirds.application.service.third.validation.BatchValidationService.BatchValidationResult;
-import com.thirdsmanagement.thirds.application.service.third.validation.BatchValidationService.ReferenceDataCache;
-import com.thirdsmanagement.thirds.application.service.third.validation.DuplicateDetectionService.DuplicateDetectionResult;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;

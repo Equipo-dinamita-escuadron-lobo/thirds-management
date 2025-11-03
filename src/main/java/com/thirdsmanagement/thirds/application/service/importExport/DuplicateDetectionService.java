@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service.third.validation;
+package com.thirdsmanagement.thirds.application.service.importExport;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
