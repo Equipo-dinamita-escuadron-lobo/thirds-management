@@ -156,15 +156,14 @@ public class PdfRUTService {
 
     /**
      * Limpia el contenido de un string.
-     * 
+     *
      * @param input String a limpiar.
      * @return String limpio.
      */
     public static String cleanString(String input) {
-        String cleaned = input.replaceAll("\\s*\\n\\s*", "\n") // Limpiar saltos de linea con espacios
-                .replaceAll("\\s{2,}", " ") // Reemplaza multiples espacios por uno
-                .trim(); // Elimina espacios al principio y al final
-        // Elimina espacios entre varios numeros consecutivos
+        String cleaned = input.replaceAll("[ \\t]*\\n[ \\t]*", "\n") 
+                .replaceAll("\\s{2,}", " ") 
+                .trim();         
         cleaned = cleaned.replaceAll("(\\d)\\s+(?=\\d)", "$1");
         return cleaned;
     }
