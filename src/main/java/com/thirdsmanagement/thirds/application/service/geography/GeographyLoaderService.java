@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.geography;
 
 import com.thirdsmanagement.thirds.application.ports.output.GeographyOutputPort;
 import com.thirdsmanagement.thirds.domain.model.City;

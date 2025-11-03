@@ -3,7 +3,7 @@ package com.thirdsmanagement.thirds.infrastructure.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.thirdsmanagement.thirds.application.service.GeographyFileDiscoveryService;
+import com.thirdsmanagement.thirds.application.service.geography.GeographyFileDiscoveryService;
 import com.thirdsmanagement.thirds.domain.exceptions.geography.GeographyDataInitializationException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.SqlScriptRunner;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.CountryRepository;

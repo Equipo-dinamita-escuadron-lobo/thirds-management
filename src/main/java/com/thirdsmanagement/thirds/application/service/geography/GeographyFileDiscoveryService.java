@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.geography;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
