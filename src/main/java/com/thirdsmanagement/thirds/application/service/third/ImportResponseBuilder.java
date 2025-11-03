@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;

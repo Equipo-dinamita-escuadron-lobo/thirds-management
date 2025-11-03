@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third.validation;
 
 import com.thirdsmanagement.thirds.domain.model.*;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
@@ -6,7 +6,6 @@ import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
  * Servicio especializado en conversión de datos Excel a entidades de dominio.
  * Utiliza cache pre-cargado para evitar consultas N+1.
  */
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class DataConverter {

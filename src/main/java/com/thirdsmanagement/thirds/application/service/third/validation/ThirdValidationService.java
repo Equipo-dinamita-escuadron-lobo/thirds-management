@@ -1,4 +1,4 @@
-package com.thirdsmanagement.thirds.application.service.third;
+package com.thirdsmanagement.thirds.application.service.third.validation;
 
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNitInvalidFormatException;

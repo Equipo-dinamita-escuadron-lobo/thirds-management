@@ -1,6 +1,7 @@
-package com.thirdsmanagement.thirds.application.service;
+package com.thirdsmanagement.thirds.application.service.third;
 
-import com.thirdsmanagement.thirds.application.service.third.CreateThirdService;
+import com.thirdsmanagement.thirds.application.service.third.validation.BatchValidationService;
+import com.thirdsmanagement.thirds.application.service.third.validation.DataConverter;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.Third;
