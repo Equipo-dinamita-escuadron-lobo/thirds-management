@@ -14,10 +14,9 @@ public class CreateTypeIdService implements CreateTypeIdUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Crea un nuevo tipo de identificación en el sistema.
-     * 
-     * @param typeId el tipo de identificación a crear
-     * @return el tipo de identificación creado con su ID asignado
+     * @brief Crea un nuevo tipo de identificación en el sistema
+     * @param typeId tipo de identificación a crear
+     * @return tipo de identificación creado con su ID asignado
      */
     @Override
     public TypeId createTypeId(TypeId typeId) {

@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio para carga y validación de TypeId.
+ * @brief Servicio para carga y validación de TypeId
+ *
  * Centraliza la lógica de carga completa de TypeId desde la base de datos.
  */
 @Service
@@ -19,11 +20,9 @@ public class TypeIdLoaderService {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Carga el TypeId completo desde la base de datos si es necesario.
-     * Si el TypeId ya tiene todos los datos necesarios, lo retorna sin cambios.
-     * 
-     * @param third el tercero que puede tener un TypeId incompleto
-     * @return el tercero con el TypeId completo cargado
+     * @brief Carga el TypeId completo desde la base de datos si es necesario
+     * @param third tercero que puede tener un TypeId incompleto
+     * @return tercero con el TypeId completo cargado
      * @throws TypeIdForeignKeyViolationException si el TypeId no existe
      */
     public Third loadCompleteTypeId(Third third) {
@@ -66,9 +65,8 @@ public class TypeIdLoaderService {
     }
 
     /**
-     * Valida que el TypeId existe en la base de datos.
-     * 
-     * @param typeIdId el ID del TypeId a validar
+     * @brief Valida que el TypeId existe en la base de datos
+     * @param typeIdId identificador único del TypeId a validar
      * @return true si existe, false si no existe
      */
     public boolean existsTypeId(Long typeIdId) {
