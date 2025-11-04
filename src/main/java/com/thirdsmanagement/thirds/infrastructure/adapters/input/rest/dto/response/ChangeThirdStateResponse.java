@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la respuesta de la operación de cambio de estado de un tercero.
+ * @brief DTO de respuesta para cambio de estado de tercero individual
  */
 @Builder
 @Getter

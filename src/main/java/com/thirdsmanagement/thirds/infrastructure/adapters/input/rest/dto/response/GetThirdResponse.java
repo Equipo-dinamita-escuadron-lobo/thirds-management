@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la respuesta de la operación de obtención de un tercero.
+ * @brief DTO de respuesta para consulta de tercero específico
  */
 @Builder
 @Getter
@@ -22,26 +22,25 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetThirdResponse {
-        private Long thId; 
+    private Long thId;
     private Long entId;
 
     private TypeId typeId;
-    
+
     private Set<ThirdType> thirdTypes;
 
- 
-    private ePersonType personType; 
-    private String names; 
-    private String lastNames; 
-    private String socialReason; 
+    private ePersonType personType;
+    private String names;
+    private String lastNames;
+    private String socialReason;
     private eThirdGender gender;
     private Long idNumber;
-    private Long verificationNumber; 
+    private Long verificationNumber;
     private Boolean state;
     private String country;
     private String province;
-    private String city; 
+    private String city;
     private String address;
-    private String phoneNumber; 
-    private String email; 
+    private String phoneNumber;
+    private String email;
 }
