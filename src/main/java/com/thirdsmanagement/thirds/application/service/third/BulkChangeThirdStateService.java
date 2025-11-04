@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Servicio para cambiar el estado de múltiples terceros de forma masiva.
+ * @brief Servicio para cambiar el estado de múltiples terceros de forma masiva
+ *
  * Implementa operaciones transaccionales para garantizar consistencia.
  */
 @Slf4j
@@ -21,13 +22,10 @@ public class BulkChangeThirdStateService implements BulkChangeThirdStateUseCase 
     private final ThirdOutputPort thirdOutputPort;
 
     /**
-     * Cambia el estado de todos los terceros de una empresa.
-     * Operación transaccional que garantiza atomicidad.
-     * Bean Validation en el controlador garantiza que los parámetros son válidos.
-     * 
-     * @param entId ID de la empresa
-     * @param newState Nuevo estado (true para activo, false para inactivo)
-     * @return Cantidad de terceros actualizados
+     * @brief Cambia el estado de todos los terceros de una empresa
+     * @param entId identificador de la empresa
+     * @param newState nuevo estado (true para activo, false para inactivo)
+     * @return cantidad de terceros actualizados
      */
     @Override
     @Transactional

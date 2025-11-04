@@ -12,7 +12,7 @@ public interface DeleteTypeIdUseCase {
      *
      * Valida que el tipo de identificación no esté siendo utilizado por terceros existentes
      * antes de proceder con la eliminación.
-     *
+     * 
      * @param typeIdId el ID del tipo de identificación a eliminar
      * @param entId el ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario

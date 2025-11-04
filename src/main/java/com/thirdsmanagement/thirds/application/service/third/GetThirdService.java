@@ -15,11 +15,10 @@ public class GetThirdService implements GetThirdUseCase {
     private final ThirdOutputPort thirdOutputPort;
 
     /**
-     * Obtiene un tercero por su ID y empresa.
-     * 
-     * @param id    el ID del tercero a buscar
-     * @param entId el ID de la empresa
-     * @return el tercero encontrado
+     * @brief Obtiene un tercero por su ID y empresa
+     * @param id identificador único del tercero
+     * @param entId identificador de la empresa
+     * @return tercero encontrado
      * @throws ThirdNotFound si el tercero no existe
      */
     @Override
@@ -30,10 +29,9 @@ public class GetThirdService implements GetThirdUseCase {
     }
 
     /**
-     * Verifica si existe un tercero por su ID en una empresa específica.
-     * 
-     * @param id    el ID del tercero a verificar
-     * @param entId el ID de la empresa
+     * @brief Verifica si existe un tercero por su ID en una empresa específica
+     * @param id identificador único del tercero
+     * @param entId identificador de la empresa
      * @return true si el tercero existe, false en caso contrario
      */
     @Override

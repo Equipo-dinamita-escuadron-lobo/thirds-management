@@ -12,7 +12,7 @@ public interface DeleteThirdTypeUseCase {
      *
      * Valida que el tipo de tercero no esté siendo utilizado por terceros existentes
      * antes de proceder con la eliminación.
-     *
+     * 
      * @param thirdTypeId el ID del tipo de tercero a eliminar
      * @param entId el ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario

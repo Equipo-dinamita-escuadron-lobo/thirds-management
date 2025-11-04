@@ -12,7 +12,7 @@ public interface DeleteThirdUseCase {
      *
      * Valida que el tercero no tenga dependencias o relaciones activas
      * antes de proceder con la eliminación.
-     *
+     * 
      * @param thirdId el ID del tercero a eliminar
      * @param entId el ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario

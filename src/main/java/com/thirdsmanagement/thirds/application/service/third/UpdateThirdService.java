@@ -37,15 +37,14 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final ThirdRepository thirdRepository;
 
     /**
-     * Actualiza un tercero existente con validación opcional de geografía.
-     * 
-     * @param third       el tercero con los datos actualizados
+     * @brief Actualiza un tercero existente con validación opcional de geografía
+     * @param third tercero con los datos actualizados
      * @param countryCode código del país (opcional)
-     * @param stateCode   código del estado (opcional)
-     * @param cityCode    código de la ciudad (opcional)
-     * @return el tercero actualizado
+     * @param stateCode código del departamento (opcional)
+     * @param cityCode código de la ciudad (opcional)
+     * @return tercero actualizado
      * @throws IllegalArgumentException si el tercero es null o no tiene ID válido
-     * @throws ThirdNotFound            si el tercero no existe
+     * @throws ThirdNotFound si el tercero no existe
      */
     @Override
     @Transactional
@@ -126,9 +125,8 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     }
 
     /**
-     * Valida que el TypeId existe en el sistema.
-     * 
-     * @param third el tercero que contiene el TypeId a validar
+     * @brief Valida que el TypeId existe en el sistema
+     * @param third tercero que contiene el TypeId a validar
      * @throws ThirdInvalidDataException si el TypeId es null
      * @throws TypeIdForeignKeyViolationException si el TypeId no existe
      */
@@ -143,9 +141,8 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     }
 
     /**
-     * Valida que todos los ThirdTypes existen en el sistema y están activos.
-     *
-     * @param third el tercero que contiene los ThirdTypes a validar
+     * @brief Valida que todos los ThirdTypes existen en el sistema y están activos
+     * @param third tercero que contiene los ThirdTypes a validar
      * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
      * @throws ThirdInvalidDataException si algún ThirdType está inactivo
      */
@@ -171,13 +168,11 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     }
 
     /**
-     * Valida que no exista otro tercero con el mismo número de identificación al actualizar.
-     * Solo valida si el idNumber cambió respecto al tercero original.
-     * 
-     * @param thId     el ID del tercero que se está actualizando
-     * @param newIdNumber el nuevo número de identificación
-     * @param entId    el ID de la entidad
-     * @throws ThirdNotFound            si el tercero original no existe
+     * @brief Valida que no exista otro tercero con el mismo número de identificación al actualizar
+     * @param thId identificador del tercero que se está actualizando
+     * @param newIdNumber nuevo número de identificación
+     * @param entId identificador de la entidad
+     * @throws ThirdNotFound si el tercero original no existe
      * @throws ThirdAlreadyExistsException si ya existe otro tercero con el mismo idNumber
      */
     private void validateDuplicateThirdOnUpdate(Long thId, Long newIdNumber, String entId) {

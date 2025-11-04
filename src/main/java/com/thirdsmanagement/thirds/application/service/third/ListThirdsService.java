@@ -16,11 +16,10 @@ public class ListThirdsService implements ListThirdsUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
     /**
-     * Obtiene todos los terceros de una empresa con paginación.
-     * 
-     * @param entId    el ID de la empresa
-     * @param pageable información de paginación
-     * @return página de terceros encontrados (puede estar vacía si no hay datos)
+     * @brief Obtiene todos los terceros de una empresa con paginación
+     * @param entId identificador de la empresa
+     * @param pageable información de paginación y ordenamiento
+     * @return página de terceros encontrados
      */
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
@@ -28,10 +27,9 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Cuenta el total de terceros por empresa.
-     * 
-     * @param entId el ID de la empresa
-     * @return el número total de terceros
+     * @brief Cuenta el total de terceros por empresa
+     * @param entId identificador de la empresa
+     * @return número total de terceros
      */
     @Override
     public long countAllThirdsByEntId(String entId) {
@@ -39,15 +37,14 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Busca terceros por empresa y término de búsqueda con ordenamiento.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de terceros que coinciden con la búsqueda
+     * @brief Busca terceros por empresa y término de búsqueda con ordenamiento
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de terceros que coinciden con la búsqueda
      */
     @Override
     public Page<Third> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
@@ -55,11 +52,10 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Cuenta terceros por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de terceros que coinciden
+     * @brief Cuenta terceros por empresa y término de búsqueda
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @return cantidad de terceros que coinciden con la búsqueda
      */
     @Override
     public long countByEntIdAndSearch(String entId, String search) {
@@ -67,14 +63,13 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Obtiene todos los terceros con ordenamiento.
-     * 
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de terceros ordenados
+     * @brief Obtiene todos los terceros con ordenamiento personalizado
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de terceros ordenados
      */
     @Override
     public Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
@@ -82,14 +77,13 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Obtiene todos los terceros activos con ordenamiento.
-     *
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de terceros activos ordenados
+     * @brief Obtiene todos los terceros activos con ordenamiento personalizado
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de terceros activos ordenados
      */
     @Override
     public Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder) {
@@ -97,10 +91,9 @@ public class ListThirdsService implements ListThirdsUseCase {
     }
 
     /**
-     * Cuenta el total de terceros activos por empresa.
-     *
-     * @param entId el ID de la empresa
-     * @return el número total de terceros activos
+     * @brief Cuenta el total de terceros activos por empresa
+     * @param entId identificador de la empresa
+     * @return número total de terceros activos
      */
     @Override
     public long countActiveThirdsByEntId(String entId) {

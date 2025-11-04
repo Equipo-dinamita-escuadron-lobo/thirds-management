@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Procesador de lotes optimizado para importación masiva.
+ * @brief Procesador de lotes optimizado para importación masiva
+ *
  * Maneja transacciones por lote (no por registro) para mejor performance.
  */
 @Slf4j
@@ -34,8 +35,11 @@ public class BatchProcessor {
     private final DataConverter dataConverter;
 
     /**
-     * Procesa un lote completo de registros en una sola transacción.
-     * OPTIMIZACIÓN: Una transacción por lote, no por registro.
+     * @brief Procesa un lote completo de registros en una sola transacción
+     * @param batch lista de registros Excel a procesar
+     * @param cache datos de referencia pre-cargados
+     * @param continueOnError si es true, continúa procesando aunque haya errores
+     * @return resultado del procesamiento del lote
      */
     @Transactional
     public BatchProcessingResult processBatch(List<ThirdExcelData> batch, 
@@ -96,7 +100,10 @@ public class BatchProcessor {
     }
 
     /**
-     * Procesa un registro individual usando el cache pre-cargado.
+     * @brief Procesa un registro individual usando el cache pre-cargado
+     * @param excelData registro Excel a procesar
+     * @param cache datos de referencia pre-cargados
+     * @return resultado del procesamiento del registro individual
      */
     private ProcessingResult processRecord(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         try {
@@ -130,7 +137,10 @@ public class BatchProcessor {
     }
 
     /**
-     * Crea un error de procesamiento estructurado.
+     * @brief Crea un error de procesamiento estructurado
+     * @param excelData registro Excel que causó el error
+     * @param message mensaje descriptivo del error
+     * @return objeto ImportErrorDetail con la información del error
      */
     private ImportErrorDetail createProcessingError(ThirdExcelData excelData, String message) {
         return ImportErrorDetail.builder()
@@ -142,7 +152,7 @@ public class BatchProcessor {
     }
 
     /**
-     * Resultado del procesamiento de un lote.
+     * @brief Resultado del procesamiento de un lote
      */
     @Data
     @Builder
@@ -156,7 +166,7 @@ public class BatchProcessor {
     }
 
     /**
-     * Resultado del procesamiento de un registro individual.
+     * @brief Resultado del procesamiento de un registro individual
      */
     @Data
     @AllArgsConstructor
@@ -182,7 +192,7 @@ public class BatchProcessor {
     }
 
     /**
-     * Estados de procesamiento de un registro.
+     * @brief Estados de procesamiento de un registro
      */
     private enum ProcessingStatus {
         SUCCESS, DUPLICATE_SKIPPED, FAILED, SKIPPED

@@ -17,12 +17,11 @@ public class ChangeThirdStateService implements ChangeThirdStateUseCase {
     private final ThirdEventPublisher thirdEventPublisher;
 
     /**
-     * Cambia el estado de un tercero (activado/desactivado).
-     * 
-     * @param thId  el ID del tercero cuyo estado se va a cambiar
-     * @param entId el ID de la empresa a la que pertenece el tercero
-     * @return true si el cambio fue exitoso, false en caso contrario
-     * @throws ThirdStateNotChanged si no se pudo cambiar el estado por un error interno
+     * @brief Cambia el estado de un tercero (activado/desactivado)
+     * @param thId identificador único del tercero
+     * @param entId identificador de la empresa
+     * @return true si el cambio fue exitoso
+     * @throws ThirdStateNotChanged si no se pudo cambiar el estado
      */
     @Override
     public boolean changeThirdState(Long thId, String entId) {
