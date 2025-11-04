@@ -26,28 +26,28 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Servicio especializado en el parseo de archivos Excel para importación de
- * terceros.
- * Maneja la lectura, validación de formato y conversión de datos desde Excel.
+ * @brief Servicio especializado en el parseo de archivos Excel para importación de terceros
+ *
+ * Maneja la lectura, validación de formato y conversión de datos desde Excel
+ * con soporte para múltiples tipos de datos y validación de estructura.
  */
 @Service
 public class ExcelParsingService {
 
     private static final int HEADER_ROW_INDEX = 0;
     private static final int DATA_START_ROW_INDEX = 1;
-    
+
     private final FileValidator fileValidator;
-    
+
     public ExcelParsingService(@Qualifier("excelFileValidator") FileValidator fileValidator) {
         this.fileValidator = fileValidator;
     }
 
     /**
-     * Parsea el archivo Excel y extrae los datos de terceros.
-     * 
-     * @param file  archivo Excel a procesar
+     * @brief Parsea el archivo Excel y extrae los datos de terceros
+     * @param file archivo Excel a procesar
      * @param entId identificador de la entidad
-     * @return lista de terceros parseados y lista de errores encontrados
+     * @return resultado con lista de terceros parseados y errores encontrados
      */
     public ExcelParsingResult parseExcelFile(MultipartFile file, String entId) {
         fileValidator.validate(file);
@@ -99,7 +99,10 @@ public class ExcelParsingService {
     }
 
     /**
-     * Detecta el mapeo de columnas basado en los encabezados del archivo.
+     * @brief Detecta el mapeo de columnas basado en los encabezados del archivo
+     * @param sheet hoja de Excel a analizar
+     * @param errors lista donde agregar errores de formato encontrados
+     * @return mapa de nombres de columna a índices de columna
      */
     private Map<String, Integer> detectColumnMapping(Sheet sheet, List<ImportErrorDetail> errors) {
         Row headerRow = sheet.getRow(HEADER_ROW_INDEX);
@@ -153,8 +156,13 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea una fila individual del Excel usando el mapa de columnas detectado.
-     * REFACTORIZADO: Dividido en sub-métodos para mejor mantenibilidad.
+     * @brief Parsea una fila individual del Excel usando el mapa de columnas detectado
+     * @param row fila de Excel a parsear
+     * @param rowNumber número de fila para referencias de error
+     * @param entId identificador de la entidad
+     * @param columnMap mapa de nombres de columna a índices
+     * @param errors lista donde agregar errores encontrados
+     * @return objeto ThirdExcelData parseado o null si hay errores críticos
      */
     private ThirdExcelData parseRow(Row row, int rowNumber, String entId, Map<String, Integer> columnMap,
             List<ImportErrorDetail> errors) {
@@ -183,7 +191,12 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos básicos requeridos de una fila.
+     * @brief Parsea los campos básicos requeridos de una fila
+     * @param row fila de Excel a parsear
+     * @param builder constructor de ThirdExcelData para agregar campos
+     * @param columnMap mapa de nombres de columna a índices
+     * @param rowNumber número de fila para referencias de error
+     * @param errors lista donde agregar errores encontrados
      */
     private void parseBasicFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap, int rowNumber, List<ImportErrorDetail> errors) {
@@ -215,7 +228,10 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos adicionales de una fila.
+     * @brief Parsea los campos adicionales de una fila
+     * @param row fila de Excel a parsear
+     * @param builder constructor de ThirdExcelData para agregar campos
+     * @param columnMap mapa de nombres de columna a índices
      */
     private void parseOptionalFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
@@ -230,8 +246,10 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los campos geográficos (opcionales, solo si existen en el archivo).
-     * Compatible con el patrón Builder de exportación.
+     * @brief Parsea los campos geográficos (opcionales, solo si existen en el archivo)
+     * @param row fila de Excel a parsear
+     * @param builder constructor de ThirdExcelData para agregar campos
+     * @param columnMap mapa de nombres de columna a índices
      */
     private void parseGeographyFields(Row row, ThirdExcelData.ThirdExcelDataBuilder builder,
             Map<String, Integer> columnMap) {
@@ -258,7 +276,16 @@ public class ExcelParsingService {
 
 
     /**
-     * Elimina duplicación de código entre parsePersonType, parseGender, etc.
+     * @brief Elimina duplicación de código entre parsePersonType, parseGender, etc.
+     * @param <T> tipo del enum a parsear
+     * @param value valor string a convertir a enum
+     * @param enumClass clase del enum
+     * @param fieldName nombre del campo para mensajes de error
+     * @param rowNumber número de fila para referencias de error
+     * @param errors lista donde agregar errores encontrados
+     * @param mapper función que mapea string a enum
+     * @param columnMap mapa de índices de columnas para referencias de error
+     * @return valor enum parseado o null si hay errores
      */
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
             int rowNumber, List<ImportErrorDetail> errors,
@@ -294,7 +321,9 @@ public class ExcelParsingService {
     }
 
     /**
-     * Mapea valores de string a ePersonType.
+     * @brief Mapea valores de string a ePersonType
+     * @param normalizedValue valor normalizado a mapear
+     * @return tipo de persona correspondiente o null si no hay coincidencia
      */
     private ePersonType mapPersonType(String normalizedValue) {
         switch (normalizedValue) {
@@ -309,7 +338,9 @@ public class ExcelParsingService {
     }
 
     /**
-     * Mapea valores de string a eThirdGender.
+     * @brief Mapea valores de string a eThirdGender
+     * @param normalizedValue valor normalizado a mapear
+     * @return género correspondiente o null si no hay coincidencia
      */
     private eThirdGender mapGender(String normalizedValue) {
         switch (normalizedValue) {
@@ -328,7 +359,10 @@ public class ExcelParsingService {
     }
 
     /**
-     * Obtiene el valor de una celda como String.
+     * @brief Obtiene el valor de una celda como String
+     * @param row fila de Excel
+     * @param columnIndex índice de la columna
+     * @return valor string de la celda o null si no existe
      */
     private String getCellValueAsString(Row row, Integer columnIndex) {
         if (columnIndex == null) {
@@ -353,7 +387,14 @@ public class ExcelParsingService {
     }
 
     /**
-     * Obtiene el valor de una celda como Long.
+     * @brief Obtiene el valor de una celda como Long
+     * @param row fila de Excel
+     * @param columnIndex índice de la columna
+     * @param rowNumber número de fila para referencias de error
+     * @param fieldName nombre del campo para mensajes de error
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
+     * @return valor Long de la celda o null si no existe
      */
     private Long getCellValueAsLong(Row row, Integer columnIndex, int rowNumber, String fieldName,
             List<ImportErrorDetail> errors, Map<String, Integer> columnMap) {
@@ -390,9 +431,14 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea el estado desde String.
+     * @brief Parsea el estado desde String
+     * @param value valor string a parsear
+     * @param rowNumber número de fila para referencias de error
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
+     * @return estado booleano parseado (true=activo, false=inactivo)
      */
-    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors, 
+    private Boolean parseState(String value, int rowNumber, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return true; // Por defecto activo
@@ -436,11 +482,14 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea y normaliza el número de teléfono.
-     * Elimina espacios automáticamente y retorna el número limpio.
-     * La validación de formato se realiza en BatchValidationService.
+     * @brief Parsea y normaliza el número de teléfono
+     * @param value valor string a parsear
+     * @param rowNumber número de fila para referencias de error
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
+     * @return número de teléfono normalizado o null si está vacío
      */
-    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors, 
+    private String parsePhoneNumber(String value, int rowNumber, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
@@ -453,7 +502,9 @@ public class ExcelParsingService {
     }
 
     /**
-     * Parsea los tipos de tercero desde String (separados por coma).
+     * @brief Parsea los tipos de tercero desde String (separados por coma)
+     * @param value valor string con tipos separados por coma
+     * @return conjunto de tipos de tercero parseados
      */
     private Set<String> parseThirdTypes(String value) {
         if (value == null || value.trim().isEmpty()) {
@@ -472,7 +523,9 @@ public class ExcelParsingService {
     }
 
     /**
-     * Verifica si una fila está vacía.
+     * @brief Verifica si una fila está vacía
+     * @param row fila de Excel a verificar
+     * @return true si la fila está vacía o contiene solo valores en blanco
      */
     private boolean isEmptyRow(Row row) {
         for (int i = 0; i < row.getLastCellNum(); i++) {
@@ -488,7 +541,7 @@ public class ExcelParsingService {
     }
 
     /**
-     * Clase que representa el resultado del parseo de Excel.
+     * @brief Clase que representa el resultado del parseo de Excel.
      */
     @Data
     @Builder

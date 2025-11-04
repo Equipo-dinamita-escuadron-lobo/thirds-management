@@ -17,9 +17,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Servicio especializado en la detección de duplicados durante la importación.
+ * @brief Servicio especializado en la detección de duplicados durante la importación
+ *
  * Maneja tanto duplicados internos del Excel como duplicados con la base de
- * datos existente.
+ * datos existente, optimizando el rendimiento mediante consultas por lotes.
  */
 @Slf4j
 @Service
@@ -29,12 +30,10 @@ public class DuplicateDetectionService {
     private final ThirdOutputPort thirdOutputPort;
 
     /**
-     * Detecta duplicados en un lote de datos de terceros.
-     * 
-     * @param thirdsData     lista de datos de terceros a analizar
-     * @param entId          identificador de la entidad
-     * @param skipDuplicates indica si se deben omitir duplicados o marcar como
-     *                       error
+     * @brief Detecta duplicados en un lote de datos de terceros
+     * @param thirdsData lista de datos de terceros a analizar
+     * @param entId identificador de la entidad
+     * @param skipDuplicates indica si se deben omitir duplicados o marcar como error
      * @return resultado de detección con registros únicos y reportes de duplicados
      */
     public DuplicateDetectionResult detectDuplicates(List<ThirdExcelData> thirdsData, String entId,
@@ -65,7 +64,10 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Detecta duplicados internos dentro del archivo Excel.
+     * @brief Detecta duplicados internos dentro del archivo Excel
+     * @param thirdsData lista de datos a analizar
+     * @param skipDuplicates indica si omitir duplicados o marcar como error
+     * @return resultado con registros únicos y errores de duplicados internos
      */
     private DuplicateAnalysisResult detectInternalDuplicates(List<ThirdExcelData> thirdsData, boolean skipDuplicates) {
 
@@ -98,7 +100,11 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Detecta duplicados con registros existentes en la base de datos.
+     * @brief Detecta duplicados con registros existentes en la base de datos
+     * @param thirdsData lista de registros únicos a verificar contra BD
+     * @param entId identificador de la entidad
+     * @param skipDuplicates indica si omitir duplicados o marcar como error
+     * @return resultado con registros únicos y errores de duplicados con BD
      */
     private DuplicateAnalysisResult detectDatabaseDuplicates(List<ThirdExcelData> thirdsData, String entId,
             boolean skipDuplicates) {
@@ -133,7 +139,11 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Maneja un duplicado interno encontrado.
+     * @brief Maneja un duplicado interno encontrado
+     * @param currentRecord registro duplicado encontrado
+     * @param existingRecord primer registro con el mismo ID
+     * @param skipDuplicates indica si crear error o solo omitir
+     * @param errors lista donde agregar errores si no se omiten
      */
     private void handleInternalDuplicate(ThirdExcelData currentRecord, ThirdExcelData existingRecord,
             boolean skipDuplicates, List<ImportErrorDetail> errors) {
@@ -153,7 +163,10 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Maneja un duplicado con la base de datos encontrado.
+     * @brief Maneja un duplicado con la base de datos encontrado
+     * @param currentRecord registro que duplica uno existente en BD
+     * @param skipDuplicates indica si crear error o solo omitir
+     * @param errors lista donde agregar errores si no se omiten
      */
     private void handleDatabaseDuplicate(ThirdExcelData currentRecord, boolean skipDuplicates,
             List<ImportErrorDetail> errors) {
@@ -171,15 +184,23 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Crea una clave única para identificar duplicados.
-     * Considera número de identificación y entidad.
+     * @brief Crea una clave única para identificar duplicados
+     *
+     * Considera número de identificación y entidad para generar
+     * una clave única que identifica registros duplicados.
+     *
+     * @param record registro del cual generar la clave
+     * @return clave única para identificación de duplicados
      */
     private String createDuplicateKey(ThirdExcelData record) {
         return record.getEntId() + "_" + record.getIdNumber();
     }
 
     /**
-     * Clase que representa el resultado de análisis de duplicados.
+     * @brief Clase que representa el resultado de análisis de duplicados
+     *
+     * Contiene los registros únicos encontrados y los errores
+     * generados durante el análisis de duplicados.
      */
     @Data
     @Builder
@@ -191,7 +212,10 @@ public class DuplicateDetectionService {
     }
 
     /**
-     * Clase que representa el resultado completo de detección de duplicados.
+     * @brief Clase que representa el resultado completo de detección de duplicados
+     *
+     * Contiene métricas completas del proceso de detección incluyendo
+     * registros únicos, errores, totales analizados y conteos.
      */
     @Data
     @Builder
