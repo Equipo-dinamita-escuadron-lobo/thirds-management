@@ -3,29 +3,35 @@ package com.thirdsmanagement.thirds.domain.exceptions.geography;
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
 
 /**
- * Excepción que se lanza cuando no se encuentra un país o está inactivo.
+ * @brief Excepción que se lanza cuando no se encuentra un país o está inactivo
+ *
+ * Se utiliza en operaciones geográficas cuando se requiere validar la existencia
+ * de un país específico y este no existe o se encuentra inactivo en el sistema.
  */
 public class CountryNotFoundException extends BaseBusinessException {
 
     /**
-     * Constructor por defecto.
+     * @brief Constructor por defecto
+     *
+     * Crea una instancia de la excepción utilizando el código de error
+     * estándar para países no encontrados.
      */
     public CountryNotFoundException() {
         super(GeographyErrorCode.COUNTRY_NOT_FOUND);
     }
 
     /**
-     * Constructor con mensaje personalizado.
-     * @param customMessage mensaje personalizado de error
+     * @brief Constructor con mensaje personalizado
+     * @param customMessage mensaje personalizado que describe el error específico
      */
     public CountryNotFoundException(String customMessage) {
         super(GeographyErrorCode.COUNTRY_NOT_FOUND, customMessage);
     }
 
     /**
-     * Constructor con mensaje personalizado y causa.
-     * @param customMessage mensaje personalizado de error
-     * @param cause causa del error
+     * @brief Constructor con mensaje personalizado y causa
+     * @param customMessage mensaje personalizado que describe el error específico
+     * @param cause causa original del error que provocó esta excepción
      */
     public CountryNotFoundException(String customMessage, Throwable cause) {
         super(GeographyErrorCode.COUNTRY_NOT_FOUND, customMessage, cause);
