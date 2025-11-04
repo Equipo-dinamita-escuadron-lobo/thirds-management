@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la petición de creación de un tipo de identificación.
- * Contiene la información necesaria para crear un nuevo tipo de identificación en el sistema.
+ * @brief DTO para solicitud de creación de tipo de identificación
  */
 @Builder
 @Getter
@@ -20,7 +19,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TypeIdCreateRequest {
-
 
     @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
