@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service to load complete geography data from codes.
- * Used by persistence layer to reconstruct full geography objects from database
- * strings.
+ * @brief Servicio para carga de datos geográficos completos desde códigos
+ *
+ * Utilizado por la capa de persistencia para reconstruir objetos geográficos
+ * completos a partir de cadenas de texto almacenadas en base de datos.
  */
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,9 @@ public class GeographyLoaderService {
     private final GeographyOutputPort geographyOutputPort;
 
     /**
-     * Loads complete Country object from country code.
-     * 
-     * @param countryCode the country code
-     * @return complete Country object or null if not found
+     * @brief Carga objeto Country completo desde código de país
+     * @param countryCode el código del país
+     * @return objeto Country completo o null si no se encuentra
      */
     public Country loadCountryByCode(String countryCode) {
         if (countryCode == null || countryCode.trim().isEmpty()) {
@@ -48,11 +48,10 @@ public class GeographyLoaderService {
     }
 
     /**
-     * Loads complete State object from state and country codes.
-     * 
-     * @param stateCode   the state code
-     * @param countryCode the country code
-     * @return complete State object or null if not found
+     * @brief Carga objeto State completo desde códigos de estado y país
+     * @param stateCode el código del estado
+     * @param countryCode el código del país
+     * @return objeto State completo o null si no se encuentra
      */
     public State loadStateByCode(String stateCode, String countryCode) {
         if (stateCode == null || stateCode.trim().isEmpty() ||
@@ -94,12 +93,11 @@ public class GeographyLoaderService {
     }
 
     /**
-     * Loads complete City object from city, state and country codes.
-     * 
-     * @param cityCode    the city code
-     * @param stateCode   the state code
-     * @param countryCode the country code
-     * @return complete City object or null if not found
+     * @brief Carga objeto City completo desde códigos de ciudad, estado y país
+     * @param cityCode el código de la ciudad
+     * @param stateCode el código del estado
+     * @param countryCode el código del país
+     * @return objeto City completo o null si no se encuentra
      */
     public City loadCityByCode(String cityCode, String stateCode, String countryCode) {
         if (cityCode == null || cityCode.trim().isEmpty() ||
