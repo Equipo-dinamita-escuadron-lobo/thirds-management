@@ -57,8 +57,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 /**
- * Controlador REST para la gestión de terceros.
- * Este controlador expone endpoints para la creación, actualización, inactivación y listado de terceros.
+ * @brief Controlador REST principal para gestión completa de terceros
+ *
+ * Adaptador de entrada que expone la API completa para gestión de terceros:
+ * CRUD completo, importación/exportación, cambios de estado masivos,
+ * validación de RUT, y consultas avanzadas con filtros y paginación.
  */
 @Slf4j
 @RestController
@@ -81,9 +84,12 @@ public class ThirdRestController {
     private final ExcelFileNameGenerator fileNameGenerator;
 
     /**
-     * Crea un tercero.
-     * @param thirdCreateRequest Datos del tercero a crear.
-     * @return Respuesta con los datos del tercero creado.
+     * @brief Crea un nuevo tercero en el sistema
+     *
+     * Endpoint para registrar un nuevo tercero con validación completa
+     * de datos, jerarquía geográfica y reglas de negocio.
+     * @param thirdCreateRequest datos completos del tercero a crear
+     * @return tercero creado con código HTTP 201
      */
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
@@ -91,18 +97,21 @@ public class ThirdRestController {
         Third third = thirdRestMapper.toThird(thirdCreateRequest);
 
         // Use geography validation service for proper geography integration
-        third = createThirdService.createThird(third, 
-                thirdCreateRequest.getCountryCode(), 
-                thirdCreateRequest.getStateCode(), 
+        third = createThirdService.createThird(third,
+                thirdCreateRequest.getCountryCode(),
+                thirdCreateRequest.getStateCode(),
                 thirdCreateRequest.getCityCode());
 
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
     /**
-     * Actualiza un tercero.
-     * @param thirdUpdateRequest Datos del tercero a actualizar.
-     * @return Respuesta con los datos del tercero actualizado.
+     * @brief Actualiza datos de un tercero existente
+     *
+     * Endpoint para modificar la información de un tercero existente
+     * con validación completa de jerarquía geográfica.
+     * @param thirdUpdateRequest datos actualizados del tercero
+     * @return tercero actualizado
      */
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdUpdateRequest thirdUpdateRequest) {
@@ -119,10 +128,12 @@ public class ThirdRestController {
     }
 
     /**
-     * Cambia el estado de un tercero individual.
-     * @param thId ID del tercero.
-     * @param entId ID de la empresa.
-     * @return Respuesta con el resultado de la operación.
+     * @brief Cambia el estado activo/inactivo de un tercero
+     *
+     * Endpoint para alternar el estado de un tercero específico entre activo e inactivo.
+     * @param thId identificador único del tercero
+     * @param entId identificador de la empresa
+     * @return resultado del cambio de estado
      */
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
@@ -134,37 +145,40 @@ public class ThirdRestController {
     }
 
     /**
-     * Cambia el estado de todos los terceros de una empresa de forma masiva.
-     * Permite activar o inactivar todos los terceros en una sola operación.
-     * 
-     * @param entId ID de la empresa
-     * @param newState Nuevo estado (true para activo, false para inactivo)
-     * @return Respuesta con la cantidad de terceros actualizados
+     * @brief Cambia el estado de todos los terceros de una empresa de forma masiva
+     *
+     * Endpoint para cambiar el estado (activo/inactivo) de todos los terceros
+     * pertenecientes a una empresa en una sola operación.
+     * @param entId identificador de la empresa
+     * @param newState nuevo estado para aplicar a todos los terceros
+     * @return cantidad de terceros actualizados
      */
     @PatchMapping("/allState")
     public ResponseEntity<BulkStateChangeResponse> changeAllThirdsState(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
-        
+
         int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
-        
-        String message = String.format("Se actualizaron %d terceros al estado %s", 
+
+        String message = String.format("Se actualizaron %d terceros al estado %s",
                 updatedCount, newState ? "activo" : "inactivo");
-        
+
         BulkStateChangeResponse response = BulkStateChangeResponse.builder()
                 .updatedCount(updatedCount)
                 .newState(newState)
                 .message(message)
                 .build();
-        
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
-     * Obtiene un tercero por ID y empresa.
-     * @param thId ID del tercero.
-     * @param entId ID de la empresa.
-     * @return Respuesta con los datos del tercero.
+     * @brief Obtiene un tercero específico por ID y empresa
+     *
+     * Endpoint para consultar los datos completos de un tercero específico.
+     * @param thId identificador único del tercero
+     * @param entId identificador de la empresa
+     * @return datos completos del tercero solicitado
      */
     @GetMapping("/third")
     public ResponseEntity<Third> getThirdById(
@@ -177,7 +191,7 @@ public class ThirdRestController {
     }
 
     /**
-     * Verifica si existe un tercero.
+     * @brief Verifica si existe un tercero.
      * @param idNumber ID del tercero.
      * @param entId ID de la empresa.
      * @return Respuesta con el resultado de la verificación.
@@ -193,7 +207,7 @@ public class ThirdRestController {
     }
 
     /**
-     * Obtiene una lista de terceros con paginación flexible, búsqueda y ordenamiento.
+     * @brief Obtiene una lista de terceros con paginación flexible, búsqueda y ordenamiento.
      * Si no se especifican parámetros de paginación, retorna todos los terceros.
      * 
      * @param entId Id de la empresa
@@ -232,7 +246,7 @@ public class ThirdRestController {
     }
 
     /**
-     * Obtiene una lista de terceros activos con paginación flexible y ordenamiento.
+     * @brief Obtiene una lista de terceros activos con paginación flexible y ordenamiento.
      *
      * @param entId Id de la empresa
      * @param numPage Número de página (opcional)
@@ -263,7 +277,7 @@ public class ThirdRestController {
     }
 
     /**
-     * Cargar un archivo PDF y extraer su contenido RUT.
+     * @brief Cargar un archivo PDF y extraer su contenido RUT.
      * @param file el archivo PDF que se va a cargar.
      * @return ResponseEntity con el contenido extraído del PDF en caso de éxito,
      *         o un ResponseEntity con un estado de error en caso de fallo.
@@ -333,18 +347,13 @@ public class ThirdRestController {
     }
 
     /**
-     * Importa terceros masivamente desde un archivo Excel.
-     * Procesa el archivo, valida datos y crea los terceros en el sistema.
-     * 
-     * Comportamiento:
-     * - Los duplicados se omiten automáticamente (usabilidad)
-     * - Se procesan archivos grandes sin límite de lote específico
-     * - La importación se detiene al primer error crítico de validación
-     * - Permite reimportar el mismo archivo omitiendo registros existentes
-     * 
-     * @param entId ID de la empresa
-     * @param file Archivo Excel con los terceros a importar
-     * @return Respuesta con estadísticas detalladas incluyendo duplicados omitidos
+     * @brief Importa terceros masivamente desde archivo Excel
+     *
+     * Endpoint para carga masiva de terceros desde archivo Excel con validación completa,
+     * detección de duplicados y reporting detallado de resultados.
+     * @param entId identificador de la empresa
+     * @param file archivo Excel con los datos de terceros a importar
+     * @return estadísticas completas de la importación (procesados, errores, duplicados)
      */
     @PostMapping("/import/excel")
     public ResponseEntity<ThirdImportResponse> importThirdsFromExcel(
@@ -370,13 +379,14 @@ public class ThirdRestController {
         return new ResponseEntity<>(response, status);
     }
 
-
     /**
-     * Elimina un tercero del sistema.
-     * Valida que el tercero no tenga dependencias antes de eliminarlo.
-     * @param thirdId ID del tercero a eliminar
-     * @param entId ID de la empresa
-     * @return Respuesta con el resultado de la eliminación
+     * @brief Elimina un tercero del sistema
+     *
+     * Endpoint para eliminación lógica de un tercero, validando que no tenga
+     * dependencias activas antes de proceder con la eliminación.
+     * @param thirdId identificador único del tercero a eliminar
+     * @param entId identificador de la empresa
+     * @return resultado de la operación de eliminación
      */
     @DeleteMapping("/delete")
     public ResponseEntity<Boolean> deleteThird(

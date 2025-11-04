@@ -22,8 +22,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Controlador REST para la gestión de información geográfica.
- * Expone endpoints para consultar países, estados y ciudades con validación de jerarquía.
+ * @brief Controlador REST para consultas de información geográfica
+ *
+ * Adaptador de entrada que expone endpoints para consultar datos geográficos
+ * (países, estados/departamentos, ciudades) siguiendo la jerarquía geográfica.
+ * Traduce entre el protocolo HTTP y los casos de uso del dominio.
  */
 @RestController
 @RequestMapping("/api/thirds/geography")
@@ -34,8 +37,11 @@ public class GeographyRestController {
     private final GeographyRestMapper geographyRestMapper;
 
     /**
-     * Obtiene todos los países activos.
-     * @return Lista de países activos ordenados por nombre
+     * @brief Obtiene todos los países activos
+     *
+     * Endpoint que retorna la lista completa de países disponibles para asignar
+     * a terceros, filtrando solo los países marcados como activos.
+     * @return lista de países activos ordenados por nombre
      */
     @GetMapping("/countries")
     public ResponseEntity<List<CountryResponse>> getAllCountries() {
@@ -45,33 +51,39 @@ public class GeographyRestController {
     }
 
     /**
-     * Obtiene todos los estados activos de un país específico.
-     * @param countryCode Código del país (requerido)
-     * @return Lista de estados activos del país ordenados por nombre
+     * @brief Obtiene todos los estados/departamentos de un país específico
+     *
+     * Endpoint que retorna los estados/departamentos activos pertenecientes
+     * a un país específico, validando la jerarquía geográfica.
+     * @param countryCode código único del país (requerido)
+     * @return lista de estados activos del país especificado
      */
     @GetMapping("/states")
     public ResponseEntity<List<StateResponse>> getStatesByCountry(
-            @NotBlank(message = "El código del país es obligatorio") 
-            @RequestParam("countryCode") String countryCode) {
-        
+            @NotBlank(message = "El código del país es obligatorio")
+            @RequestParam String countryCode) {
+
         List<State> states = listGeographyUseCase.getStatesByCountry(countryCode);
         List<StateResponse> response = geographyRestMapper.toStateResponseList(states);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
-     * Obtiene todas las ciudades activas de un estado específico.
-     * @param stateCode Código del estado (requerido)
-     * @param countryCode Código del país (requerido)
-     * @return Lista de ciudades activas del estado ordenadas por nombre
+     * @brief Obtiene todas las ciudades de un estado/departamento específico
+     *
+     * Endpoint que retorna las ciudades activas pertenecientes a un estado/departamento
+     * específico dentro de un país, validando la jerarquía geográfica completa.
+     * @param stateCode código único del estado/departamento (requerido)
+     * @param countryCode código único del país (requerido)
+     * @return lista de ciudades activas del estado especificado
      */
     @GetMapping("/cities")
     public ResponseEntity<List<CityResponse>> getCitiesByState(
-            @NotBlank(message = "El código del estado es obligatorio") 
-            @RequestParam("stateCode") String stateCode,
-            @NotBlank(message = "El código del país es obligatorio") 
-            @RequestParam("countryCode") String countryCode) {
-        
+            @NotBlank(message = "El código del estado es obligatorio")
+            @RequestParam String stateCode,
+            @NotBlank(message = "El código del país es obligatorio")
+            @RequestParam String countryCode) {
+
         List<City> cities = listGeographyUseCase.getCitiesByState(stateCode, countryCode);
         List<CityResponse> response = geographyRestMapper.toCityResponseList(cities);
         return new ResponseEntity<>(response, HttpStatus.OK);
