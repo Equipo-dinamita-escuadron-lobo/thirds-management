@@ -11,11 +11,6 @@ import java.text.Normalizer;
  */
 public final class StringNormalizer {
 
-    /**
-     * @brief Constructor privado para evitar instanciación
-     *
-     * Esta clase es de utilidad y no debe ser instanciada.
-     */
     private StringNormalizer() {
         throw new UnsupportedOperationException("StringNormalizer es una clase de utilidad y no debe ser instanciada");
     }
@@ -240,8 +235,6 @@ public final class StringNormalizer {
      * Útil para procesar encabezados con indicativos de requerimiento, limpiando el texto
      * para obtener solo el nombre esencial del campo.
      *
-     * Ejemplo: "Tipo Identificación\n(Requerido)" -> "Tipo Identificación"
-     * Ejemplo: "Dígito Verificación\n(Requerido para persona jurídica con NIT)" -> "Dígito Verificación"
      * @param headerName nombre del encabezado original
      * @return nombre normalizado sin indicativos de requerimiento ni saltos de línea
      */
@@ -256,7 +249,6 @@ public final class StringNormalizer {
         // Eliminar texto entre paréntesis (indicativos de requerimiento)
         normalized = normalized.replaceAll("\\s*\\([^)]*\\)\\s*", "");
 
-        // Limpiar espacios múltiples y trim
         normalized = normalized.replaceAll("\\s+", " ").trim();
 
         return normalized;
