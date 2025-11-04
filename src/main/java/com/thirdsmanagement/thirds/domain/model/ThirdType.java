@@ -16,6 +16,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 
+/**
+ * @brief Modelo de dominio que representa un tipo de tercero
+ *
+ * Entidad que define las categorías o tipos de terceros disponibles en el sistema
+ * (cliente, proveedor, empleado, etc.). Cada tipo pertenece a una empresa específica.
+ */
 @Builder
 @Getter
 @Setter
@@ -40,12 +46,12 @@ public class ThirdType {
     @Builder.Default
     private Boolean status = true;
 
-
     /**
-     * Obtiene el nombre normalizado usando StringNormalizer.
-     * Elimina acentos pero preserva el formato de caso original.
-     * 
-     * @return nombre normalizado
+     * @brief Obtiene el nombre normalizado del tipo de tercero
+     *
+     * Retorna el nombre del tipo de tercero con caracteres especiales normalizados
+     * (acentos eliminados) pero preservando el formato de mayúsculas/minúsculas original.
+     * @return nombre normalizado sin acentos pero con formato de caso preservado
      */
     public String getNormalizedName() {
         return StringNormalizer.normalizePreservingCase(thirdTypeName);

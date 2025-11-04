@@ -11,8 +11,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Modelo de dominio que representa un país.
- * Contiene la información básica de un país para la jerarquía geográfica.
+ * @brief Modelo de dominio que representa un país
+ *
+ * Entidad que contiene la información básica de un país para la jerarquía geográfica.
+ * Forma parte del sistema de ubicación geográfica utilizado en los terceros.
  */
 @Builder
 @Getter

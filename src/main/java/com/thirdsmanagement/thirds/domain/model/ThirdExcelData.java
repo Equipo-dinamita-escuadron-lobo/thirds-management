@@ -11,8 +11,10 @@ import com.thirdsmanagement.thirds.domain.enums.ePersonType;
 import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 
 /**
- * Modelo que representa los datos de un tercero parseados desde Excel.
- * Contiene los datos en formato raw antes de ser convertidos a entidades de dominio.
+ * @brief Modelo que representa los datos de un tercero parseados desde Excel
+ *
+ *        Contiene los datos en formato raw tal como se leen del archivo Excel,
+ *        antes de ser validados y convertidos a entidades de dominio completas.
  */
 @Data
 @Builder
@@ -20,99 +22,42 @@ import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 @AllArgsConstructor
 public class ThirdExcelData {
 
-    /**
-     * Número de fila en el Excel donde se encuentra este registro.
-     */
     private Integer rowNumber;
 
-    /**
-     * Identificador de la entidad.
-     */
     private String entId;
 
-    /**
-     * Nombre del tipo de identificación (ej: "CC", "NIT", "CE").
-     */
     private String typeIdName;
 
-    /**
-     * Número de identificación.
-     */
     private Long idNumber;
 
-    /**
-     * Dígito de verificación.
-     */
     private Long verificationNumber;
 
-    /**
-     * Tipo de persona (Natural o Jurídica).
-     */
     private ePersonType personType;
 
-    /**
-     * Nombres (para persona natural).
-     */
     private String names;
 
-    /**
-     * Apellidos (para persona natural).
-     */
     private String lastNames;
 
-    /**
-     * Razón social (para persona jurídica).
-     */
     private String socialReason;
 
-    /**
-     * Género.
-     */
     private eThirdGender gender;
 
-    /**
-     * Estado del tercero (activo/inactivo).
-     */
     private Boolean state;
 
-    /**
-     * Nombre del país.
-     */
     private String countryName;
 
-    /**
-     * Nombre del estado/departamento.
-     */
     private String stateName;
 
-    /**
-     * Nombre de la ciudad.
-     */
     private String cityName;
 
-    /**
-     * Dirección.
-     */
     private String address;
 
-    /**
-     * Número de teléfono.
-     */
     private String phoneNumber;
 
-    /**
-     * Correo electrónico.
-     */
     private String email;
 
-    /**
-     * Nombres de los tipos de tercero (ej: "Cliente", "Proveedor").
-     */
     private Set<String> thirdTypesNames;
 
-    /**
-     * Verifica si los datos básicos están presentes para validación.
-     */
     public boolean hasRequiredFields() {
         return typeIdName != null && !typeIdName.trim().isEmpty()
                 && idNumber != null
@@ -123,7 +68,12 @@ public class ThirdExcelData {
     }
 
     /**
-     * Verifica si es una persona natural con datos completos.
+     * @brief Verifica si es una persona natural con datos completos
+     *
+     *        Valida que el registro tenga toda la información requerida para una
+     *        persona natural:
+     *        nombres, apellidos, género presente, y razón social ausente.
+     * @return true si los datos corresponden a una persona natural válida
      */
     public boolean isValidNaturalPerson() {
         return personType == ePersonType.Natural
@@ -134,7 +84,12 @@ public class ThirdExcelData {
     }
 
     /**
-     * Verifica si es una persona jurídica con datos completos.
+     * @brief Verifica si es una persona jurídica con datos completos
+     *
+     *        Valida que el registro tenga toda la información requerida para una
+     *        persona jurídica:
+     *        razón social presente, campos de persona natural ausentes.
+     * @return true si los datos corresponden a una persona jurídica válida
      */
     public boolean isValidLegalEntity() {
         return personType == ePersonType.Juridica
@@ -144,17 +99,4 @@ public class ThirdExcelData {
                 && gender == null;
     }
 
-    /**
-     * Obtiene una representación String del registro para logging y errores.
-     */
-    public String toLogString() {
-        return String.format("Fila %d: %s %s - %s %s",
-                rowNumber,
-                typeIdName != null ? typeIdName : "N/A",
-                idNumber != null ? idNumber : "N/A",
-                personType != null ? personType : "N/A",
-                personType == ePersonType.Natural 
-                    ? (names + " " + lastNames) 
-                    : socialReason);
-    }
 }

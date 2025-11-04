@@ -12,8 +12,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Modelo de dominio que representa un estado/departamento.
- * Contiene la información básica de un estado para la jerarquía geográfica.
+ * @brief Modelo de dominio que representa un estado/departamento
+ *
+ * Entidad que contiene la información básica de un estado o departamento
+ * para la jerarquía geográfica. Está relacionado con un país específico.
  */
 @Builder
 @Getter

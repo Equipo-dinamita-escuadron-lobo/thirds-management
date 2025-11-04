@@ -22,9 +22,11 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Modelo de dominio que representa un tercero en el sistema.
- * Un tercero puede ser una persona natural o jurídica con diferentes tipos
- * (cliente, proveedor, empleado, etc.) y información geográfica asociada.
+ * @brief Modelo de dominio que representa un tercero en el sistema
+ *
+ * Entidad principal que representa a personas naturales o jurídicas (terceros)
+ * con información completa de identificación, contacto, ubicación geográfica
+ * y categorización por tipos (cliente, proveedor, empleado, etc.).
  */
 @Builder
 @Getter

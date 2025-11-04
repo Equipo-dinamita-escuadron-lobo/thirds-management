@@ -7,8 +7,10 @@ import java.util.Set;
 import com.thirdsmanagement.thirds.domain.enums.ExportableField;
 
 /**
- * Configuración de exportación para terceros.
- * Implementa el patrón Builder para construcción flexible de configuraciones.
+ * @brief Configuración de exportación para terceros
+ *
+ * Implementa el patrón Builder para construcción flexible de configuraciones
+ * que determinan qué campos geográficos opcionales incluir en las exportaciones.
  */
 public class ExportConfiguration {
 
@@ -19,32 +21,36 @@ public class ExportConfiguration {
         this.includedFields = Collections.unmodifiableSet(builder.includedFields);
     }
 
+    /**
+     * @brief Obtiene el conjunto de campos incluidos en la exportación
+     * @return conjunto inmutable de campos que serán exportados
+     */
     public Set<ExportableField> getIncludedFields() {
         return includedFields;
     }
 
     /**
-     * Verifica si un campo específico debe incluirse en la exportación.
-     * 
+     * @brief Verifica si un campo específico debe incluirse en la exportación
      * @param field campo a verificar
-     * @return true si el campo debe incluirse
+     * @return true si el campo debe incluirse, false en caso contrario
      */
     public boolean includes(ExportableField field) {
         return includedFields.contains(field);
     }
 
     /**
-     * Crea un nuevo Builder para construcción de configuraciones.
-     * 
-     * @return nuevo Builder
+     * @brief Crea un nuevo Builder para construcción de configuraciones
+     * @return nueva instancia del Builder para configuración fluida
      */
     public static Builder builder() {
         return new Builder();
     }
 
     /**
-     * Builder para construcción flexible de ExportConfiguration.
-     * Implementa patrón Builder con método fluent.
+     * @brief Builder para construcción flexible de ExportConfiguration
+     *
+     * Implementa patrón Builder con método fluent para permitir
+     * configuración progresiva de qué campos incluir en la exportación.
      */
     public static class Builder {
         private final Set<ExportableField> includedFields;
@@ -54,10 +60,9 @@ public class ExportConfiguration {
         }
 
         /**
-         * Incluye un campo específico en la exportación.
-         * 
+         * @brief Incluye un campo específico en la exportación
          * @param field campo a incluir
-         * @return este Builder para encadenamiento
+         * @return este Builder para encadenamiento fluido
          */
         public Builder includeField(ExportableField field) {
             if (field != null) {
@@ -67,10 +72,9 @@ public class ExportConfiguration {
         }
 
         /**
-         * Incluye múltiples campos en la exportación.
-         * 
-         * @param fields campos a incluir
-         * @return este Builder para encadenamiento
+         * @brief Incluye múltiples campos en la exportación
+         * @param fields conjunto de campos a incluir
+         * @return este Builder para encadenamiento fluido
          */
         public Builder includeFields(Set<ExportableField> fields) {
             if (fields != null) {
@@ -80,9 +84,8 @@ public class ExportConfiguration {
         }
 
         /**
-         * Incluye todos los campos disponibles en la exportación.
-         * 
-         * @return este Builder para encadenamiento
+         * @brief Incluye todos los campos disponibles en la exportación
+         * @return este Builder para encadenamiento fluido
          */
         public Builder includeAllFields() {
             this.includedFields.addAll(EnumSet.allOf(ExportableField.class));
@@ -90,10 +93,9 @@ public class ExportConfiguration {
         }
 
         /**
-         * Excluye un campo específico de la exportación.
-         * 
+         * @brief Excluye un campo específico de la exportación
          * @param field campo a excluir
-         * @return este Builder para encadenamiento
+         * @return este Builder para encadenamiento fluido
          */
         public Builder excludeField(ExportableField field) {
             if (field != null) {
@@ -103,9 +105,10 @@ public class ExportConfiguration {
         }
 
         /**
-         * Limpia todos los campos incluidos.
-         * 
-         * @return este Builder para encadenamiento
+         * @brief Limpia todos los campos incluidos
+         *
+         * Reinicia la configuración, removiendo todos los campos previamente incluidos.
+         * @return este Builder para encadenamiento fluido
          */
         public Builder clear() {
             this.includedFields.clear();
@@ -113,9 +116,11 @@ public class ExportConfiguration {
         }
 
         /**
-         * Construye la configuración inmutable.
-         * 
-         * @return ExportConfiguration construida
+         * @brief Construye la configuración inmutable
+         *
+         * Crea una instancia final de ExportConfiguration con la configuración
+         * acumulada, convirtiéndola en inmutable.
+         * @return ExportConfiguration construida e inmutable
          */
         public ExportConfiguration build() {
             return new ExportConfiguration(this);
