@@ -18,9 +18,8 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Obtiene todos los tipos de terceros para una empresa específica.
-     * 
-     * @param entId el ID de la empresa
+     * @brief Obtiene todos los tipos de terceros para una empresa específica
+     * @param entId identificador de la empresa
      * @return lista de tipos de terceros disponibles
      */
     @Override
@@ -29,14 +28,13 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
 
     /**
-     * Obtiene todos los tipos de tercero con paginación y ordenamiento.
-     * 
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero
+     * @brief Obtiene todos los tipos de tercero con paginación y ordenamiento personalizado
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de tipos de tercero
      */
     @Override
     public Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
@@ -44,15 +42,14 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
 
     /**
-     * Busca tipos de tercero por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de tercero que coinciden
+     * @brief Busca tipos de tercero por empresa y término de búsqueda
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de tipos de tercero que coinciden con la búsqueda
      */
     @Override
     public Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
@@ -60,10 +57,9 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
 
     /**
-     * Cuenta tipos de tercero por empresa.
-     * 
-     * @param entId El id de la empresa
-     * @return Cantidad de tipos de tercero
+     * @brief Cuenta tipos de tercero por empresa
+     * @param entId identificador de la empresa
+     * @return cantidad total de tipos de tercero
      */
     @Override
     public long countThirdTypesByEntId(String entId) {
@@ -71,11 +67,10 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
 
     /**
-     * Cuenta tipos de tercero por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de tercero que coinciden
+     * @brief Cuenta tipos de tercero por empresa y término de búsqueda
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @return cantidad de tipos de tercero que coinciden con la búsqueda
      */
     @Override
     public long countThirdTypesByEntIdAndSearch(String entId, String search) {
@@ -83,10 +78,9 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
     
     /**
-     * Cuenta tipos de tercero activos por empresa.
-     * 
-     * @param entId El id de la empresa
-     * @return Cantidad de tipos de tercero activos
+     * @brief Cuenta tipos de tercero activos por empresa
+     * @param entId identificador de la empresa
+     * @return cantidad de tipos de tercero activos
      */
     @Override
     public long countActiveThirdTypesByEntId(String entId) {
@@ -94,12 +88,11 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
     }
     
     /**
-     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
-     * 
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @return Página de tipos de tercero activos ordenados por nombre
+     * @brief Obtiene todos los tipos de tercero activos con paginación
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @return página de tipos de tercero activos ordenados por nombre
      */
     @Override
     public Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size) {

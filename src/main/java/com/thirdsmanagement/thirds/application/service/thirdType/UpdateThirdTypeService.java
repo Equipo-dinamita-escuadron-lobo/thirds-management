@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio para la actualización de tipos de tercero.
- * Implementa el caso de uso {@link UpdateThirdTypeUseCase}.
+ * @brief Servicio para la actualización de tipos de tercero
+ *
+ * Implementa el caso de uso UpdateThirdTypeUseCase.
  */
 @Service
 @RequiredArgsConstructor
@@ -22,10 +23,9 @@ public class UpdateThirdTypeService implements UpdateThirdTypeUseCase {
     private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
     /**
-     * Actualiza un tipo de tercero existente.
-     * 
-     * @param thirdType El tipo de tercero con los datos actualizados
-     * @return El tipo de tercero actualizado
+     * @brief Actualiza un tipo de tercero existente
+     * @param thirdType tipo de tercero con los datos actualizados
+     * @return tipo de tercero actualizado
      */
     @Override
     public ThirdType updateThirdType(ThirdType thirdType) {

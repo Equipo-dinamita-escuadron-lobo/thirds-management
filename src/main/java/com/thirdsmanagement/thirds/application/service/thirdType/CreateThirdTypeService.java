@@ -22,10 +22,9 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
     /**
-     * Crea un nuevo tipo de tercero en el sistema.
-     * 
-     * @param thirdType el tipo de tercero a crear
-     * @return el tipo de tercero creado con su ID asignado
+     * @brief Crea un nuevo tipo de tercero en el sistema
+     * @param thirdType tipo de tercero a crear
+     * @return tipo de tercero creado con su ID asignado
      * @throws ThirdTypeNameAlreadyExistsException si ya existe un tipo de tercero con el mismo nombre
      */
     @Override
@@ -57,11 +56,9 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     }
 
     /**
-     * Valida que no exista un tipo de tercero con el mismo nombre (validación de negocio).
-     * Usa el nombre ya normalizado para validar contra la base de datos (case-insensitive).
-     * 
-     * @param normalizedThirdTypeName el nombre del tipo de tercero ya normalizado
-     * @param entId                   el ID de la entidad
+     * @brief Valida que no exista un tipo de tercero con el mismo nombre
+     * @param normalizedThirdTypeName nombre del tipo de tercero ya normalizado
+     * @param entId identificador de la entidad
      * @throws ThirdTypeNameAlreadyExistsException si ya existe un tipo de tercero con el mismo nombre
      */
     private void validateDuplicateThirdTypeName(String normalizedThirdTypeName, String entId) {
