@@ -9,93 +9,105 @@ import org.springframework.data.domain.Pageable;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 /**
- * Interfaz que define los metodos de salida para la entidad Tercero.
+ * @brief Puerto de salida para operaciones de persistencia de terceros
+ *
+ * Define el contrato para todas las operaciones de acceso a datos
+ * relacionadas con la entidad Third, incluyendo CRUD, consultas y operaciones masivas.
  */
 public interface ThirdOutputPort {
     /**
-     * Guarda un tercero.
+     * @brief Guarda un tercero
      * @param third El tercero a guardar
      * @return El tercero guardado
      */
     Third saveThird(Third third);
-    
+
     /**
-     * Actualiza un tercero.
+     * @brief Actualiza un tercero
      * @param third El tercero a actualizar
      * @return El tercero actualizado
      */
     Third updateThird(Third third);
-    
+
     /**
-     * Obtiene un tercero por id y empresa.
+     * @brief Obtiene un tercero por id y empresa
      * @param id El id del tercero
      * @param entId El id de la empresa
-     * @return El tercero si existe, null en caso contrario
+     * @return El tercero si existe, vacío en caso contrario
      */
     Optional<Third> getThirdById(Long id, String entId);
-    
+
     /**
-     * Validar si existe un tercero por id y el id de la empresa.
+     * @brief Verifica existencia de tercero por id y empresa
      * @param id El id del tercero
      * @param entId El id de la empresa
      * @return True si existe, false en caso contrario
      */
     boolean existThirdById(long id, String entId);
-    
+
     /**
-     * Encuentra qué números de identificación ya existen en la base de datos.
-     * 
+     * @brief Encuentra números de identificación existentes
+     *
+     * Verifica cuáles números de identificación ya existen en la base de datos
+     * para evitar duplicados durante operaciones de importación.
+     *
      * @param idNumbers conjunto de números de identificación a verificar
      * @param entId el id de la empresa
      * @return conjunto de números de identificación que ya existen
      */
     Set<Long> findExistingIdNumbers(Set<Long> idNumbers, String entId);
-    
+
     /**
-     * Cambia el estado de un tercero.
+     * @brief Cambia el estado de un tercero
      * @param thId El id del tercero
      * @param entId El id de la empresa
-     * @return True si se cambio el estado, false en caso contrario
+     * @return True si se cambió el estado, false en caso contrario
      */
     boolean changeThirdState(Long thId, String entId);
-    
+
     /**
-     * Obtiene todos los terceros.
+     * @brief Obtiene todos los terceros con paginación
      * @param entId El id de la empresa
-     * @param page El pageable object
-     * @return La pagina de terceros
+     * @param page El objeto pageable para paginación
+     * @return La página de terceros
      */
     Page<Third> getAllThirdsBy(String entId, Pageable page);
     
     /**
-     * Obtiene todos los terceros filtrados por estado.
-     * Optimizado para exportación con filtro de estado en BD.
-     * 
+     * @brief Obtiene terceros filtrados por estado
+     *
+     * Optimizado para exportación con filtro de estado directamente en BD
+     * para mejorar rendimiento en operaciones de exportación masiva.
+     *
      * @param entId El id de la empresa
      * @param state Estado de los terceros (true=activos, false=inactivos)
-     * @param page El pageable object
-     * @return La pagina de terceros filtrados por estado
+     * @param page El objeto pageable para paginación
+     * @return La página de terceros filtrados por estado
      */
     Page<Third> getAllThirdsByState(String entId, Boolean state, Pageable page);
-    
-    
+
+
     /**
-     * Elimina un tercero del sistema junto con sus asociaciones.
+     * @brief Elimina un tercero del sistema
+     *
+     * Elimina un tercero junto con todas sus asociaciones y dependencias
+     * del sistema de forma permanente.
+     *
      * @param thirdId El ID del tercero a eliminar
      * @param entId El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
      */
     boolean deleteThird(Long thirdId, String entId);
-    
+
     /**
-     * Cuenta el total de terceros por empresa.
+     * @brief Cuenta el total de terceros por empresa
      * @param entId El id de la empresa
      * @return El número total de terceros
      */
     long countAllThirdsByEntId(String entId);
-    
+
     /**
-     * Busca terceros por empresa y término de búsqueda con ordenamiento.
+     * @brief Busca terceros por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -105,17 +117,17 @@ public interface ThirdOutputPort {
      * @return Página de terceros que coinciden con la búsqueda
      */
     Page<Third> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta terceros por empresa y término de búsqueda.
+     * @brief Cuenta terceros por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de terceros que coinciden
      */
     long countByEntIdAndSearch(String entId, String search);
-    
+
     /**
-     * Obtiene todos los terceros con ordenamiento.
+     * @brief Obtiene todos los terceros con ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -124,9 +136,13 @@ public interface ThirdOutputPort {
      * @return Página de terceros ordenados
      */
     Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
+     * @brief Actualiza estado de terceros de forma masiva
+     *
+     * Cambia el estado de todos los terceros pertenecientes a una empresa
+     * en una sola operación optimizada.
+     *
      * @param entId El id de la empresa
      * @param newState El nuevo estado (true para activo, false para inactivo)
      * @return La cantidad de terceros actualizados
@@ -134,7 +150,7 @@ public interface ThirdOutputPort {
     int bulkUpdateThirdState(String entId, Boolean newState);
 
     /**
-     * Obtiene todos los terceros activos con ordenamiento.
+     * @brief Obtiene terceros activos con ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -145,7 +161,7 @@ public interface ThirdOutputPort {
     Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
 
     /**
-     * Cuenta el total de terceros activos por empresa.
+     * @brief Cuenta el total de terceros activos por empresa
      * @param entId El id de la empresa
      * @return El número total de terceros activos
      */

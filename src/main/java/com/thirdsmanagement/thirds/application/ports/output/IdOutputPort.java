@@ -8,105 +8,108 @@ import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 /**
- * Interfaz que define los métodos de salida para la gestión de tipos de tercero y tipos de identificación.
+ * @brief Puerto de salida para gestión de tipos de tercero e identificación
+ *
+ * Define el contrato para todas las operaciones de persistencia
+ * relacionadas con tipos de tercero y tipos de identificación.
  */
 public interface IdOutputPort {
     /**
-     * Guarda un tipo de tercero.
+     * @brief Guarda un tipo de tercero
      * @param thirdType El tipo de tercero a guardar
      * @return El tipo de tercero guardado
      */
     ThirdType saveThirdType(ThirdType thirdType);
-    
+
     /**
-     * Obtiene todos los tipos de tercero.
+     * @brief Obtiene todos los tipos de tercero
      * @param entId El id de la empresa
      * @return La lista de tipos de tercero
      */
     List<ThirdType> getALLThirdTypes(String entId);
-    
+
     /**
-     * Guarda un tipo de identificacion.
-     * @param typeId El tipo de identificacion a guardar
-     * @return El tipo de identificacion guardado
+     * @brief Guarda un tipo de identificación
+     * @param typeId El tipo de identificación a guardar
+     * @return El tipo de identificación guardado
      */
     TypeId saveTypeId(TypeId typeId);
-    
+
     /**
-     * Obtiene todos los tipos de identificacion.
+     * @brief Obtiene todos los tipos de identificación
      * @param entId El id de la empresa
-     * @return La lista de tipos de identificacion
+     * @return La lista de tipos de identificación
      */
     List<TypeId> getAllTypeIds(String entId);
-    
+
     /**
-     * Actualiza un tipo de identificacion.
-     * @param typeId El tipo de identificacion a actualizar
-     * @return El tipo de identificacion actualizado
+     * @brief Actualiza un tipo de identificación
+     * @param typeId El tipo de identificación a actualizar
+     * @return El tipo de identificación actualizado
      */
     TypeId updateTypeId(TypeId typeId);
-    
+
     /**
-     * Actualiza un tipo de tercero.
+     * @brief Actualiza un tipo de tercero
      * @param thirdType El tipo de tercero a actualizar
      * @return El tipo de tercero actualizado
      */
     ThirdType updateThirdType(ThirdType thirdType);
     
     /**
-     * Verifica si existe un tipo de identificación por su ID.
+     * @brief Verifica existencia de tipo de identificación por ID
      * @param typeIdId El ID del tipo de identificación
      * @return true si existe, false en caso contrario
      */
     boolean existsTypeIdById(Long typeIdId);
-    
+
     /**
-     * Verifica si existe un tipo de tercero por su ID.
+     * @brief Verifica existencia de tipo de tercero por ID
      * @param thirdTypeId El ID del tipo de tercero
      * @return true si existe, false en caso contrario
      */
     boolean existsThirdTypeById(Long thirdTypeId);
-    
+
     /**
-     * Obtiene un tipo de identificación completo por su ID.
+     * @brief Obtiene tipo de identificación completo por ID
      * @param typeIdId El ID del tipo de identificación
      * @return El tipo de identificación completo o null si no existe
      */
     TypeId getTypeIdById(Long typeIdId);
-    
+
     /**
-     * Obtiene un tipo de tercero completo por su ID.
+     * @brief Obtiene tipo de tercero completo por ID
      * @param thirdTypeId El ID del tipo de tercero
      * @return El tipo de tercero completo o null si no existe
      */
     ThirdType getThirdTypeById(Long thirdTypeId);
-    
+
     /**
-     * Elimina un tipo de tercero del sistema.
+     * @brief Elimina un tipo de tercero del sistema
      * @param thirdTypeId El ID del tipo de tercero a eliminar
      * @param entId El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
      */
     boolean deleteThirdType(Long thirdTypeId, String entId);
-    
+
     /**
-     * Verifica si un tipo de tercero está siendo utilizado por terceros existentes.
+     * @brief Verifica si tipo de tercero está en uso
      * @param thirdTypeId El ID del tipo de tercero
      * @param entId El ID de la empresa
      * @return true si está en uso, false en caso contrario
      */
     boolean isThirdTypeInUse(Long thirdTypeId, String entId);
-    
+
     /**
-     * Elimina un tipo de identificación del sistema.
+     * @brief Elimina un tipo de identificación del sistema
      * @param typeIdId El ID del tipo de identificación a eliminar
      * @param entId El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
      */
     boolean deleteTypeId(Long typeIdId, String entId);
-    
+
     /**
-     * Verifica si un tipo de identificación está siendo utilizado por terceros existentes.
+     * @brief Verifica si tipo de identificación está en uso
      * @param typeIdId El ID del tipo de identificación
      * @param entId El ID de la empresa
      * @return true si está en uso, false en caso contrario
@@ -114,7 +117,7 @@ public interface IdOutputPort {
     boolean isTypeIdInUse(Long typeIdId, String entId);
     
     /**
-     * Obtiene todos los tipos de identificación con paginación y ordenamiento.
+     * @brief Obtiene tipos de identificación con paginación y ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -123,9 +126,9 @@ public interface IdOutputPort {
      * @return Página de tipos de identificación
      */
     Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Busca tipos de identificación por empresa y término de búsqueda.
+     * @brief Busca tipos de identificación por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -135,24 +138,24 @@ public interface IdOutputPort {
      * @return Página de tipos de identificación que coinciden
      */
     Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta tipos de identificación por empresa.
+     * @brief Cuenta tipos de identificación por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación
      */
     long countByEntId(String entId);
-    
+
     /**
-     * Cuenta tipos de identificación por empresa y término de búsqueda.
+     * @brief Cuenta tipos de identificación por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de identificación que coinciden
      */
     long countByEntIdAndSearch(String entId, String search);
-    
+
     /**
-     * Obtiene todos los tipos de tercero con paginación y ordenamiento.
+     * @brief Obtiene tipos de tercero con paginación y ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -161,9 +164,9 @@ public interface IdOutputPort {
      * @return Página de tipos de tercero
      */
     Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Busca tipos de tercero por empresa y término de búsqueda.
+     * @brief Busca tipos de tercero por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -173,49 +176,49 @@ public interface IdOutputPort {
      * @return Página de tipos de tercero que coinciden
      */
     Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta tipos de tercero por empresa.
+     * @brief Cuenta tipos de tercero por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero
      */
     long countThirdTypesByEntId(String entId);
-    
+
     /**
-     * Cuenta tipos de tercero por empresa y término de búsqueda.
+     * @brief Cuenta tipos de tercero por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de tercero que coinciden
      */
     long countThirdTypesByEntIdAndSearch(String entId, String search);
-    
+
     /**
-     * Obtiene todos los tipos de identificación activos con paginación simple (ordenado por tiName asc).
+     * @brief Obtiene tipos de identificación activos con paginación
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
      * @return Página de tipos de identificación activos ordenados por nombre
      */
     Page<TypeId> getAllActiveTypeIds(String entId, int page, int size);
-    
+
     /**
-     * Cuenta tipos de identificación activos por empresa.
+     * @brief Cuenta tipos de identificación activos por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación activos
      */
     long countActiveByEntId(String entId);
-    
+
     /**
-     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
+     * @brief Obtiene tipos de tercero activos con paginación
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
      * @return Página de tipos de tercero activos ordenados por nombre
      */
     Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size);
-    
+
     /**
-     * Cuenta tipos de tercero activos por empresa.
+     * @brief Cuenta tipos de tercero activos por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero activos
      */
