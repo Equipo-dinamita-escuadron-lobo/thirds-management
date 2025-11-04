@@ -3,49 +3,39 @@ package com.thirdsmanagement.thirds.domain.enums;
 import lombok.Getter;
 
 /**
- * Estados posibles del proceso de importación de terceros.
+ * @brief Estados posibles del proceso de importación de terceros
+ *
  * Define los diferentes estados que puede tener una importación
- * durante su ciclo de vida.
+ * durante su ciclo de vida completo desde la recepción hasta el procesamiento final.
  */
 @Getter
 public enum ImportStatus {
-    
-    /**
-     * El proceso de importación está pendiente de iniciarse.
-     */
+
     PENDING("Pendiente"),
-    
-    /**
-     * El proceso de importación está actualmente en ejecución.
-     */
+
     PROCESSING("Procesando"),
-    
-    /**
-     * El proceso de importación se completó exitosamente sin errores.
-     */
+
     COMPLETED("Completado"),
-    
-    /**
-     * El proceso de importación se completó pero con algunos errores.
-     * Algunos registros fueron procesados exitosamente.
-     */
+
     COMPLETED_WITH_ERRORS("Completado con Errores"),
-    
-    /**
-     * El proceso de importación falló completamente.
-     * No se procesó ningún registro exitosamente.
-     */
+
     FAILED("Fallido");
 
     private final String description;
 
+    /**
+     * @brief Constructor del enum
+     * @param description Descripción legible del estado de importación
+     */
     ImportStatus(String description) {
         this.description = description;
     }
 
     /**
-     * Verifica si el estado indica que la importación ha terminado.
-     * 
+     * @brief Verifica si el estado indica que la importación ha terminado
+     *
+     * Un proceso terminado puede haber sido exitoso, parcialmente exitoso o fallido,
+     * pero ya no está en ejecución.
      * @return true si la importación ha terminado (exitosa o fallida)
      */
     public boolean isFinished() {
@@ -53,8 +43,10 @@ public enum ImportStatus {
     }
 
     /**
-     * Verifica si el estado indica éxito total o parcial.
-     * 
+     * @brief Verifica si el estado indica éxito total o parcial
+     *
+     * Indica que al menos algunos registros fueron procesados exitosamente,
+     * independientemente de si hubo errores en otros registros.
      * @return true si hay al menos algunos registros procesados exitosamente
      */
     public boolean hasSuccessfulRecords() {
@@ -62,9 +54,10 @@ public enum ImportStatus {
     }
 
     /**
-     * Verifica si el estado indica que hubo errores durante el procesamiento.
-     * 
-     * @return true si hubo errores
+     * @brief Verifica si el estado indica que hubo errores durante el procesamiento
+     *
+     * Puede indicar errores parciales (COMPLETED_WITH_ERRORS) o totales (FAILED).
+     * @return true si hubo errores en el procesamiento
      */
     public boolean hasErrors() {
         return this == COMPLETED_WITH_ERRORS || this == FAILED;

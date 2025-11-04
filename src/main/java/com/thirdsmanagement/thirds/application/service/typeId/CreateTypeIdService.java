@@ -20,13 +20,7 @@ public class CreateTypeIdService implements CreateTypeIdUseCase {
      */
     @Override
     public TypeId createTypeId(TypeId typeId) {
-        // Guardar el tipo de identificación
         TypeId createdTypeId = idOutputPort.saveTypeId(typeId);
-
-        // TODO: Implementar publicación de eventos cuando esté disponible el publisher
-        // typeIdEventPublisher.publishTypeIdCreatedEvent(new
-        // TypeIdCreatedEvent(createdTypeId.getTypeId()));
-
         return createdTypeId;
     }
 
