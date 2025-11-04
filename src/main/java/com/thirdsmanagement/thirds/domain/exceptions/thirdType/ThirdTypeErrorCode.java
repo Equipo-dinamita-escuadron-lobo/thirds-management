@@ -4,7 +4,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.ErrorCodeDefinition;
 import lombok.Getter;
 
 /**
- * Códigos de error específicos del dominio de Tipos de Tercero.
+ * @brief Códigos de error específicos del dominio de Tipos de Tercero
+ *
  */
 @Getter
 public enum ThirdTypeErrorCode implements ErrorCodeDefinition {
@@ -19,6 +20,11 @@ public enum ThirdTypeErrorCode implements ErrorCodeDefinition {
     private final String code;
     private final String message;
 
+    /**
+     * @brief Constructor del enum
+     * @param code código único del error utilizado internamente
+     * @param message mensaje descriptivo del error para usuarios
+     */
     ThirdTypeErrorCode(String code, String message) {
         this.code = code;
         this.message = message;
