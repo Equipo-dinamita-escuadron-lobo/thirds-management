@@ -1,11 +1,14 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
 /**
- * Interfaz que define el método para cambiar el estado de un tercero.
+ * @brief Caso de uso para cambio individual del estado de un tercero
+ *
+ * Permite activar o inactivar un tercero específico
+ * perteneciente a una empresa.
  */
 public interface ChangeThirdStateUseCase {
     /**
-     * Cambia el estado de un tercero.
+     * @brief Cambia el estado de un tercero específico
      * @param thId Identificador del tercero
      * @param entId Identificador de la empresa
      * @return true si el estado cambió, false en caso contrario

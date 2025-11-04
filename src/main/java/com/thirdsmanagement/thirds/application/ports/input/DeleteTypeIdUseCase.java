@@ -1,13 +1,18 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
 /**
- * Interfaz que representa el caso de uso para la eliminación de un tipo de identificación.
+ * @brief Caso de uso para eliminación de tipos de identificación
+ *
+ * Permite eliminar tipos de identificación del sistema con validación
+ * de integridad referencial para evitar eliminación de tipos en uso.
  */
 public interface DeleteTypeIdUseCase {
     /**
-     * Elimina un tipo de identificación del sistema.
-     * Valida que el tipo de identificación no esté siendo utilizado por terceros existentes.
-     * 
+     * @brief Elimina un tipo de identificación del sistema
+     *
+     * Valida que el tipo de identificación no esté siendo utilizado por terceros existentes
+     * antes de proceder con la eliminación.
+     *
      * @param typeIdId el ID del tipo de identificación a eliminar
      * @param entId el ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario

@@ -7,18 +7,21 @@ import org.springframework.data.domain.Page;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
 /**
- * Interfaz que representa el caso de uso para listar los tipos de terceros.
+ * @brief Caso de uso para consulta y listado de tipos de tercero
+ *
+ * Proporciona operaciones de consulta, búsqueda, paginación y conteo
+ * para tipos de tercero con múltiples criterios de filtrado.
  */
 public interface ListThirdTypeUseCase {
     /**
-     * Obtiene todos los tipos de terceros
+     * @brief Obtiene todos los tipos de terceros
      * @param entId Identificador de la empresa
      * @return Lista de tipos de terceros
      */
     List<ThirdType> getAllThirdTypes(String entId);
-    
+
     /**
-     * Obtiene todos los tipos de tercero con paginación y ordenamiento.
+     * @brief Obtiene tipos de tercero con paginación y ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -27,9 +30,9 @@ public interface ListThirdTypeUseCase {
      * @return Página de tipos de tercero
      */
     Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Busca tipos de tercero por empresa y término de búsqueda.
+     * @brief Busca tipos de tercero por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -39,31 +42,31 @@ public interface ListThirdTypeUseCase {
      * @return Página de tipos de tercero que coinciden
      */
     Page<ThirdType> findThirdTypesByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta tipos de tercero por empresa.
+     * @brief Cuenta tipos de tercero por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero
      */
     long countThirdTypesByEntId(String entId);
-    
+
     /**
-     * Cuenta tipos de tercero por empresa y término de búsqueda.
+     * @brief Cuenta tipos de tercero por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de tercero que coinciden
      */
     long countThirdTypesByEntIdAndSearch(String entId, String search);
-    
+
     /**
-     * Cuenta tipos de tercero activos por empresa.
+     * @brief Cuenta tipos de tercero activos por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero activos
      */
     long countActiveThirdTypesByEntId(String entId);
-    
+
     /**
-     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
+     * @brief Obtiene tipos de tercero activos con paginación
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
