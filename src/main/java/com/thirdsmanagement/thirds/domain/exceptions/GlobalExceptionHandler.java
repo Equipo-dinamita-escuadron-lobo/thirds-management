@@ -25,14 +25,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Manejador global de excepciones para toda la aplicación.
- * Proporciona respuestas consistentes y descriptivas para diferentes tipos de errores.
+ * @brief Manejador global de excepciones para toda la aplicación
+ *
+ * Proporciona respuestas consistentes y descriptivas para diferentes tipos de errores,
+ * convirtiendo excepciones del dominio en respuestas HTTP apropiadas.
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
-     * Maneja excepciones de negocio y resuelve el estado HTTP según el código de error.
+     * @brief Maneja excepciones de negocio y resuelve el estado HTTP según el código de error
+     *
+     * Convierte excepciones de negocio en respuestas HTTP apropiadas,
+     * mapeando códigos de error específicos a estados HTTP correspondientes.
+     * @param ex excepción de negocio del dominio
+     * @param request solicitud web que causó la excepción
+     * @return respuesta HTTP con información estructurada del error
      */
     @ExceptionHandler(BaseBusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessExceptions(
@@ -54,29 +62,35 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja errores de deserialización JSON, incluyendo enums inválidos.
+     * @brief Maneja errores de deserialización JSON, incluyendo enums inválidos
+     *
+     * Detecta y maneja errores específicos como valores de enum inválidos,
+     * especialmente para clasificaciones de persona, proporcionando mensajes claros.
+     * @param ex excepción de mensaje no legible
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con error de formato de solicitud
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, WebRequest request) {
-        
+
         String message = "Error en el formato de los datos enviados";
         String code = "INVALID_REQUEST_FORMAT";
-        
+
         // Detectar si es un error de enum inválido
         if (ex.getCause() instanceof InvalidFormatException) {
             InvalidFormatException formatEx = (InvalidFormatException) ex.getCause();
-            
+
             // Verificar si es un error de PersonClassification
-            if (formatEx.getTargetType() != null && 
+            if (formatEx.getTargetType() != null &&
                 formatEx.getTargetType().getSimpleName().equals("PersonClassification")) {
-                
-                message = "La clasificación de persona '" + formatEx.getValue() + 
+
+                message = "La clasificación de persona '" + formatEx.getValue() +
                          "' no es válida. Valores válidos: NATURAL_PERSON, LEGAL_ENTITY";
                 code = "TYPE_ID_INVALID_CLASSIFICATION";
             }
         }
-        
+
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -85,12 +99,18 @@ public class GlobalExceptionHandler {
                 .code(code)
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
-        
+
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
     
     /**
-     * Maneja errores de validación de payload (Bean Validation en @RequestBody con @Valid).
+     * @brief Maneja errores de validación de payload (Bean Validation en @RequestBody con @Valid)
+     *
+     * Procesa errores de validación de campos en objetos DTO, incluyendo
+     * manejo especial para clasificaciones de persona requeridas.
+     * @param ex excepción de argumento de método no válido
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con errores de campo detallados
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -107,7 +127,7 @@ public class GlobalExceptionHandler {
         // Detectar si es un error específico de clasificación
         String message = "Error de validación de campos";
         String code = ErrorCode.GENERIC_ERROR.getCode();
-        
+
         if (fieldErrors.containsKey("classification")) {
             message = "La clasificación de persona no puede ser nula. Debe especificar: NATURAL_PERSON o LEGAL_ENTITY";
             code = "TYPE_ID_INVALID_CLASSIFICATION";
@@ -129,7 +149,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja errores de validación a nivel de parámetros (e.g., @RequestParam, @PathVariable).
+     * @brief Maneja errores de validación a nivel de parámetros (e.g., @RequestParam, @PathVariable)
+     *
+     * Procesa violaciones de restricciones Bean Validation en parámetros
+     * de métodos REST, proporcionando detalles específicos de cada violación.
+     * @param ex excepción de violación de restricción
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con violaciones de restricción detalladas
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolation(
@@ -159,7 +185,14 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja excepciones de integridad de datos, especialmente violaciones de clave foránea.
+     * @brief Maneja excepciones de integridad de datos, especialmente violaciones de clave foránea
+     *
+     * Detecta y convierte violaciones de integridad de base de datos en excepciones
+     * de negocio específicas, especialmente para claves foráneas relacionadas
+     * con tipos de tercero e identificación.
+     * @param ex excepción de violación de integridad de datos
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con error de integridad de datos
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
@@ -177,20 +210,20 @@ public class GlobalExceptionHandler {
                 if (thirdTypeId == null) {
                     thirdTypeId = "desconocido";
                 }
-                
-                ThirdTypeForeignKeyViolationException customEx = 
+
+                ThirdTypeForeignKeyViolationException customEx =
                     new ThirdTypeForeignKeyViolationException(thirdTypeId, ex);
                 return handleBusinessExceptions(customEx, request);
             }
-            
+
             if (message.contains("fk_thirds_type_id") || message.contains("ti_id")) {
                 // Extraer el ID del tipo de identificación del mensaje de error si es posible
                 String typeId = extractIdFromConstraintMessage(message, "ti_id");
                 if (typeId == null) {
                     typeId = "desconocido";
                 }
-                
-                TypeIdForeignKeyViolationException customEx = 
+
+                TypeIdForeignKeyViolationException customEx =
                     new TypeIdForeignKeyViolationException(typeId, ex);
                 return handleBusinessExceptions(customEx, request);
             }
@@ -210,7 +243,14 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Extrae el ID de una restricción de clave foránea del mensaje de error.
+     * @brief Extrae el ID de una restricción de clave foránea del mensaje de error
+     *
+     * Analiza mensajes de error de base de datos para extraer IDs específicos
+     * de claves foráneas violadas, utilizando expresiones regulares para
+     * diferentes formatos de mensajes de PostgreSQL y MySQL.
+     * @param message mensaje de error de la base de datos
+     * @param columnName nombre de la columna de clave foránea
+     * @return ID extraído o null si no se puede extraer
      */
     private String extractIdFromConstraintMessage(String message, String columnName) {
         try {
@@ -220,7 +260,7 @@ public class GlobalExceptionHandler {
                 "'" + columnName + "'='([^']+)'",
                 columnName + "=([^\\s,)]+)"
             };
-            
+
             for (String pattern : patterns) {
                 java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
                 java.util.regex.Matcher m = p.matcher(message);
@@ -235,7 +275,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja excepciones cuando un archivo excede el tamaño máximo permitido.
+     * @brief Maneja excepciones cuando un archivo excede el tamaño máximo permitido
+     *
+     * Convierte excepciones de Spring sobre límites de carga de archivos
+     * en excepciones de negocio personalizadas con mensajes más descriptivos.
+     * @param ex excepción de tamaño máximo de carga excedido
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP delegada al manejador de excepciones de negocio
      */
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(
@@ -243,7 +289,7 @@ public class GlobalExceptionHandler {
 
         // Extraer el tamaño máximo permitido
         long maxSize = ex.getMaxUploadSize();
-        
+
         // Crear excepción personalizada
         FileSizeExceededException customEx = new FileSizeExceededException(
             maxSize > 0 ? maxSize : 5242880
@@ -252,6 +298,14 @@ public class GlobalExceptionHandler {
         return handleBusinessExceptions(customEx, request);
     }
 
+    /**
+     * @brief Mapea códigos de error a estados HTTP apropiados
+     *
+     * Convierte códigos de error específicos del dominio en códigos de estado HTTP
+     * estándar para proporcionar respuestas REST apropiadas.
+     * @param code código de error del dominio
+     * @return estado HTTP correspondiente al tipo de error
+     */
     private HttpStatus mapStatusFromErrorCode(String code) {
         if (code == null) {
             return HttpStatus.BAD_REQUEST;
@@ -273,7 +327,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Maneja excepciones generales no específicas.
+     * @brief Maneja excepciones generales no específicas
+     *
+     * Captura cualquier excepción no manejada específicamente por otros
+     * métodos del manejador, proporcionando una respuesta genérica de error interno.
+     * @param ex excepción general no específica
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con error interno del servidor
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
