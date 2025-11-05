@@ -310,7 +310,7 @@ public class ThirdRestController {
     }
 
     /**
-     * Exporta terceros con validaciones a formato Excel.
+     * @brief Exporta terceros con validaciones a formato Excel.
      * Utiliza configuración flexible de campos opcionales mediante ExportableField.
      * 
      * @param entId Identificador de la entidad (requerido)
