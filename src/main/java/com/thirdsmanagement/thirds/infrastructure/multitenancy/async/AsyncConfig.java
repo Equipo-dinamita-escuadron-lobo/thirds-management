@@ -9,19 +9,26 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
+/**
+ * @brief Configuración de procesamiento asíncrono con soporte multi-tenant
+ *
+ * Implementa AsyncConfigurer para proporcionar un ejecutor de tareas que preserva
+ * el contexto del tenant en operaciones @Async. Configura un ThreadPoolTaskExecutor
+ * con TenantAwareTaskDecorator para garantizar aislamiento de datos entre tenants
+ * en operaciones concurrentes.
+ */
 @Configuration
 @EnableAsync
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class AsyncConfig implements AsyncConfigurer {
 
-/**
- * Devuelve un ejecutor de grupo de hilos que decora cada tarea con
- * TenantAwareTaskDecorator. Esto significa que cada tarea tendrá
- * el identificador de inquilino establecido antes de ser ejecutada y
- * restablecido después de que termine.
- * 
- * @return un ejecutor que decora tareas con identificador de inquilino
- */
+    /**
+     * @brief Configura ejecutor asíncrono con preservación de contexto tenant
+     * @details Crea ThreadPoolTaskExecutor con TenantAwareTaskDecorator que asegura
+     * que cada tarea @Async mantenga el tenant ID correcto. Configura pool dinámico
+     * con límites apropiados para operaciones concurrentes multi-tenant.
+     * @return Executor configurado con decorador de contexto tenant
+     */
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
