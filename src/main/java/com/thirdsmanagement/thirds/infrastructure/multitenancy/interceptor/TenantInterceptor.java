@@ -10,8 +10,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 
 /**
- * Interceptor para manejar el contexto de inquilino (tenant) basado en JWT.
- * Este interceptor establece el ID del inquilino en el contexto para cada solicitud.
+ * @brief Interceptor web que maneja contexto multi-tenant basado en JWT
+ *
+ * Implementa WebRequestInterceptor para extraer el tenant ID desde tokens JWT
+ * en cada solicitud HTTP. Establece el contexto del tenant antes del procesamiento
+ * de la solicitud y lo limpia después, garantizando aislamiento de datos entre tenants.
  */
 @Component
 public class TenantInterceptor implements WebRequestInterceptor {
@@ -20,10 +23,12 @@ public class TenantInterceptor implements WebRequestInterceptor {
     private IJwtUtils jwtUtils;
 
     /**
-     * Pre-manipulación de la solicitud para establecer el ID del inquilino en el contexto.
-     * Si no hay JWT disponible, usa el tenant por defecto.
-     * @param request Objeto WebRequest que representa la solicitud actual.
-     * @throws Exception Si ocurre algún error durante la manipulación de la solicitud.
+     * @brief Establece tenant ID en contexto desde JWT antes de procesar solicitud
+     * @details Extrae el tenant ID del token JWT actual. Si no hay JWT válido,
+     * establece tenant por defecto ("default"). Maneja errores gracefully
+     * para asegurar que siempre haya un tenant establecido.
+     * @param request solicitud web entrante
+     * @throws Exception si ocurre error durante el procesamiento
      */
     @Override
     public void preHandle(WebRequest request) throws Exception {
@@ -42,10 +47,12 @@ public class TenantInterceptor implements WebRequestInterceptor {
     }
 
     /**
-     * Manipulación posterior a la solicitud para limpiar el contexto del inquilino.
-     * @param request Objeto WebRequest que representa la solicitud actual.
-     * @param model Modelo de datos asociado con la solicitud.
-     * @throws Exception Si ocurre algún error durante la manipulación posterior a la solicitud.
+     * @brief Limpia contexto del tenant después del procesamiento de la solicitud
+     * @details Libera el contexto del tenant para evitar memory leaks y asegurar
+     * que solicitudes subsiguientes no hereden el tenant de la solicitud anterior.
+     * @param request solicitud web procesada
+     * @param model modelo de datos de la respuesta
+     * @throws Exception si ocurre error durante la limpieza
      */
     @Override
     public void postHandle(WebRequest request, ModelMap model) throws Exception {
@@ -53,13 +60,15 @@ public class TenantInterceptor implements WebRequestInterceptor {
     }
 
     /**
-     * Método llamado después de completar la solicitud, no realiza ninguna acción en este caso.
-     * @param request Objeto WebRequest que representa la solicitud actual.
-     * @param ex Excepción que puede haber ocurrido durante la solicitud, o nulo si no hay excepción.
-     * @throws Exception Si ocurre algún error después de completar la solicitud.
+     * @brief Método de finalización de solicitud (sin implementación específica)
+     * @details Método requerido por WebRequestInterceptor, no realiza acciones adicionales
+     * en este interceptor específico ya que la limpieza se hace en postHandle.
+     * @param request solicitud web completada
+     * @param ex excepción ocurrida durante el procesamiento (puede ser null)
+     * @throws Exception si ocurre error en la finalización
      */
     @Override
     public void afterCompletion(WebRequest request, Exception ex) throws Exception {
-        // No se realiza ninguna acción en este método para este interceptor.
+        // No se realiza ninguna acción adicional en este interceptor
     }
 }
