@@ -6,34 +6,26 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 /**
- * Clase de utilidad para manejar la lógica de paginación flexible.
- * Proporciona métodos estáticos para crear objetos Pageable basados en parámetros opcionales
- * y maneja de forma segura la conversión de long a int.
- * 
- * <p>Esta es una clase de utilidad y no debe ser instanciada.</p>
+ * @brief Utilidades para manejo flexible de paginación en Spring Data
+ *
+ * Clase de utilidad que facilita la creación de objetos Pageable con parámetros opcionales.
+ * Maneja conversiones seguras long a int y soporta paginación opcional donde si no se
+ * especifican parámetros, retorna todos los registros en una sola página.
  */
 public class PaginationHelper {
 
     /**
-     * Constructor privado para prevenir la instanciación de esta clase de utilidad.
-     * 
-     * @throws UnsupportedOperationException si se intenta instanciar
+     * @brief Crea objeto Pageable con parámetros opcionales de paginación
+     * @details Si numPage o size no están presentes, crea una página que contiene todos los registros
+     * disponibles (página 0 con tamaño = totalRecords). Si ambos parámetros están presentes,
+     * crea paginación normal con PageRequest.of().
+     * @param numPage número de página opcional (0-based)
+     * @param size tamaño de página opcional
+     * @param totalRecords total de registros para calcular tamaño cuando no hay paginación
+     * @return Pageable configurado según parámetros disponibles
      */
-    private PaginationHelper() {
-        throw new UnsupportedOperationException("PaginationHelper es una clase de utilidad y no debe ser instanciada");
-    }
-
-    /**
-     * Crea un objeto Pageable flexible basado en parámetros opcionales.
-     * Si no se especifican parámetros de paginación, crea una página que contiene todos los registros.
-     * 
-     * @param numPage Número de página opcional
-     * @param size Tamaño de página opcional
-     * @param totalRecords Total de registros disponibles
-     * @return Objeto Pageable configurado
-     */
-    public static Pageable createFlexiblePageable(Optional<Integer> numPage, 
-                                                   Optional<Integer> size, 
+    public static Pageable createFlexiblePageable(Optional<Integer> numPage,
+                                                   Optional<Integer> size,
                                                    long totalRecords) {
         if (numPage.isEmpty() || size.isEmpty()) {
             // Si no se especifican parámetros de paginación, traer todos los registros
@@ -46,11 +38,12 @@ public class PaginationHelper {
     }
 
     /**
-     * Convierte de forma segura un long a int, evitando overflow.
-     * Si el valor excede el rango de int, retorna Integer.MAX_VALUE.
-     * 
-     * @param value Valor long a convertir
-     * @return Valor int seguro
+     * @brief Convierte long a int de forma segura evitando overflow
+     * @details Verifica si el valor long excede Integer.MAX_VALUE. Si es así,
+     * retorna Integer.MAX_VALUE para evitar ArithmeticException. De lo contrario,
+     * hace cast normal a int.
+     * @param value valor long a convertir
+     * @return valor int equivalente o Integer.MAX_VALUE si hay overflow
      */
     private static int safeIntCast(long value) {
         if (value > Integer.MAX_VALUE) {

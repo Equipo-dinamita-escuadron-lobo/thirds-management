@@ -12,7 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Configuración de seguridad para la aplicación.
+ * @brief Configuración central de Spring Security con JWT y multi-tenancy
+ *
+ * Configura seguridad stateless con OAuth2 Resource Server, JWT authentication,
+ * deshabilitación de CSRF, y habilita @PreAuthorize/@Secured en métodos.
+ * Define reglas de autorización para endpoints públicos vs protegidos.
  */
 @Configuration
 @EnableWebSecurity
@@ -24,11 +28,13 @@ public class SecurityConfig {
     private JwtAuthConverter jwtAuthConverter;
 
     /**
-     * Configura las reglas de seguridad HTTP para la aplicación.
-     *
-     * @param httpSecurity el objeto HttpSecurity para configurar
-     * @return un SecurityFilterChain configurado
-     * @throws Exception si ocurre algún error durante la configuración
+     * @brief Configura cadena de filtros de seguridad HTTP con JWT OAuth2
+     * @details Deshabilita CSRF, configura endpoints públicos (Swagger, actuator),
+     * establece servidor de recursos OAuth2 con convertidor JWT personalizado,
+     * y política de sesión stateless para API REST.
+     * @param httpSecurity configuración de seguridad HTTP de Spring
+     * @return SecurityFilterChain configurado con reglas de autorización
+     * @throws Exception si hay errores en la configuración
      */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
