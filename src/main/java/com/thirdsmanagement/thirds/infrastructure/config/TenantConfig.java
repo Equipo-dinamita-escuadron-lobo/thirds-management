@@ -14,8 +14,11 @@ import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantConte
 import jakarta.annotation.PreDestroy;
 
 /**
- * Configuración de multi-tenancy para la aplicación.
- * Establece el tenant por defecto y configura el manejo de tareas asíncronas.
+ * @brief Configuración centralizada de multi-tenancy y procesamiento asíncrono
+ *
+ * Establece tenant por defecto al arranque, configura pool de hilos para operaciones
+ * asíncronas con preservación de contexto multi-tenant, y maneja limpieza de recursos.
+ * Garantiza aislamiento de datos entre tenants en operaciones concurrentes.
  */
 @Configuration
 @EnableAsync
@@ -24,8 +27,9 @@ public class TenantConfig {
     private static final String DEFAULT_TENANT = "default";
 
     /**
-     * Evento que se ejecuta cuando la aplicación está lista.
-     * Establece el tenant por defecto para evitar errores de Hibernate.
+     * @brief Inicializa tenant por defecto al arranque de la aplicación
+     * @details Evita errores de Hibernate al establecer un tenant válido antes
+     * de cualquier operación de base de datos.
      */
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationReady() {
@@ -33,7 +37,10 @@ public class TenantConfig {
     }
 
     /**
-     * Configura el ejecutor de tareas asíncronas con soporte para multi-tenancy.
+     * @brief Configura pool de hilos asíncronos con soporte multi-tenancy
+     * @details Crea ThreadPoolTaskExecutor con TaskDecorator que preserva el contexto
+     * del tenant en operaciones @Async. Configura pool dinámico con límites apropiados.
+     * @return ThreadPoolTaskExecutor configurado para operaciones concurrentes
      */
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
@@ -48,7 +55,10 @@ public class TenantConfig {
     }
 
     /**
-     * Decorador que preserva el contexto del tenant en operaciones asíncronas.
+     * @brief Proporciona decorador que preserva contexto multi-tenant en hilos
+     * @details Bean que crea instancia de TenantAwareTaskDecorator para asegurar
+     * que las operaciones asíncronas mantengan el tenant correcto.
+     * @return TaskDecorator configurado para preservar contexto de tenant
      */
     @Bean
     public TaskDecorator tenantAwareTaskDecorator() {
@@ -56,8 +66,9 @@ public class TenantConfig {
     }
 
     /**
-     * Método de limpieza que se ejecuta antes de destruir el bean.
-     * Limpia el contexto del tenant.
+     * @brief Limpieza de recursos antes de destruir el bean de configuración
+     * @details Libera el contexto del tenant para evitar memory leaks y asegurar
+     * limpieza apropiada de recursos durante el shutdown de la aplicación.
      */
     @PreDestroy
     public void cleanup() {

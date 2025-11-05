@@ -14,13 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
- * Inicializador de datos geográficos refactorizado.
- * Aplica principios SOLID y es altamente mantenible y escalable.
- * 
- * Principios aplicados:
- * - Single Responsibility: Solo coordina la carga inicial
- * - Open/Closed: Extensible sin modificar código existente
- * - Dependency Inversion: Depende de abstracciones, no implementaciones
+ * @brief Inicializador automático de datos geográficos al arranque de la aplicación
+ *
+ * Implementa CommandLineRunner para cargar datos maestros geográficos (países, estados, ciudades)
+ * desde archivos SQL durante el startup. Aplica principios SOLID con composición sobre herencia
+ * y delega responsabilidades específicas a servicios especializados.
  */
 @Component
 @RequiredArgsConstructor
@@ -31,6 +29,11 @@ public class GeographyDataInitializer implements CommandLineRunner {
     private final GeographyFileDiscoveryService fileDiscoveryService;
     private final SqlScriptRunner sqlScriptRunner;
 
+    /**
+     * @brief Punto de entrada de Spring Boot para inicialización automática
+     * @param args argumentos de línea de comandos (no utilizados)
+     * @throws Exception si falla la inicialización de datos geográficos
+     */
     @Override
     public void run(String... args) throws Exception {
         if (shouldLoadGeographyData()) {
@@ -39,15 +42,18 @@ public class GeographyDataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Determina si se deben cargar los datos geográficos
+     * @brief Verifica si la base de datos necesita carga inicial de datos geográficos
+     * @return true si no existen países en BD, false si ya están cargados
      */
     private boolean shouldLoadGeographyData() {
         return countryRepository.count() == 0;
     }
 
     /**
-     * Coordina la carga de datos geográficos usando los servicios especializados.
-     * Aplica el principio de composición sobre herencia.
+     * @brief Coordina la carga completa de datos geográficos con manejo de errores
+     * @details Descubre archivos SQL, valida existencia y ejecuta carga secuencial.
+     * Maneja excepciones específicas de inicialización geográfica.
+     * @throws GeographyDataInitializationException si falla cualquier paso del proceso
      */
     private void loadGeographyData() {
         try {
@@ -64,7 +70,11 @@ public class GeographyDataInitializer implements CommandLineRunner {
     }
 
     /**
-     * Ejecuta la lista de archivos SQL descubiertos
+     * @brief Ejecuta secuencialmente todos los archivos SQL de datos geográficos
+     * @details Procesa cada archivo SQL en orden, ejecutando todas las sentencias.
+     * Si falla cualquier archivo, detiene el proceso y lanza excepción específica.
+     * @param sqlFiles lista de rutas de archivos SQL a ejecutar
+     * @throws GeographyDataInitializationException si falla la ejecución de algún archivo
      */
     private void executeGeographyFiles(List<String> sqlFiles) {
         for (String sqlFile : sqlFiles) {

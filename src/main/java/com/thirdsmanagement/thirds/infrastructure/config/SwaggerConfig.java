@@ -10,15 +10,19 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
- * Clase de configuración para Swagger/OpenAPI.
+ * @brief Configuración de documentación OpenAPI/Swagger para la API REST
+ *
+ * Configura la especificación OpenAPI 3.0 con autenticación JWT Bearer,
+ * información del API y esquemas de seguridad para la documentación interactiva.
  */
 @Configuration
 public class SwaggerConfig {
 
     /**
-     * Configura y personaliza la especificación OpenAPI para la API de gestión de productos.
-     *
-     * @return OpenAPI configurado.
+     * @brief Configura especificación OpenAPI con autenticación JWT
+     * @details Crea configuración completa de OpenAPI con esquema de seguridad Bearer JWT,
+     * metadatos del API (título, descripción, versión) y requerimientos de seguridad globales.
+     * @return OpenAPI configurado con esquema JWT y metadatos del API
      */
     @Bean
     public OpenAPI customizeOpenAPI() {
