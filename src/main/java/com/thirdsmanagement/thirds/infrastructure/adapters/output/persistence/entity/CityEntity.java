@@ -17,8 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entidad JPA que representa la tabla de ciudades.
- * Contiene la información básica de una ciudad para la jerarquía geográfica.
+ * @brief Entidad JPA para ciudades con clave compuesta triple
  */
 @Entity
 @Getter

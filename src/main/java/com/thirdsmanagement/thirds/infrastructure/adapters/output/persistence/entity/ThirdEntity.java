@@ -21,10 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la entidad de la tabla thirds.
- * Contiene la información de un tercero.
- * La tabla tiene una clave primaria identificada por th_id.
- * La tabla tiene una relación muchos a muchos con la tabla thirds_and_types.
+ * @brief Entidad JPA principal para terceros con multi-tenancy
  */
 @Entity
 @Getter
@@ -38,7 +35,7 @@ public class ThirdEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false, name = "th_id")
-    private Long thId; 
+    private Long thId;
 
     @Column(name = "ent_id")
     private String entId;
@@ -47,18 +44,17 @@ public class ThirdEntity {
     @JoinColumn(name = "type_id_fk", referencedColumnName = "ti_id")
     private TypeIdEntity typeId;
 
-
     @Column(name = "th_person_type")
-    private ePersonType personType; 
+    private ePersonType personType;
 
     @Column(name = "th_names")
-    private String names; 
+    private String names;
 
     @Column(name = "th_last_names")
-    private String lastNames; 
-    
+    private String lastNames;
+
     @Column(name = "th_social_reason")
-    private String socialReason; 
+    private String socialReason;
 
     @Column(name = "th_gender")
     private String gender;
@@ -67,7 +63,7 @@ public class ThirdEntity {
     private Long idNumber;
 
     @Column(name = "th_verification_number")
-    private Long verificationNumber; 
+    private Long verificationNumber;
 
     @Column(name = "th_state")
     @Builder.Default
@@ -80,19 +76,18 @@ public class ThirdEntity {
     private String province;
 
     @Column(name = "th_city")
-    private String city; 
+    private String city;
 
     @Column(name = "th_address")
     private String address;
 
     @Column(name = "th_phone_number")
-    private String phoneNumber; 
+    private String phoneNumber;
 
     @Column(name = "th_email")
-    private String email; 
+    private String email;
 
     @TenantId
     @Column(name = "tenant_id")
     private String tenantId;
-
 }

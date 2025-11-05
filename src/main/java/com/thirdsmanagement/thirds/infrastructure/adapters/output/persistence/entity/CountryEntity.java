@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entidad JPA que representa la tabla de países.
- * Contiene la información básica de un país para la jerarquía geográfica.
+ * @brief Entidad JPA para países en jerarquía geográfica
  */
 @Entity
 @Getter

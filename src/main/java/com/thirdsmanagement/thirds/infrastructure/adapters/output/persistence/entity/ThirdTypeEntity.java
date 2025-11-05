@@ -14,10 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la entidad de la tabla third_type.
- * Contiene la información de un tipo de tercero.
- * La tabla tiene una clave primaria identificada por tt_id.
- * La tabla tiene una relación muchos a muchos con la tabla thirds.
+ * @brief Entidad JPA para tipos de tercero con multi-tenancy
  */
 @Entity
 @Getter
@@ -42,9 +39,7 @@ public class ThirdTypeEntity {
     @Column(name = "tenant_id")
     private String tenantId;
 
-
     @Builder.Default
     @Column(name = "tt_status")
     private Boolean status = true;
-
 }

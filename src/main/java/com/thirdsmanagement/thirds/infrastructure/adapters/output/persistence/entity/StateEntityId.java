@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase de clave compuesta para StateEntity.
- * Representa la clave primaria compuesta por stateCode y countryCode.
+ * @brief Clave compuesta para StateEntity (stateCode + countryCode)
  */
 @Getter
 @Setter
@@ -17,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class StateEntityId implements Serializable {
-    
+
     private String stateCode;
     private String countryCode;
 }
