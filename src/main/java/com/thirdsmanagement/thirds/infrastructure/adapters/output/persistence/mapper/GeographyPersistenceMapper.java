@@ -13,13 +13,11 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.StateEntity;
 
 /**
- * Mapper para la conversión entre entidades de geografía y modelos de dominio.
- * Utiliza MapStruct para generar automáticamente las implementaciones de mapeo.
+ * @brief Mapper para conversión entre entidades geográficas JPA y modelos del dominio
  */
 @Mapper(componentModel = "spring")
 public interface GeographyPersistenceMapper {
 
-    // Country mappings
     CountryEntity toCountryEntity(Country country);
 
     Country toCountry(CountryEntity countryEntity);
@@ -28,7 +26,6 @@ public interface GeographyPersistenceMapper {
 
     List<Country> toCountryList(List<CountryEntity> countryEntities);
 
-    // State mappings
     @Mapping(target = "country", ignore = true)
     StateEntity toStateEntity(State state);
 
@@ -39,7 +36,6 @@ public interface GeographyPersistenceMapper {
 
     List<State> toStateList(List<StateEntity> stateEntities);
 
-    // City mappings
     @Mapping(target = "state", ignore = true)
     CityEntity toCityEntity(City city);
 
