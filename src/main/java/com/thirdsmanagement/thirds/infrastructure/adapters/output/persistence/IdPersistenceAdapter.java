@@ -35,13 +35,11 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Clase adaptador de persistencia para la entidad Id.
- * Implementa la interfaz {@link IdOutputPort}.
- * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y
- * {@link TypeIdRepository} para las operaciones de persistencia.
- * Utiliza {@link IdPersistenceMapper} para mapear las entidades y los modelos.
- * Proporciona métodos para guardar y obtener los tipos de terceros y los tipos
- * de identificación.
+ * @brief Adaptador principal de persistencia para tipos de tercero e identificación
+ *
+ * Implementa IdOutputPort para gestionar operaciones CRUD de TypeId y ThirdType
+ * con validaciones avanzadas, normalización de datos y soporte multi-tenant.
+ * Maneja búsquedas paginadas, validaciones de unicidad y operaciones batch.
  */
 @Component
 @RequiredArgsConstructor
@@ -57,7 +55,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     private final IdPersistenceMapper idPersistenceMapper;
 
     /**
-     * Guarda un tipo de tercero.
+     * @brief Guarda un tipo de tercero.
      * 
      * @param thirdType Tipo de tercero a guardar.
      * @return Tipo de tercero guardado.
@@ -75,7 +73,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de terceros.
+     * @brief Obtiene todos los tipos de terceros.
      * 
      * @param entId Id de la entidad.
      * @return Lista de tipos de terceros.
@@ -86,10 +84,15 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Guarda un tipo de identificación.
-     * 
-     * @param typeId Tipo de identificación a guardar.
-     * @return Tipo de identificación guardado.
+     * @brief Crea nuevo tipo de identificación con validaciones exhaustivas
+     * @details Valida datos requeridos, normaliza códigos y nombres, verifica unicidad
+     * tanto de código como nombre (case-insensitive), valida clasificación de persona,
+     * asigna tenant ID y persiste la entidad.
+     * @param typeId objeto TypeId con datos del nuevo tipo de identificación
+     * @return TypeId creado con ID asignado
+     * @throws TypeIdInvalidDataException si faltan datos requeridos
+     * @throws PersonClassificationInvalidException si la clasificación es inválida
+     * @throws TypeIdAlreadyExists si ya existe código o nombre similar
      */
     @Override
     public TypeId saveTypeId(TypeId typeId) {
@@ -148,8 +151,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de identificación.
-     * 
+     * @brief Obtiene todos los tipos de identificación.     * 
      * @param entId Id de la entidad.
      * @return Lista de tipos de identificación.
      */
@@ -159,10 +161,16 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Actualiza un tipo de identificación.
-     * 
-     * @param typeId Tipo de identificación a actualizar.
-     * @return Tipo de identificación actualizado.
+     * @brief Actualiza tipo de identificación existente con validaciones completas
+     * @details Verifica existencia, valida pertenencia a empresa, normaliza datos,
+     * verifica unicidad excluyendo el registro actual, valida clasificación de persona,
+     * preserva datos de auditoría y actualiza la entidad.
+     * @param typeId objeto TypeId con datos actualizados (debe incluir ID)
+     * @return TypeId actualizado
+     * @throws TypeIdInvalidDataException si faltan datos o no pertenece a la empresa
+     * @throws PersonClassificationInvalidException si la clasificación es inválida
+     * @throws TypeIdNotFound si no existe el tipo de identificación
+     * @throws TypeIdAlreadyExists si ya existe código o nombre similar
      */
     @Override
     public TypeId updateTypeId(TypeId typeId) {
@@ -234,8 +242,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Actualiza un tipo de tercero.
-     * 
+     * @brief Actualiza un tipo de tercero.     * 
      * @param thirdType Tipo de tercero a actualizar.
      * @return Tipo de tercero actualizado.
      */
@@ -294,8 +301,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Verifica si existe un tipo de identificación por su ID.
-     * 
+     * @brief Verifica si existe un tipo de identificación por su ID.     * 
      * @param typeIdId El ID del tipo de identificación
      * @return true si existe, false en caso contrario
      */
@@ -308,8 +314,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Verifica si existe un tipo de tercero por su ID.
-     * 
+     * @brief Verifica si existe un tipo de tercero por su ID.     * 
      * @param thirdTypeId El ID del tipo de tercero
      * @return true si existe, false en caso contrario
      */
@@ -322,8 +327,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene un tipo de identificación completo por su ID.
-     * 
+     * @brief Obtiene un tipo de identificación completo por su ID.     * 
      * @param typeIdId El ID del tipo de identificación
      * @return El tipo de identificación completo o null si no existe
      */
@@ -339,8 +343,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene un tipo de tercero completo por su ID.
-     * 
+     * @brief Obtiene un tipo de tercero completo por su ID.     * 
      * @param thirdTypeId El ID del tipo de tercero
      * @return El tipo de tercero completo o null si no existe
      */
@@ -356,8 +359,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Elimina un tipo de tercero del sistema.
-     * 
+     * @brief Elimina un tipo de tercero del sistema.     * 
      * @param thirdTypeId El ID del tipo de tercero a eliminar
      * @param entId       El ID de la empresa
      * @return true si se eliminó correctamente, false en caso contrario
@@ -390,8 +392,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Verifica si un tipo de tercero está siendo utilizado por terceros existentes.
-     * 
+     * @brief Verifica si un tipo de tercero está siendo utilizado por terceros existentes.     * 
      * @param thirdTypeId El ID del tipo de tercero
      * @param entId       El ID de la empresa
      * @return true si está en uso, false en caso contrario
@@ -415,11 +416,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Elimina un tipo de identificación del sistema.
-     * 
-     * @param typeIdId El ID del tipo de identificación a eliminar
-     * @param entId    El ID de la empresa
-     * @return true si se eliminó correctamente, false en caso contrario
+     * @brief Elimina tipo de identificación con validación de uso
+     * @details Verifica que el tipo de identificación no esté siendo usado por terceros existentes,
+     * valida pertenencia a la empresa y elimina el registro con manejo transaccional.
+     * @param typeIdId ID del tipo de identificación a eliminar
+     * @param entId ID de la empresa para validación de pertenencia
+     * @return true si se eliminó correctamente, false si hay errores o está en uso
      */
     @Override
     public boolean deleteTypeId(Long typeIdId, String entId) {
@@ -449,12 +451,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Verifica si un tipo de identificación está siendo utilizado por terceros
-     * existentes.
-     * 
-     * @param typeIdId El ID del tipo de identificación
-     * @param entId    El ID de la empresa
-     * @return true si está en uso, false en caso contrario
+     * @brief Verifica si tipo de identificación está siendo usado por terceros
+     * @details Consulta la existencia de terceros que utilicen este tipo de identificación
+     * dentro de la empresa especificada. Esencial para validaciones de eliminación.
+     * @param typeIdId ID del tipo de identificación a verificar
+     * @param entId ID de la empresa para el alcance de la verificación
+     * @return true si hay terceros usando este tipo, false si está libre
      */
     @Override
     public boolean isTypeIdInUse(Long typeIdId, String entId) {
@@ -483,11 +485,10 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de identificación con paginación y ordenamiento.
-     * 
-     * @param entId     El id de la empresa
-     * @param page      Número de página
-     * @param size      Tamaño de página
+     * @brief Obtiene todos los tipos de identificación con paginación y ordenamiento.     * 
+     * @param entId El id de la empresa
+     * @param page Número de página
+     * @param size Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de identificación
@@ -506,12 +507,12 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Busca tipos de identificación por empresa y término de búsqueda.
+     * @brief Busca tipos de identificación por empresa y término de búsqueda.
      * 
-     * @param entId     El id de la empresa
-     * @param search    Término de búsqueda
-     * @param page      Número de página
-     * @param size      Tamaño de página
+     * @param entId El id de la empresa
+     * @param search Término de búsqueda
+     * @param page Número de página
+     * @param size Tamaño de página
      * @param sortField Campo de ordenamiento
      * @param sortOrder Orden (asc/desc)
      * @return Página de tipos de identificación que coinciden
@@ -531,8 +532,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de identificación por empresa.
-     * 
+     * @brief Cuenta tipos de identificación por empresa.     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación
      */
@@ -542,8 +542,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de identificación por empresa y término de búsqueda.
-     * 
+     * @brief Cuenta tipos de identificación por empresa y término de búsqueda.     * 
      * @param entId  El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de identificación que coinciden
@@ -554,8 +553,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de tercero con paginación y ordenamiento.
-     * 
+     * @brief Obtiene todos los tipos de tercero con paginación y ordenamiento.     * 
      * @param entId     El id de la empresa
      * @param page      Número de página
      * @param size      Tamaño de página
@@ -577,8 +575,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Busca tipos de tercero por empresa y término de búsqueda.
-     * 
+     * @brief Busca tipos de tercero por empresa y término de búsqueda.     * 
      * @param entId     El id de la empresa
      * @param search    Término de búsqueda
      * @param page      Número de página
@@ -601,8 +598,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de tercero por empresa.
-     * 
+     * @brief Cuenta tipos de tercero por empresa.     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero
      */
@@ -612,8 +608,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de tercero por empresa y término de búsqueda.
-     * 
+     * @brief Cuenta tipos de tercero por empresa y término de búsqueda.     * 
      * @param entId  El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de tercero que coinciden
@@ -624,9 +619,8 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de identificación activos con paginación simple
-     * (ordenado por tiName asc).
-     * 
+     * @brief Obtiene todos los tipos de identificación activos con paginación simple
+     * (ordenado por tiName asc).     * 
      * @param entId El id de la empresa
      * @param page  Número de página
      * @param size  Tamaño de página
@@ -642,8 +636,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de identificación activos por empresa.
-     * 
+     * @brief Cuenta tipos de identificación activos por empresa.     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación activos
      */
@@ -653,7 +646,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
+     * @brief Obtiene todos los tipos de tercero activos con paginación simple (ordenado por ttName asc).
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -669,8 +662,7 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Cuenta tipos de tercero activos por empresa.
-     * 
+     * @brief Cuenta tipos de tercero activos por empresa.     * 
      * @param entId El id de la empresa
      * @return Cantidad de tipos de tercero activos
      */
@@ -680,11 +672,11 @@ public class IdPersistenceAdapter implements IdOutputPort {
     }
 
     /**
-     * Mapea el campo de ordenamiento del modelo TypeId al campo correspondiente en
-     * TypeIdEntity.
-     * 
-     * @param sortField Campo de ordenamiento del modelo
-     * @return Campo de ordenamiento de la entidad
+     * @brief Mapea campos de ordenamiento del dominio TypeId a entidad JPA
+     * @details Traduce nombres de campos del modelo TypeId a campos correspondientes
+     * en TypeIdEntity para consultas de ordenamiento. Solo permite campos seguros.
+     * @param sortField nombre del campo en el modelo de dominio
+     * @return nombre del campo correspondiente en la entidad JPA
      */
     private String mapTypeIdSortField(String sortField) {
         if (sortField == null || sortField.trim().isEmpty()) {

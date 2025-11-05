@@ -16,8 +16,11 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import lombok.RequiredArgsConstructor;
 
 /**
- * Adaptador de persistencia para operaciones geográficas.
- * Implementa el puerto de salida GeographyOutputPort para acceder a datos geográficos.
+ * @brief Adaptador de persistencia para consultas geográficas optimizadas
+ *
+ * Implementa GeographyOutputPort para acceso eficiente a datos geográficos.
+ * Utiliza consultas especializadas de los repositorios geográficos para obtener
+ * países, estados y ciudades con ordenamiento.
  */
 @Component
 @RequiredArgsConstructor
