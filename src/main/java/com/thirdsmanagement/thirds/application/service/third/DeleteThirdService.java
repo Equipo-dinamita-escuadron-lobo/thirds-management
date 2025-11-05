@@ -21,13 +21,7 @@ public class DeleteThirdService implements DeleteThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
 
-    /**
-     * @brief Elimina un tercero del sistema con validaciones completas
-     * @param thirdId identificador único del tercero a eliminar
-     * @param entId identificador de la empresa
-     * @return true si se eliminó correctamente
-     * @throws ThirdNotFound si el tercero no existe
-     */
+  
     @Override
     @Transactional
     public boolean deleteThird(Long thirdId, String entId) {
@@ -38,12 +32,7 @@ public class DeleteThirdService implements DeleteThirdUseCase {
         return thirdOutputPort.deleteThird(thirdId, entId);
     }
 
-    /**
-     * @brief Valida que el tercero existe en el sistema
-     * @param thirdId identificador único del tercero
-     * @param entId identificador de la empresa
-     * @throws ThirdNotFound si el tercero no existe
-     */
+
     private void validateThirdExists(Long thirdId, String entId) {
         if (!thirdOutputPort.existThirdById(thirdId, entId)) {
             throw new ThirdNotFound("El tercero con ID " + thirdId + " no existe para la empresa " + entId);

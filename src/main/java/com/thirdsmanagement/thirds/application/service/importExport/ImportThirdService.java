@@ -37,15 +37,11 @@ public class ImportThirdService implements ImportThirdUseCase {
     private final BatchProcessor batchProcessor;
     private final ImportResponseBuilder responseBuilder;
     
-    private static final boolean SKIP_DUPLICATES = true; // Omitir duplicados automáticamente
-    private static final boolean CONTINUE_ON_ERROR = false; // Parar en primer error
-    private static final int MAX_BATCH_SIZE = 500; // Máximo registros por lote
+    private static final boolean SKIP_DUPLICATES = true; 
+    private static final boolean CONTINUE_ON_ERROR = false; 
+    private static final int MAX_BATCH_SIZE = 500; 
 
-    /**
-     * @brief Orquesta el proceso completo de importación
-     * @param importRequest Solicitud de importación con archivo Excel
-     * @return Respuesta con resultado detallado de la importación
-     */
+    
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
         try {

@@ -21,12 +21,7 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     private final ThirdTypeRepository thirdTypeRepository;
     private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
-    /**
-     * @brief Crea un nuevo tipo de tercero en el sistema
-     * @param thirdType tipo de tercero a crear
-     * @return tipo de tercero creado con su ID asignado
-     * @throws ThirdTypeNameAlreadyExistsException si ya existe un tipo de tercero con el mismo nombre
-     */
+   
     @Override
     @Transactional
     public ThirdType createThirdType(ThirdType thirdType) {

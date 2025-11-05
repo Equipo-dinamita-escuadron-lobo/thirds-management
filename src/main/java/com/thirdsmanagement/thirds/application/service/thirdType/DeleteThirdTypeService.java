@@ -23,14 +23,7 @@ public class DeleteThirdTypeService implements DeleteThirdTypeUseCase {
 
     private final IdOutputPort idOutputPort;
 
-    /**
-     * @brief Elimina un tipo de tercero del sistema con validaciones completas
-     * @param thirdTypeId identificador único del tipo de tercero a eliminar
-     * @param entId identificador de la empresa
-     * @return true si se eliminó correctamente
-     * @throws ThirdTypeNotFound si el tipo de tercero no existe
-     * @throws ThirdTypeInUseException si el tipo de tercero está siendo utilizado
-     */
+ 
     @Override
     @Transactional
     public boolean deleteThirdType(Long thirdTypeId, String entId) {

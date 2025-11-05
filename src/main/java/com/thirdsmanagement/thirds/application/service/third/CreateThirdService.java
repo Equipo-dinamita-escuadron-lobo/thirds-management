@@ -34,14 +34,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final TypeIdLoaderService typeIdLoaderService;
     private final IdOutputPort idOutputPort;
 
-    /**
-     * @brief Crea un tercero con validación geográfica desde códigos proporcionados
-     * @param third tercero a crear
-     * @param countryCode código del país
-     * @param stateCode código del departamento
-     * @param cityCode código de la ciudad
-     * @return tercero creado con geografía validada
-     */
+    
     @Override
     @Transactional
     public Third createThird(Third third, String countryCode, String stateCode, String cityCode) {

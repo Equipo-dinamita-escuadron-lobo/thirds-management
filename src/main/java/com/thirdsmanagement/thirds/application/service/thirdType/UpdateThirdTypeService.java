@@ -22,11 +22,6 @@ public class UpdateThirdTypeService implements UpdateThirdTypeUseCase {
     private final IdOutputPort idOutputPort;
     private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
-    /**
-     * @brief Actualiza un tipo de tercero existente
-     * @param thirdType tipo de tercero con los datos actualizados
-     * @return tipo de tercero actualizado
-     */
     @Override
     public ThirdType updateThirdType(ThirdType thirdType) {
         ThirdType updatedThirdType = idOutputPort.updateThirdType(thirdType);

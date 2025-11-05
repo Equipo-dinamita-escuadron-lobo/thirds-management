@@ -21,12 +21,6 @@ public class BulkChangeThirdStateService implements BulkChangeThirdStateUseCase 
 
     private final ThirdOutputPort thirdOutputPort;
 
-    /**
-     * @brief Cambia el estado de todos los terceros de una empresa
-     * @param entId identificador de la empresa
-     * @param newState nuevo estado (true para activo, false para inactivo)
-     * @return cantidad de terceros actualizados
-     */
     @Override
     @Transactional
     public int changeAllThirdsState(String entId, Boolean newState) {

@@ -16,13 +16,6 @@ public class ChangeThirdStateService implements ChangeThirdStateUseCase {
     private final ThirdOutputPort thirdOutputPort;
     private final ThirdEventPublisher thirdEventPublisher;
 
-    /**
-     * @brief Cambia el estado de un tercero (activado/desactivado)
-     * @param thId identificador único del tercero
-     * @param entId identificador de la empresa
-     * @return true si el cambio fue exitoso
-     * @throws ThirdStateNotChanged si no se pudo cambiar el estado
-     */
     @Override
     public boolean changeThirdState(Long thId, String entId) {
         boolean result = thirdOutputPort.changeThirdState(thId, entId);

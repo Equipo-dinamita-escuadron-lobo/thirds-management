@@ -36,16 +36,6 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final IdOutputPort idOutputPort;
     private final ThirdRepository thirdRepository;
 
-    /**
-     * @brief Actualiza un tercero existente con validación opcional de geografía
-     * @param third tercero con los datos actualizados
-     * @param countryCode código del país (opcional)
-     * @param stateCode código del departamento (opcional)
-     * @param cityCode código de la ciudad (opcional)
-     * @return tercero actualizado
-     * @throws IllegalArgumentException si el tercero es null o no tiene ID válido
-     * @throws ThirdNotFound si el tercero no existe
-     */
     @Override
     @Transactional
     public Third updateThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {

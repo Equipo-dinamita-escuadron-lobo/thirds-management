@@ -41,10 +41,7 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
     private final ExcelValidationService excelValidationService;
-
-    /**
-     * @brief Tamaño de página óptimo para exportación
-     */
+  
     private static final int EXPORT_PAGE_SIZE = 5000;
 
     /**
@@ -379,11 +376,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         return count;
     }
 
-    /**
-     * @brief Exporta una plantilla de terceros con validaciones de datos
-     * @param entId identificador de la entidad para filtrar datos de referencia
-     * @return recurso con el archivo Excel de plantilla
-     */
+    
     @Override
     public Resource exportThirdTemplateWithValidations(String entId) {
 
@@ -397,11 +390,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
-    /**
-     * @brief Exporta terceros existentes con validaciones de datos
-     * @param exportRequest solicitud de exportación con filtros y configuración
-     * @return recurso con el archivo Excel de exportación
-     */
+ 
     @Override
     public Resource exportThirdsWithValidations(ThirdExportRequest exportRequest) {
 
