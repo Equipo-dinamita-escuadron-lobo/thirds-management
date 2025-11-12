@@ -7,27 +7,29 @@ import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
 
 /**
- * Caso de uso para listar información geográfica.
- * Permite obtener países, estados y ciudades con validación de jerarquía.
+ * @brief Caso de uso para consulta de información geográfica
+ *
+ * Proporciona acceso jerárquico a datos geográficos
+ * con validación de relaciones entre países, estados y ciudades.
  */
 public interface ListGeographyUseCase {
-    
+
     /**
-     * Obtiene todos los países activos.
+     * @brief Obtiene todos los países activos
      * @return Lista de países activos ordenados por nombre
      */
     List<Country> getAllCountries();
-    
+
     /**
-     * Obtiene todos los estados activos de un país específico.
+     * @brief Obtiene estados activos de un país específico
      * @param countryCode Código del país
      * @return Lista de estados activos del país ordenados por nombre
      * @throws IllegalArgumentException si el país no existe o no está activo
      */
     List<State> getStatesByCountry(String countryCode);
-    
+
     /**
-     * Obtiene todas las ciudades activas de un estado específico.
+     * @brief Obtiene ciudades activas de un estado específico
      * @param stateCode Código del estado
      * @param countryCode Código del país
      * @return Lista de ciudades activas del estado ordenadas por nombre

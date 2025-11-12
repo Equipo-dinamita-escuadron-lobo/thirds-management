@@ -3,38 +3,52 @@ package com.thirdsmanagement.thirds.domain.exceptions.thirdType;
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
 
 /**
- * Excepción lanzada cuando se intenta eliminar un tipo de tercero que está siendo utilizado por terceros existentes.
+ * @brief Excepción lanzada cuando se intenta eliminar un tipo de tercero que está siendo utilizado por terceros existentes
+ *
+ * Se utiliza en operaciones de eliminación de tipos de tercero para prevenir
+ * la ruptura de integridad referencial cuando existen terceros que dependen de ese tipo.
  */
 public class ThirdTypeInUseException extends BaseBusinessException {
 
-    /**
-     * Constructor con ID específico del tipo de tercero.
-     * @param thirdTypeId el ID del tipo de tercero que está en uso
-     */
-    public ThirdTypeInUseException(Long thirdTypeId) {
-        super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE, 
-              "El tipo de tercero con ID '" + thirdTypeId + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
-    }
 
-    /**
-     * Constructor con nombre específico del tipo de tercero.
-     * @param thirdTypeName el nombre del tipo de tercero que está en uso
-     */
-    public ThirdTypeInUseException(String thirdTypeName) {
-        super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE, 
-              "El tipo de tercero '" + thirdTypeName + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
-    }
-
-    /**
-     * Constructor por defecto.
+     /**
+     * @brief Constructor por defecto
+     *
+     * Crea una instancia de la excepción utilizando el código de error
+     * estándar para tipos de tercero en uso.
      */
     public ThirdTypeInUseException() {
         super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE);
     }
+    
+    /**
+     * @brief Constructor con ID específico del tipo de tercero
+     *
+     * Crea una excepción específica cuando se intenta eliminar un tipo de tercero
+     * que tiene terceros asociados, identificándolo por su ID.
+     * @param thirdTypeId el ID del tipo de tercero que está en uso
+     */
+    public ThirdTypeInUseException(Long thirdTypeId) {
+        super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE,
+              "El tipo de tercero con ID '" + thirdTypeId + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+    }
 
     /**
-     * Constructor con causa.
-     * @param cause la causa de la excepción
+     * @brief Constructor con nombre específico del tipo de tercero
+     *
+     * Crea una excepción específica cuando se intenta eliminar un tipo de tercero
+     * que tiene terceros asociados, identificándolo por su nombre.
+     * @param thirdTypeName el nombre del tipo de tercero que está en uso
+     */
+    public ThirdTypeInUseException(String thirdTypeName) {
+        super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE,
+              "El tipo de tercero '" + thirdTypeName + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+    }
+
+
+    /**
+     * @brief Constructor con causa
+     * @param cause la causa original del error que provocó esta excepción
      */
     public ThirdTypeInUseException(Throwable cause) {
         super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE, ThirdTypeErrorCode.THIRD_TYPE_IN_USE.getMessage(), cause);

@@ -6,26 +6,29 @@ import org.springframework.data.domain.Pageable;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 /**
- * Interfaz que representa el caso de uso para listar terceros.
+ * @brief Caso de uso para consulta y listado de terceros
+ *
+ * Proporciona operaciones de consulta, búsqueda, paginación y conteo
+ * para terceros con múltiples criterios de filtrado y ordenamiento.
  */
 public interface ListThirdsUseCase {
     /**
-     * Obtiene todos los terceros.
+     * @brief Obtiene todos los terceros con paginación
      * @param entId El id de la empresa
      * @param pageable El objeto pageable
      * @return La página de terceros
      */
     Page<Third> getAllThirdsBy(String entId, Pageable pageable);
-    
+
     /**
-     * Cuenta el total de terceros por empresa.
+     * @brief Cuenta el total de terceros por empresa
      * @param entId El id de la empresa
      * @return El número total de terceros
      */
     long countAllThirdsByEntId(String entId);
-    
+
     /**
-     * Busca terceros por empresa y término de búsqueda con ordenamiento.
+     * @brief Busca terceros por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -35,17 +38,17 @@ public interface ListThirdsUseCase {
      * @return Página de terceros que coinciden con la búsqueda
      */
     Page<Third> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta terceros por empresa y término de búsqueda.
+     * @brief Cuenta terceros por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de terceros que coinciden
      */
     long countByEntIdAndSearch(String entId, String search);
-    
+
     /**
-     * Obtiene todos los terceros con ordenamiento.
+     * @brief Obtiene todos los terceros con ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -56,7 +59,7 @@ public interface ListThirdsUseCase {
     Page<Third> getAllThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
 
     /**
-     * Obtiene todos los terceros activos con ordenamiento.
+     * @brief Obtiene terceros activos con ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -67,10 +70,28 @@ public interface ListThirdsUseCase {
     Page<Third> getAllActiveThirdsByWithSort(String entId, int page, int size, String sortField, String sortOrder);
 
     /**
-     * Cuenta el total de terceros activos por empresa.
+     * @brief Cuenta el total de terceros activos por empresa
      * @param entId El id de la empresa
      * @return El número total de terceros activos
      */
     long countActiveThirdsByEntId(String entId);
+
+    /**
+     * @brief Obtiene terceros filtrados por empresa y nombre de tipo de tercero activo con paginación
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @return Página de terceros filtrados por tipo de tercero activo ordenados por defecto ASC
+     */
+    Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, int page, int size);
+
+    /**
+     * @brief Cuenta terceros por empresa y nombre de tipo de tercero activo
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @return Cantidad de terceros que tienen el tipo activo especificado
+     */
+    long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName);
 
 }

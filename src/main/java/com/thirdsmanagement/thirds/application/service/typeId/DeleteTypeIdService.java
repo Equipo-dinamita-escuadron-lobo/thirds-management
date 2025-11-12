@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Servicio para eliminar tipos de identificación.
+ * @brief Servicio para eliminar tipos de identificación
+ *
  * Implementa las validaciones de negocio necesarias antes de la eliminación.
  */
 @Slf4j
@@ -23,12 +24,11 @@ public class DeleteTypeIdService implements DeleteTypeIdUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Elimina un tipo de identificación del sistema con validaciones completas.
-     * 
-     * @param typeIdId el ID del tipo de identificación a eliminar
-     * @param entId    el ID de la empresa
+     * @brief Elimina un tipo de identificación del sistema con validaciones completas
+     * @param typeIdId identificador único del tipo de identificación a eliminar
+     * @param entId identificador de la empresa
      * @return true si se eliminó correctamente
-     * @throws TypeIdNotFound       si el tipo de identificación no existe
+     * @throws TypeIdNotFound si el tipo de identificación no existe
      * @throws TypeIdInUseException si el tipo de identificación está siendo utilizado
      */
     @Override
@@ -45,11 +45,10 @@ public class DeleteTypeIdService implements DeleteTypeIdUseCase {
     }
 
     /**
-     * Valida que el tipo de identificación existe en el sistema.
-     * 
-     * @param typeIdId el ID del tipo de identificación
-     * @param entId    el ID de la empresa
-     * @return el tipo de identificación encontrado
+     * @brief Valida que el tipo de identificación existe en el sistema
+     * @param typeIdId identificador único del tipo de identificación
+     * @param entId identificador de la empresa
+     * @return tipo de identificación encontrado
      * @throws TypeIdNotFound si el tipo de identificación no existe
      */
     private TypeId validateTypeIdExists(Long typeIdId, String entId) {
@@ -67,15 +66,11 @@ public class DeleteTypeIdService implements DeleteTypeIdUseCase {
     }
 
     /**
-     * Valida que el tipo de identificación no esté siendo utilizado por terceros
-     * existentes.
-     * 
-     * @param typeIdId   el ID del tipo de identificación
-     * @param entId      el ID de la empresa
-     * @param typeIdName el nombre del tipo de identificación (para mensajes de
-     *                   error)
-     * @throws TypeIdInUseException si el tipo de identificación está siendo
-     *                              utilizado
+     * @brief Valida que el tipo de identificación no esté siendo utilizado por terceros existentes
+     * @param typeIdId identificador único del tipo de identificación
+     * @param entId identificador de la empresa
+     * @param typeIdName nombre del tipo de identificación para mensajes de error
+     * @throws TypeIdInUseException si el tipo de identificación está siendo utilizado
      */
     private void validateTypeIdNotInUse(Long typeIdId, String entId, String typeIdName) {
         boolean isInUse = idOutputPort.isTypeIdInUse(typeIdId, entId);

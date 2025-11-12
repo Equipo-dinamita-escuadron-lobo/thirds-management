@@ -11,15 +11,21 @@ import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantConte
 import java.util.Map;
 
 /**
- * Implementación de resolver de identificador de inquilino actual para Hibernate.
- * Esta clase determina dinámicamente el inquilino actual basado en el contexto de TenantContext.
+ * @brief Resolver de identificador de tenant actual para Hibernate multi-tenancy
+ *
+ * Implementa CurrentTenantIdentifierResolver para proporcionar a Hibernate el tenant ID
+ * actual desde TenantContext. Registra automáticamente esta implementación en las
+ * propiedades de Hibernate para habilitar aislamiento de datos por tenant.
  */
 @Component
 public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentifierResolver<String>, HibernatePropertiesCustomizer {
 
     /**
-     * Resuelve el identificador del inquilino actual.
-     * @return ID del inquilino actual o "default" si no hay inquilino configurado.
+     * @brief Resuelve dinámicamente el tenant ID actual para Hibernate
+     * @details Obtiene el tenant ID desde TenantContext. Si no hay contexto establecido,
+     * retorna "default" como fallback para desarrollo. Este método es llamado por Hibernate
+     * en cada operación de base de datos para determinar qué tenant usar.
+     * @return tenant ID actual o "default" si no hay contexto
      */
     @Override
     public String resolveCurrentTenantIdentifier() {
@@ -33,8 +39,10 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
     }
 
     /**
-     * Indica si se deben validar las sesiones actuales existentes.
-     * @return Siempre devuelve true para validar las sesiones existentes.
+     * @brief Indica validación de sesiones existentes al cambiar tenant
+     * @details Retorna true para que Hibernate valide las sesiones existentes cuando
+     * cambia el tenant ID, asegurando integridad de datos.
+     * @return siempre true para habilitar validación de sesiones
      */
     @Override
     public boolean validateExistingCurrentSessions() {
@@ -42,8 +50,11 @@ public class CurrentTenantIdentifierResolverImpl implements CurrentTenantIdentif
     }
 
     /**
-     * Personaliza las propiedades de Hibernate añadiendo este resolver como identificador de inquilino.
-     * @param hibernateProperties Mapa de propiedades de Hibernate a personalizar.
+     * @brief Registra este resolver en propiedades de Hibernate
+     * @details Método de HibernatePropertiesCustomizer que registra automáticamente
+     * esta implementación como el resolver de tenant ID en las propiedades de Hibernate,
+     * habilitando multi-tenancy sin configuración manual.
+     * @param hibernateProperties mapa de propiedades de Hibernate a modificar
      */
     @Override
     public void customize(Map<String, Object> hibernateProperties) {

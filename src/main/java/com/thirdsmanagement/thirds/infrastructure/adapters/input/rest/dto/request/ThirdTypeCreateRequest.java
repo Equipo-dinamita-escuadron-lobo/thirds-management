@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la petición de creación de un tipo de tercero.
+ * @brief DTO para solicitud de creación de tipo de tercero
  */
 @Builder
 @Getter
@@ -16,18 +16,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThirdTypeCreateRequest {
-    @NotNull(message = "El ID de la empresa no puede estar vacío") 
+    @NotNull(message = "El ID de la empresa no puede estar vacío")
     private String entId;
 
     private Long thirdTypeId;
 
-    @NotNull(message = "El nombre del tipo de tercero no puede estar vacío") 
+    @NotNull(message = "El nombre del tipo de tercero no puede estar vacío")
     private String thirdTypeName;
 
-    /**
-     * Estado del tipo de tercero.
-     * true = activo, false = inactivo
-     */
     @Builder.Default
     private Boolean status = true;
 }

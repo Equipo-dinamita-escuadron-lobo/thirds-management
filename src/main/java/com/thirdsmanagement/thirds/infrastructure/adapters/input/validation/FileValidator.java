@@ -3,30 +3,24 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.validation;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Interfaz para validadores de archivos.
- * Implementa el patrón Strategy para diferentes tipos de archivos.
- * Permite extensibilidad y centralización de la lógica de validación.
+ * @brief Interfaz para validadores de archivos usando patrón Strategy
  */
 public interface FileValidator {
-    
+
     /**
-     * Valida el archivo según reglas específicas del tipo.
-     * 
+     * @brief Valida un archivo según reglas específicas del tipo
      * @param file archivo a validar
-     * @throws FileValidationException si la validación falla
      */
     void validate(MultipartFile file);
-    
+
     /**
-     * Indica los tipos MIME soportados por este validador.
-     * 
+     * @brief Obtiene los tipos MIME soportados por este validador
      * @return array de tipos MIME soportados
      */
     String[] getSupportedMimeTypes();
-    
+
     /**
-     * Indica las extensiones soportadas por este validador.
-     * 
+     * @brief Obtiene las extensiones soportadas por este validador
      * @return array de extensiones soportadas
      */
     String[] getSupportedExtensions();

@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * DTO para respuestas de importación masiva de terceros.
- * Contiene estadísticas del proceso y reportes de errores.
+ * @brief DTO de respuesta para importación masiva de terceros desde Excel
  */
 @Data
 @Builder
@@ -20,46 +19,19 @@ import java.util.List;
 @AllArgsConstructor
 public class ThirdImportResponse {
 
-    /**
-     * Identificador de la entidad.
-     */
     private String entId;
 
-    /**
-     * Nombre del archivo procesado.
-     */
     private String fileName;
 
-
-    /**
-     * Estado del proceso de importación.
-     */
     private ImportStatus status;
 
-    /**
-     * Número total de registros encontrados en el Excel.
-     */
     private Integer totalRecords;
 
-    /**
-     * Número de registros procesados exitosamente.
-     */
     private Integer successfulImports;
 
-    /**
-     * Número de registros que fallaron.
-     */
     private Integer failedImports;
 
-    /**
-     * Número de registros omitidos por ser duplicados.
-     */
     private Integer duplicatesSkipped;
 
-    /**
-     * Lista de errores encontrados durante la importación.
-     */
     private List<ImportErrorDetail> errors;
-
-    // Enum ImportStatus movido a domain.enums para reutilización
 }

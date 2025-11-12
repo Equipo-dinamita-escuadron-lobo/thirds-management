@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 
 /**
- * Repositorio de terceros.
- * Proporciona métodos para acceder a los datos de los terceros.
+ * @brief Repositorio JPA principal para terceros con operaciones complejas de búsqueda y actualización masiva
  */
 @Repository
 public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
@@ -24,22 +23,12 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
     Page<ThirdEntity> getThirdsBy(String entId, Pageable page);
 
-    /**
-     * Obtiene todos los terceros de una empresa filtrados por estado.
-     * Optimizado para exportación masiva con filtro de estado.
-     * 
-     * @param entId ID de la empresa
-     * @param state Estado de los terceros (true=activos, false=inactivos)
-     * @param page Paginación
-     * @return Página de terceros filtrados por estado
-     */
     @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
     Page<ThirdEntity> getThirdsByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state, Pageable page);
 
     /**
-     * Busca terceros por empresa y término de búsqueda.
-     * Busca en: nombres, apellidos, razón social, número de identificación.
-     * 
+     * @brief Busca terceros por empresa y término de búsqueda
+     * @details Busca en: nombres, apellidos, razón social, número de identificación con case insensitive
      * @param entId ID de la empresa
      * @param search Término de búsqueda
      * @param page Paginación con ordenamiento
@@ -52,13 +41,6 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
            "CAST(t.idNumber AS string) LIKE CONCAT('%', :search, '%'))")
     Page<ThirdEntity> findByEntIdAndSearch(@Param("entId") String entId, @Param("search") String search, Pageable page);
 
-    /**
-     * Cuenta terceros por empresa y término de búsqueda.
-     * 
-     * @param entId ID de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de terceros que coinciden
-     */
     @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND " +
            "(LOWER(t.names) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(t.lastNames) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -72,7 +54,6 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     boolean existThirdByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
-
     @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
@@ -83,9 +64,8 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     long countByEntId(@Param("entId") String entId);
 
     /**
-     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
-     * Query optimizada para operaciones bulk.
-     * 
+     * @brief Actualiza el estado de todos los terceros de una empresa de forma masiva
+     * @details Query optimizada para operaciones bulk con @Modifying
      * @param entId ID de la empresa
      * @param newState Nuevo estado (true para activo, false para inactivo)
      * @return Cantidad de registros actualizados
@@ -95,8 +75,8 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     int bulkUpdateStateByEntId(@Param("entId") String entId, @Param("newState") Boolean newState);
 
     /**
-     * Encuentra números de identificación que ya existen en la base de datos para importaciones masivas. 
-     * 
+     * @brief Encuentra números de identificación que ya existen para importaciones masivas
+     * @details Optimizado para validación de duplicados en procesos batch
      * @param idNumbers lista de números de identificación a verificar
      * @param entId ID de la empresa
      * @return lista de números de identificación que ya existen
@@ -104,24 +84,39 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t.idNumber FROM ThirdEntity t WHERE t.idNumber IN :idNumbers AND t.entId = :entId")
     List<Long> findExistingIdNumbers(@Param("idNumbers") Set<Long> idNumbers, @Param("entId") String entId);
 
-    /**
-     * Obtiene todos los terceros activos de una empresa.
-     *
-     * @param entId ID de la empresa
-     * @param page Paginación con ordenamiento
-     * @return Página de terceros activos
-     */
     @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
     Page<ThirdEntity> getActiveThirdsBy(@Param("entId") String entId, Pageable page);
 
-
-    /**
-     * Cuenta el total de terceros activos por empresa.
-     *
-     * @param entId ID de la empresa
-     * @return Cantidad total de terceros activos
-     */
     @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
     long countActiveByEntId(@Param("entId") String entId);
 
+    /**
+     * @brief Busca terceros por empresa y nombre de tipo de tercero activo con paginación
+     * @details Filtra terceros que tienen al menos un tipo de tercero específico y activo.
+     * La búsqueda por nombre es case insensitive.
+     * El ordenamiento se aplica desde el Pageable proporcionado por el servicio.
+     * @param entId ID de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo (case insensitive)
+     * @param page Paginación con ordenamiento ASC por defecto en "names"
+     * @return Página de terceros que tienen el tipo especificado y activo
+     */
+    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+           "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
+           "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
+           "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
+    Page<ThirdEntity> findByEntIdAndThirdTypeName(@Param("entId") String entId, @Param("thirdTypeName") String thirdTypeName, Pageable page);
+
+    /**
+     * @brief Cuenta terceros por empresa y nombre de tipo de tercero activo
+     * @details Cuenta terceros que tienen al menos un tipo de tercero específico y activo.
+     * La búsqueda por nombre es case insensitive.
+     * @param entId ID de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo (case insensitive)
+     * @return Cantidad de terceros que tienen el tipo especificado y activo
+     */
+    @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
+           "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
+           "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
+           "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
+    long countByEntIdAndThirdTypeName(@Param("entId") String entId, @Param("thirdTypeName") String thirdTypeName);
 }

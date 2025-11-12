@@ -4,7 +4,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.ErrorCodeDefinition;
 import lombok.Getter;
 
 /**
- * Códigos de error específicos del dominio de Tipos de Identificación.
+ * @brief Códigos de error específicos del dominio de Tipos de Identificación
+ * 
  */
 @Getter
 public enum TypeIdErrorCode implements ErrorCodeDefinition {
@@ -20,6 +21,11 @@ public enum TypeIdErrorCode implements ErrorCodeDefinition {
     private final String code;
     private final String message;
 
+    /**
+     * @brief Constructor del enum
+     * @param code código único del error utilizado internamente
+     * @param message mensaje descriptivo del error para usuarios
+     */
     TypeIdErrorCode(String code, String message) {
         this.code = code;
         this.message = message;

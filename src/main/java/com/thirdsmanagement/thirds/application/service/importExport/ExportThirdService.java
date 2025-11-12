@@ -29,7 +29,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Servicio para exportar terceros en formato Excel.
+ * @brief Servicio para exportar terceros en formato Excel
+ *
+ * Gestiona la exportación completa de terceros con filtros, paginación
+ * automática y generación de archivos Excel con validaciones integradas.
  */
 @Slf4j
 @Service
@@ -38,15 +41,12 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
     private final ExcelValidationService excelValidationService;
-
-    /**
-     * Tamaño de página óptimo para exportación.
-     * Balance entre rendimiento y uso de memoria.
-     */
+  
     private static final int EXPORT_PAGE_SIZE = 5000;
 
     /**
-     * Obtiene terceros filtrados aplicando el filtro en la base de datos.
+     * @brief Obtiene terceros filtrados aplicando el filtro en la base de datos
+     *
      * Utiliza paginación automática para exportar TODOS los registros sin límite,
      * optimizando el uso de memoria mediante procesamiento por lotes.
      * 
@@ -81,6 +81,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         return allThirds;
     }
 
+    /**
+     * @brief Crea estilo para encabezados principales de Excel
+     * @param workbook libro de Excel donde crear el estilo
+     * @return estilo configurado para encabezados principales
+     */
     private CellStyle createHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -100,7 +105,9 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Crea estilo para encabezados de columnas opcionales (fondo gris claro).
+     * @brief Crea estilo para encabezados de columnas opcionales
+     * @param workbook libro de Excel donde crear el estilo
+     * @return estilo configurado para encabezados opcionales
      */
     private CellStyle createOptionalHeaderStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
@@ -120,6 +127,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
+    /**
+     * @brief Crea estilo para celdas de datos en Excel
+     * @param workbook libro de Excel donde crear el estilo
+     * @return estilo configurado para celdas de datos
+     */
     private CellStyle createDataStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         style.setBorderBottom(BorderStyle.THIN);
@@ -130,6 +142,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
+    /**
+     * @brief Crea estilo para celdas de fechas en Excel
+     * @param workbook libro de Excel donde crear el estilo
+     * @return estilo configurado para celdas de fechas
+     */
     private CellStyle createDateStyle(Workbook workbook) {
         CellStyle style = createDataStyle(workbook);
         CreationHelper createHelper = workbook.getCreationHelper();
@@ -137,6 +154,12 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
+    /**
+     * @brief Crea los encabezados de las columnas en la hoja de Excel
+     * @param sheet hoja de Excel donde crear los encabezados
+     * @param headerStyle estilo para encabezados principales
+     * @param request solicitud de exportación con configuración
+     */
     private void createHeaders(Sheet sheet, CellStyle headerStyle, ThirdExportRequest request) {
         CellStyle optionalHeaderStyle = createOptionalHeaderStyle(sheet.getWorkbook());
         Row headerRow = sheet.createRow(0);
@@ -183,12 +206,27 @@ public class ExportThirdService implements ExportThirdUseCase {
         headerRow.setHeightInPoints(35);
     }
 
+    /**
+     * @brief Crea una celda de encabezado con estilo específico
+     * @param row fila donde crear la celda
+     * @param colIndex índice de columna
+     * @param value valor a colocar en la celda
+     * @param style estilo a aplicar a la celda
+     */
     private void createHeaderCell(Row row, int colIndex, String value, CellStyle style) {
         Cell cell = row.createCell(colIndex);
         cell.setCellValue(value);
         cell.setCellStyle(style);
     }
 
+    /**
+     * @brief Llena la hoja de Excel con los datos de terceros
+     * @param sheet hoja de Excel donde colocar los datos
+     * @param thirds lista de terceros a exportar
+     * @param dataStyle estilo para celdas de datos
+     * @param dateStyle estilo para celdas de fechas
+     * @param request solicitud de exportación con configuración
+     */
     private void fillData(Sheet sheet, List<Third> thirds, CellStyle dataStyle, CellStyle dateStyle,
             ThirdExportRequest request) {
         int rowIndex = 1;
@@ -250,6 +288,13 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Crea una celda de datos con valor y estilo específico
+     * @param row fila donde crear la celda
+     * @param colIndex índice de columna
+     * @param value valor a colocar en la celda (maneja null, Number y String)
+     * @param style estilo a aplicar a la celda
+     */
     private void createDataCell(Row row, int colIndex, Object value, CellStyle style) {
         Cell cell = row.createCell(colIndex);
 
@@ -264,6 +309,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         cell.setCellStyle(style);
     }
 
+    /**
+     * @brief Ajusta automáticamente el ancho de las columnas de Excel
+     * @param sheet hoja de Excel cuyas columnas ajustar
+     * @param columnCount número total de columnas a ajustar
+     */
     private void autoSizeColumns(Sheet sheet, int columnCount) {
         for (int i = 0; i < columnCount; i++) {
             // Primero aplicar el auto-sizing basado en el contenido
@@ -289,6 +339,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Calcula el número total de columnas según la configuración de exportación
+     * @param request solicitud de exportación con configuración de campos
+     * @return número total de columnas que tendrá la exportación
+     */
     private int getColumnCount(ThirdExportRequest request) {
         ExportConfiguration config = request.getExportConfiguration();
         
@@ -321,10 +376,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         return count;
     }
 
-    /**
-     * Exporta una plantilla de terceros con validaciones de datos (listas
-     * desplegables).
-     */
+    
     @Override
     public Resource exportThirdTemplateWithValidations(String entId) {
 
@@ -338,10 +390,7 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
-    /**
-     * Exporta terceros existentes con validaciones de datos (listas desplegables).
-     * Combina los datos reales con las validaciones de la plantilla.
-     */
+ 
     @Override
     public Resource exportThirdsWithValidations(ThirdExportRequest exportRequest) {
 
@@ -377,6 +426,12 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Genera archivo Excel de plantilla con validaciones integradas
+     * @param entId identificador de la entidad para datos de referencia
+     * @return arreglo de bytes con el contenido del archivo Excel
+     * @throws IOException si ocurre un error al escribir el archivo
+     */
     private byte[] generateTemplateWithValidations(String entId) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -417,6 +472,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Crea estilo para celdas de plantilla en Excel
+     * @param workbook libro de Excel donde crear el estilo
+     * @return estilo configurado para celdas de plantilla
+     */
     private CellStyle createTemplateStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -430,6 +490,13 @@ public class ExportThirdService implements ExportThirdUseCase {
         return style;
     }
 
+    /**
+     * @brief Crea filas de ejemplo en la plantilla de Excel
+     * @param sheet hoja de Excel donde crear las filas
+     * @param templateStyle estilo para las celdas de plantilla
+     * @param request solicitud de exportación con configuración
+     * @param numberOfRows número de filas de ejemplo a crear
+     */
     private void createTemplateRows(Sheet sheet, CellStyle templateStyle, ThirdExportRequest request,
             int numberOfRows) {
         ExportConfiguration config = request.getExportConfiguration();
@@ -479,6 +546,12 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Crea una fila vacía de plantilla con todas las columnas
+     * @param row fila de Excel a llenar
+     * @param request solicitud de exportación con configuración
+     * @param templateStyle estilo para las celdas de plantilla
+     */
     private void createEmptyTemplateRow(Row row, ThirdExportRequest request, CellStyle templateStyle) {
         int totalColumns = getColumnCount(request);
         for (int i = 0; i < totalColumns; i++) {
@@ -486,12 +559,25 @@ public class ExportThirdService implements ExportThirdUseCase {
         }
     }
 
+    /**
+     * @brief Crea una celda de plantilla con valor y estilo específico
+     * @param row fila donde crear la celda
+     * @param colIndex índice de columna
+     * @param value valor a colocar en la celda
+     * @param style estilo a aplicar a la celda
+     */
     private void createTemplateCell(Row row, int colIndex, String value, CellStyle style) {
         Cell cell = row.createCell(colIndex);
         cell.setCellValue(value);
         cell.setCellStyle(style);
     }
 
+    /**
+     * @brief Aplica validaciones de datos a una hoja de plantilla
+     * @param sheet hoja de Excel donde aplicar validaciones
+     * @param entId identificador de la entidad
+     * @param request solicitud de exportación con configuración
+     */
     private void applyValidationsToTemplate(Sheet sheet, String entId, ThirdExportRequest request) {
         int startRow = 1; // Después del encabezado
         int endRow = 1000; // Permitir muchas filas para la plantilla
@@ -512,7 +598,8 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Calcula el índice de la columna Género.
+     * @brief Calcula el índice de la columna Género
+     * @param request solicitud de exportación con configuración
      * @return índice de columna o -1 si no está incluido
      */
     private int getGenderColumnIndex(ThirdExportRequest request) {
@@ -522,7 +609,8 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Calcula el índice de la columna Estado.
+     * @brief Calcula el índice de la columna Estado
+     * @param request solicitud de exportación con configuración
      * @return índice de columna (dinámico según si género está incluido)
      */
     private int getStateColumnIndex(ThirdExportRequest request) {
@@ -532,7 +620,8 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Calcula el índice de la columna Tipos de Tercero.
+     * @brief Calcula el índice de la columna Tipos de Tercero
+     * @param request solicitud de exportación con configuración
      * @return índice de columna (dinámico según si género está incluido)
      */
     private int getTypesColumnIndex(ThirdExportRequest request) {
@@ -542,6 +631,11 @@ public class ExportThirdService implements ExportThirdUseCase {
         return config.includes(ExportableField.GENDER) ? 9 : 8;
     }
 
+    /**
+     * @brief Calcula los índices de las columnas geográficas
+     * @param request solicitud de exportación con configuración
+     * @return arreglo con índices de columnas [país, departamento, ciudad]
+     */
     private int[] getGeographyColumnIndexes(ThirdExportRequest request) {
         ExportConfiguration config = request.getExportConfiguration();
         
@@ -567,7 +661,11 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Genera archivo Excel con datos reales y validaciones aplicadas.
+     * @brief Genera archivo Excel con datos reales y validaciones aplicadas
+     * @param thirds lista de terceros a exportar
+     * @param request solicitud de exportación con configuración
+     * @return arreglo de bytes con el contenido del archivo Excel
+     * @throws IOException si ocurre un error al escribir el archivo
      */
     private byte[] generateExcelFileWithValidations(List<Third> thirds, ThirdExportRequest request) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
@@ -600,9 +698,11 @@ public class ExportThirdService implements ExportThirdUseCase {
     }
 
     /**
-     * Aplica validaciones de datos a una hoja con datos existentes.
-     * Reutiliza la lógica de applyValidationsToTemplate pero ajustada para datos
-     * reales.
+     * @brief Aplica validaciones de datos a una hoja con datos existentes
+     * @param sheet hoja de Excel donde aplicar validaciones
+     * @param entId identificador de la entidad
+     * @param request solicitud de exportación con configuración
+     * @param dataRowCount número de filas con datos existentes
      */
     private void applyValidationsToDataSheet(Sheet sheet, String entId, ThirdExportRequest request, int dataRowCount) {
         int startRow = 1; // Después del encabezado

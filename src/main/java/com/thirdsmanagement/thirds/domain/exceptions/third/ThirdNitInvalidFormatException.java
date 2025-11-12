@@ -3,17 +3,21 @@ package com.thirdsmanagement.thirds.domain.exceptions.third;
 import com.thirdsmanagement.thirds.domain.exceptions.BaseBusinessException;
 
 /**
- * Excepción lanzada cuando el formato del NIT no es válido para personas jurídicas.
- * El NIT debe empezar por 8 o 9 según las regulaciones colombianas.
+ * @brief Excepción lanzada cuando el formato del NIT no es válido para personas jurídicas
+ *
+ * Se utiliza para validar que los NIT de personas jurídicas cumplan con
+ * las regulaciones colombianas, específicamente que deben empezar por 8 o 9.
  */
 public class ThirdNitInvalidFormatException extends BaseBusinessException {
 
     private static final String DEFAULT_MESSAGE = "El NIT debe empezar por 8 o 9 para personas jurídicas";
 
     /**
-     * Constructor con número de identificación específico.
-     * 
-     * @param nitNumber el número de NIT que no cumple con el formato
+     * @brief Constructor con número de identificación específico
+     *
+     * Crea una excepción específica cuando se detecta que un NIT no cumple
+     * con el formato requerido, generando automáticamente un mensaje descriptivo.
+     * @param nitNumber el número de NIT que no cumple con el formato requerido
      */
     public ThirdNitInvalidFormatException(String nitNumber) {
         super(
@@ -23,27 +27,28 @@ public class ThirdNitInvalidFormatException extends BaseBusinessException {
     }
 
     /**
-     * Constructor con mensaje por defecto.
+     * @brief Constructor con mensaje por defecto
+     *
+     * Crea una instancia de la excepción utilizando el mensaje estándar
+     * para errores de formato de NIT.
      */
     public ThirdNitInvalidFormatException() {
         super(ThirdsErrorCode.THIRD_NIT_INVALID_FORMAT, DEFAULT_MESSAGE);
     }
 
     /**
-     * Constructor con NIT y mensaje personalizado.
-     * 
+     * @brief Constructor con NIT y mensaje personalizado
      * @param nitNumber el número de NIT que no cumple con el formato
-     * @param customMessage mensaje personalizado de error
+     * @param customMessage mensaje personalizado que describe el error específico
      */
     public ThirdNitInvalidFormatException(String nitNumber, String customMessage) {
         super(ThirdsErrorCode.THIRD_NIT_INVALID_FORMAT, customMessage);
     }
 
     /**
-     * Constructor con mensaje personalizado y causa.
-     * 
-     * @param message mensaje personalizado de error
-     * @param cause causa del error
+     * @brief Constructor con mensaje personalizado y causa
+     * @param message mensaje personalizado que describe el error específico
+     * @param cause causa original del error que provocó esta excepción
      */
     public ThirdNitInvalidFormatException(String message, Throwable cause) {
         super(ThirdsErrorCode.THIRD_NIT_INVALID_FORMAT, message, cause);

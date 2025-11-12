@@ -34,15 +34,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final TypeIdLoaderService typeIdLoaderService;
     private final IdOutputPort idOutputPort;
 
-    /**
-     * Crea un tercero con validación geográfica desde códigos proporcionados.
-     * 
-     * @param third       el tercero a crear
-     * @param countryCode código del país
-     * @param stateCode   código del estado
-     * @param cityCode    código de la ciudad
-     * @return el tercero creado con geografía validada
-     */
+    
     @Override
     @Transactional
     public Third createThird(Third third, String countryCode, String stateCode, String cityCode) {
@@ -105,10 +97,9 @@ public class CreateThirdService implements CreateThirdUseCase {
     }
 
     /**
-     * Valida que no exista un tercero duplicado con el mismo número de identificación.
-     * 
-     * @param idNumber el número de identificación
-     * @param entId    el ID de la entidad
+     * @brief Valida que no exista un tercero duplicado con el mismo número de identificación
+     * @param idNumber número de identificación
+     * @param entId identificador de la entidad
      * @throws ThirdAlreadyExistsException si ya existe un tercero con el mismo número de identificación
      */
     private void validateDuplicateThird(Long idNumber, String entId) {
@@ -118,9 +109,8 @@ public class CreateThirdService implements CreateThirdUseCase {
     }
 
     /**
-     * Valida que todos los ThirdTypes existen en el sistema y están activos.
-     *
-     * @param third el tercero que contiene los ThirdTypes a validar
+     * @brief Valida que todos los ThirdTypes existen en el sistema y están activos
+     * @param third tercero que contiene los ThirdTypes a validar
      * @throws ThirdTypeForeignKeyViolationException si algún ThirdType no existe
      * @throws ThirdInvalidDataException si algún ThirdType está inactivo
      */

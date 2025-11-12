@@ -14,8 +14,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Servicio especializado en conversión de datos Excel a entidades de dominio.
- * Utiliza cache pre-cargado para evitar consultas N+1.
+ * @brief Servicio especializado en conversión de datos Excel a entidades de dominio
+ *
+ * Utiliza cache pre-cargado para evitar consultas N+1 y optimizar
+ * el rendimiento durante conversiones masivas de datos.
  */
 
 @Service
@@ -23,7 +25,10 @@ import java.util.stream.Collectors;
 public class DataConverter {
 
     /**
-     * Convierte datos de Excel a entidad Third usando cache pre-cargado.
+     * @brief Convierte datos de Excel a entidad Third usando cache pre-cargado
+     * @param excelData Datos extraídos del archivo Excel
+     * @param cache Cache con datos de referencia pre-cargados
+     * @return Entidad Third construida o null si faltan campos requeridos
      */
     public Third convertWithCache(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         if (!excelData.hasRequiredFields()) {
@@ -58,14 +63,20 @@ public class DataConverter {
     }
 
     /**
-     * Obtiene los códigos geográficos resueltos para un registro.
+     * @brief Obtiene los códigos geográficos resueltos para un registro
+     * @param excelData Datos del Excel con nombres geográficos
+     * @param cache Cache con datos de referencia geográficos
+     * @return Objeto GeographyData con códigos resueltos
      */
     public GeographyData getGeographyData(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         return resolveGeographyFromCache(excelData, cache);
     }
 
     /**
-     * Obtiene TypeId desde cache evitando consultas individuales.
+     * @brief Obtiene TypeId desde cache evitando consultas individuales
+     * @param typeIdName Nombre del tipo de identificación
+     * @param cache Cache con datos de referencia
+     * @return TypeId encontrado o null si no existe
      */
     private TypeId getTypeIdFromCache(String typeIdName, BatchValidationService.ReferenceDataCache cache) {
         if (typeIdName == null || typeIdName.trim().isEmpty()) {
@@ -75,7 +86,10 @@ public class DataConverter {
     }
 
     /**
-     * Obtiene ThirdTypes desde cache evitando consultas individuales.
+     * @brief Obtiene ThirdTypes desde cache evitando consultas individuales
+     * @param typeNames Conjunto de nombres de tipos de tercero
+     * @param cache Cache con datos de referencia
+     * @return Set de ThirdType encontrados (puede estar vacío)
      */
     private Set<ThirdType> getThirdTypesFromCache(Set<String> typeNames, BatchValidationService.ReferenceDataCache cache) {
         if (typeNames == null || typeNames.isEmpty()) {
@@ -89,8 +103,14 @@ public class DataConverter {
     }
 
     /**
-     * Resuelve geografía desde cache.
-     * Todos los campos geográficos son obligatorios.
+     * @brief Resuelve geografía desde cache
+     *
+     * Convierte nombres geográficos a códigos usando la jerarquía:
+     * país -> estado -> ciudad. Todos los campos son opcionales.
+     *
+     * @param excelData Datos del Excel con nombres geográficos
+     * @param cache Cache con datos de referencia geográficos
+     * @return GeographyData con códigos resueltos (pueden ser null)
      */
     private GeographyData resolveGeographyFromCache(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         String countryCode = null;
@@ -128,14 +148,19 @@ public class DataConverter {
     }
 
     /**
-     * Normaliza strings preservando case cuando es necesario.
+     * @brief Normaliza strings preservando case cuando es necesario
+     * @param value String a normalizar
+     * @return String normalizado o null si el valor original es null
      */
     private String normalizeString(String value) {
         return value != null ? StringNormalizer.normalizePreservingCase(value) : null;
     }
 
     /**
-     * Clase auxiliar para encapsular datos geográficos resueltos.
+     * @brief Clase auxiliar para encapsular datos geográficos resueltos
+     *
+     * Contiene los códigos geográficos resueltos desde nombres,
+     * manteniendo la jerarquía: país -> estado -> ciudad.
      */
     @Getter
     @AllArgsConstructor

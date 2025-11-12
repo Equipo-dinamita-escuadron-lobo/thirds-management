@@ -4,7 +4,8 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.reques
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdImportResponse;
 
 /**
- * Puerto de entrada para la importación masiva de terceros desde Excel.
+ * @brief Caso de uso para importación masiva de terceros desde Excel
+ *
  * Define el contrato para la funcionalidad de importación con omisión automática de duplicados:
  * - Los duplicados se omiten automáticamente para mejorar usabilidad
  * - Se procesan archivos grandes sin límite de lote específico
@@ -12,11 +13,13 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.respon
  * - Permite reimportar archivos corregidos omitiendo registros existentes
  */
 public interface ImportThirdUseCase {
-    
+
     /**
-     * Importa terceros masivamente desde un archivo Excel con omisión automática de duplicados.
+     * @brief Importa terceros masivamente desde archivo Excel
+     *
+     * Importa terceros desde un archivo Excel con omisión automática de duplicados.
      * Los registros duplicados se omiten silenciosamente permitiendo reimportaciones del mismo archivo.
-     * 
+     *
      * @param importRequest la solicitud de importación con el archivo
      * @return el resultado de la importación con estadísticas detalladas incluyendo duplicados omitidos
      * @throws IllegalArgumentException si los parámetros son inválidos

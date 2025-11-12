@@ -1,13 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.importExport;
 
 import com.thirdsmanagement.thirds.application.ports.input.ImportThirdUseCase;
-import com.thirdsmanagement.thirds.application.service.importExport.BatchValidationService.BatchValidationResult;
-import com.thirdsmanagement.thirds.application.service.importExport.BatchValidationService.ReferenceDataCache;
-import com.thirdsmanagement.thirds.application.service.importExport.DuplicateDetectionService.DuplicateDetectionResult;
-import com.thirdsmanagement.thirds.application.service.importExport.ExcelParsingService.ExcelParsingResult;
-import com.thirdsmanagement.thirds.application.service.importExport.ImportResponseBuilder.ImportMetrics;
 import com.thirdsmanagement.thirds.application.service.third.BatchProcessor;
-import com.thirdsmanagement.thirds.application.service.third.BatchProcessor.BatchProcessingResult;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdImportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
@@ -27,7 +21,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Servicio principal para la importación masiva de terceros desde Excel.
+ * @brief Servicio principal para importación masiva de terceros desde Excel
+ *
+ * Orquesta el proceso completo de importación con validación por lotes,
+ * detección de duplicados y procesamiento transaccional optimizado.
  */
 @Slf4j
 @Service
@@ -39,15 +36,12 @@ public class ImportThirdService implements ImportThirdUseCase {
     private final DuplicateDetectionService duplicateDetectionService;
     private final BatchProcessor batchProcessor;
     private final ImportResponseBuilder responseBuilder;
+    
+    private static final boolean SKIP_DUPLICATES = true; 
+    private static final boolean CONTINUE_ON_ERROR = false; 
+    private static final int MAX_BATCH_SIZE = 500; 
 
-    // Configuración fija según requerimientos del usuario
-    private static final boolean SKIP_DUPLICATES = true; // Omitir duplicados automáticamente
-    private static final boolean CONTINUE_ON_ERROR = false; // Parar en primer error
-    private static final int MAX_BATCH_SIZE = 500; // Máximo registros por lote
-
-    /**
-     * Orquesta el proceso completo de importación.
-     */
+    
     @Override
     public ThirdImportResponse importThirdsFromExcel(ThirdImportRequest importRequest) {
         try {
@@ -79,14 +73,19 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Paso 1: Parsear archivo Excel.
+     * @brief Parsear archivo Excel
+     * @param importRequest Solicitud de importación con el archivo Excel
+     * @return Resultado del parsing con datos extraídos y mapa de columnas
      */
     private ExcelParsingService.ExcelParsingResult parseExcelFile(ThirdImportRequest importRequest) {
         return excelParsingService.parseExcelFile(importRequest.getExcelFile(), importRequest.getEntId());
     }
 
     /**
-     * Paso 2: Validar datos con cache optimizado.
+     * @brief Validar datos con cache optimizado
+     * @param parsingResult Resultado del parsing con datos extraídos
+     * @param importRequest Solicitud de importación con contexto
+     * @return Resultado de validación con registros válidos y errores
      */
     private BatchValidationService.BatchValidationResult validateData(
             ExcelParsingService.ExcelParsingResult parsingResult,
@@ -98,7 +97,10 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Paso 3: Detectar y filtrar duplicados.
+     * @brief Detectar y filtrar duplicados
+     * @param validationResult Resultado de validación con registros válidos
+     * @param importRequest Solicitud de importación con configuración
+     * @return Resultado de detección con registros únicos y duplicados encontrados
      */
     private DuplicateDetectionService.DuplicateDetectionResult detectDuplicates(
             BatchValidationService.BatchValidationResult validationResult,
@@ -110,7 +112,9 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Paso 4: Procesar registros únicos en lotes optimizados.
+     * @brief Paso 4: Procesar registros únicos en lotes optimizados
+     * @param uniqueRecords Lista de registros únicos a procesar
+     * @return Resultado consolidado del procesamiento por lotes
      */
     private BatchProcessingResult processInBatches(List<ThirdExcelData> uniqueRecords) {
         if (uniqueRecords.isEmpty()) {
@@ -153,7 +157,13 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Paso 5: Construir respuesta final consolidada.
+     * @brief Paso 5: Construir respuesta final consolidada
+     * @param importRequest Solicitud original de importación
+     * @param parsingResult Resultado del parsing del archivo
+     * @param validationResult Resultado de validación por lotes
+     * @param duplicateResult Resultado de detección de duplicados
+     * @param processingResult Resultado del procesamiento por lotes
+     * @return Respuesta final consolidada con métricas y errores
      */
     private ThirdImportResponse buildFinalResponse(ThirdImportRequest importRequest,
             ExcelParsingService.ExcelParsingResult parsingResult,
@@ -188,7 +198,10 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Maneja errores críticos del sistema.
+     * @brief Maneja errores críticos del sistema
+     * @param importRequest Solicitud de importación que falló
+     * @param e Excepción crítica que ocurrió
+     * @return Respuesta de error con detalles del fallo del sistema
      */
     private ThirdImportResponse handleCriticalError(ThirdImportRequest importRequest, Exception e) {
         List<ImportErrorDetail> systemErrors = List.of(
@@ -202,7 +215,11 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Divide lista en lotes del tamaño especificado.
+     * @brief Divide lista en lotes del tamaño especificado
+     * @param <T> Tipo de elementos en la lista
+     * @param list Lista original a dividir
+     * @param batchSize Tamaño máximo de cada lote
+     * @return Lista de lotes con elementos distribuidos
      */
     private <T> List<List<T>> createBatches(List<T> list, int batchSize) {
         List<List<T>> batches = new ArrayList<>();
@@ -213,8 +230,13 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Calcula el número de registros únicos que tienen errores de validación.
-     * Un registro puede tener múltiples errores, pero solo cuenta como 1 fallo.
+     * @brief Calcula el número de registros únicos que tienen errores de validación
+     *
+     * Un registro puede tener múltiples errores, pero solo cuenta como 1 fallo
+     * para evitar duplicar el conteo de registros fallidos.
+     *
+     * @param errors Lista de errores de importación
+     * @return Número de registros únicos que fallaron
      */
     private int calculateUniqueFailedRecords(List<ImportErrorDetail> errors) {
         return (int) errors.stream()
@@ -224,7 +246,10 @@ public class ImportThirdService implements ImportThirdUseCase {
     }
 
     /**
-     * Clase interna para resultado de procesamiento en lotes.
+     * @brief Clase interna para resultado de procesamiento en lotes
+     *
+     * Contiene métricas consolidadas del procesamiento de lotes:
+     * registros procesados exitosamente, fallidos y omitidos.
      */
     @Getter
     @AllArgsConstructor

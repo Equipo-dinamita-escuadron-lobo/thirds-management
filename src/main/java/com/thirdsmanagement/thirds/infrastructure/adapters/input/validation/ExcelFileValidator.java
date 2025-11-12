@@ -11,16 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 /**
- * Validador específico para archivos Excel (.xlsx, .xls).
- * Implementa validaciones de tamaño, extensión y tipo MIME para Excel.
+ * @brief Validador específico para archivos Excel (.xlsx, .xls)
  */
 @Component
 @Qualifier("excelFileValidator")
 @RequiredArgsConstructor
 public class ExcelFileValidator implements FileValidator {
-    
+
     private final FileUploadProperties fileProperties;
-    
+
     @Override
     public void validate(MultipartFile file) {
         validateNotNull(file);
@@ -28,52 +27,68 @@ public class ExcelFileValidator implements FileValidator {
         validateSize(file);
         validateExtension(file);
     }
-    
+
+    /**
+     * @brief Valida que el archivo no sea null
+     * @param file archivo a validar
+     */
     private void validateNotNull(MultipartFile file) {
         if (file == null) {
             throw FileValidationException.forNullFile();
         }
     }
-    
+
+    /**
+     * @brief Valida que el archivo no esté vacío
+     * @param file archivo a validar
+     */
     private void validateNotEmpty(MultipartFile file) {
         if (file.isEmpty() || file.getSize() == 0) {
             throw FileValidationException.forEmptyFile(file.getOriginalFilename());
         }
     }
-    
+
+    /**
+     * @brief Valida que el tamaño del archivo no exceda el límite configurado
+     * @param file archivo a validar
+     */
     private void validateSize(MultipartFile file) {
         if (file.getSize() > fileProperties.getMaxSize()) {
             throw new FileSizeExceededException(fileProperties.getMaxSize());
         }
     }
-    
+
+    /**
+     * @brief Valida que la extensión del archivo sea válida para Excel
+     * @param file archivo a validar
+     */
     private void validateExtension(MultipartFile file) {
         String filename = file.getOriginalFilename();
         if (filename == null) {
             throw FileValidationException.forInvalidExtension("archivo sin nombre", getSupportedExtensions());
         }
-        
+
         String lowerFilename = filename.toLowerCase();
         boolean validExtension = false;
-        
+
         for (String ext : getSupportedExtensions()) {
             if (lowerFilename.endsWith(ext)) {
                 validExtension = true;
                 break;
             }
         }
-        
+
         if (!validExtension) {
             throw FileValidationException.forInvalidExtension(filename, getSupportedExtensions());
         }
     }
-    
+
     @Override
     public String[] getSupportedMimeTypes() {
         List<String> mimeTypes = fileProperties.getAllowedMimeTypes().get("excel");
         return mimeTypes != null ? mimeTypes.toArray(new String[0]) : new String[0];
     }
-    
+
     @Override
     public String[] getSupportedExtensions() {
         List<String> extensions = fileProperties.getAllowedExtensions().get("excel");

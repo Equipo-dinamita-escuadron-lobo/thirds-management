@@ -7,49 +7,51 @@ import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
 
 /**
- * Puerto de salida para operaciones geográficas.
- * Define los métodos para acceder a datos de países, estados y ciudades.
+ * @brief Puerto de salida para operaciones geográficas
+ *
+ * Define el contrato para acceder a datos geográficos
+ * de países, estados y ciudades con validación de jerarquía.
  */
 public interface GeographyOutputPort {
-    
+
     /**
-     * Obtiene todos los países activos.
+     * @brief Obtiene todos los países activos
      * @return Lista de países activos ordenados por nombre
      */
     List<Country> getAllActiveCountries();
-    
+
     /**
-     * Obtiene todos los estados activos de un país específico.
+     * @brief Obtiene estados activos de un país específico
      * @param countryCode Código del país
      * @return Lista de estados activos del país ordenados por nombre
      */
     List<State> getStatesByCountry(String countryCode);
-    
+
     /**
-     * Obtiene todas las ciudades activas de un estado específico.
+     * @brief Obtiene ciudades activas de un estado específico
      * @param stateCode Código del estado
      * @param countryCode Código del país
      * @return Lista de ciudades activas del estado ordenadas por nombre
      */
     List<City> getCitiesByState(String stateCode, String countryCode);
-    
+
     /**
-     * Verifica si existe un país activo con el código especificado.
+     * @brief Verifica existencia de país activo
      * @param countryCode Código del país
      * @return true si el país existe y está activo, false en caso contrario
      */
     boolean existsActiveCountry(String countryCode);
-    
+
     /**
-     * Verifica si existe un estado activo con el código especificado en un país.
+     * @brief Verifica existencia de estado activo en un país
      * @param stateCode Código del estado
      * @param countryCode Código del país
      * @return true si el estado existe y está activo, false en caso contrario
      */
     boolean existsActiveState(String stateCode, String countryCode);
-    
+
     /**
-     * Verifica si existe una ciudad activa con el código especificado en un estado.
+     * @brief Verifica existencia de ciudad activa en un estado
      * @param cityCode Código de la ciudad
      * @param stateCode Código del estado
      * @param countryCode Código del país

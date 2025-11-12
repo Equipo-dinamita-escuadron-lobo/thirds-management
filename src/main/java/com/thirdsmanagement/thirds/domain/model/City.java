@@ -12,8 +12,10 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Modelo de dominio que representa una ciudad.
- * Contiene la información básica de una ciudad para la jerarquía geográfica.
+ * @brief Modelo de dominio que representa una ciudad
+ *
+ * Entidad que contiene la información básica de una ciudad para completar
+ * la jerarquía geográfica. Está relacionada con un estado/departamento específico.
  */
 @Builder
 @Getter

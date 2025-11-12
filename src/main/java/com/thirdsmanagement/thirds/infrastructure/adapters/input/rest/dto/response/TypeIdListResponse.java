@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la respuesta de la lista de tipos de identificación.
- * Contiene una lista de tipos de identificación.
+ * @brief DTO de respuesta para lista de tipos de identificación
  */
 @Builder
 @Getter

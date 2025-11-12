@@ -3,41 +3,36 @@ package com.thirdsmanagement.thirds.domain.enums;
 import lombok.Getter;
 
 /**
- * Estados posibles del procesamiento de un registro individual durante la importación.
- * Define el resultado del procesamiento de cada registro de tercero.
+ * @brief Estados posibles del procesamiento de un registro individual durante la importación
+ *
+ * Define el resultado del procesamiento de cada registro de tercero,
+ * permitiendo un seguimiento granular del éxito o fracaso de cada elemento procesado.
  */
 @Getter
 public enum ProcessingStatus {
-    
-    /**
-     * El registro fue procesado y creado exitosamente.
-     */
+
     SUCCESS("Éxito"),
-    
-    /**
-     * El registro fue omitido por ser un duplicado existente.
-     */
+
     DUPLICATE_SKIPPED("Duplicado Omitido"),
-    
-    /**
-     * El procesamiento del registro falló debido a errores.
-     */
+
     FAILED("Fallido"),
-    
-    /**
-     * El registro fue omitido por razones de validación o datos incompletos.
-     */
+
     SKIPPED("Omitido");
 
     private final String description;
 
+    /**
+     * @brief Constructor del enum
+     * @param description Descripción legible del estado de procesamiento
+     */
     ProcessingStatus(String description) {
         this.description = description;
     }
 
     /**
-     * Verifica si el estado indica un procesamiento exitoso.
-     * 
+     * @brief Verifica si el estado indica un procesamiento exitoso
+     *
+     * Indica que el registro fue procesado correctamente y guardado en el sistema.
      * @return true si el procesamiento fue exitoso
      */
     public boolean isSuccessful() {
@@ -45,8 +40,9 @@ public enum ProcessingStatus {
     }
 
     /**
-     * Verifica si el estado indica que el registro fue omitido.
-     * 
+     * @brief Verifica si el estado indica que el registro fue omitido
+     *
+     * Puede ser omitido por duplicados o por otras razones de validación.
      * @return true si el registro fue omitido por cualquier razón
      */
     public boolean wasSkipped() {
@@ -54,8 +50,10 @@ public enum ProcessingStatus {
     }
 
     /**
-     * Verifica si el estado indica un fallo en el procesamiento.
-     * 
+     * @brief Verifica si el estado indica un fallo en el procesamiento
+     *
+     * Indica que el registro no pudo ser procesado debido a errores
+     * que impidieron su inserción o actualización.
      * @return true si el procesamiento falló
      */
     public boolean isFailed() {
@@ -63,8 +61,10 @@ public enum ProcessingStatus {
     }
 
     /**
-     * Verifica si el estado debe contarse como un duplicado.
-     * 
+     * @brief Verifica si el estado debe contarse como un duplicado
+     *
+     * Específicamente identifica registros omitidos por ser duplicados
+     * de otros ya existentes en el sistema.
      * @return true si fue omitido por ser duplicado
      */
     public boolean isDuplicate() {

@@ -4,18 +4,21 @@ import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
 import com.thirdsmanagement.thirds.domain.event.ThirdTypeUpdatedEvent;
 
 /**
- * Interfaz que define los métodos para publicar eventos de tipos de terceros.
+ * @brief Puerto de salida para publicación de eventos de tipos de tercero
+ *
+ * Define el contrato para publicar eventos relacionados
+ * con operaciones de creación y actualización de tipos de tercero.
  */
 public interface ThirdTypeEventPublisher {
     /**
-     * Publica un evento de creación de tipo de tercero.
-     * @param event Evento de creación de tipo de tercero.
-     */	
+     * @brief Publica evento de creación de tipo de tercero
+     * @param event Evento de creación de tipo de tercero
+     */
     void publishThirdTypeCreatedEvent(ThirdTypeCreatedEvent event);
-    
+
     /**
-     * Publica un evento de actualización de tipo de tercero.
-     * @param event Evento de actualización de tipo de tercero.
+     * @brief Publica evento de actualización de tipo de tercero
+     * @param event Evento de actualización de tipo de tercero
      */
     void publishThirdTypeUpdatedEvent(ThirdTypeUpdatedEvent event);
 }

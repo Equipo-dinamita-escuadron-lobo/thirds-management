@@ -8,8 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Clase ID compuesta para la entidad ThirdsAndTypesEntity.
- * Representa la clave primaria compuesta de la tabla thirds_and_types.
+ * @brief Clave compuesta para ThirdsAndTypesEntity (thId + ttId)
  */
 @Data
 @NoArgsConstructor

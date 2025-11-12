@@ -18,8 +18,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Servicio centralizado para validaciones de Excel.
- * Maneja tanto la obtención de datos como la aplicación de validaciones.
+ * @brief Servicio centralizado para validaciones de Excel
+ *
+ * Maneja tanto la obtención de datos de referencia como la aplicación
+ * de validaciones y listas desplegables en archivos Excel de exportación.
  */
 @Slf4j
 @Service
@@ -32,7 +34,9 @@ public class ExcelValidationService {
     // ========== MÉTODOS DE OBTENCIÓN DE DATOS ==========
 
     /**
-     * Obtiene todos los tipos de identificación activos para una entidad.
+     * @brief Obtiene todos los tipos de identificación activos para una entidad
+     * @param entId identificador de la entidad
+     * @return lista de nombres de tipos de identificación activos
      */
     public List<String> getTypeIdOptions(String entId) {
         return idOutputPort.getAllTypeIds(entId).stream()
@@ -42,7 +46,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene todos los tipos de tercero activos para una entidad.
+     * @brief Obtiene todos los tipos de tercero activos para una entidad
+     * @param entId identificador de la entidad
+     * @return lista de nombres de tipos de tercero activos
      */
     public List<String> getThirdTypeOptions(String entId) {
         return idOutputPort.getALLThirdTypes(entId).stream()
@@ -52,28 +58,32 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene todas las opciones de tipo de persona.
+     * @brief Obtiene todas las opciones de tipo de persona
+     * @return lista con las opciones disponibles (NATURAL, JURIDICA)
      */
     public List<String> getPersonTypeOptions() {
         return List.of("NATURAL", "JURIDICA");
     }
 
     /**
-     * Obtiene todas las opciones de género.
+     * @brief Obtiene todas las opciones de género
+     * @return lista con las opciones disponibles (MASCULINO, FEMENINO, OTRO)
      */
     public List<String> getGenderOptions() {
         return List.of("MASCULINO", "FEMENINO", "OTRO");
     }
 
     /**
-     * Obtiene todas las opciones de estado (activo/inactivo).
+     * @brief Obtiene todas las opciones de estado (activo/inactivo)
+     * @return lista con las opciones disponibles (ACTIVO, INACTIVO)
      */
     public List<String> getStatusOptions() {
         return List.of("ACTIVO", "INACTIVO");
     }
 
     /**
-     * Obtiene todos los países activos.
+     * @brief Obtiene todos los países activos
+     * @return lista de nombres de países activos del sistema
      */
     public List<String> getCountryOptions() {
         return geographyOutputPort.getAllActiveCountries().stream()
@@ -82,7 +92,8 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene todos los departamentos de Colombia.
+     * @brief Obtiene todos los departamentos de Colombia
+     * @return lista de nombres de departamentos colombianos
      */
     public List<String> getColombianStates() {
         return geographyOutputPort.getStatesByCountry("COL").stream()
@@ -91,7 +102,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene el código de un país desde su nombre.
+     * @brief Obtiene el código de un país desde su nombre
+     * @param countryName nombre del país
+     * @return código del país o null si no se encuentra
      */
     public String getCountryCodeByName(String countryName) {
         return geographyOutputPort.getAllActiveCountries().stream()
@@ -102,7 +115,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene todos los departamentos de un país específico por nombre del país.
+     * @brief Obtiene todos los departamentos de un país específico por nombre del país
+     * @param countryName nombre del país
+     * @return lista de nombres de departamentos ordenados alfabéticamente
      */
     public List<String> getStatesByCountryName(String countryName) {
         String countryCode = getCountryCodeByName(countryName);
@@ -160,16 +175,14 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validaciones para terceros con tipos incluidos.
-     * Permite múltiples tipos de tercero separados por comas.
-     * 
-     * @param sheet hoja de Excel
-     * @param entId ID de la empresa
-     * @param startRow fila inicial
-     * @param endRow fila final
-     * @param genderColumnIndex índice de la columna Género (-1 si no está incluida)
-     * @param stateColumnIndex índice de la columna Estado
-     * @param typesColumnIndex índice de la columna Tipos de Tercero
+     * @brief Aplica validaciones para terceros con tipos incluidos
+     * @param sheet hoja de Excel donde aplicar validaciones
+     * @param entId identificador de la entidad
+     * @param startRow fila inicial del rango de validación
+     * @param endRow fila final del rango de validación
+     * @param genderColumnIndex índice de columna Género (-1 si no incluida)
+     * @param stateColumnIndex índice de columna Estado
+     * @param typesColumnIndex índice de columna Tipos de Tercero
      */
     public void applyThirdValidationsWithTypes(Sheet sheet, String entId, int startRow, int endRow,
             int genderColumnIndex, int stateColumnIndex, int typesColumnIndex) {
@@ -184,15 +197,13 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validaciones geográficas para terceros con ciudades incluidas.
-     * Solo aplica validaciones si los índices de columna son válidos (>= 0).
-     * 
-     * @param sheet hoja de Excel
-     * @param startRow fila inicial
-     * @param endRow fila final
-     * @param countryColumnIndex índice de columna País (-1 si no está incluido)
-     * @param stateColumnIndex índice de columna Departamento (-1 si no está incluido)
-     * @param cityColumnIndex índice de columna Ciudad (-1 si no está incluido)
+     * @brief Aplica validaciones geográficas para terceros con ciudades incluidas
+     * @param sheet hoja de Excel donde aplicar validaciones
+     * @param startRow fila inicial del rango de validación
+     * @param endRow fila final del rango de validación
+     * @param countryColumnIndex índice de columna País (-1 si no incluida)
+     * @param stateColumnIndex índice de columna Departamento (-1 si no incluida)
+     * @param cityColumnIndex índice de columna Ciudad (-1 si no incluida)
      */
     public void applyGeographyValidations(Sheet sheet, int startRow, int endRow,
             int countryColumnIndex, int stateColumnIndex, int cityColumnIndex) {
@@ -220,7 +231,13 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación de lista desplegable a una columna específica.
+     * @brief Aplica validación de lista desplegable a una columna específica
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param columnIndex índice de la columna a validar
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
+     * @param options lista de opciones disponibles
+     * @param errorMessage mensaje de error para valores inválidos
      */
     public void applyDropdownValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
             List<String> options, String errorMessage) {
@@ -262,16 +279,15 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación de rango numérico a una columna específica.
-     * 
-     * @param sheet        hoja de Excel
-     * @param columnIndex  índice de la columna
-     * @param startRow     fila inicial
-     * @param endRow       fila final
-     * @param minValue     valor mínimo permitido
-     * @param maxValue     valor máximo permitido
-     * @param fieldName    nombre del campo para mensajes
-     * @param errorMessage mensaje de error personalizado
+     * @brief Aplica validación de rango numérico a una columna específica
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param columnIndex índice de la columna a validar
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
+     * @param minValue valor mínimo permitido (incluyente)
+     * @param maxValue valor máximo permitido (incluyente)
+     * @param fieldName nombre del campo para mensajes informativos
+     * @param errorMessage mensaje de error personalizado para valores inválidos
      */
     public void applyNumericRangeValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
             int minValue, int maxValue, String fieldName, String errorMessage) {
@@ -314,8 +330,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea una hoja separada con los datos de referencia para las listas
-     * desplegables.
+     * @brief Crea una hoja separada con los datos de referencia para las listas desplegables
+     * @param workbook libro de Excel donde crear la hoja
+     * @param entId identificador de la entidad para filtrar datos específicos
      */
     public void createReferenceDataSheet(Workbook workbook, String entId) {
         Sheet refSheet = workbook.createSheet("Datos_Referencia");
@@ -364,7 +381,10 @@ public class ExcelValidationService {
     }
 
     /**
-     * Llena una columna de datos de referencia en una hoja.
+     * @brief Llena una columna de datos de referencia en una hoja
+     * @param sheet hoja donde llenar los datos
+     * @param columnIndex índice de la columna a llenar
+     * @param data lista de valores a colocar en la columna
      */
     private void fillColumnData(Sheet sheet, int columnIndex, List<String> data) {
         // Llenar datos
@@ -383,7 +403,14 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación usando referencias a celdas de otra hoja.
+     * @brief Aplica validación usando referencias a celdas de otra hoja
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param columnIndex índice de la columna a validar
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
+     * @param referenceSheetName nombre de la hoja que contiene los datos de referencia
+     * @param referenceRange rango de celdas de referencia (ej. "$A$2:$A$100")
+     * @param errorMessage mensaje de error para valores inválidos
      */
     public void applyReferenceBasedValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
             String referenceSheetName, String referenceRange, String errorMessage) {
@@ -415,7 +442,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea rangos con nombre para los departamentos de cada país.
+     * @brief Crea rangos con nombre para los departamentos de cada país
+     * @param workbook libro de Excel donde crear los rangos
+     * @param referenceSheet hoja de referencia donde están los datos
      */
     private void createNamedRangesForStatesByCountry(Workbook workbook, Sheet referenceSheet) {
         List<String> countries = getCountryOptions();
@@ -424,9 +453,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea rangos con nombre para las ciudades de cada departamento en la hoja de
-     * referencia.
-     * Organiza las ciudades en columnas consecutivas para facilitar OFFSET.
+     * @brief Crea rangos con nombre para las ciudades de cada departamento
+     * @param workbook libro de Excel donde crear los rangos
+     * @param referenceSheet hoja de referencia donde están los datos
      */
     private void createNamedRangesForCitiesByState(Workbook workbook, Sheet referenceSheet) {
         List<String> states = getColombianStates();
@@ -444,8 +473,15 @@ public class ExcelValidationService {
     }
 
     /**
-     * Versión especializada para ciudades que usa normalización específica para
-     * rangos.
+     * @brief Procesa entidades geográficas con normalización personalizada
+     * @param workbook libro de Excel donde crear los rangos
+     * @param referenceSheet hoja de referencia donde están los datos
+     * @param entities lista de entidades a procesar
+     * @param startColumn columna inicial donde colocar los datos
+     * @param entityType tipo de entidad (país, departamento, ciudad)
+     * @param prefix prefijo para nombres de rangos
+     * @param dataProvider función que obtiene datos para cada entidad
+     * @return siguiente columna disponible después del procesamiento
      */
     private int processGeographicalEntitiesWithCustomNormalization(Workbook workbook, Sheet referenceSheet,
             List<String> entities, int startColumn, String entityType,
@@ -461,8 +497,6 @@ public class ExcelValidationService {
 
             if (!data.isEmpty()) {
                 try {
-                    // Usar normalización específica para rangos (debe coincidir con fórmulas
-                    // INDIRECT)
                     String normalizedName = StringNormalizer.normalizeForExcelNamedRange(entityName);
 
                     if (normalizedName.isEmpty() || normalizedName.length() > 255) {
@@ -487,7 +521,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Obtiene las ciudades de un departamento específico por nombre.
+     * @brief Obtiene las ciudades de un departamento específico por nombre
+     * @param stateName nombre del departamento
+     * @return lista de nombres de ciudades ordenados alfabéticamente
      */
     private List<String> getCitiesByStateName(String stateName) {
         try {
@@ -508,8 +544,12 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación de departamentos usando rangos con nombre directos con
-     * INDIRECT.
+     * @brief Aplica validación de departamentos usando rangos con nombre
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param stateColumnIndex índice de la columna de departamento
+     * @param countryColumnIndex índice de la columna de país
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
      */
     public void applyStateValidationWithNamedRanges(Sheet sheet, int stateColumnIndex, int countryColumnIndex,
             int startRow, int endRow) {
@@ -518,7 +558,12 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación de ciudades usando rangos con nombre directos con INDIRECT.
+     * @brief Aplica validación de ciudades usando rangos con nombre
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param cityColumnIndex índice de la columna de ciudad
+     * @param stateColumnIndex índice de la columna de departamento
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
      */
     public void applyCityValidationWithNamedRanges(Sheet sheet, int cityColumnIndex, int stateColumnIndex,
             int startRow, int endRow) {
@@ -526,7 +571,9 @@ public class ExcelValidationService {
     }
 
     /**
-     * Convierte un índice de columna numérico a letra (A, B, C, etc.).
+     * @brief Convierte un índice de columna numérico a letra (A, B, C, etc.)
+     * @param columnIndex índice numérico de la columna (0 = A, 1 = B, etc.)
+     * @return letra correspondiente a la columna
      */
     private String getColumnLetter(int columnIndex) {
         StringBuilder columnLetter = new StringBuilder();
@@ -538,16 +585,22 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea una fórmula INDIRECT con normalización de caracteres especiales.
-     * Delega la construcción de la fórmula al StringNormalizer para mantener
-     * consistencia.
+     * @brief Crea una fórmula INDIRECT con normalización de caracteres especiales
+     * @param cellReference referencia de celda (ej. "A1")
+     * @param prefix prefijo para el nombre del rango
+     * @return fórmula INDIRECT normalizada
      */
     private String buildNormalizedIndirectFormula(String cellReference, String prefix) {
         return StringNormalizer.buildNormalizedIndirectFormula(cellReference, prefix);
     }
 
     /**
-     * Configura las propiedades comunes de una validación de datos.
+     * @brief Configura las propiedades comunes de una validación de datos
+     * @param validation objeto de validación a configurar
+     * @param errorTitle título del mensaje de error
+     * @param errorMessage mensaje de error personalizado
+     * @param promptTitle título del mensaje de ayuda
+     * @param promptMessage mensaje de ayuda informativo
      */
     private void configureDataValidation(DataValidation validation, String errorTitle, String errorMessage,
             String promptTitle, String promptMessage) {
@@ -560,7 +613,14 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación dependiente usando INDIRECT con configuración común.
+     * @brief Aplica validación dependiente usando INDIRECT
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param targetColumnIndex índice de la columna a validar
+     * @param sourceColumnIndex índice de la columna fuente de dependencia
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
+     * @param prefix prefijo para nombres de rangos
+     * @param validationType tipo de validación (departamento, ciudad, etc.)
      */
     private void applyDependentValidation(Sheet sheet, int targetColumnIndex, int sourceColumnIndex,
             int startRow, int endRow, String prefix, String validationType) {
@@ -596,7 +656,12 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea un rango con nombre para un conjunto de datos.
+     * @brief Crea un rango con nombre para un conjunto de datos
+     * @param workbook libro de Excel donde crear el rango
+     * @param rangeName nombre del rango a crear
+     * @param column índice de la columna donde están los datos
+     * @param dataSize cantidad de elementos en los datos
+     * @param entityType tipo de entidad (país, departamento, ciudad)
      */
     private void createNamedRange(Workbook workbook, String rangeName, int column, int dataSize, String entityType) {
         try {
@@ -614,7 +679,15 @@ public class ExcelValidationService {
     }
 
     /**
-     * Procesa y crea rangos con nombre para una lista de entidades geográficas.
+     * @brief Procesa y crea rangos con nombre para entidades geográficas
+     * @param workbook libro de Excel donde crear los rangos
+     * @param referenceSheet hoja de referencia donde están los datos
+     * @param entities lista de entidades a procesar
+     * @param startColumn columna inicial donde colocar los datos
+     * @param entityType tipo de entidad (país, departamento, ciudad)
+     * @param prefix prefijo para nombres de rangos
+     * @param dataProvider función que obtiene datos para cada entidad
+     * @return siguiente columna disponible después del procesamiento
      */
     private int processGeographicalEntities(Workbook workbook, Sheet referenceSheet, List<String> entities,
             int startColumn, String entityType, String prefix,
@@ -654,8 +727,14 @@ public class ExcelValidationService {
     }
 
     /**
-     * Aplica validación que permite múltiples valores separados por comas.
-     * Muestra un mensaje informativo con los valores válidos disponibles.
+     * @brief Aplica validación que permite múltiples valores separados por comas
+     * @param sheet hoja de Excel donde aplicar la validación
+     * @param columnIndex índice de la columna a validar
+     * @param startRow fila inicial del rango
+     * @param endRow fila final del rango
+     * @param options lista de opciones disponibles
+     * @param fieldName nombre del campo para mensajes
+     * @param promptPrefix prefijo para el mensaje informativo
      */
     public void applyMultiSelectValidation(Sheet sheet, int columnIndex, int startRow, int endRow,
             List<String> options, String fieldName, String promptPrefix) {
@@ -702,8 +781,8 @@ public class ExcelValidationService {
     }
 
     /**
-     * Crea una tabla de mapeo entre nombres originales de departamentos y nombres
-     * de rangos normalizados.
+     * @brief Crea una tabla de mapeo entre nombres originales y rangos normalizados
+     * @param referenceSheet hoja de referencia donde crear la tabla de mapeo
      */
     private void createDepartmentMappingTable(Sheet referenceSheet) {
         try {

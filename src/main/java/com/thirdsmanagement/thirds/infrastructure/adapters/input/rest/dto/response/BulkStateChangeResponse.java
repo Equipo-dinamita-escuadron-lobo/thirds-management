@@ -6,27 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO de respuesta para operaciones de cambio de estado masivo.
- * Contiene información sobre la cantidad de registros actualizados.
+ * @brief DTO de respuesta para cambio masivo de estado de terceros
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BulkStateChangeResponse {
-    
-    /**
-     * Cantidad de terceros actualizados.
-     */
+
     private int updatedCount;
-    
-    /**
-     * Nuevo estado aplicado (true para activo, false para inactivo).
-     */
+
     private Boolean newState;
-    
-    /**
-     * Mensaje descriptivo de la operación.
-     */
+
     private String message;
 }

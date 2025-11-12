@@ -21,9 +21,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Servicio especializado en validaciones en lotes para importación de terceros.
+ * @brief Servicio especializado en validaciones en lotes para importación de terceros
+ *
  * Optimiza las validaciones pre-cargando datos de referencia y procesando en
- * lotes. *
+ * lotes para mejorar rendimiento en importaciones masivas.
  */
 @Slf4j
 @Service
@@ -35,12 +36,10 @@ public class BatchValidationService {
     private final ThirdValidationService thirdValidationService;
 
     /**
-     * Valida un lote de datos de terceros de Excel.
-     * 
+     * @brief Valida un lote de datos de terceros de Excel
      * @param thirdsData lista de datos de terceros a validar
-     * @param entId      identificador de la entidad
-     * @param columnMap  mapa de columnas del Excel para incluir números de columna
-     *                   en errores
+     * @param entId identificador de la entidad
+     * @param columnMap mapa de columnas del Excel para incluir números de columna en errores
      * @return resultado de validación con errores y advertencias
      */
     public BatchValidationResult validateBatch(List<ThirdExcelData> thirdsData, String entId,
@@ -81,8 +80,9 @@ public class BatchValidationService {
     }
 
     /**
-     * Pre-carga todos los datos de referencia para optimizar validaciones.
-     * Retorna un objeto inmutable con todos los datos necesarios.
+     * @brief Pre-carga todos los datos de referencia para optimizar validaciones
+     * @param entId identificador de la entidad
+     * @return objeto inmutable con todos los datos de referencia necesarios
      */
     public ReferenceDataCache preloadReferenceData(String entId) {
 
@@ -131,8 +131,11 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida un registro individual usando los datos pre-cargados.
-     * Ejecuta TODAS las validaciones para mostrar todos los errores del registro.
+     * @brief Valida un registro individual usando los datos pre-cargados
+     * @param excelData registro de Excel a validar
+     * @param cache datos de referencia pre-cargados
+     * @param columnMap mapa de índices de columnas
+     * @return resultado con validez del registro y lista de errores
      */
     private ValidationResult validateSingleRecord(ThirdExcelData excelData, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -157,7 +160,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida campos básicos y formato.
+     * @brief Valida campos básicos y formato
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateBasicFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -178,7 +184,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida campos requeridos comunes para todos los tipos de persona.
+     * @brief Valida campos requeridos comunes para todos los tipos de persona
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateCommonRequiredFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -221,8 +230,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida campos específicos requeridos para personas naturales.
-     * Género es opcional.
+     * @brief Valida campos específicos requeridos para personas naturales
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateNaturalPersonFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -239,7 +250,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida campos específicos requeridos para personas jurídicas.
+     * @brief Valida campos específicos requeridos para personas jurídicas
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateLegalEntityFields(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -250,7 +264,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida formatos de campos.
+     * @brief Valida formatos de campos
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateFieldFormats(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             Map<String, Integer> columnMap) {
@@ -276,7 +293,11 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida referencias a datos maestros.
+     * @brief Valida referencias a datos maestros
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param cache datos de referencia pre-cargados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateReferences(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -311,8 +332,11 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida datos geográficos - jerarquía y existencia.
-     * La geografía es opcional, solo se valida la existencia si los datos están presentes.
+     * @brief Valida datos geográficos - jerarquía y existencia
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param cache datos de referencia pre-cargados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateGeography(ThirdExcelData excelData, List<ImportErrorDetail> errors, ReferenceDataCache cache,
             Map<String, Integer> columnMap) {
@@ -356,8 +380,11 @@ public class BatchValidationService {
     }
 
     /**
-     * Valida reglas de negocio reutilizando el servicio existente.
-     * Captura CADA excepción individualmente para mostrar todos los errores.
+     * @brief Valida reglas de negocio reutilizando el servicio existente
+     * @param excelData registro de Excel a validar
+     * @param errors lista donde agregar errores encontrados
+     * @param cache datos de referencia pre-cargados
+     * @param columnMap mapa de índices de columnas para referencias de error
      */
     private void validateBusinessRules(ThirdExcelData excelData, List<ImportErrorDetail> errors,
             ReferenceDataCache cache, Map<String, Integer> columnMap) {
@@ -399,8 +426,9 @@ public class BatchValidationService {
     }
 
     /**
-     * Verifica si se puede construir un objeto Third con los datos disponibles.
-     * Requiere al menos: personType, typeId y idNumber.
+     * @brief Verifica si se puede construir un objeto Third con los datos disponibles
+     * @param excelData registro de Excel a validar
+     * @return true si tiene los datos mínimos requeridos para construir un Third
      */
     private boolean canBuildThirdObject(ThirdExcelData excelData) {
         return excelData.getPersonType() != null 
@@ -409,7 +437,10 @@ public class BatchValidationService {
     }
 
     /**
-     * Convierte ThirdExcelData a Third para validaciones.
+     * @brief Convierte ThirdExcelData a Third para validaciones
+     * @param excelData registro de Excel a convertir
+     * @param cache datos de referencia pre-cargados
+     * @return objeto Third construido para validaciones de negocio
      */
     private Third convertToThird(ThirdExcelData excelData, ReferenceDataCache cache) {
         // Obtener TypeId usando encapsulación correcta
@@ -448,7 +479,7 @@ public class BatchValidationService {
     }
 
     /**
-     * Objeto inmutable que encapsula todos los datos de referencia.
+     * @brief Objeto inmutable que encapsula todos los datos de referencia.
      * Simplifica testing y elimina complejidad de ThreadLocal.
      * Aplica encapsulación correcta con métodos de acceso.
      */
@@ -459,7 +490,6 @@ public class BatchValidationService {
         private final Map<String, State> states;
         private final Map<String, City> cities;
 
-        // Constructor completo para uso en producción
         ReferenceDataCache(Map<String, TypeId> typeIds, Map<String, ThirdType> thirdTypes,
                 Map<String, Country> countries, Map<String, State> states, Map<String, City> cities) {
             // Crear copias inmutables para evitar modificaciones externas
@@ -523,7 +553,7 @@ public class BatchValidationService {
     }
 
     /**
-     * Clase que representa el resultado de validación de un registro individual.
+     * @brief Clase que representa el resultado de validación de un registro individual.
      */
     @Data
     @Builder
@@ -535,7 +565,7 @@ public class BatchValidationService {
     }
 
     /**
-     * Clase que representa el resultado de validación de un lote completo.
+     * @brief Clase que representa el resultado de validación de un lote completo.
      */
     @Data
     @Builder

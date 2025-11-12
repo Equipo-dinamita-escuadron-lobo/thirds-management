@@ -6,15 +6,20 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Component;
 
 /**
- * Utilidad para generar nombres de archivos Excel de terceros.
+ * @brief Generador de nombres de archivo Excel para operaciones de importación/exportación
+ *
+ * Utilidad especializada en crear nombres de archivo descriptivos y únicos para
+ * plantillas y exportaciones de terceros. Incluye timestamps, nombres de empresa
+ * y estados para facilitar identificación y organización de archivos.
  */
 @Component
 public class ExcelFileNameGenerator {
-    
+
     /**
-     * Genera nombre de archivo para plantilla de terceros.
-     * 
-     * @return nombre del archivo con timestamp
+     * @brief Genera nombre único para plantilla de importación de terceros
+     * @details Crea nombre con formato "Plantilla_Terceros_yyyyMMdd_HHmmss.xlsx"
+     * que incluye timestamp para evitar conflictos de nombre.
+     * @return nombre de archivo único para plantilla Excel
      */
     public String generateTemplateFileName() {
         String timestamp = generateTimestamp();
@@ -22,12 +27,13 @@ public class ExcelFileNameGenerator {
     }
     
     /**
-     * Genera nombre de archivo para exportación de terceros.
-     * 
-     * @param entId ID de la empresa
-     * @param companyName Nombre de la empresa (opcional)
-     * @param status Estado de los terceros exportados (true=activos, false=inactivos, null=todos)
-     * @return nombre del archivo con timestamp, empresa y estado si aplica
+     * @brief Genera nombre descriptivo para archivo de exportación de terceros
+     * @details Construye nombre con formato "Terceros_[Empresa]_[Estado]_yyyyMMdd_HHmmss.xlsx"
+     * incluyendo nombre de empresa normalizado y estado si se especifican.
+     * @param entId ID de la empresa (usado internamente, no en nombre)
+     * @param companyName nombre de la empresa para incluir en el archivo (opcional)
+     * @param status estado de los terceros (true=activos, false=inactivos, null=todos)
+     * @return nombre de archivo descriptivo y único para exportación
      */
     public String generateExportFileName(String entId, String companyName, Boolean status) {
         String timestamp = generateTimestamp();
@@ -50,20 +56,21 @@ public class ExcelFileNameGenerator {
     }
     
     /**
-     * Normaliza el nombre para uso en archivos.
-     * Reemplaza espacios por guiones bajos.
-     * 
-     * @param name nombre a normalizar
-     * @return nombre normalizado para archivo
+     * @brief Normaliza nombre de empresa para uso seguro en nombres de archivo
+     * @details Reemplaza espacios por guiones bajos para evitar problemas de path
+     * y caracteres especiales en sistemas de archivo.
+     * @param name nombre original de la empresa
+     * @return nombre normalizado seguro para archivo
      */
     private String normalizeForFileName(String name) {
         return name.replace(" ", "_");
     }
     
     /**
-     * Genera timestamp en formato yyyyMMdd_HHmmss.
-     * 
-     * @return timestamp formateado
+     * @brief Genera timestamp formateado para nombres de archivo únicos
+     * @details Crea timestamp con formato yyyyMMdd_HHmmss usando hora actual del sistema.
+     * Garantiza unicidad de nombres de archivo en operaciones secuenciales.
+     * @return timestamp formateado seguro para nombres de archivo
      */
     private String generateTimestamp() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));

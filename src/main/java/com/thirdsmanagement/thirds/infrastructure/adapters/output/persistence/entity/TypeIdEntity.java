@@ -19,9 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la entidad de la tabla type_id.
- * Contiene la información de un tipo de identificación.
- * La tabla tiene una clave primaria autoincrementable id.
+ * @brief Entidad JPA para tipos de identificación con clasificación de persona
  */
 @Entity
 @Getter
@@ -48,7 +46,6 @@ public class TypeIdEntity {
     @TenantId
     @Column(name = "tenant_id")
     private String tenantId;
-
 
     @Builder.Default
     @Column(name = "ti_status")

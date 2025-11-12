@@ -7,18 +7,21 @@ import org.springframework.data.domain.Page;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
 
 /**
- * Interfaz que representa el caso de uso para listar los tipos de identificacion.
+ * @brief Caso de uso para consulta y listado de tipos de identificación
+ *
+ * Proporciona operaciones de consulta, búsqueda, paginación y conteo
+ * para tipos de identificación con múltiples criterios de filtrado.
  */
 public interface ListTypeIdUseCase {
     /**
-     * Obtiene todos los tipos de identidicacion
+     * @brief Obtiene todos los tipos de identificación
      * @param entId Identificador de la empresa
-     * @return Lista de tipos de identificacion
+     * @return Lista de tipos de identificación
      */
     List<TypeId> getAllTypeId(String entId);
-    
+
     /**
-     * Obtiene todos los tipos de identificación con paginación y ordenamiento.
+     * @brief Obtiene tipos de identificación con paginación y ordenamiento
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -27,18 +30,18 @@ public interface ListTypeIdUseCase {
      * @return Página de tipos de identificación
      */
     Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Obtiene todos los tipos de identificación activos con paginación simple (ordenado por tiName asc).
+     * @brief Obtiene tipos de identificación activos con paginación
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
      * @return Página de tipos de identificación activos ordenados por nombre
      */
     Page<TypeId> getAllActiveTypeIds(String entId, int page, int size);
-    
+
     /**
-     * Busca tipos de identificación por empresa y término de búsqueda.
+     * @brief Busca tipos de identificación por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -48,23 +51,23 @@ public interface ListTypeIdUseCase {
      * @return Página de tipos de identificación que coinciden
      */
     Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder);
-    
+
     /**
-     * Cuenta tipos de identificación por empresa.
+     * @brief Cuenta tipos de identificación por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación
      */
     long countByEntId(String entId);
-    
+
     /**
-     * Cuenta tipos de identificación activos por empresa.
+     * @brief Cuenta tipos de identificación activos por empresa
      * @param entId El id de la empresa
      * @return Cantidad de tipos de identificación activos
      */
     long countActiveByEntId(String entId);
-    
+
     /**
-     * Cuenta tipos de identificación por empresa y término de búsqueda.
+     * @brief Cuenta tipos de identificación por empresa y término de búsqueda
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de tipos de identificación que coinciden

@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase de clave compuesta para CityEntity.
- * Representa la clave primaria compuesta por cityCode, stateCode y countryCode.
+ * @brief Clave compuesta para CityEntity (cityCode + stateCode + countryCode)
  */
 @Getter
 @Setter
@@ -17,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class CityEntityId implements Serializable {
-    
+
     private String cityCode;
     private String stateCode;
     private String countryCode;

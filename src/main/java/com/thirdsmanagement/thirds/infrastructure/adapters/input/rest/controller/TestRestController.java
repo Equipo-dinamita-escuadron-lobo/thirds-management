@@ -8,16 +8,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * Controlador REST para verificar la disponibilidad del servicio.
- * Este controlador expone un endpoint para verificar si el servicio está disponible y en funcionamiento.
- * @return Una cadena de texto "pong" indicando que el servicio está disponible.
+ * @brief Controlador REST para pruebas de disponibilidad del servicio
+ *
+ * Adaptador de entrada que expone un endpoint simple para verificar
+ * que el servicio de terceros está operativo y responde correctamente.
  */
 @RestController
 @RequestMapping("/api/thirds/test")
 public class TestRestController {
+
     /**
-     * Verificar disponibilidad del servicio.
-     * @return Una cadena de texto "pong" indicando que el servicio está disponible.
+     * @brief Endpoint de verificación de disponibilidad (health check)
+     *
+     * Método que responde con "pong" para confirmar que el servicio
+     * está funcionando correctamente.
+     * @return cadena "pong" indicando que el servicio está disponible
      */
     @GetMapping("/ping")
     public String ping() {

@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * @brief DTO de respuesta para información de tipo de tercero
+ */
 @Builder
 @Getter
 @Setter

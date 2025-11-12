@@ -13,15 +13,21 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Builder especializado en la construcción de respuestas de importación.
- * Centraliza la lógica de determinación de estados y cálculos de métricas.
+ * @brief Builder especializado en la construcción de respuestas de importación
+ *
+ * Centraliza la lógica de determinación de estados y cálculos de métricas
+ * para proporcionar respuestas consistentes en operaciones de importación.
  */
 @Slf4j
 @Service
 public class ImportResponseBuilder {
 
     /**
-     * Construye respuesta de importación exitosa o parcialmente exitosa.
+     * @brief Construye respuesta de importación exitosa o parcialmente exitosa
+     * @param request Solicitud original de importación
+     * @param metrics Métricas consolidadas de la importación
+     * @param allErrors Lista completa de errores encontrados
+     * @return Respuesta estructurada con estado y métricas finales
      */
     public ThirdImportResponse buildSuccessResponse(ThirdImportRequest request,
             ImportMetrics metrics,
@@ -42,7 +48,11 @@ public class ImportResponseBuilder {
     }
 
     /**
-     * Construye respuesta de importación fallida.
+     * @brief Construye respuesta de importación fallida
+     * @param request Solicitud original de importación
+     * @param errorMessage Mensaje descriptivo del error crítico
+     * @param errors Lista de errores específicos encontrados
+     * @return Respuesta con estado FAILED y métricas en cero
      */
     public ThirdImportResponse buildFailedResponse(ThirdImportRequest request,
             String errorMessage,
@@ -61,7 +71,10 @@ public class ImportResponseBuilder {
     }
 
     /**
-     * Determina el estado final de la importación basado en métricas.
+     * @brief Determina el estado final de la importación basado en métricas
+     * @param metrics Métricas consolidadas del proceso de importación
+     * @param allErrors Lista completa de errores encontrados
+     * @return Estado final: COMPLETED, COMPLETED_WITH_ERRORS, o FAILED
      */
     private ImportStatus determineImportStatus(ImportMetrics metrics, List<ImportErrorDetail> allErrors) {
         boolean hasProcessingFailures = metrics.getFailureCount() > 0;
@@ -79,7 +92,10 @@ public class ImportResponseBuilder {
 
 
     /**
-     * Clase para encapsular métricas de importación.
+     * @brief Clase para encapsular métricas de importación
+     *
+     * Contiene todas las métricas relevantes del proceso de importación:
+     * total de registros, exitosos, fallidos y duplicados omitidos.
      */
     @Getter
     @AllArgsConstructor

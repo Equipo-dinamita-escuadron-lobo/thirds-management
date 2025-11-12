@@ -12,15 +12,14 @@ import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Servicio para validaciones comunes de terceros.
+ * @brief Servicio para validaciones comunes de terceros
  */
 @Component
 public class ThirdValidationService {
 
     /**
-     * Valida la consistencia entre el tipo de persona y los campos requeridos.
-     * 
-     * @param third el tercero a validar
+     * @brief Valida la consistencia entre el tipo de persona y los campos requeridos
+     * @param third tercero a validar
      * @throws ThirdPersonTypeValidationException si hay inconsistencias
      */
     public void validatePersonTypeConsistency(Third third) {
@@ -63,9 +62,8 @@ public class ThirdValidationService {
     }
 
     /**
-     * Valida que el tipo de identificación sea compatible con el tipo de persona.
-     * 
-     * @param third el tercero a validar
+     * @brief Valida que el tipo de identificación sea compatible con el tipo de persona
+     * @param third tercero a validar
      * @throws ThirdTypeIdPersonTypeIncompatibilityException si hay incompatibilidad
      */
     public void validateTypeIdPersonTypeCompatibility(Third third) {
@@ -93,10 +91,8 @@ public class ThirdValidationService {
     }
 
     /**
-     * Valida que el formato del NIT sea correcto para personas jurídicas.
-     * El NIT debe tener exactamente 9 dígitos y empezar por 8 o 9.
-     * 
-     * @param third el tercero a validar
+     * @brief Valida que el formato del NIT sea correcto para personas jurídicas
+     * @param third tercero a validar
      * @throws ThirdNitInvalidFormatException si el NIT no tiene el formato correcto
      */
     public void validateNitFormat(Third third) {
@@ -134,12 +130,8 @@ public class ThirdValidationService {
     }
 
     /**
-     * Valida el dígito de verificación según el tipo de persona.
-     * - Personas jurídicas con NIT: dígito de verificación OBLIGATORIO
-     * - Personas jurídicas con otro tipo de ID: dígito de verificación OPCIONAL
-     * - Personas naturales: dígito de verificación NO PERMITIDO
-     * 
-     * @param third el tercero a validar
+     * @brief Valida el dígito de verificación según el tipo de persona
+     * @param third tercero a validar
      * @throws VerificationDigitNotAllowedException si es persona natural y tiene dígito de verificación
      * @throws VerificationDigitRequiredException si es persona jurídica con NIT y no tiene dígito de verificación
      */

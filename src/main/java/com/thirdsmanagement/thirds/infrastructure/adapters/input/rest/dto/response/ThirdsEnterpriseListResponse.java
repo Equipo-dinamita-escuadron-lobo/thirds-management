@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la respuesta de la lista de terceros.
- * Contiene una lista de terceros.
+ * @brief DTO de respuesta para lista paginada de terceros por empresa
  */
 @Builder
 @Getter

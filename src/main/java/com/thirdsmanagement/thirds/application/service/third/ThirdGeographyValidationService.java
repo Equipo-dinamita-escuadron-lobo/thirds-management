@@ -15,7 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio de validación geográfica para operaciones de terceros.
+ * @brief Servicio de validación geográfica para operaciones de terceros
+ *
  * Valida la jerarquía geográfica: País → Estado/Departamento → Ciudad
  */
 @Service
@@ -26,15 +27,13 @@ public class ThirdGeographyValidationService {
     private final GeographyOutputPort geographyOutputPort;
 
     /**
-     * Valida y obtiene la información geográfica completa basada en los códigos
-     * proporcionados. Permite geografía parcial cuando los códigos son null.
-     * 
+     * @brief Valida y obtiene la información geográfica completa basada en los códigos proporcionados
      * @param countryCode código del país (puede ser null)
-     * @param stateCode   código del estado/departamento (puede ser null)
-     * @param cityCode    código de la ciudad (puede ser null)
+     * @param stateCode código del departamento (puede ser null)
+     * @param cityCode código de la ciudad (puede ser null)
      * @return array con [Country, State, City] validados (algunos pueden ser null)
-     * @throws CountryNotFoundException      si el país no existe
-     * @throws StateNotFoundException        si el estado no existe
+     * @throws CountryNotFoundException si el país no existe
+     * @throws StateNotFoundException si el departamento no existe
      * @throws GeographyInvalidDataException si la jerarquía es inválida
      */
     public Object[] validateAndGetGeography(String countryCode, String stateCode, String cityCode) {
@@ -112,12 +111,10 @@ public class ThirdGeographyValidationService {
     }
 
     /**
-     * Valida que la jerarquía geográfica sea consistente.
-     * Valida país-estado cuando city es null, o la jerarquía completa cuando city está presente.
-     * 
+     * @brief Valida que la jerarquía geográfica sea consistente
      * @param country país
-     * @param state   estado/departamento
-     * @param city    ciudad (puede ser null para validar solo país-estado)
+     * @param state departamento
+     * @param city ciudad (puede ser null para validar solo país-departamento)
      * @throws GeographyInvalidDataException si la jerarquía es inconsistente
      */
     private void validateGeographyHierarchy(Country country, State state, City city) {

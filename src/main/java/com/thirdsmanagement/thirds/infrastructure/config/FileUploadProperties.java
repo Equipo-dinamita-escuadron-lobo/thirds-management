@@ -7,25 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Propiedades de configuración para carga de archivos.
- * Permite externalizar límites y restricciones de archivos en application.yml
+ * @brief Propiedades de configuración para carga de archivos con validación
+ *
+ * Externaliza límites y restricciones de archivos en application.yml para facilitar
+ * configuración sin recompilación. Soporta diferentes tipos de archivo con sus
+ * extensiones y tipos MIME permitidos.
  */
 @Data
 @ConfigurationProperties(prefix = "file-upload")
 public class FileUploadProperties {
-    
-    /**
-     * Tamaño máximo permitido para archivos en bytes.
-     */
     private Long maxSize;
-    
-    /**
-     * Extensiones permitidas por tipo de archivo.
-     */
     private Map<String, List<String>> allowedExtensions;
-    
-    /**
-     * Tipos MIME permitidos por tipo de archivo.
-     */
     private Map<String, List<String>> allowedMimeTypes;
 }

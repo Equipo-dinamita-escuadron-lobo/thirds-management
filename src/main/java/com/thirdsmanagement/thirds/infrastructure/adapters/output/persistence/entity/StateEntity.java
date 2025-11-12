@@ -16,8 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Entidad JPA que representa la tabla de estados/departamentos.
- * Contiene la información básica de un estado para la jerarquía geográfica.
+ * @brief Entidad JPA para estados/departamentos con clave compuesta
  */
 @Entity
 @Getter

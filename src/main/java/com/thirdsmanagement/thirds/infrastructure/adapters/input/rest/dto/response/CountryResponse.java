@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO de respuesta para información de países.
+ * @brief DTO de respuesta para información de países
  */
 @Builder
 @Getter
@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CountryResponse {
-    
+
     private String countryCode;
     private String countryName;
 }

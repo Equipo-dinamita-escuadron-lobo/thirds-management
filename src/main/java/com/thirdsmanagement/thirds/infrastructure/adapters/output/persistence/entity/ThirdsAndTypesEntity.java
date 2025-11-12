@@ -15,8 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Entidad que representa la relación muchos a muchos entre terceros y tipos de tercero.
- * Esta entidad intermedia es necesaria para incluir el tenant_id en la tabla de relación.
+ * @brief Entidad intermedia para relación muchos a muchos terceros-tipos con multi-tenancy
  */
 @Entity
 @Table(name = "thirds_and_types")
@@ -46,5 +45,4 @@ public class ThirdsAndTypesEntity {
     @ManyToOne
     @JoinColumn(name = "tt_id", insertable = false, updatable = false)
     private ThirdTypeEntity thirdType;
-
 }

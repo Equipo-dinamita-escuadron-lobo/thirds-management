@@ -35,11 +35,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Component;
 
 /**
- * Clase adaptador de persistencia para la entidad Third.
- * Implementa la interfaz {@link ThirdOutputPort}.
- * Utiliza {@link ThirdRepository}, {@link ThirdTypeRepository} y {@link TypeIdRepository} para las operaciones de persistencia.
- * Utiliza {@link ThirdPersistenceMapper} para mapear las entidades y los modelos.
- * Proporciona métodos para guardar y obtener los terceros.
+ * @brief Adaptador principal de persistencia para operaciones CRUD de terceros con multi-tenancy
+ *
+ * Implementa el puerto de salida ThirdOutputPort para gestionar todas las operaciones de persistencia
+ * de terceros, incluyendo creación, actualización, eliminación, búsqueda y carga de datos geográficos.
+ * Maneja validaciones de claves foráneas, relaciones muchos-a-muchos con tipos de tercero y
+ * operaciones masivas optimizadas.
  */
 @Slf4j
 @Component
@@ -56,9 +57,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     private final GeographyLoaderService geographyLoaderService;
 
     /**
-     * Guarda un tercero.
-     * @param third Tercero a guardar.
-     * @return Tercero guardado.
+     * @brief Guarda un tercero con validaciones y relaciones de tipos de tercero
+     * @details Realiza validaciones de claves foráneas, asigna tenant ID, guarda el tercero principal
+     * y crea las relaciones muchos-a-muchos con los tipos de tercero. Finalmente carga datos geográficos completos.
+     * @param third Tercero a guardar con sus datos y tipos asociados
+     * @return Tercero guardado con datos geográficos completos
+     * @throws IllegalArgumentException si el tercero o su tipo de identificación son null
      */
     @Override
     public Third saveThird(Third third) {
@@ -114,10 +118,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Carga los datos geográficos completos para un objeto Third.
-     * @param third el objeto Third del dominio
-     * @param thirdEntity la entidad de persistencia con los códigos geográficos
-     * @return el objeto Third con datos geográficos completos
+     * @brief Carga datos geográficos completos desde servicios especializados
+     * @details Utiliza GeographyLoaderService para cargar objetos completos de Country, State y City
+     * basándose en los códigos almacenados en la entidad. Crea un nuevo objeto Third con toda la información geográfica.
+     * @param third objeto Third del dominio con datos básicos
+     * @param thirdEntity entidad JPA con códigos geográficos (country, province, city)
+     * @return nuevo objeto Third con datos geográficos completos cargados
      */
     private Third loadGeographyData(Third third, ThirdEntity thirdEntity) {
         return Third.builder()
@@ -143,7 +149,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Valida que el tipo de identificación existe antes de proceder con el guardado.
+     * @brief Valida existencia de tipo de identificación para claves foráneas
+     * @details Verifica que el tipo de identificación referenciado exista en la base de datos
+     * antes de proceder con operaciones que dependan de esta relación.
+     * @param typeId ID del tipo de identificación a validar
+     * @throws TypeIdForeignKeyViolationException si el tipo de identificación no existe
      */
     private void validateTypeIdExists(Long typeId) {
         if (!typeIdRepository.existsById(typeId)) {
@@ -152,7 +162,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Valida que todos los tipos de tercero existen antes de proceder con el guardado.
+     * @brief Valida existencia de todos los tipos de tercero para relaciones muchos-a-muchos
+     * @details Verifica que cada tipo de tercero en el conjunto exista en la base de datos
+     * antes de crear relaciones muchos-a-muchos en la tabla intermedia thirds_and_types.
+     * @param thirdTypes conjunto de tipos de tercero a validar
+     * @throws ThirdTypeForeignKeyViolationException si algún tipo de tercero no existe
      */
     private void validateThirdTypesExist(Set<ThirdType> thirdTypes) {
         if (thirdTypes != null && !thirdTypes.isEmpty()) {
@@ -165,7 +179,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Obtiene un tercero por su identificador y empresa.
+     * @brief Obtiene un tercero por su identificador y empresa.
      * @param id Identificador del tercero.
      * @param entId Identificador de la empresa.
      * @return Tercero encontrado.
@@ -181,13 +195,22 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Third third = convertToThird(thirdEntity.get());
         return Optional.of(third);
     }
+    
+    /**
+     * @brief Verifica existencia de tercero por ID y empresa
+     * @details Consulta optimizada para verificar si existe un tercero con el ID especificado
+     * dentro de la empresa indicada, sin cargar toda la entidad.
+     * @param id ID del tercero a verificar
+     * @param entId ID de la empresa para el alcance de la verificación
+     * @return true si existe el tercero, false en caso contrario
+     */
     @Override
     public boolean existThirdById(long id, String entId) {
         return thirdRepository.existThirdByThIdAndEntId(id, entId);
     }
 
     /**
-     * Cambia el estado de un tercero.
+     * @brief Cambia el estado de un tercero.
      * @param thId Identificador del tercero.
      * @param entId Identificador de la empresa.
      * @return Verdadero si el estado del tercero cambió, falso en caso contrario.
@@ -211,7 +234,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Obtiene una página de terceros filtrados por el identificador de entidad.
+     * @brief Obtiene una página de terceros filtrados por el identificador de entidad.
      * @param entId El identificador de la entidad por la cual se filtrarán los terceros.
      * @param page El objeto Pageable que contiene la información de paginación.
      * @return Una página de objetos Third que representan los terceros.
@@ -225,9 +248,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Obtiene todos los terceros de una empresa filtrados por estado.
-     * Optimizado para exportación: el filtro se aplica en BD, no en memoria.
-     * 
+     * @brief Obtiene todos los terceros de una empresa filtrados por estado.   
      * @param entId El identificador de la entidad
      * @param state Estado de los terceros (true=activos, false=inactivos)
      * @param page El objeto Pageable que contiene la información de paginación
@@ -244,9 +265,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Convierte un objeto ThirdEntity a un objeto Third.
-     * @param thirdEntity El objeto ThirdEntity que se va a convertir.
-     * @return El objeto Third resultante de la conversión.
+     * @brief Convierte ThirdEntity a Third con carga completa de relaciones
+     * @details Mapea la entidad JPA al modelo de dominio, carga datos geográficos completos,
+     * y recupera todas las relaciones muchos-a-muchos con tipos de tercero desde la tabla intermedia.
+     * @param thirdEntity entidad JPA con datos básicos del tercero
+     * @return objeto Third completo con datos geográficos y tipos de tercero asociados
      */
     private Third convertToThird(ThirdEntity thirdEntity) {
 
@@ -275,20 +298,14 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-    * Actualiza un tercero en el sistema.
-    * Este método permite actualizar la información de un tercero existente,
-    * incluyendo su nombre, apellidos, número de identificación, razón social,
-    * dirección, ubicación geográfica, tipo de persona, género, estado, tipo de
-    * identificación y otros datos relacionados.
-    *
-    * @param third el objeto {@link Third} que contiene la información actualizada del tercero.
-    *              Debe incluir el identificador único del tercero (ThId) para localizarlo en la base de datos.
-    * @return el objeto {@link Third} actualizado después de persistir los cambios en la base de datos.
-    *         Contiene los nuevos valores de las propiedades del tercero.
-    *
-    * @throws IllegalArgumentException si el tercero proporcionado es nulo.
-    * @throws EntityNotFoundException si no se encuentra un tercero con el identificador proporcionado (ThId).
-    * @throws DataIntegrityViolationException si se viola alguna restricción de la base de datos durante la actualización.
+     * @brief Actualiza tercero existente con validaciones y manejo de relaciones
+     * @details Actualiza todos los campos del tercero, valida claves foráneas, actualiza las relaciones
+     * muchos-a-muchos con tipos de tercero (eliminando existentes y creando nuevas), y retorna el tercero
+     * actualizado con datos geográficos completos.    *
+     * @param third objeto Third con datos actualizados (debe incluir thId)
+     * @return Third actualizado con datos geográficos completos    *
+     * @throws IllegalArgumentException si third es null o no tiene ID
+     * @throws ThirdNotFound si no existe el tercero con el ID especificado
     */
     @Override
     public Third updateThird(Third third) {
@@ -354,10 +371,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Actualiza las relaciones de tipos de tercero para un tercero específico.
-     * Elimina todas las relaciones existentes y crea las nuevas.
-     * @param thirdId ID del tercero
-     * @param thirdTypes Nuevos tipos de tercero a asociar
+     * @brief Actualiza relaciones muchos-a-muchos con tipos de tercero
+     * @details Elimina todas las relaciones existentes en la tabla intermedia thirds_and_types
+     * para el tercero especificado, luego crea las nuevas relaciones basadas en el conjunto
+     * de tipos de tercero proporcionado.
+     * @param thirdId ID del tercero cuyas relaciones se van a actualizar
+     * @param thirdTypes conjunto de nuevos tipos de tercero a asociar
      */
     private void updateThirdTypeRelations(Long thirdId, Set<ThirdType> thirdTypes) {
         // Eliminar todas las relaciones existentes
@@ -385,11 +404,13 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
     
     /**
-     * Elimina un tercero del sistema junto con sus asociaciones.
-     * El tercero es la entidad raíz, por lo que sus asociaciones se eliminan automáticamente.
-     * @param thirdId El ID del tercero a eliminar
-     * @param entId El ID de la empresa
-     * @return true si se eliminó correctamente, false en caso contrario
+     * @brief Elimina tercero y sus asociaciones con manejo transaccional
+     * @details Elimina primero las asociaciones en la tabla intermedia thirds_and_types,
+     * luego elimina el tercero principal. Utiliza contexto de tenant para asegurar
+     * aislamiento multi-tenant. Retorna false si hay errores pero no lanza excepciones.
+     * @param thirdId ID del tercero a eliminar
+     * @param entId ID de la empresa para validación de pertenencia
+     * @return true si se eliminó correctamente, false en caso de error
      */
     @Override
     @Transactional
@@ -427,9 +448,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Cuenta el total de terceros por empresa.
-     * @param entId El id de la empresa
-     * @return El número total de terceros
+     * @brief Cuenta el total de terceros por empresa
+     * @details Retorna el conteo total de terceros registrados para la empresa especificada,
+     * incluyendo tanto activos como inactivos.
+     * @param entId ID de la empresa
+     * @return número total de terceros de la empresa
+     * @throws IllegalArgumentException si entId es null o vacío
      */
     @Override
     public long countAllThirdsByEntId(String entId) {
@@ -440,13 +464,13 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Actualiza el estado de todos los terceros de una empresa de forma masiva.
-     * Utiliza una query nativa optimizada para mejor performance.
-     * Bean Validation en el controlador garantiza que los parámetros no son null.
-     * 
-     * @param entId El id de la empresa
-     * @param newState El nuevo estado (true para activo, false para inactivo)
-     * @return La cantidad de terceros actualizados
+     * @brief Actualización masiva del estado de terceros con query optimizada
+     * @details Utiliza una consulta UPDATE nativa del repositorio para cambiar el estado
+     * de todos los terceros de una empresa de forma eficiente. Maneja el contexto de tenant
+     * para asegurar aislamiento multi-tenant.
+     * @param entId ID de la empresa cuyos terceros serán actualizados
+     * @param newState nuevo estado a asignar (true=activo, false=inactivo)
+     * @return cantidad de terceros actualizados
      */
     @Override
     @Transactional
@@ -461,11 +485,13 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Encuentra qué números de identificación ya existen en la base de datos.
-     * 
-     * @param idNumbers conjunto de números de identificación a verificar
-     * @param entId el id de la empresa
-     * @return conjunto de números de identificación que ya existen
+     * @brief Valida existencia de números de identificación para importaciones batch
+     * @details Utiliza consulta optimizada del repositorio para verificar qué números de identificación
+     * del conjunto proporcionado ya existen en la base de datos para la empresa especificada.
+     * Esencial para validaciones durante procesos de importación masiva.
+     * @param idNumbers conjunto de números de identificación a validar
+     * @param entId ID de la empresa para filtrar la búsqueda
+     * @return conjunto de números de identificación que ya existen en BD
      */
     @Override
     public Set<Long> findExistingIdNumbers(Set<Long> idNumbers, String entId) {
@@ -483,7 +509,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Busca terceros por empresa y término de búsqueda con ordenamiento.
+     * @brief Busca terceros por empresa y término de búsqueda con ordenamiento.
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @param page Número de página
@@ -508,7 +534,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Cuenta terceros por empresa y término de búsqueda.
+     * @brief Cuenta terceros por empresa y término de búsqueda.
      * @param entId El id de la empresa
      * @param search Término de búsqueda
      * @return Cantidad de terceros que coinciden
@@ -520,7 +546,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Obtiene todos los terceros con ordenamiento.
+     * @brief Obtiene todos los terceros con ordenamiento.
      * @param entId El id de la empresa
      * @param page Número de página
      * @param size Tamaño de página
@@ -541,10 +567,10 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Page<Third> pageThirds = pageEntities.map(this::convertToThird);
         
         return pageThirds;
-    }
+    }    
 
     /**
-     * Obtiene todos los terceros activos con ordenamiento.
+     * @brief Obtiene todos los terceros activos con ordenamiento.
      *
      * @param entId El id de la empresa
      * @param page Número de página
@@ -569,8 +595,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
-     * Cuenta el total de terceros activos por empresa.
-     *
+     * @brief Cuenta el total de terceros activos por empresa.     *
      * @param entId el ID de la empresa
      * @return el número total de terceros activos
      */
@@ -582,10 +607,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
 
     /**
-     * Mapea el campo de ordenamiento del modelo Third al campo correspondiente en ThirdEntity.
-     * Solo permite ordenamiento por nombre/razón social y número de identificación.
-     * @param sortField Campo de ordenamiento del modelo
-     * @return Campo de ordenamiento de la entidad
+     * @brief Mapea campos de ordenamiento del dominio a la entidad JPA
+     * @details Traduce los nombres de campos del modelo Third a los nombres de campos
+     * correspondientes en ThirdEntity para consultas de ordenamiento. Solo permite
+     * ordenamiento por campos seguros: nombres y número de identificación.
+     * @param sortField nombre del campo de ordenamiento en el modelo de dominio
+     * @return nombre del campo correspondiente en la entidad JPA
      */
     private String mapThirdSortField(String sortField) {
         if (sortField == null || sortField.trim().isEmpty()) {
@@ -600,5 +627,33 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 return "names"; // Default para cualquier otro campo
         }
     }
-    
+
+    /**
+     * @brief Obtiene terceros filtrados por empresa y nombre de tipo de tercero activo con paginación
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @param page El objeto pageable para paginación con ordenamiento ASC por defecto
+     * @return La página de terceros filtrados por tipo activo
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.findByEntIdAndThirdTypeName(entId, thirdTypeName, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    /**
+     * @brief Cuenta el total de terceros por empresa y nombre de tipo de tercero activo
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @return El número total de terceros del tipo activo especificado
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName) {
+        return thirdRepository.countByEntIdAndThirdTypeName(entId, thirdTypeName);
+    }
+
 }

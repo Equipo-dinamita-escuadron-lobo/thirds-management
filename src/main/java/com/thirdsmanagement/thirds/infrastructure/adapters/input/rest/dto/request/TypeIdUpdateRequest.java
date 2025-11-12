@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * @brief DTO para solicitud de actualización de tipo de identificación
+ */
 @Builder
 @Getter
 @Setter

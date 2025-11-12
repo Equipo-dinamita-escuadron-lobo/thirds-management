@@ -5,7 +5,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.ErrorCodeDefinition;
 import lombok.Getter;
 
 /**
- * Códigos de error específicos del dominio de Terceros.
+ * @brief Códigos de error específicos del dominio de Terceros.
+ * 
  */
 @Getter
 public enum ThirdsErrorCode implements ErrorCodeDefinition {

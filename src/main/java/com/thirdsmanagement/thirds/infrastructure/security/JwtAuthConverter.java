@@ -17,8 +17,11 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.stereotype.Component;
 
 /**
- * Clase que implementa la conversión de un JWT en un token de autenticación.
- * También proporciona métodos utilitarios relacionados con JWT.
+ * @brief Convertidor JWT a Spring Security Authentication con soporte multi-tenancy
+ *
+ * Implementa conversión de tokens JWT a AuthenticationTokens de Spring Security,
+ * extrayendo authorities, roles de recursos y configurando el contexto multi-tenant.
+ * Implementa IJwtUtils para proporcionar acceso al ID del tenant desde JWT.
  */
 @Component
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken>, IJwtUtils {
@@ -34,10 +37,12 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     private Jwt jwtToken;
 
     /**
-     * Convierte un JWT en un token de autenticación.
-     *
-     * @param jwt el JWT a convertir
-     * @return el token de autenticación
+     * @brief Convierte JWT en AuthenticationToken de Spring Security
+     * @details Extrae authorities desde claims estándar y custom del JWT,
+     * combina con roles de recursos, almacena referencia al JWT para uso posterior,
+     * y crea JwtAuthenticationToken con nombre del principal.
+     * @param jwt token JWT validado a convertir
+     * @return AuthenticationToken configurado con authorities y principal
      */
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -66,7 +71,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     }
 
     /**
-     * Extrae los roles de recursos del JWT.
+     * @brief Extrae los roles de recursos del JWT.
      *
      * @param jwt el JWT
      * @return una colección de autoridades concedidas
@@ -100,11 +105,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 .toList();
     }
 
-    /**
-     * Obtiene el ID del JWT.
-     *
-     * @return el ID del JWT
-     */
+  
     @Override
     public String getId() {
         return (String) jwtToken.getClaims().get("sub");

@@ -1,12 +1,17 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
 /**
- * Interfaz que representa el caso de uso para la eliminación de un tercero.
+ * @brief Caso de uso para eliminación de terceros
+ *
+ * Permite eliminar terceros del sistema con validación
+ * de integridad referencial para evitar eliminación de terceros con dependencias.
  */
 public interface DeleteThirdUseCase {
     /**
-     * Elimina un tercero del sistema.
-     * Valida que el tercero no tenga dependencias o relaciones activas antes de eliminarlo.
+     * @brief Elimina un tercero del sistema
+     *
+     * Valida que el tercero no tenga dependencias o relaciones activas
+     * antes de proceder con la eliminación.
      * 
      * @param thirdId el ID del tercero a eliminar
      * @param entId el ID de la empresa

@@ -17,10 +17,9 @@ public class UpdateTypeIdService implements UpdateTypeIdUseCase {
     private final TypeIdEventPublisher typeIdEventPublisher;
 
     /**
-     * Actualiza un tipo de identificación existente en el sistema.
-     * 
-     * @param typeId el tipo de identificación con los datos actualizados
-     * @return el tipo de identificación actualizado
+     * @brief Actualiza un tipo de identificación existente en el sistema
+     * @param typeId tipo de identificación con los datos actualizados
+     * @return tipo de identificación actualizado
      */
     @Override
     public TypeId updateTypeId(TypeId typeId) {

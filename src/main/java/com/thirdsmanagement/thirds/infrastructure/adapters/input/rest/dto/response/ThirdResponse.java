@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Clase que representa la respuesta de un tercero.
+ * @brief DTO de respuesta para información básica de tercero
  */
 @Builder
 @Getter
@@ -21,5 +21,4 @@ public class ThirdResponse {
     private String name;
 
     private String description;
-    
 }

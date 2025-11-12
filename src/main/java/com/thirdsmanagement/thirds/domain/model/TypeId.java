@@ -13,6 +13,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 
+/**
+ * @brief Modelo de dominio que representa un tipo de identificación
+ *
+ * Entidad que define los tipos de documentos de identificación válidos en el sistema
+ * (cédula, NIT, pasaporte, etc.) y su clasificación según el tipo de persona.
+ */
 @Builder
 @Getter
 @Setter
@@ -43,25 +49,34 @@ public class TypeId {
     private PersonClassification classification;
 
     /**
-     * Verifica si este tipo de identificación es válido para personas naturales.
-     * Utiliza la clasificación configurada en lugar de validaciones hardcodeadas.
-     * 
-     * @return true si es válido para personas naturales
+     * @brief Verifica si este tipo de identificación es válido para personas naturales
+     *
+     * Determina si el tipo de documento puede ser utilizado por personas naturales
+     * basándose en la clasificación configurada.
+     * @return true si es válido para personas naturales, false en caso contrario
      */
     public boolean isValidForNaturalPerson() {
         return classification != null && classification.isValidForNaturalPerson();
     }
 
     /**
-     * Verifica si este tipo de identificación es válido para personas jurídicas.
-     * Utiliza la clasificación configurada en lugar de validaciones hardcodeadas.
-     * 
-     * @return true si es válido para personas jurídicas
+     * @brief Verifica si este tipo de identificación es válido para personas jurídicas
+     *
+     * Determina si el tipo de documento puede ser utilizado por personas jurídicas
+     * basándose en la clasificación configurada.
+     * @return true si es válido para personas jurídicas, false en caso contrario
      */
     public boolean isValidForLegalEntity() {
         return classification != null && classification.isValidForLegalEntity();
     }
 
+    /**
+     * @brief Obtiene el código del tipo de identificación normalizado
+     *
+     * Retorna el código del tipo de identificación normalizado para búsquedas
+     * y comparaciones, eliminando caracteres especiales y normalizando el formato.
+     * @return código normalizado del tipo de identificación
+     */
     public String getNormalizedTypeId() {
         return StringNormalizer.normalizeCode(typeId);
     }

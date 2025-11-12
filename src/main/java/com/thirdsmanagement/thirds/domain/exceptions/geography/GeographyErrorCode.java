@@ -4,7 +4,11 @@ import com.thirdsmanagement.thirds.domain.exceptions.ErrorCodeDefinition;
 import lombok.Getter;
 
 /**
- * Códigos de error específicos del dominio geográfico.
+ * @brief Códigos de error específicos del dominio geográfico
+ *
+ * Define todos los códigos de error estándar utilizados en las excepciones
+ * relacionadas con operaciones geográficas como validación de países,
+ * estados, ciudades y jerarquías geográficas.
  */
 @Getter
 public enum GeographyErrorCode implements ErrorCodeDefinition {
@@ -21,6 +25,11 @@ public enum GeographyErrorCode implements ErrorCodeDefinition {
     private final String code;
     private final String message;
 
+    /**
+     * @brief Constructor del enum
+     * @param code código único del error utilizado internamente
+     * @param message mensaje descriptivo del error para usuarios
+     */
     GeographyErrorCode(String code, String message) {
         this.code = code;
         this.message = message;

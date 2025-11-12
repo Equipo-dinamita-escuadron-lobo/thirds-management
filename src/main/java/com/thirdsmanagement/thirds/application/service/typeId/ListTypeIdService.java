@@ -18,9 +18,8 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     private final IdOutputPort idOutputPort;
 
     /**
-     * Obtiene todos los tipos de identificación para una empresa específica.
-     * 
-     * @param entId el ID de la empresa
+     * @brief Obtiene todos los tipos de identificación para una empresa específica
+     * @param entId identificador de la empresa
      * @return lista de tipos de identificación disponibles
      */
     @Override
@@ -29,14 +28,13 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
 
     /**
-     * Obtiene todos los tipos de identificación con paginación y ordenamiento.
-     * 
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación
+     * @brief Obtiene todos los tipos de identificación con paginación y ordenamiento personalizado
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de tipos de identificación
      */
     @Override
     public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
@@ -44,12 +42,11 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
 
     /**
-     * Obtiene todos los tipos de identificación activos con paginación simple (ordenado por tiName asc).
-     * 
-     * @param entId El id de la empresa
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @return Página de tipos de identificación activos ordenados por nombre
+     * @brief Obtiene todos los tipos de identificación activos con paginación
+     * @param entId identificador de la empresa
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @return página de tipos de identificación activos ordenados por nombre
      */
     @Override
     public Page<TypeId> getAllActiveTypeIds(String entId, int page, int size) {
@@ -57,15 +54,14 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
 
     /**
-     * Busca tipos de identificación por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @param page Número de página
-     * @param size Tamaño de página
-     * @param sortField Campo de ordenamiento
-     * @param sortOrder Orden (asc/desc)
-     * @return Página de tipos de identificación que coinciden
+     * @brief Busca tipos de identificación por empresa y término de búsqueda
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @param page número de página (0-based)
+     * @param size tamaño de página
+     * @param sortField campo de ordenamiento
+     * @param sortOrder orden (ascendente/descendente)
+     * @return página de tipos de identificación que coinciden con la búsqueda
      */
     @Override
     public Page<TypeId> findByEntIdAndSearch(String entId, String search, int page, int size, String sortField, String sortOrder) {
@@ -73,10 +69,9 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
     
     /**
-     * Cuenta tipos de identificación por empresa.
-     * 
-     * @param entId El id de la empresa
-     * @return Cantidad de tipos de identificación
+     * @brief Cuenta tipos de identificación por empresa
+     * @param entId identificador de la empresa
+     * @return cantidad total de tipos de identificación
      */
     @Override
     public long countByEntId(String entId) {
@@ -84,10 +79,9 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
     
     /**
-     * Cuenta tipos de identificación activos por empresa.
-     * 
-     * @param entId El id de la empresa
-     * @return Cantidad de tipos de identificación activos
+     * @brief Cuenta tipos de identificación activos por empresa
+     * @param entId identificador de la empresa
+     * @return cantidad de tipos de identificación activos
      */
     @Override
     public long countActiveByEntId(String entId) {
@@ -95,11 +89,10 @@ public class ListTypeIdService implements ListTypeIdUseCase {
     }
     
     /**
-     * Cuenta tipos de identificación por empresa y término de búsqueda.
-     * 
-     * @param entId El id de la empresa
-     * @param search Término de búsqueda
-     * @return Cantidad de tipos de identificación que coinciden
+     * @brief Cuenta tipos de identificación por empresa y término de búsqueda
+     * @param entId identificador de la empresa
+     * @param search término de búsqueda
+     * @return cantidad de tipos de identificación que coinciden con la búsqueda
      */
     @Override
     public long countByEntIdAndSearch(String entId, String search) {

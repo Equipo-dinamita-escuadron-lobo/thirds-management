@@ -17,26 +17,28 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.validation.File
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
+/**
+ * @brief Servicio para extracción de contenido de PDFs de RUT
+ *
+ * Proporciona funcionalidad para extraer y procesar contenido textual
+ * de archivos PDF correspondientes a Registros Únicos Tributarios (RUT).
+ */
 @Service
 public class PdfRUTService {
-    
+
     private final FileValidator fileValidator;
-    
+
     public PdfRUTService(@Qualifier("pdfFileValidator") FileValidator fileValidator) {
         this.fileValidator = fileValidator;
     }
 
     /**
-     * Extrae el contenido de un archivo PDF de RUT.
-     * 
+     * @brief Extrae el contenido de un archivo PDF de RUT
      * @param request objeto con la información del archivo PDF
      * @return objeto con la información extraída del archivo PDF
-     * @throws IOException                    si ocurre un error al cargar el
-     *                                        archivo PDF
-     * @throws ThirdInvalidDataException      si el request es null o el archivo es
-     *                                        inválido
-     * @throws PdfRutInvalidFormatException   si el PDF no tiene el formato válido
-     *                                        de RUT
+     * @throws IOException si ocurre un error al cargar el archivo PDF
+     * @throws ThirdInvalidDataException si el request es null o el archivo es inválido
+     * @throws PdfRutInvalidFormatException si el PDF no tiene el formato válido de RUT
      */
     public PdfRUTContentOutput extractContent(PdfRUTContent request) throws IOException {
         if (request == null) {
@@ -142,10 +144,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Extrae el contenido después de la palabra "CLASIFICACIÓN".
-     * 
-     * @param content Contenido del archivo PDF.
-     * @return Arreglo con las líneas después de la palabra "CLASIFICACIÓN".
+     * @brief Extrae el contenido después de la palabra "CLASIFICACIÓN"
+     * @param content Contenido del archivo PDF
+     * @return Arreglo con las líneas después de la palabra "CLASIFICACIÓN"
      */
     private String[] extractAfterClasificacion(String content) {
         int index = content.indexOf("CLASIFICACIÓN");
@@ -158,10 +159,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Extrae la informacion de la ubicacion de un tercero desde el PDF de RUT.
-     * 
-     * @param content Contenido del archivo PDF.
-     * @return Arreglo con las líneas de la ubicación de un tercero.
+     * @brief Extrae la información de ubicación de un tercero desde el PDF de RUT
+     * @param content Contenido del archivo PDF
+     * @return Arreglo con las líneas de la ubicación de un tercero
      */
     private String[] extractUbicationThird(String content) {
         int index = content.lastIndexOf("COLOMBIA");
@@ -175,10 +175,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Limpia el contenido de un string.
-     *
-     * @param input String a limpiar.
-     * @return String limpio.
+     * @brief Limpia el contenido de un string
+     * @param input String a limpiar
+     * @return String limpio
      */
     public static String cleanString(String input) {
         String cleaned = input.replaceAll("[ \\t]*\\n[ \\t]*", "\n") 
@@ -189,10 +188,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Separa numeros y texto en un string.
-     * 
-     * @param input String con numeros y texto.
-     * @return Arreglo con los numeros y texto separados.
+     * @brief Separa números y texto en un string
+     * @param input String con números y texto
+     * @return Arreglo con los números y texto separados
      */
     public static String[] separateNumbersAndText(String input) {
         // Regex para separar cuando hay un cambio de numeros a letras
@@ -200,10 +198,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Separa y une numeros en un string.
-     * 
-     * @param input String con numeros.
-     * @return Arreglo con los numeros separados.
+     * @brief Separa y une números en un string
+     * @param input String con números
+     * @return Arreglo con los números separados
      */
     public static String[] separateAndJoinNumbers(String input) {
         // Reemplaza multiples espacios con un separador especial
@@ -215,10 +212,9 @@ public class PdfRUTService {
     }
 
     /**
-     * Divide un string por espacios y letras mayúsculas.
-     * 
-     * @param input String a dividir.
-     * @return Arreglo con las partes del string.
+     * @brief Divide un string por espacios y letras mayúsculas
+     * @param input String a dividir
+     * @return Arreglo con las partes del string
      */
     public static String[] splitBySpaceAndUpperCase(String input) {
         return input.split("(?<=\\s)(?=[A-Z])");
