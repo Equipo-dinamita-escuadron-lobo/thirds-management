@@ -89,4 +89,34 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
 
     @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
     long countActiveByEntId(@Param("entId") String entId);
+
+    /**
+     * @brief Busca terceros por empresa y nombre de tipo de tercero activo con paginación
+     * @details Filtra terceros que tienen al menos un tipo de tercero específico y activo.
+     * La búsqueda por nombre es case insensitive.
+     * El ordenamiento se aplica desde el Pageable proporcionado por el servicio.
+     * @param entId ID de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo (case insensitive)
+     * @param page Paginación con ordenamiento ASC por defecto en "names"
+     * @return Página de terceros que tienen el tipo especificado y activo
+     */
+    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+           "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
+           "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
+           "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
+    Page<ThirdEntity> findByEntIdAndThirdTypeName(@Param("entId") String entId, @Param("thirdTypeName") String thirdTypeName, Pageable page);
+
+    /**
+     * @brief Cuenta terceros por empresa y nombre de tipo de tercero activo
+     * @details Cuenta terceros que tienen al menos un tipo de tercero específico y activo.
+     * La búsqueda por nombre es case insensitive.
+     * @param entId ID de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo (case insensitive)
+     * @return Cantidad de terceros que tienen el tipo especificado y activo
+     */
+    @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
+           "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
+           "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
+           "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
+    long countByEntIdAndThirdTypeName(@Param("entId") String entId, @Param("thirdTypeName") String thirdTypeName);
 }

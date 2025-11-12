@@ -627,5 +627,33 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 return "names"; // Default para cualquier otro campo
         }
     }
-    
+
+    /**
+     * @brief Obtiene terceros filtrados por empresa y nombre de tipo de tercero activo con paginación
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @param page El objeto pageable para paginación con ordenamiento ASC por defecto
+     * @return La página de terceros filtrados por tipo activo
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.findByEntIdAndThirdTypeName(entId, thirdTypeName, page);
+        Page<Third> pageThirds = pageEntities.map(this::convertToThird);
+
+        return pageThirds;
+    }
+
+    /**
+     * @brief Cuenta el total de terceros por empresa y nombre de tipo de tercero activo
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @return El número total de terceros del tipo activo especificado
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName) {
+        return thirdRepository.countByEntIdAndThirdTypeName(entId, thirdTypeName);
+    }
+
 }

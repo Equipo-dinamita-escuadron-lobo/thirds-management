@@ -398,4 +398,32 @@ public class ThirdRestController {
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
+    /**
+     * @brief Obtiene una lista de terceros filtrados por nombre de tipo activo con paginación inteligente.
+     *
+     * Endpoint que lista terceros filtrados por un tipo específico de tercero activo,
+     * con paginación inteligente, ordenamiento por defecto ASC y búsqueda case insensitive.
+     *
+     * @param entId Id de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo para filtrar (case insensitive)
+     * @param numPage Número de página (opcional)
+     * @param size Tamaño de página (opcional)
+     * @return Respuesta con la lista de terceros filtrados por tipo activo
+     */
+    @GetMapping("/by-type")
+    public ResponseEntity<Page<Third>> getThirdsByType(
+            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotNull(message = "thirdTypeName es requerido") @RequestParam String thirdTypeName,
+            @RequestParam(required = false) Optional<Integer> numPage,
+            @RequestParam(required = false) Optional<Integer> size) {
+
+        long totalRecords = listThirdsUseCase.countThirdsByEntIdAndThirdTypeName(entId, thirdTypeName);
+
+        Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
+        Page<Third> page = listThirdsUseCase.getThirdsByEntIdAndThirdTypeName(entId, thirdTypeName,
+                pageable.getPageNumber(), pageable.getPageSize());
+
+        return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
 }

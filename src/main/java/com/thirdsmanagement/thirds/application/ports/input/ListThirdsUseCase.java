@@ -76,4 +76,22 @@ public interface ListThirdsUseCase {
      */
     long countActiveThirdsByEntId(String entId);
 
+    /**
+     * @brief Obtiene terceros filtrados por empresa y nombre de tipo de tercero activo con paginación
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @param page Número de página
+     * @param size Tamaño de página
+     * @return Página de terceros filtrados por tipo de tercero activo ordenados por defecto ASC
+     */
+    Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, int page, int size);
+
+    /**
+     * @brief Cuenta terceros por empresa y nombre de tipo de tercero activo
+     * @param entId El id de la empresa
+     * @param thirdTypeName El nombre del tipo de tercero activo (case insensitive)
+     * @return Cantidad de terceros que tienen el tipo activo especificado
+     */
+    long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName);
+
 }

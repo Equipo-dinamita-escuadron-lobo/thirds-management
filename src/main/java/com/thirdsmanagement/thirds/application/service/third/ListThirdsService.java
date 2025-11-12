@@ -1,7 +1,9 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -52,6 +54,17 @@ public class ListThirdsService implements ListThirdsUseCase {
     @Override
     public long countActiveThirdsByEntId(String entId) {
         return thirdOutputPort.countActiveThirdsByEntId(entId);
+    }
+
+    @Override
+    public Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, int page, int size) {
+        return thirdOutputPort.getThirdsByEntIdAndThirdTypeName(entId, thirdTypeName, PageRequest.of(page, size,
+            Sort.by("names").ascending()));
+    }
+
+    @Override
+    public long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName) {
+        return thirdOutputPort.countThirdsByEntIdAndThirdTypeName(entId, thirdTypeName);
     }
 
 }
