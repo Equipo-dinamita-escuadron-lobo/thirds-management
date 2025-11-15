@@ -2,10 +2,8 @@ package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.typeId.TypeIdLoaderService;
-import com.thirdsmanagement.thirds.domain.event.ThirdCreatedEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
@@ -27,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateThirdService implements CreateThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
-    private final ThirdEventPublisher thirdEventPublisher;
     private final ThirdRepository thirdRepository;
     private final ThirdGeographyValidationService geographyValidationService;
     private final ThirdValidationService thirdValidationService;
@@ -91,7 +88,6 @@ public class CreateThirdService implements CreateThirdUseCase {
         validateDuplicateThird(normalizedThird.getIdNumber(), normalizedThird.getEntId());
 
         Third createdThird = thirdOutputPort.saveThird(normalizedThird);
-        thirdEventPublisher.publishThirdCreatedEvent(new ThirdCreatedEvent(createdThird.getThId()));
 
         return createdThird;
     }

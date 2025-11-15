@@ -1,9 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
-import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase;
-import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
+import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase; 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
-import com.thirdsmanagement.thirds.domain.event.ThirdStateUpdateEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdStateNotChanged;
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class ChangeThirdStateService implements ChangeThirdStateUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
-    private final ThirdEventPublisher thirdEventPublisher;
 
     @Override
     public boolean changeThirdState(Long thId, String entId) {
@@ -23,9 +20,6 @@ public class ChangeThirdStateService implements ChangeThirdStateUseCase {
         if (!result) {
             throw new ThirdStateNotChanged("El estado no se pudo cambiar debido a un error interno");
         }
-
-        // Publicar evento de cambio de estado
-        thirdEventPublisher.publishThirdStateUpdateEvent(new ThirdStateUpdateEvent(thId));
 
         return result;
     }

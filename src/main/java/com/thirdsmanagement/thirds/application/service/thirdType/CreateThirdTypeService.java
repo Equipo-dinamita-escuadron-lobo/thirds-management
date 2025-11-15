@@ -2,8 +2,6 @@ package com.thirdsmanagement.thirds.application.service.thirdType;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.application.ports.output.ThirdTypeEventPublisher;
-import com.thirdsmanagement.thirds.domain.event.ThirdTypeCreatedEvent;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNameAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
@@ -19,7 +17,6 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
 
     private final IdOutputPort idOutputPort;
     private final ThirdTypeRepository thirdTypeRepository;
-    private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
    
     @Override
@@ -37,15 +34,6 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
 
         // Guardar el tipo de tercero
         ThirdType createdThirdType = idOutputPort.saveThirdType(normalizedThirdType);
-
-        // Publicar evento de creación
-        ThirdTypeCreatedEvent event = ThirdTypeCreatedEvent.builder()
-                .thirdTypeId(createdThirdType.getThirdTypeId())
-                .thirdTypeName(createdThirdType.getThirdTypeName())
-                .entId(createdThirdType.getEntId())
-                .build();
-
-        thirdTypeEventPublisher.publishThirdTypeCreatedEvent(event);
 
         return createdThirdType;
     }

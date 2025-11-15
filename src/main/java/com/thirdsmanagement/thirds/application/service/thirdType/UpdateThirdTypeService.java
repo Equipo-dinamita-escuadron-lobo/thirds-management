@@ -2,9 +2,7 @@ package com.thirdsmanagement.thirds.application.service.thirdType;
 
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdTypeUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.application.ports.output.ThirdTypeEventPublisher;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
-import com.thirdsmanagement.thirds.domain.event.ThirdTypeUpdatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,20 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateThirdTypeService implements UpdateThirdTypeUseCase {
 
     private final IdOutputPort idOutputPort;
-    private final ThirdTypeEventPublisher thirdTypeEventPublisher;
 
     @Override
     public ThirdType updateThirdType(ThirdType thirdType) {
         ThirdType updatedThirdType = idOutputPort.updateThirdType(thirdType);
-
-        // Publicar evento de actualización
-        ThirdTypeUpdatedEvent event = ThirdTypeUpdatedEvent.builder()
-                .thirdTypeId(updatedThirdType.getThirdTypeId())
-                .thirdTypeName(updatedThirdType.getThirdTypeName())
-                .entId(updatedThirdType.getEntId())
-                .build();
-
-        thirdTypeEventPublisher.publishThirdTypeUpdatedEvent(event);
 
         return updatedThirdType;
     }

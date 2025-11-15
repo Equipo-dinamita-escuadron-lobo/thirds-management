@@ -1,11 +1,9 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
-import com.thirdsmanagement.thirds.application.ports.output.ThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.typeId.TypeIdLoaderService;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
-import com.thirdsmanagement.thirds.domain.event.ThirdUpdateEvent;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
 import com.thirdsmanagement.thirds.domain.model.State;
@@ -29,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UpdateThirdService implements UpdateThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
-    private final ThirdEventPublisher thirdEventPublisher;
     private final ThirdGeographyValidationService geographyValidationService;
     private final ThirdValidationService thirdValidationService;
     private final TypeIdLoaderService typeIdLoaderService;
@@ -107,9 +104,6 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                 .build();
 
         Third updatedThird = thirdOutputPort.updateThird(normalizedThird);
-
-        // Publicar evento de actualización
-        thirdEventPublisher.publishThirdUpdateEvent(new ThirdUpdateEvent(updatedThird.getThId()));
 
         return updatedThird;
     }
