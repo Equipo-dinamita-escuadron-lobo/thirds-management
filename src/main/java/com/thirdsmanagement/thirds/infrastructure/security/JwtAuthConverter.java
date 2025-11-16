@@ -1,27 +1,26 @@
 package com.thirdsmanagement.thirds.infrastructure.security;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 /**
- * @brief Convertidor JWT a Spring Security Authentication con soporte multi-tenancy
+ * @brief Conversor de JWT a token de autenticación Spring Security
  *
- * Implementa conversión de tokens JWT a AuthenticationTokens de Spring Security,
- * extrayendo authorities, roles de recursos y configurando el contexto multi-tenant.
- * Implementa IJwtUtils para proporcionar acceso al ID del tenant desde JWT.
+ * Convierte tokens JWT OAuth2 en objetos de autenticación, extrae roles
+ * de recursos y proporciona utilidades para acceso a claims JWT.
  */
 @Component
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken>, IJwtUtils {
@@ -29,7 +28,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
     @Value("${jwt.auth.converter.principle-attribute}")
-    private String principleAttribute;
+    private String principleAtrribute;
 
     @Value("${jwt.auth.converter.resource-id}")
     private String resourceId;
@@ -37,12 +36,9 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     private Jwt jwtToken;
 
     /**
-     * @brief Convierte JWT en AuthenticationToken de Spring Security
-     * @details Extrae authorities desde claims estándar y custom del JWT,
-     * combina con roles de recursos, almacena referencia al JWT para uso posterior,
-     * y crea JwtAuthenticationToken con nombre del principal.
-     * @param jwt token JWT validado a convertir
-     * @return AuthenticationToken configurado con authorities y principal
+     * @brief Convierte JWT en token de autenticación Spring Security
+     * @param jwt token JWT a convertir
+     * @return JwtAuthenticationToken con authorities extraídas
      */
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -51,30 +47,28 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 .toList();
 
         this.jwtToken = jwt;
-        return new JwtAuthenticationToken(jwt, authorities, getPrincipalName(jwt));
+        return new JwtAuthenticationToken(jwt, authorities, getPrincipleName(jwt));
     }
 
     /**
-     * Obtiene el nombre principal del JWT.
-     *
-     * @param jwt el JWT
-     * @return el nombre principal
+     * @brief Extrae nombre principal del JWT según configuración
+     * @param jwt token JWT
+     * @return nombre principal (subject claim)
      */
-    private String getPrincipalName(Jwt jwt) {
+    private String getPrincipleName(Jwt jwt) {
         String claimName = JwtClaimNames.SUB;
 
-        if (principleAttribute != null) {
-            claimName = principleAttribute;
+        if (principleAtrribute != null) {
+            claimName = principleAtrribute;
         }
 
         return jwt.getClaim(claimName);
     }
 
     /**
-     * @brief Extrae los roles de recursos del JWT.
-     *
-     * @param jwt el JWT
-     * @return una colección de autoridades concedidas
+     * @brief Extrae roles de recursos del JWT para authorities
+     * @param jwt token JWT con claims de resource_access
+     * @return colección de GrantedAuthority con prefijo ROLE_
      */
     @SuppressWarnings("unchecked")
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
@@ -105,9 +99,21 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 .toList();
     }
 
-  
+    /**
+     * @brief Obtiene ID del usuario del contexto JWT actual
+     * @return subject claim del JWT actual
+     */
     @Override
     public String getId() {
         return (String) jwtToken.getClaims().get("sub");
+    }
+
+    /**
+     * @brief Obtiene token JWT completo del contexto actual
+     * @return valor del token JWT
+     */
+    @Override
+    public String getToken() {
+        return jwtToken.getTokenValue();
     }
 }
