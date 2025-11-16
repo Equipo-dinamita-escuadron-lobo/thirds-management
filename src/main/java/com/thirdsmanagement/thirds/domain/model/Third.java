@@ -120,6 +120,7 @@ public class Third {
      * @brief Verifica si el tercero está siendo usado
      * @return true si el tercero tiene uso registrado
      */
+    @JsonIgnore
     public boolean isInUse() {
         return this.usageCount != null && this.usageCount > 0;
     }

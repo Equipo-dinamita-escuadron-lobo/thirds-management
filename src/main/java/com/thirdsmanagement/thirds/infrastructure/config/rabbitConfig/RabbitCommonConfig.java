@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainer
 @Profile("!test")
 public class RabbitCommonConfig {
     /**
-     * @brief Configura conversor JSON para mensajes RabbitMQ     *
+     * @brief Configura conversor JSON para mensajes RabbitMQ
      * @return Conversor JSON configurado para mensajes RabbitMQ
      */
     @Bean
