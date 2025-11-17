@@ -5,6 +5,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.thirdsmanagement.thirds.application.ports.input.IThirdUsagePort;
 import com.thirdsmanagement.thirds.infrastructure.config.rabbitConfig.RabbitThirdUsedConfig;
@@ -80,34 +81,39 @@ public class ThirdUsageListener extends AbstractMessageListener<EventDto<ThirdUs
         return true;
     }
 
+    /**
+     * @brief Procesa el evento de tercero basado en su tipo
+     * @param event El evento de tercero a procesar
+     */
+    @Transactional
     @Override
     protected void processEvent(EventDto<ThirdUsageEventDto, EventUsageType> event) {
-        log.info("Received product usage event");
-        
         try {
-            if (!isValidEvent(event)) {
-                log.warn("Invalid product usage event received");
-                return;
+            switch (event.getType()) {
+                case USED:
+                    if (!isValidEvent(event)) {
+                        log.warn("Invalid third usage event received");
+                        return;
+                    }
+
+                    ThirdUsageEventDto data = event.getData();
+                    log.info("Registrando uso de tercero ID: {}, cantidad: {}",
+                             data.getThirdId(), data.getQuantityUsed());
+                    thirdUsagePort.incrementUsageCount(data.getThirdId());
+                    log.info("Uso registrado correctamente para tercero ID: {}", data.getThirdId());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo de evento no soportado: " + event.getType());
             }
-            
-            ThirdUsageEventDto data = event.getData();
-            log.info("Processing usage for productId: {}, quantity: {}",
-                     data.getThirdId(), data.getQuantityUsed());
-
-            thirdUsagePort.incrementUsageCount(data.getThirdId());
-
-            log.info("Product usage event processed successfully for productId: {}", data.getThirdId());
-            
         } catch (Exception e) {
-            log.error("Error processing product usage event: {}", e.getMessage(), e);
-            // En caso de error, el mensaje se pierde intencionalmente para no bloquear la cola
-            // Se podría implementar DLQ o reintentos según necesidades del negocio
+            log.error("Error procesando evento de tercero: {}", e.getMessage());
+            throw e;
         }
     }
 
     @Override
     protected String getEntityType() {
-        return "ProductUsage";
+        return "ThirdUsage";
     }
 }
 

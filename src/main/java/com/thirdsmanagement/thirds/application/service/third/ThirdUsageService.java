@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.thirdsmanagement.thirds.application.ports.input.IThirdUsagePort;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
@@ -19,6 +20,7 @@ public class ThirdUsageService implements IThirdUsagePort {
 
     private final ThirdOutputPort thirdOutputPort;
 
+    @Transactional
     @Override
     public void incrementUsageCount(Long thirdId) {
         log.debug("Incrementando contador de uso para tercero con ID: {}", thirdId);

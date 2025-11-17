@@ -304,12 +304,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                     .thirdTypeId(tt.getTtId())
                     .thirdTypeName(tt.getTtName())
                     .entId(tt.getTtentId())
-                    .status(tt.getStatus())
+                    .status(tt.getStatus())                    
                     .build();
                 obj.getThirdTypes().add(thirdType);
             }
         }
-
+        obj.setUsageCount(thirdEntity.getUsageCount());
         return obj;
     }
 
@@ -369,6 +369,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         thirdEntity.setState(third.getState() != null ? third.getState() : true);
         thirdEntity.setPhoneNumber(third.getPhoneNumber());
         thirdEntity.setEmail(third.getEmail());
+        thirdEntity.setUsageCount(third.getUsageCount());
 
         // Guardar la entidad principal actualizada
         try {
