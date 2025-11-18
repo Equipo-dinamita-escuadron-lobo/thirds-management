@@ -38,8 +38,8 @@ public class ImportThirdService implements ImportThirdUseCase {
     private final ImportResponseBuilder responseBuilder;
     
     private static final boolean SKIP_DUPLICATES = true; 
-    private static final boolean CONTINUE_ON_ERROR = false; 
-    private static final int MAX_BATCH_SIZE = 500; 
+    private static final boolean CONTINUE_ON_ERROR = true; 
+    private static final int MAX_BATCH_SIZE = 100; 
 
     
     @Override

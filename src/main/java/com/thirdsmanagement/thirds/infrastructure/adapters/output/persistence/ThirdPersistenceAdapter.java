@@ -203,7 +203,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      */
     @Override
     public Third findById(Long id) {
-        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findByIdWithTypeId(id);
 
         if(thirdEntity.isEmpty()) {
             return null;
@@ -309,6 +309,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                 obj.getThirdTypes().add(thirdType);
             }
         }
+        // Asegurar que usageCount se copie correctamente desde la entidad
         obj.setUsageCount(thirdEntity.getUsageCount());
         return obj;
     }
