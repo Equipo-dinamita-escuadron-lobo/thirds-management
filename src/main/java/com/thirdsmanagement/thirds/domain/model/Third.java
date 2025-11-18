@@ -85,6 +85,9 @@ public class Third {
     @Size(max = 150, message = "El correo electrónico no puede exceder los 150 caracteres")
     private String email;
 
+    @Builder.Default
+    private Integer usageCount = 0;
+
     @JsonIgnore
     public boolean isActive() {
         return Boolean.TRUE.equals(state);
@@ -104,5 +107,21 @@ public class Third {
 
     public boolean isNaturalPerson() {
         return ePersonType.Natural.equals(personType);
+    }
+
+    /**
+     * @brief Incrementa el contador de uso del tercero
+     */
+    public void incrementUsageCount() {
+        this.usageCount = this.usageCount == null ? 1 : this.usageCount + 1;
+    }
+
+    /**
+     * @brief Verifica si el tercero está siendo usado
+     * @return true si el tercero tiene uso registrado
+     */
+    @JsonIgnore
+    public boolean isInUse() {
+        return this.usageCount != null && this.usageCount > 0;
     }
 }

@@ -87,6 +87,10 @@ public class ThirdEntity {
     @Column(name = "th_email")
     private String email;
 
+    @Column(name = "th_usage_count")
+    @Builder.Default
+    private Integer usageCount = 0;
+
     @TenantId
     @Column(name = "tenant_id")
     private String tenantId;

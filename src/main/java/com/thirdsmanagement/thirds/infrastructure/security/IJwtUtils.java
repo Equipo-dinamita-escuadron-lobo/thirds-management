@@ -1,13 +1,15 @@
 package com.thirdsmanagement.thirds.infrastructure.security;
 
 /**
- * @brief Interfaz para operaciones con tokens JWT en el contexto de multi-tenancy
+ * @brief Interfaz contrato para utilidades JWT
  *
- * Define contrato para extraer información del tenant desde tokens JWT.
- * Implementaciones específicas manejan diferentes formatos y algoritmos de JWT.
+ * Define contrato para acceso a información del contexto de seguridad JWT,
+ * incluyendo ID de usuario y token de autenticación.
  */
 public interface IJwtUtils {
-    
+
     String getId();
+
+    String getToken();
 
 }

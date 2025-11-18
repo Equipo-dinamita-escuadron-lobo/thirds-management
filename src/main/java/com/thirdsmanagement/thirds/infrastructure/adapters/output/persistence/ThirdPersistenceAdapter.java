@@ -195,7 +195,23 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         Third third = convertToThird(thirdEntity.get());
         return Optional.of(third);
     }
-    
+
+    /**
+     * @brief Encuentra un tercero por su ID (sin filtrar por empresa)
+     * @param id El id del tercero
+     * @return El tercero si existe, null en caso contrario
+     */
+    @Override
+    public Third findById(Long id) {
+        Optional<ThirdEntity> thirdEntity = thirdRepository.findById(id);
+
+        if(thirdEntity.isEmpty()) {
+            return null;
+        }
+
+        return convertToThird(thirdEntity.get());
+    }
+
     /**
      * @brief Verifica existencia de tercero por ID y empresa
      * @details Consulta optimizada para verificar si existe un tercero con el ID especificado
@@ -288,12 +304,12 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
                     .thirdTypeId(tt.getTtId())
                     .thirdTypeName(tt.getTtName())
                     .entId(tt.getTtentId())
-                    .status(tt.getStatus())
+                    .status(tt.getStatus())                    
                     .build();
                 obj.getThirdTypes().add(thirdType);
             }
         }
-
+        obj.setUsageCount(thirdEntity.getUsageCount());
         return obj;
     }
 
@@ -353,6 +369,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         thirdEntity.setState(third.getState() != null ? third.getState() : true);
         thirdEntity.setPhoneNumber(third.getPhoneNumber());
         thirdEntity.setEmail(third.getEmail());
+        thirdEntity.setUsageCount(third.getUsageCount());
 
         // Guardar la entidad principal actualizada
         try {

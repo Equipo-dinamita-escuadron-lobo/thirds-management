@@ -38,6 +38,13 @@ public interface ThirdOutputPort {
     Optional<Third> getThirdById(Long id, String entId);
 
     /**
+     * @brief Encuentra un tercero por su ID (sin filtrar por empresa)
+     * @param id El id del tercero
+     * @return El tercero si existe, null en caso contrario
+     */
+    Third findById(Long id);
+
+    /**
      * @brief Verifica existencia de tercero por id y empresa
      * @param id El id del tercero
      * @param entId El id de la empresa

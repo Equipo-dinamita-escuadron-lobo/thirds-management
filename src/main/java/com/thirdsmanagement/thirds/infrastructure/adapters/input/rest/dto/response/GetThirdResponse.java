@@ -43,4 +43,5 @@ public class GetThirdResponse {
     private String address;
     private String phoneNumber;
     private String email;
+    private Integer usageCount;
 }
