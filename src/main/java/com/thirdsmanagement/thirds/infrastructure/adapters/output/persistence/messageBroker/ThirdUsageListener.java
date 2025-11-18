@@ -32,8 +32,8 @@ public class ThirdUsageListener extends AbstractMessageListener<EventDto<ThirdUs
     private final IThirdUsagePort thirdUsagePort;
 
     /**
-     * @brief Maneja eventos de uso de productos desde la cola
-     * @param event Evento con información del producto usado
+     * @brief Maneja eventos de uso de terceros desde la cola
+     * @param event Evento con información del tercero usado
      */
     @RabbitListener(queues = RabbitThirdUsedConfig.THIRD_USED_QUEUE)
     public void handleThirdEvent(
@@ -91,6 +91,7 @@ public class ThirdUsageListener extends AbstractMessageListener<EventDto<ThirdUs
         try {
             switch (event.getType()) {
                 case USED:
+                
                     if (!isValidEvent(event)) {
                         log.warn("Invalid third usage event received");
                         return;
