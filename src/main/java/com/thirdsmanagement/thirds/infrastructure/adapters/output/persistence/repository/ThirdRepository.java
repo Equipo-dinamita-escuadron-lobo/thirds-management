@@ -20,10 +20,10 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.en
 @Repository
 public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId")
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.entId = :entId")
     Page<ThirdEntity> getThirdsBy(String entId, Pageable page);
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = :state")
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.entId = :entId AND t.state = :state")
     Page<ThirdEntity> getThirdsByEntIdAndState(@Param("entId") String entId, @Param("state") Boolean state, Pageable page);
 
     /**
@@ -34,7 +34,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      * @param page Paginación con ordenamiento
      * @return Página de terceros que coinciden con la búsqueda
      */
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND " +
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.entId = :entId AND " +
            "(LOWER(t.names) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(t.lastNames) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(t.socialReason) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -54,7 +54,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
     boolean existThirdByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.thId = :thId AND t.entId = :entId")
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.thId = :thId AND t.entId = :entId")
     Optional<ThirdEntity> findByThIdAndEntId(@Param("thId") Long thId, @Param("entId") String entId);
 
     @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId")
@@ -84,7 +84,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
     @Query("SELECT t.idNumber FROM ThirdEntity t WHERE t.idNumber IN :idNumbers AND t.entId = :entId")
     List<Long> findExistingIdNumbers(@Param("idNumbers") Set<Long> idNumbers, @Param("entId") String entId);
 
-    @Query("SELECT t FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.entId = :entId AND t.state = true")
     Page<ThirdEntity> getActiveThirdsBy(@Param("entId") String entId, Pageable page);
 
     @Query("SELECT COUNT(t) FROM ThirdEntity t WHERE t.entId = :entId AND t.state = true")
@@ -101,6 +101,7 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      * @return Página de terceros que tienen el tipo especificado y activo
      */
     @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+           "LEFT JOIN FETCH t.typeId " +
            "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
            "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
            "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
@@ -119,4 +120,14 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
            "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +
            "WHERE t.entId = :entId AND LOWER(tt.ttName) = LOWER(:thirdTypeName) AND tt.status = true")
     long countByEntIdAndThirdTypeName(@Param("entId") String entId, @Param("thirdTypeName") String thirdTypeName);
+
+    /**
+     * @brief Busca tercero por ID con typeId cargado
+     * @details Método personalizado para cargar tercero con su typeId inicializado,
+     * usado en servicios que requieren acceso completo a los datos del tercero
+     * @param id ID del tercero
+     * @return Tercero con typeId cargado o vacío si no existe
+     */
+    @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.thId = :id")
+    Optional<ThirdEntity> findByIdWithTypeId(@Param("id") Long id);
 }
