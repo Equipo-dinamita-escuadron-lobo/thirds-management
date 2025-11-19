@@ -191,4 +191,13 @@ public interface ThirdOutputPort {
      */
     long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName);
 
+    /**
+     * @brief Incrementa el contador de uso de un tercero
+     * @details Incrementa el contador de uso del tercero sin pasar por las validaciones
+     * de actualización completa. Optimizado para operaciones de eventos asíncronos.
+     * @param thirdId El id del tercero
+     * @return true si se incrementó correctamente, false si el tercero no existe
+     */
+    boolean incrementUsageCount(Long thirdId);
+
 }

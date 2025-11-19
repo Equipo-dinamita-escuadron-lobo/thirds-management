@@ -110,13 +110,6 @@ public class Third {
     }
 
     /**
-     * @brief Incrementa el contador de uso del tercero
-     */
-    public void incrementUsageCount() {
-        this.usageCount = this.usageCount == null ? 1 : this.usageCount + 1;
-    }
-
-    /**
      * @brief Verifica si el tercero está siendo usado
      * @return true si el tercero tiene uso registrado
      */

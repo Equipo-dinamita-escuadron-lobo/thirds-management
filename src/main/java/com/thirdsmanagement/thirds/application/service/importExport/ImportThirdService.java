@@ -142,11 +142,6 @@ public class ImportThirdService implements ImportThirdUseCase {
                 totalFailure.addAndGet(batchResult.getFailureCount());
                 totalSkipped.addAndGet(batchResult.getSkippedCount());
 
-                // Si hay errores y no continuamos en errores, parar
-                if (batchResult.getFailureCount() > 0 && !CONTINUE_ON_ERROR) {
-                    break;
-                }
-
             } catch (Exception e) {
                 throw new ThirdImportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
                         "Error crítico en lote " + (i + 1) + ": " + e.getMessage(), e);
