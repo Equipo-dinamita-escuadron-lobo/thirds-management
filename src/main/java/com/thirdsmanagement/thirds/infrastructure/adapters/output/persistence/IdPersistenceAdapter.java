@@ -693,4 +693,65 @@ public class IdPersistenceAdapter implements IdOutputPort {
                 return "tiName"; // Default
         }
     }
+
+    /**
+     * @brief Verifica si tipo de identificación tiene terceros con movimientos contables
+     * @details Verifica si hay terceros asociados a este tipo de identificación que tengan
+     * movimientos contables (usageCount > 0), lo que impediría su edición.
+     * @param typeIdId El ID del tipo de identificación
+     * @param entId El ID de la empresa
+     * @return true si tiene terceros con movimientos contables, false en caso contrario
+     */
+    @Override
+    public boolean hasTypeIdThirdsWithMovements(Long typeIdId, String entId) {
+        if (typeIdId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+
+            // Primero obtener el código del tipo de identificación
+            Optional<TypeIdEntity> typeIdEntity = typeIdRepository.findById(typeIdId);
+            if (typeIdEntity.isEmpty()) {
+                return false;
+            }
+
+            String typeIdCode = typeIdEntity.get().getTiId();
+
+            // Verificar si existe algún tercero con movimientos contables que use este tipo de identificación
+            return thirdRepository.existsByTypeIdTiIdAndEntIdAndUsageCountGreaterThan(typeIdCode, entId, 0);
+
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
+
+    /**
+     * @brief Verifica si tipo de tercero tiene terceros con movimientos contables
+     * @details Verifica si hay terceros asociados a este tipo de tercero que tengan
+     * movimientos contables (usageCount > 0), lo que impediría su edición.
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return true si tiene terceros con movimientos contables, false en caso contrario
+     */
+    @Override
+    public boolean hasThirdTypeThirdsWithMovements(Long thirdTypeId, String entId) {
+        if (thirdTypeId == null || entId == null || entId.trim().isEmpty()) {
+            return false;
+        }
+
+        String currentTenant = TenantContext.getTenantId();
+        try {
+            TenantContext.setTenantId(currentTenant);
+
+            // Verificar si existe algún tercero con movimientos contables asociado a este tipo de tercero
+            // Usar consulta personalizada en ThirdRepository o lógica en el servicio
+            return thirdRepository.existsByThirdTypeIdAndEntIdAndUsageCountGreaterThan(thirdTypeId, entId, 0);
+
+        } finally {
+            TenantContext.setTenantId(currentTenant);
+        }
+    }
 }

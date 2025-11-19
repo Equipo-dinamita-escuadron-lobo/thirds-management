@@ -30,11 +30,11 @@ public class ThirdTypeInUseException extends BaseBusinessException {
      */
     public ThirdTypeInUseException(Long thirdTypeId) {
         super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE,
-              "El tipo de tercero con ID '" + thirdTypeId + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+              "El tipo de tercero con ID " + thirdTypeId + " está siendo utilizado por terceros existentes y no puede ser eliminado");
     }
 
     /**
-     * @brief Constructor con nombre específico del tipo de tercero
+     * @brief Constructor con nombre específico del tipo de tercero para eliminación
      *
      * Crea una excepción específica cuando se intenta eliminar un tipo de tercero
      * que tiene terceros asociados, identificándolo por su nombre.
@@ -42,7 +42,22 @@ public class ThirdTypeInUseException extends BaseBusinessException {
      */
     public ThirdTypeInUseException(String thirdTypeName) {
         super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE,
-              "El tipo de tercero '" + thirdTypeName + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+              "El tipo de tercero " + thirdTypeName + " está siendo utilizado por terceros existentes y no puede ser eliminado");
+    }
+
+    /**
+     * @brief Constructor con nombre específico del tipo de tercero para edición
+     *
+     * Crea una excepción específica cuando se intenta editar un tipo de tercero
+     * que tiene terceros con movimientos contables asociados.
+     * @param thirdTypeName el nombre del tipo de tercero que está en uso
+     * @param isEditOperation indica si es una operación de edición (true) o eliminación (false)
+     */
+    public ThirdTypeInUseException(String thirdTypeName, boolean isEditOperation) {
+        super(ThirdTypeErrorCode.THIRD_TYPE_IN_USE,
+              isEditOperation ?
+              "No se puede editar el tipo de tercero " + thirdTypeName + " porque tiene terceros con movimientos contables" :
+              "El tipo de tercero " + thirdTypeName + " está siendo utilizado por terceros existentes y no puede ser eliminado");
     }
 
 

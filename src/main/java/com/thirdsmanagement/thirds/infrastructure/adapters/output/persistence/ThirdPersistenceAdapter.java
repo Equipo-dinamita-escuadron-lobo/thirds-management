@@ -23,6 +23,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
@@ -316,13 +317,14 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
     /**
      * @brief Actualiza tercero existente con validaciones y manejo de relaciones
-     * @details Actualiza todos los campos del tercero, valida claves foráneas, actualiza las relaciones
-     * muchos-a-muchos con tipos de tercero (eliminando existentes y creando nuevas), y retorna el tercero
-     * actualizado con datos geográficos completos.    *
+     * @details Actualiza todos los campos del tercero, valida claves foráneas, valida que no tenga
+     * movimientos contables asociados, actualiza las relaciones muchos-a-muchos con tipos de tercero
+     * (eliminando existentes y creando nuevas), y retorna el tercero actualizado con datos geográficos completos.
      * @param third objeto Third con datos actualizados (debe incluir thId)
-     * @return Third actualizado con datos geográficos completos    *
+     * @return Third actualizado con datos geográficos completos
      * @throws IllegalArgumentException si third es null o no tiene ID
      * @throws ThirdNotFound si no existe el tercero con el ID especificado
+     * @throws ThirdInUseException si el tercero tiene movimientos contables asociados
     */
     @Override
     public Third updateThird(Third third) {
@@ -341,6 +343,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         }
 
         ThirdEntity thirdEntity = existingEntityOpt.get();
+
+        // Validar que el tercero no tenga movimientos contables asociados
+        if (thirdEntity.getUsageCount() != null && thirdEntity.getUsageCount() > 0) {
+            throw new ThirdInUseException("No se puede editar el tercero porque tiene movimientos contables");
+        }
 
         // Validar que el TypeId existe antes de actualizar
         if (third.getTypeId() != null && third.getTypeId().getId() != null) {
@@ -425,41 +432,49 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      * @brief Elimina tercero y sus asociaciones con manejo transaccional
      * @details Elimina primero las asociaciones en la tabla intermedia thirds_and_types,
      * luego elimina el tercero principal. Utiliza contexto de tenant para asegurar
-     * aislamiento multi-tenant. Retorna false si hay errores pero no lanza excepciones.
+     * aislamiento multi-tenant. Valida que el tercero no tenga movimientos contables antes de eliminarlo.
      * @param thirdId ID del tercero a eliminar
      * @param entId ID de la empresa para validación de pertenencia
-     * @return true si se eliminó correctamente, false en caso de error
+     * @return true si se eliminó correctamente
+     * @throws ThirdNotFound si no se encuentra el tercero
+     * @throws ThirdInUseException si el tercero tiene movimientos contables asociados
+     * @throws IllegalArgumentException si los parámetros son inválidos
      */
     @Override
     @Transactional
     public boolean deleteThird(Long thirdId, String entId) {
         if (thirdId == null || entId == null || entId.trim().isEmpty()) {
-            return false;
+            throw new IllegalArgumentException("El ID del tercero y el ID de la empresa son requeridos");
         }
-        
+
         String currentTenant = TenantContext.getTenantId();
         try {
             TenantContext.setTenantId(currentTenant);
-            
+
             // Buscar el tercero por ID y empresa
             Optional<ThirdEntity> thirdEntity = thirdRepository.findByThIdAndEntId(thirdId, entId);
-            
+
             if (thirdEntity.isPresent()) {
+                ThirdEntity entity = thirdEntity.get();
+
+                // Validar que el tercero no tenga movimientos contables
+                if (entity.getUsageCount() != null && entity.getUsageCount() > 0) {
+                    throw new ThirdInUseException("No se puede eliminar el tercero porque tiene movimientos contables");
+                }
+
                 // Eliminar las asociaciones del tercero
                 List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdId);
                 if (!relations.isEmpty()) {
                     thirdsAndTypesRepository.deleteAll(relations);
                 }
-                
+
                 // Eliminar el tercero
-                thirdRepository.delete(thirdEntity.get());
+                thirdRepository.delete(entity);
                 return true;
             }
-            
-            return false;
-            
-        } catch (Exception e) {
-            return false;
+
+            throw new ThirdNotFound("No se encontró el tercero con ID: " + thirdId + " en la empresa: " + entId);
+
         } finally {
             TenantContext.setTenantId(currentTenant);
         }

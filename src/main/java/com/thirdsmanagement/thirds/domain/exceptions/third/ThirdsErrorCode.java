@@ -30,7 +30,8 @@ public enum ThirdsErrorCode implements ErrorCodeDefinition {
     THIRD_NIT_INVALID_FORMAT("THIRD_NIT_INVALID_FORMAT", "El NIT debe empezar por 8 o 9 para personas jurídicas"),
     THIRD_VERIFICATION_DIGIT_NOT_ALLOWED("THIRD_VERIFICATION_DIGIT_NOT_ALLOWED", "El dígito de verificación solo se permite para personas jurídicas"),
     THIRD_VERIFICATION_DIGIT_REQUIRED("THIRD_VERIFICATION_DIGIT_REQUIRED", "El dígito de verificación es obligatorio para personas jurídicas"),
-    FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", "El archivo excede el tamaño máximo permitido");
+    FILE_SIZE_EXCEEDED("FILE_SIZE_EXCEEDED", "El archivo excede el tamaño máximo permitido"),
+    THIRD_IN_USE("THIRD_IN_USE", "El tercero no puede ser modificado o eliminado porque tiene movimientos contables asociados");
 
     private final String code;
     private final String message;

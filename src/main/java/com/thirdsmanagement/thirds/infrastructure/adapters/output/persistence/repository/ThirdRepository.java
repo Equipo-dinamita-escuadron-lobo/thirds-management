@@ -130,4 +130,26 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      */
     @Query("SELECT t FROM ThirdEntity t LEFT JOIN FETCH t.typeId WHERE t.thId = :id")
     Optional<ThirdEntity> findByIdWithTypeId(@Param("id") Long id);
+
+    /**
+     * @brief Verifica si existe tercero con tipo de identificación específico, empresa y movimientos contables
+     * @param typeIdCode Código del tipo de identificación
+     * @param entId ID de la empresa
+     * @param usageCount Límite mínimo de movimientos contables
+     * @return true si existe al menos un tercero que cumple las condiciones
+     */
+    @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t WHERE t.typeId.tiId = :typeIdCode AND t.entId = :entId AND t.usageCount > :usageCount")
+    boolean existsByTypeIdTiIdAndEntIdAndUsageCountGreaterThan(@Param("typeIdCode") String typeIdCode, @Param("entId") String entId, @Param("usageCount") int usageCount);
+
+    /**
+     * @brief Verifica si existe tercero asociado a tipo de tercero específico, empresa y movimientos contables
+     * @param thirdTypeId ID del tipo de tercero
+     * @param entId ID de la empresa
+     * @param usageCount Límite mínimo de movimientos contables
+     * @return true si existe al menos un tercero que cumple las condiciones
+     */
+    @Query("SELECT COUNT(t) > 0 FROM ThirdEntity t " +
+           "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
+           "WHERE tat.ttId = :thirdTypeId AND t.entId = :entId AND t.usageCount > :usageCount")
+    boolean existsByThirdTypeIdAndEntIdAndUsageCountGreaterThan(@Param("thirdTypeId") Long thirdTypeId, @Param("entId") String entId, @Param("usageCount") int usageCount);
 }
