@@ -152,4 +152,15 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
            "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
            "WHERE tat.ttId = :thirdTypeId AND t.entId = :entId AND t.usageCount > :usageCount")
     boolean existsByThirdTypeIdAndEntIdAndUsageCountGreaterThan(@Param("thirdTypeId") Long thirdTypeId, @Param("entId") String entId, @Param("usageCount") int usageCount);
+
+    /**
+     * @brief Incrementa el contador de uso de un tercero de forma optimizada
+     * @details Query optimizada para incrementar el usageCount sin cargar la entidad completa.
+     * Usa COALESCE para manejar valores null correctamente.
+     * @param thirdId ID del tercero
+     * @return Cantidad de registros actualizados (debe ser 1 si existe, 0 si no existe)
+     */
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE ThirdEntity t SET t.usageCount = COALESCE(t.usageCount, 0) + 1 WHERE t.thId = :thirdId")
+    int incrementUsageCountByThirdId(@Param("thirdId") Long thirdId);
 }

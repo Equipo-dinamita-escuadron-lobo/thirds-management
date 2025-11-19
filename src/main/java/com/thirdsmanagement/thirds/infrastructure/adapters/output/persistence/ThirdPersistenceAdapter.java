@@ -344,8 +344,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
         ThirdEntity thirdEntity = existingEntityOpt.get();
 
-        // Validar que el tercero no tenga movimientos contables asociados
-        if (thirdEntity.getUsageCount() != null && thirdEntity.getUsageCount() > 0) {
+        // Convertir a dominio para usar la lógica de negocio
+        Third existingThird = convertToThird(thirdEntity);
+        
+        // Validar que el tercero no tenga movimientos contables asociados usando el método del dominio
+        if (existingThird.isInUse()) {
             throw new ThirdInUseException("No se puede editar el tercero porque tiene movimientos contables");
         }
 
@@ -377,7 +380,6 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         thirdEntity.setState(third.getState() != null ? third.getState() : true);
         thirdEntity.setPhoneNumber(third.getPhoneNumber());
         thirdEntity.setEmail(third.getEmail());
-        thirdEntity.setUsageCount(third.getUsageCount());
 
         // Guardar la entidad principal actualizada
         try {
@@ -457,8 +459,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             if (thirdEntity.isPresent()) {
                 ThirdEntity entity = thirdEntity.get();
 
-                // Validar que el tercero no tenga movimientos contables
-                if (entity.getUsageCount() != null && entity.getUsageCount() > 0) {
+                // Convertir a dominio para usar la lógica de negocio
+                Third third = convertToThird(entity);
+                
+                // Validar que el tercero no tenga movimientos contables usando el método del dominio
+                if (third.isInUse()) {
                     throw new ThirdInUseException("No se puede eliminar el tercero porque tiene movimientos contables");
                 }
 
@@ -687,6 +692,28 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     @Transactional(readOnly = true)
     public long countThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName) {
         return thirdRepository.countByEntIdAndThirdTypeName(entId, thirdTypeName);
+    }
+
+    /**
+     * @brief Incrementa el contador de uso de un tercero de forma optimizada
+     * @details Utiliza una query optimizada para incrementar el usageCount sin pasar
+     * por las validaciones de actualización completa. Esto permite incrementar el
+     * contador incluso cuando el tercero ya tiene movimientos contables asociados.
+     * @param thirdId ID del tercero cuyo contador se va a incrementar
+     * @return true si se incrementó correctamente, false si el tercero no existe
+     */
+    @Override
+    @Transactional
+    public boolean incrementUsageCount(Long thirdId) {
+        if (thirdId == null) {
+            log.warn("Intento de incrementar usageCount con thirdId null");
+            return false;
+        }
+
+        int updatedRows = thirdRepository.incrementUsageCountByThirdId(thirdId);
+        boolean success = updatedRows > 0;  
+        
+        return success;
     }
 
 }
