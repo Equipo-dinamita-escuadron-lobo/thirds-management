@@ -101,6 +101,14 @@ public interface IdOutputPort {
     boolean isThirdTypeInUse(Long thirdTypeId, String entId);
 
     /**
+     * @brief Verifica si tipo de tercero tiene terceros con movimientos contables
+     * @param thirdTypeId El ID del tipo de tercero
+     * @param entId El ID de la empresa
+     * @return true si tiene terceros con movimientos contables, false en caso contrario
+     */
+    boolean hasThirdTypeThirdsWithMovements(Long thirdTypeId, String entId);
+
+    /**
      * @brief Elimina un tipo de identificación del sistema
      * @param typeIdId El ID del tipo de identificación a eliminar
      * @param entId El ID de la empresa
@@ -115,6 +123,14 @@ public interface IdOutputPort {
      * @return true si está en uso, false en caso contrario
      */
     boolean isTypeIdInUse(Long typeIdId, String entId);
+
+    /**
+     * @brief Verifica si tipo de identificación tiene terceros con movimientos contables
+     * @param typeIdId El ID del tipo de identificación
+     * @param entId El ID de la empresa
+     * @return true si tiene terceros con movimientos contables, false en caso contrario
+     */
+    boolean hasTypeIdThirdsWithMovements(Long typeIdId, String entId);
     
     /**
      * @brief Obtiene tipos de identificación con paginación y ordenamiento

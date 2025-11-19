@@ -19,11 +19,11 @@ public class TypeIdInUseException extends BaseBusinessException {
      */
     public TypeIdInUseException(Long typeIdId) {
         super(TypeIdErrorCode.TYPE_ID_IN_USE,
-              "El tipo de identificación con ID '" + typeIdId + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+              "El tipo de identificación con ID " + typeIdId + " está siendo utilizado por terceros existentes y no puede ser eliminado");
     }
 
     /**
-     * @brief Constructor con nombre específico del tipo de identificación
+     * @brief Constructor con nombre específico del tipo de identificación para eliminación
      *
      * Crea una excepción específica cuando se intenta eliminar un tipo de identificación
      * que tiene terceros asociados, identificándolo por su nombre.
@@ -31,7 +31,22 @@ public class TypeIdInUseException extends BaseBusinessException {
      */
     public TypeIdInUseException(String typeIdName) {
         super(TypeIdErrorCode.TYPE_ID_IN_USE,
-              "El tipo de identificación '" + typeIdName + "' está siendo utilizado por terceros existentes y no puede ser eliminado");
+              "El tipo de identificación " + typeIdName + " está siendo utilizado por terceros existentes y no puede ser eliminado");
+    }
+
+    /**
+     * @brief Constructor con nombre específico del tipo de identificación para edición
+     *
+     * Crea una excepción específica cuando se intenta editar un tipo de identificación
+     * que tiene terceros con movimientos contables asociados.
+     * @param typeIdName el nombre del tipo de identificación que está en uso
+     * @param isEditOperation indica si es una operación de edición (true) o eliminación (false)
+     */
+    public TypeIdInUseException(String typeIdName, boolean isEditOperation) {
+        super(TypeIdErrorCode.TYPE_ID_IN_USE,
+              isEditOperation ?
+              "No se puede editar el tipo de identificación " + typeIdName + " porque tiene terceros con movimientos contables" :
+              "El tipo de identificación " + typeIdName + " está siendo utilizado por terceros existentes y no puede ser eliminado");
     }
 
     /**
