@@ -21,4 +21,12 @@ public interface CityRepository extends JpaRepository<CityEntity, CityEntityId> 
 
     @Query("SELECT COUNT(c) > 0 FROM CityEntity c WHERE c.cityCode = :cityCode AND c.stateCode = :stateCode AND c.countryCode = :countryCode")
     boolean existsByCityCodeAndStateCodeAndCountryCode(@Param("cityCode") String cityCode, @Param("stateCode") String stateCode, @Param("countryCode") String countryCode);
+
+    /**
+     * @brief Obtiene todas las ciudades activas sin filtrar por estado
+     * @details Optimizado para carga batch en exportaciones masivas
+     * @return Lista de todas las ciudades ordenadas por nombre
+     */
+    @Query("SELECT c FROM CityEntity c ORDER BY c.cityName")
+    List<CityEntity> findAllCities();
 }

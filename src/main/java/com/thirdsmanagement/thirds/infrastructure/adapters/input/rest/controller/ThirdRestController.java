@@ -54,6 +54,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -312,20 +313,23 @@ public class ThirdRestController {
     }
 
     /**
-     * @brief Exporta terceros con validaciones a formato Excel.
+     * @brief Inicia exportación asíncrona de terceros a formato Excel.
      * Utiliza configuración flexible de campos opcionales mediante ExportableField.
      * 
      * @param entId Identificador de la entidad (requerido)
      * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
      * @param companyName Nombre de la empresa para el nombre del archivo
      * @param optionalFields Conjunto de campos opcionales a incluir (GENDER, COUNTRY, STATE, CITY)
+     * @return ResponseEntity con jobId y mensaje de confirmación
      */
     @GetMapping("/export/excel")
-    public ResponseEntity<Resource> exportThirdsWithValidations(
+    public ResponseEntity<Map<String, String>> exportThirdsWithValidationsAsync(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName,
             @RequestParam(required = false) Set<ExportableField> optionalFields) {
+        
+        log.info("Iniciando exportación asíncrona para entidad: {}", entId);
         
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
@@ -336,16 +340,76 @@ public class ThirdRestController {
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
                 .status(statusBoolean)
+                .companyName(companyName)
                 .optionalFields(fields)
                 .build();
         
-        Resource excelFile = exportThirdUseCase.exportThirdsWithValidations(exportRequest);
-        String filename = fileNameGenerator.generateExportFileName(entId, companyName, statusBoolean);
+        String jobId = exportThirdUseCase.exportThirdsAsync(exportRequest);
+        
+        Map<String, String> response = Map.of(
+                "jobId", jobId,
+                "message", "Exportación iniciada correctamente",
+                "downloadUrl", "/api/thirds/export/download/" + jobId
+        );
+        
+        log.info("Exportación asíncrona iniciada. JobId: {}", jobId);
+        
+        return ResponseEntity.accepted().body(response);
+    }
+
+    /**
+     * @brief Consulta el estado de una exportación asíncrona
+     * 
+     * @param jobId identificador único del job de exportación
+     * @return ResponseEntity con el estado del job
+     */
+    @GetMapping("/export/status/{jobId}")
+    public ResponseEntity<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> getExportStatus(@PathVariable String jobId) {
+        Optional<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> jobStatus = exportThirdUseCase.getExportStatus(jobId);
+        return jobStatus.map(status -> new ResponseEntity<>(status, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    /**
+     * @brief Descarga el archivo Excel generado por una exportación asíncrona
+     * 
+     * @param jobId identificador único del job de exportación
+     * @return ResponseEntity con el archivo Excel si está disponible
+     */
+    @GetMapping("/export/download/{jobId}")
+    public ResponseEntity<Resource> downloadExportedFile(@PathVariable String jobId) {
+        Optional<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> jobStatusOpt = exportThirdUseCase.getExportStatus(jobId);
+        
+        if (jobStatusOpt.isEmpty()) {
+            log.warn("Job de exportación no encontrado: {}", jobId);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        
+        com.thirdsmanagement.thirds.domain.model.ExportJobStatus jobStatus = jobStatusOpt.get();
+        
+        // Verificar que el job esté completado
+        if (jobStatus.getStatus() != com.thirdsmanagement.thirds.domain.enums.ImportStatus.COMPLETED) {
+            log.warn("Job de exportación {} aún no está completado. Estado: {}", jobId, jobStatus.getStatus());
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(null); // Indicar que aún no está listo
+        }
+        
+        // Verificar que los datos del archivo existan
+        if (jobStatus.getFileData() == null || jobStatus.getFileData().length == 0) {
+            log.error("Job de exportación {} completado pero sin datos de archivo", jobId);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        // Crear recurso con los datos del archivo
+        ByteArrayResource resource = new ByteArrayResource(jobStatus.getFileData());
+        
+        log.info("Descargando archivo de exportación. JobId: {}, Tamaño: {} bytes", 
+                jobId, jobStatus.getFileData().length);
         
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + jobStatus.getFileName() + "\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(excelFile);
+                .body(resource);
     }
 
     /**

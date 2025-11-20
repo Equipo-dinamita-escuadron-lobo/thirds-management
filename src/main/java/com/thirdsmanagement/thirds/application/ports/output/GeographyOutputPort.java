@@ -58,4 +58,18 @@ public interface GeographyOutputPort {
      * @return true si la ciudad existe y está activa, false en caso contrario
      */
     boolean existsActiveCity(String cityCode, String stateCode, String countryCode);
+
+    /**
+     * @brief Obtiene todos los estados activos (sin filtrar por país)
+     * @details Optimizado para carga batch en exportaciones masivas
+     * @return Lista de todos los estados activos
+     */
+    List<State> getAllActiveStates();
+
+    /**
+     * @brief Obtiene todas las ciudades activas (sin filtrar por estado)
+     * @details Optimizado para carga batch en exportaciones masivas
+     * @return Lista de todas las ciudades activas
+     */
+    List<City> getAllActiveCities();
 }

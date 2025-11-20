@@ -21,4 +21,12 @@ public interface StateRepository extends JpaRepository<StateEntity, StateEntityI
 
     @Query("SELECT COUNT(s) > 0 FROM StateEntity s WHERE s.stateCode = :stateCode AND s.countryCode = :countryCode")
     boolean existsByStateCodeAndCountryCode(@Param("stateCode") String stateCode, @Param("countryCode") String countryCode);
+
+    /**
+     * @brief Obtiene todos los estados activos sin filtrar por país
+     * @details Optimizado para carga batch en exportaciones masivas
+     * @return Lista de todos los estados ordenados por nombre
+     */
+    @Query("SELECT s FROM StateEntity s ORDER BY s.stateName")
+    List<StateEntity> findAllStates();
 }

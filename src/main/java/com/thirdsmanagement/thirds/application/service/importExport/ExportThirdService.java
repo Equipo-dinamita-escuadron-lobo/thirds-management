@@ -6,6 +6,7 @@ import com.thirdsmanagement.thirds.domain.enums.ExportableField;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdExportException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdsErrorCode;
 import com.thirdsmanagement.thirds.domain.model.ExportConfiguration;
+import com.thirdsmanagement.thirds.domain.model.ExportJobStatus;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdExportRequest;
@@ -25,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,17 +43,21 @@ public class ExportThirdService implements ExportThirdUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
     private final ExcelValidationService excelValidationService;
+    private final ExportJobTracker exportJobTracker;
+    private final AsyncExportProcessor asyncExportProcessor;
+    private final com.thirdsmanagement.thirds.infrastructure.utils.ExcelFileNameGenerator fileNameGenerator;
   
     private static final int EXPORT_PAGE_SIZE = 5000;
 
     /**
-     * @brief Obtiene terceros filtrados aplicando el filtro en la base de datos
+     * @brief Obtiene terceros filtrados con paginación optimizada para exportación
      *
      * Utiliza paginación automática para exportar TODOS los registros sin límite,
      * optimizando el uso de memoria mediante procesamiento por lotes.
+     * IMPORTANTE: Usa métodos optimizados que eliminan el problema N+1 queries.
      * 
      * @param request solicitud de exportación con filtros
-     * @return lista completa de terceros filtrados
+     * @return lista completa de terceros filtrados con todas sus relaciones pre-cargadas
      */
     private List<Third> getFilteredThirds(ThirdExportRequest request) {
         List<Third> allThirds = new ArrayList<>();
@@ -62,11 +68,11 @@ public class ExportThirdService implements ExportThirdUseCase {
             // Crear pageable para la página actual
             Pageable pageable = PageRequest.of(currentPage, EXPORT_PAGE_SIZE);
             
-            // Obtener página según filtros
+            // Obtener página según filtros usando métodos optimizados para exportación
             if (request.getStatus() != null) {
-                page = thirdOutputPort.getAllThirdsByState(request.getEntId(), request.getStatus(), pageable);
+                page = thirdOutputPort.getAllThirdsByStateForExport(request.getEntId(), request.getStatus(), pageable);
             } else {
-                page = thirdOutputPort.getAllThirdsBy(request.getEntId(), pageable);
+                page = thirdOutputPort.getAllThirdsForExport(request.getEntId(), pageable);
             }
             
             // Agregar contenido de esta página a la lista total
@@ -424,6 +430,60 @@ public class ExportThirdService implements ExportThirdUseCase {
             throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
                     "Error al generar archivo de exportación", e);
         }
+    }
+
+    /**
+     * @brief Inicia exportación asíncrona de terceros
+     * @param exportRequest solicitud de exportación con filtros
+     * @return jobId único para consultar el estado
+     */
+    @Override
+    public String exportThirdsAsync(ThirdExportRequest exportRequest) {
+        try {
+            // Generar nombre de archivo descriptivo
+            String fileName = generateFileName(exportRequest);
+            
+            // Crear job de exportación y obtener ID (síncrono, retorna inmediatamente)
+            String jobId = exportJobTracker.createJob(exportRequest.getEntId(), fileName);
+            
+            log.info("Job de exportación creado. JobId: {}, Entidad: {}, Archivo: {}", 
+                    jobId, exportRequest.getEntId(), fileName);
+            
+            // Ejecutar exportación de forma asíncrona usando servicio separado
+            asyncExportProcessor.processExportAsync(exportRequest, jobId);
+            
+            log.info("Job de exportación lanzado de forma asíncrona. JobId: {}", jobId);
+            
+            return jobId;
+            
+        } catch (Exception e) {
+            log.error("Error al iniciar la exportación: {}", e.getMessage(), e);
+            throw new ThirdExportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
+                    "Error al iniciar la exportación: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * @brief Obtiene el estado de un job de exportación
+     * @param jobId identificador único del job
+     * @return estado del job si existe
+     */
+    @Override
+    public Optional<ExportJobStatus> getExportStatus(String jobId) {
+        return exportJobTracker.getJobStatus(jobId);
+    }
+
+    /**
+     * @brief Genera un nombre de archivo descriptivo para la exportación
+     * @param exportRequest solicitud de exportación
+     * @return nombre de archivo generado
+     */
+    private String generateFileName(ThirdExportRequest exportRequest) {
+        return fileNameGenerator.generateExportFileName(
+                exportRequest.getEntId(), 
+                exportRequest.getCompanyName(), 
+                exportRequest.getStatus()
+        );
     }
 
     /**

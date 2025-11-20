@@ -28,4 +28,16 @@ public interface ThirdsAndTypesRepository extends JpaRepository<ThirdsAndTypesEn
     void deleteByTtId(Long ttId);
 
     boolean existsByTtId(Long ttId);
+
+    /**
+     * @brief Obtiene todas las relaciones tercero-tipo para múltiples terceros (batch)
+     * @details Optimizado para exportación masiva, carga todas las relaciones con sus ThirdTypes
+     * en una sola consulta usando JOIN FETCH. Elimina el problema N+1 queries.
+     * @param thirdIds lista de IDs de terceros
+     * @return lista de relaciones con ThirdTypes cargados
+     */
+    @Query("SELECT tat FROM ThirdsAndTypesEntity tat " +
+           "JOIN FETCH tat.thirdType " +
+           "WHERE tat.thId IN :thirdIds")
+    List<ThirdsAndTypesEntity> findByThIdInWithThirdType(@Param("thirdIds") List<Long> thirdIds);
 }
