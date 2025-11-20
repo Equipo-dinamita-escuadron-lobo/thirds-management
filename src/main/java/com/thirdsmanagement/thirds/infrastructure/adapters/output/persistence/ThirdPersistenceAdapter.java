@@ -119,6 +119,127 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     }
 
     /**
+     * @brief Guarda múltiples terceros en lote usando saveAll (optimizado)
+     * @param thirds Lista de terceros a guardar (asume que ya están validados)
+     * @return Lista de terceros guardados con datos geográficos completos
+     * @details Este método está optimizado para importación masiva y asume que los datos
+     * ya fueron validados previamente. NO realiza validaciones de existencia de TypeIds o ThirdTypes
+     * para evitar redundancia con la fase de validación.
+     */
+    @Override
+    public List<Third> saveAllThirds(List<Third> thirds) {
+        if (thirds == null || thirds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String currentTenant = TenantContext.getTenantId();
+        List<ThirdEntity> entitiesToSave = new ArrayList<>();
+        List<ThirdsAndTypesEntity> relationsToSave = new ArrayList<>();
+
+        // PASO 1: Obtener todos los TypeIds únicos en UN SOLO batch query
+        Set<Long> uniqueTypeIds = new HashSet<>();
+        for (Third third : thirds) {
+            if (third != null && third.getTypeId() != null && third.getTypeId().getId() != null) {
+                uniqueTypeIds.add(third.getTypeId().getId());
+            }
+        }
+        
+        // Consulta batch de todos los TypeIds de una vez
+        List<TypeIdEntity> typeIdEntities = typeIdRepository.findAllById(uniqueTypeIds);
+        Map<Long, TypeIdEntity> typeIdCache = new HashMap<>();
+        for (TypeIdEntity entity : typeIdEntities) {
+            // Usar el ID (PK) de TypeIdEntity, NO el tiId (que es el código como "CC")
+            typeIdCache.put(entity.getId(), entity);
+        }
+
+        // PASO 2: Preparar todas las entidades USANDO EL CACHE (sin más consultas)
+        for (Third third : thirds) {
+            if (third == null) {
+                continue;
+            }
+
+            // Preparar la entidad principal
+            ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
+            thirdEntity.setTenantId(currentTenant);
+            
+            // Obtener del cache (SIN consulta a BD)
+            TypeIdEntity typeIdEntity = typeIdCache.get(third.getTypeId().getId());
+            if (typeIdEntity != null) {
+                thirdEntity.setTypeId(typeIdEntity);
+            }
+
+            entitiesToSave.add(thirdEntity);
+        }
+
+        // Guardar todas las entidades principales en un solo batch
+        List<ThirdEntity> savedEntities;
+        try {
+            savedEntities = thirdRepository.saveAll(entitiesToSave);
+        } catch (DataIntegrityViolationException e) {
+            throw e;
+        }
+
+        // Crear todas las relaciones con tipos de tercero
+        for (int i = 0; i < savedEntities.size(); i++) {
+            ThirdEntity savedEntity = savedEntities.get(i);
+            Third originalThird = thirds.get(i);
+
+            if (originalThird.getThirdTypes() != null && !originalThird.getThirdTypes().isEmpty()) {
+                for (ThirdType tt : originalThird.getThirdTypes()) {
+                    ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                            .thId(savedEntity.getThId())
+                            .ttId(tt.getThirdTypeId())
+                            .tenantId(currentTenant)
+                            .build();
+                    relationsToSave.add(relationEntity);
+                }
+            }
+        }
+
+        // Guardar todas las relaciones en un solo batch
+        if (!relationsToSave.isEmpty()) {
+            try {
+                thirdsAndTypesRepository.saveAll(relationsToSave);
+            } catch (DataIntegrityViolationException e) {
+                throw e;
+            }
+        }
+
+        // Convertir de vuelta al dominio REUTILIZANDO la geografía original
+        List<Third> result = new ArrayList<>();
+        for (int i = 0; i < savedEntities.size(); i++) {
+            ThirdEntity savedEntity = savedEntities.get(i);
+            Third originalThird = thirds.get(i);
+            
+            // Reutilizar geografía del Third original (ya validada en Fase 2)
+            Third savedThird = Third.builder()
+                    .thId(savedEntity.getThId())
+                    .entId(savedEntity.getEntId())
+                    .typeId(originalThird.getTypeId())
+                    .thirdTypes(originalThird.getThirdTypes())  
+                    .personType(originalThird.getPersonType())
+                    .names(originalThird.getNames())
+                    .lastNames(originalThird.getLastNames())
+                    .socialReason(originalThird.getSocialReason())
+                    .gender(originalThird.getGender())
+                    .idNumber(originalThird.getIdNumber())
+                    .verificationNumber(originalThird.getVerificationNumber())
+                    .state(originalThird.getState())
+                    .country(originalThird.getCountry())
+                    .province(originalThird.getProvince())  
+                    .city(originalThird.getCity())  
+                    .address(originalThird.getAddress())
+                    .phoneNumber(originalThird.getPhoneNumber())
+                    .email(originalThird.getEmail())
+                    .build();
+            
+            result.add(savedThird);
+        }       
+
+        return result;
+    }
+
+    /**
      * @brief Carga datos geográficos completos desde servicios especializados
      * @details Utiliza GeographyLoaderService para cargar objetos completos de Country, State y City
      * basándose en los códigos almacenados en la entidad. Crea un nuevo objeto Third con toda la información geográfica.

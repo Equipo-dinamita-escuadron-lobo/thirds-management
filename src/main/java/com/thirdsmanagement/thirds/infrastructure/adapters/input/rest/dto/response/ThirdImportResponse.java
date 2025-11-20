@@ -19,6 +19,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ThirdImportResponse {
 
+    
+    private String jobId;
+
     private String entId;
 
     private String fileName;
@@ -32,6 +35,8 @@ public class ThirdImportResponse {
     private Integer failedImports;
 
     private Integer duplicatesSkipped;
+
+    private Integer progress;
 
     private List<ImportErrorDetail> errors;
 }

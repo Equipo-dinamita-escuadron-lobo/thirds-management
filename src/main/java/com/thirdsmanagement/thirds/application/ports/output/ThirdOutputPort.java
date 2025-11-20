@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +22,13 @@ public interface ThirdOutputPort {
      * @return El tercero guardado
      */
     Third saveThird(Third third);
+
+    /**
+     * @brief Guarda múltiples terceros en lote (optimizado)
+     * @param thirds Lista de terceros a guardar
+     * @return Lista de terceros guardados
+     */
+    List<Third> saveAllThirds(List<Third> thirds);
 
     /**
      * @brief Actualiza un tercero

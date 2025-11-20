@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
 
@@ -15,6 +16,7 @@ import com.thirdsmanagement.thirds.infrastructure.config.FileUploadProperties;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableAsync
 @EnableConfigurationProperties(FileUploadProperties.class)
 @EnableSpringDataWebSupport(pageSerializationMode = PageSerializationMode.VIA_DTO)
 public class ThirdsManagementApplication {

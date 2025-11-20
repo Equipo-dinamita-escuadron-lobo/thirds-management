@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.controlle
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ import com.thirdsmanagement.thirds.application.service.importExport.PdfRUTServic
 import com.thirdsmanagement.thirds.application.service.third.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.third.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.enums.ExportableField;
+import com.thirdsmanagement.thirds.domain.model.ImportJobStatus;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
@@ -27,7 +29,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.reques
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.BulkStateChangeResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ChangeThirdStateResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdImportResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
 import com.thirdsmanagement.thirds.infrastructure.utils.ExcelFileNameGenerator;
@@ -45,13 +46,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -347,16 +349,18 @@ public class ThirdRestController {
     }
 
     /**
-     * @brief Importa terceros masivamente desde archivo Excel
+     * @brief Inicia una importación asíncrona de terceros masivamente desde archivo Excel
      *
-     * Endpoint para carga masiva de terceros desde archivo Excel con validación completa,
-     * detección de duplicados y reporting detallado de resultados.
+     * Endpoint para carga masiva asíncrona de terceros desde archivo Excel. La importación
+     * se ejecuta en segundo plano y retorna inmediatamente un ID de job para consultar el estado.
+     * Este método retorna de forma inmediata después de crear el job, sin esperar el procesamiento.
+     * 
      * @param entId identificador de la empresa
      * @param file archivo Excel con los datos de terceros a importar
-     * @return estadísticas completas de la importación (procesados, errores, duplicados)
+     * @return ResponseEntity con jobId único para consultar el estado de la importación y mensaje de confirmación
      */
     @PostMapping("/import/excel")
-    public ResponseEntity<ThirdImportResponse> importThirdsFromExcel(
+    public ResponseEntity<Map<String, String>> importThirdsFromExcel(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
             @NotNull(message = "El archivo Excel es obligatorio") @RequestParam("file") MultipartFile file) {
 
@@ -365,18 +369,33 @@ public class ThirdRestController {
                 .excelFile(file)
                 .fileName(file.getOriginalFilename())
                 .build();
+        
+        log.error("Antes de iniciar la importación");
+        // Crea el job y lanza el procesamiento asíncrono (retorna inmediatamente)
+        String jobId = importThirdUseCase.importThirdsFromExcel(importRequest);
 
-        ThirdImportResponse response = importThirdUseCase.importThirdsFromExcel(importRequest);
+        Map<String, String> response = Map.of(
+                "jobId", jobId,
+                "message", "Importación iniciada correctamente",
+                "statusUrl", "/api/thirds/import/status/" + jobId
+        );
+        log.error("Después de iniciar la importación");
+        return ResponseEntity.accepted().body(response);
+    }
 
-        // Determinar código de respuesta HTTP basado en el estado
-        HttpStatus status = switch (response.getStatus()) {
-            case COMPLETED -> HttpStatus.OK;
-            case COMPLETED_WITH_ERRORS -> HttpStatus.ACCEPTED;
-            case FAILED -> HttpStatus.BAD_REQUEST;
-            default -> HttpStatus.INTERNAL_SERVER_ERROR;
-        };
-
-        return new ResponseEntity<>(response, status);
+    /**
+     * @brief Consulta el estado de una importación asíncrona de terceros
+     *
+     * Endpoint para consultar el progreso y resultados de una importación en ejecución o completada.
+     * Incluye métricas detalladas, porcentaje de progreso y errores acumulados.
+     * @param jobId identificador único del job de importación
+     * @return estado completo del job con métricas y errores, o 404 si no se encuentra
+     */
+    @GetMapping("/import/status/{jobId}")
+    public ResponseEntity<ImportJobStatus> getImportStatus(@PathVariable String jobId) {
+        return importThirdUseCase.getImportStatus(jobId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**

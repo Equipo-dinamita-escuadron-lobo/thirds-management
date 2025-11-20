@@ -22,7 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -44,6 +46,21 @@ public class ExcelParsingService {
     }
 
     /**
+     * @brief Parsea el archivo Excel desde bytes y extrae los datos de terceros
+     * @param fileBytes contenido del archivo Excel en bytes
+     * @param entId identificador de la entidad
+     * @return resultado con lista de terceros parseados y errores encontrados
+     */
+    public ExcelParsingResult parseExcelFileFromBytes(byte[] fileBytes, String entId) {
+        try (InputStream inputStream = new ByteArrayInputStream(fileBytes)) {
+            return parseExcelFromInputStream(inputStream, entId);
+        } catch (IOException e) {
+            throw new ThirdImportException(ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error al leer el archivo Excel desde bytes: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * @brief Parsea el archivo Excel y extrae los datos de terceros
      * @param file archivo Excel a procesar
      * @param entId identificador de la entidad
@@ -51,22 +68,39 @@ public class ExcelParsingService {
      */
     public ExcelParsingResult parseExcelFile(MultipartFile file, String entId) {
         fileValidator.validate(file);
+        
+        try {
+            return parseExcelFromInputStream(file.getInputStream(), entId);
+        } catch (IOException e) {
+            throw new ThirdImportException(
+                    ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
+                    "Error leyendo archivo Excel: " + e.getMessage(),
+                    e);
+        }
+    }
 
+    /**
+     * @brief Parsea el archivo Excel desde un InputStream
+     * @param inputStream stream del archivo Excel
+     * @param entId identificador de la entidad
+     * @return resultado con lista de terceros parseados y errores encontrados
+     */
+    private ExcelParsingResult parseExcelFromInputStream(InputStream inputStream, String entId) {
         List<ThirdExcelData> thirdsData = new ArrayList<>();
         List<ImportErrorDetail> errors = new ArrayList<>();
         Map<String, Integer> columnMap = new HashMap<>();
 
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
 
             if (sheet.getPhysicalNumberOfRows() == 0) {
-                throw ThirdImportException.forEmptyFile(file.getOriginalFilename());
+                throw ThirdImportException.forEmptyFile("excel-file");
             }
 
             // Detectar mapa de columnas dinámicamente
             columnMap = detectColumnMapping(sheet, errors);
             if (columnMap.isEmpty()) {
-                throw ThirdImportException.forInvalidExcelFile(file.getOriginalFilename(),
+                throw ThirdImportException.forInvalidExcelFile("excel-file",
                         "No se pudieron detectar las columnas requeridas");
             }
 
@@ -86,7 +120,7 @@ public class ExcelParsingService {
         } catch (IOException e) {
             throw new ThirdImportException(
                     ThirdsErrorCode.EXCEL_VALIDATION_ERROR,
-                    "Error leyendo archivo Excel: " + e.getMessage(),
+                    "Error leyendo archivo Excel desde InputStream: " + e.getMessage(),
                     e);
         }
 

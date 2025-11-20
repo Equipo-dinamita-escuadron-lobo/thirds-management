@@ -528,6 +528,10 @@ public class BatchValidationService {
             return name != null && countries.containsKey(StringNormalizer.normalizeCode(name));
         }
 
+        Country getCountry(String name) {
+            return name != null ? countries.get(StringNormalizer.normalizeCode(name)) : null;
+        }
+
         boolean hasState(String name) {
             return name != null && states.containsKey(StringNormalizer.normalizeCode(name));
         }

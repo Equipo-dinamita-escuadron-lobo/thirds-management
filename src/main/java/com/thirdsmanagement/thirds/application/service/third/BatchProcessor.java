@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
+import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.importExport.BatchValidationService;
 import com.thirdsmanagement.thirds.application.service.importExport.DataConverter;
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
@@ -25,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @brief Procesador de lotes optimizado para importación masiva
  *
  * Maneja transacciones por lote (no por registro) para mejor performance.
+ * Utiliza saveAll() para insertar múltiples registros en una sola operación.
  */
 @Slf4j
 @Service
@@ -33,9 +35,10 @@ public class BatchProcessor {
 
     private final CreateThirdService createThirdService;
     private final DataConverter dataConverter;
+    private final ThirdOutputPort thirdOutputPort;
 
     /**
-     * @brief Procesa un lote completo de registros en una sola transacción
+     * @brief Procesa un lote completo de registros en una sola transacción usando saveAll()
      * @param batch lista de registros Excel a procesar
      * @param cache datos de referencia pre-cargados
      * @param continueOnError si es true, continúa procesando aunque haya errores
@@ -45,19 +48,23 @@ public class BatchProcessor {
     public BatchProcessingResult processBatch(List<ThirdExcelData> batch, 
                                              BatchValidationService.ReferenceDataCache cache,
                                              boolean continueOnError) {
+        long batchStartTime = System.currentTimeMillis();
+        
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failureCount = new AtomicInteger(0);
         AtomicInteger skippedCount = new AtomicInteger(0);
         List<ImportErrorDetail> errors = new ArrayList<>();
+        List<Third> thirdsToSave = new ArrayList<>();
 
-
+        // Fase 4.1: Preparar todos los registros (validar y normalizar)
+        long prepareStartTime = System.currentTimeMillis();
         for (ThirdExcelData excelData : batch) {
             try {
-                ProcessingResult result = processRecord(excelData, cache);
+                ProcessingResult result = prepareRecord(excelData, cache);
                 
                 switch (result.getStatus()) {
                     case SUCCESS:
-                        successCount.incrementAndGet();
+                        thirdsToSave.add(result.getPreparedThird());
                         break;
                     case DUPLICATE_SKIPPED:
                         skippedCount.incrementAndGet();
@@ -89,7 +96,49 @@ public class BatchProcessor {
                 }
             }
         }
+        long prepareTime = System.currentTimeMillis() - prepareStartTime;
 
+        log.info("📋 Preparados {} registros para guardar (de {} en el lote)", thirdsToSave.size(), batch.size());
+
+        // Fase 4.2: Guardar todos los terceros preparados en una sola operación (saveAll)
+        long saveTime = 0;
+        if (!thirdsToSave.isEmpty()) {
+            long saveStartTime = System.currentTimeMillis();
+            try {
+                List<Third> savedThirds = thirdOutputPort.saveAllThirds(thirdsToSave);
+                successCount.addAndGet(savedThirds.size());
+                saveTime = System.currentTimeMillis() - saveStartTime;
+                
+                double recordsPerSec = (savedThirds.size() * 1000.0) / saveTime;
+                log.info("💾 saveAll() - {} registros en {} ms ({} reg/seg)", 
+                        savedThirds.size(), saveTime, String.format("%.2f", recordsPerSec));
+            } catch (Exception e) {
+                saveTime = System.currentTimeMillis() - saveStartTime;
+                log.error("❌ ERROR en saveAll() - {} registros - Error: {}", thirdsToSave.size(), e.getMessage(), e);
+                if (continueOnError) {
+                    failureCount.addAndGet(thirdsToSave.size());
+                    for (int i = 0; i < thirdsToSave.size(); i++) {
+                        errors.add(ImportErrorDetail.builder()
+                                .rowNumber(batch.get(i).getRowNumber())
+                                .errorCode("BATCH_SAVE_ERROR")
+                                .errorMessage("Error al guardar lote: " + e.getMessage())
+                                .errorType(ImportErrorType.SYSTEM_ERROR)
+                                .build());
+                    }
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        long batchTotalTime = System.currentTimeMillis() - batchStartTime;
+        
+        // Log detallado del desglose del lote
+        double preparePercent = (prepareTime * 100.0) / batchTotalTime;
+        double savePercent = (saveTime * 100.0) / batchTotalTime;
+        log.info("🔍 Lote - Total: {} ms | Preparación: {} ms ({}%) | Guardado: {} ms ({}%)",
+                batchTotalTime, prepareTime, String.format("%.1f", preparePercent), 
+                saveTime, String.format("%.1f", savePercent));
 
         return BatchProcessingResult.builder()
                 .successCount(successCount.get())
@@ -100,12 +149,12 @@ public class BatchProcessor {
     }
 
     /**
-     * @brief Procesa un registro individual usando el cache pre-cargado
-     * @param excelData registro Excel a procesar
+     * @brief Prepara un registro individual sin guardarlo (validación y normalización)
+     * @param excelData registro Excel a preparar
      * @param cache datos de referencia pre-cargados
-     * @return resultado del procesamiento del registro individual
+     * @return resultado de la preparación con el Third listo para persistir
      */
-    private ProcessingResult processRecord(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
+    private ProcessingResult prepareRecord(ThirdExcelData excelData, BatchValidationService.ReferenceDataCache cache) {
         try {
             // Convertir usando cache (evita consultas N+1)
             Third third = dataConverter.convertWithCache(excelData, cache);
@@ -117,13 +166,14 @@ public class BatchProcessor {
             // Obtener códigos geográficos resueltos
             DataConverter.GeographyData geography = dataConverter.getGeographyData(excelData, cache);
 
-            // Crear tercero - el servicio maneja duplicados internamente
-            createThirdService.createThird(third, 
+            // Preparar tercero (validar y normalizar SIN guardarlo)
+            Third preparedThird = createThirdService.prepareThirdForBatchSave(third, 
                     geography.getCountryCode(), geography.getStateCode(), geography.getCityCode());
             
-            return ProcessingResult.success();
+            return ProcessingResult.success(preparedThird);
 
         } catch (Exception e) {
+            log.error("❌ Error en prepareRecord fila {}: {}", excelData.getRowNumber(), e.getMessage(), e);
             // Clasificar el tipo de error
             if (ValidationUtils.isDuplicateError(e.getMessage())) {
                 return ProcessingResult.duplicateSkipped();
@@ -173,21 +223,22 @@ public class BatchProcessor {
     private static class ProcessingResult {
         private ProcessingStatus status;
         private String errorMessage;
+        private Third preparedThird;
 
-        public static ProcessingResult success() {
-            return new ProcessingResult(ProcessingStatus.SUCCESS, null);
+        public static ProcessingResult success(Third preparedThird) {
+            return new ProcessingResult(ProcessingStatus.SUCCESS, null, preparedThird);
         }
 
         public static ProcessingResult duplicateSkipped() {
-            return new ProcessingResult(ProcessingStatus.DUPLICATE_SKIPPED, null);
+            return new ProcessingResult(ProcessingStatus.DUPLICATE_SKIPPED, null, null);
         }
 
         public static ProcessingResult failed(String errorMessage) {
-            return new ProcessingResult(ProcessingStatus.FAILED, errorMessage);
+            return new ProcessingResult(ProcessingStatus.FAILED, errorMessage, null);
         }
 
         public static ProcessingResult skipped(String reason) {
-            return new ProcessingResult(ProcessingStatus.SKIPPED, reason);
+            return new ProcessingResult(ProcessingStatus.SKIPPED, reason, null);
         }
     }
 
