@@ -52,9 +52,8 @@ public class ExportThirdService implements ExportThirdUseCase {
     /**
      * @brief Obtiene terceros filtrados con paginación optimizada para exportación
      *
-     * Utiliza paginación automática para exportar TODOS los registros sin límite,
+     * Utiliza paginación automática para exportar todos los registros sin límite,
      * optimizando el uso de memoria mediante procesamiento por lotes.
-     * IMPORTANTE: Usa métodos optimizados que eliminan el problema N+1 queries.
      * 
      * @param request solicitud de exportación con filtros
      * @return lista completa de terceros filtrados con todas sus relaciones pre-cargadas
