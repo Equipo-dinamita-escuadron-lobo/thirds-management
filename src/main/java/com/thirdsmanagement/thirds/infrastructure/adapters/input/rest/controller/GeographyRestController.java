@@ -36,13 +36,6 @@ public class GeographyRestController {
     private final ListGeographyUseCase listGeographyUseCase;
     private final GeographyRestMapper geographyRestMapper;
 
-    /**
-     * @brief Obtiene todos los países activos
-     *
-     * Endpoint que retorna la lista completa de países disponibles para asignar
-     * a terceros, filtrando solo los países marcados como activos.
-     * @return lista de países activos ordenados por nombre
-     */
     @GetMapping("/countries")
     public ResponseEntity<List<CountryResponse>> getAllCountries() {
         List<Country> countries = listGeographyUseCase.getAllCountries();
@@ -50,14 +43,6 @@ public class GeographyRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * @brief Obtiene todos los estados/departamentos de un país específico
-     *
-     * Endpoint que retorna los estados/departamentos activos pertenecientes
-     * a un país específico, validando la jerarquía geográfica.
-     * @param countryCode código único del país (requerido)
-     * @return lista de estados activos del país especificado
-     */
     @GetMapping("/states")
     public ResponseEntity<List<StateResponse>> getStatesByCountry(
             @NotBlank(message = "El código del país es obligatorio")
@@ -68,15 +53,6 @@ public class GeographyRestController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * @brief Obtiene todas las ciudades de un estado/departamento específico
-     *
-     * Endpoint que retorna las ciudades activas pertenecientes a un estado/departamento
-     * específico dentro de un país, validando la jerarquía geográfica completa.
-     * @param stateCode código único del estado/departamento (requerido)
-     * @param countryCode código único del país (requerido)
-     * @return lista de ciudades activas del estado especificado
-     */
     @GetMapping("/cities")
     public ResponseEntity<List<CityResponse>> getCitiesByState(
             @NotBlank(message = "El código del estado es obligatorio")
