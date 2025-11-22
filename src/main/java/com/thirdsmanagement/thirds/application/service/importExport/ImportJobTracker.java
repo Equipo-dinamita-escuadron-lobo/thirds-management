@@ -49,9 +49,7 @@ public class ImportJobTracker {
                 .build();
 
         jobStatusMap.put(jobId, jobStatus);
-        
-        log.info("Job de importación creado: {} para entidad: {} archivo: {}", jobId, entId, fileName);
-        
+
         return jobId;
     }
 
@@ -64,14 +62,11 @@ public class ImportJobTracker {
         ImportJobStatus jobStatus = jobStatusMap.get(jobId);
         if (jobStatus != null) {
             jobStatus.setStatus(status);
-            
+
             if (status.isFinished()) {
                 jobStatus.setEndTime(LocalDateTime.now());
                 jobStatus.setProgress(100);
-                log.info("Job de importación finalizado: {} con estado: {}", jobId, status);
             }
-        } else {
-            log.warn("Intento de actualizar job inexistente: {}", jobId);
         }
     }
 
@@ -88,8 +83,6 @@ public class ImportJobTracker {
         ImportJobStatus jobStatus = jobStatusMap.get(jobId);
         if (jobStatus != null) {
             jobStatus.updateMetrics(totalRecords, successfulImports, failedImports, duplicatesSkipped);
-            log.debug("Métricas actualizadas para job: {} - Total: {}, Exitosos: {}, Fallidos: {}, Duplicados: {}",
-                    jobId, totalRecords, successfulImports, failedImports, duplicatesSkipped);
         }
     }
 
@@ -102,7 +95,6 @@ public class ImportJobTracker {
         ImportJobStatus jobStatus = jobStatusMap.get(jobId);
         if (jobStatus != null) {
             jobStatus.setProgress(Math.min(100, Math.max(0, progress)));
-            log.debug("Progreso actualizado para job: {} - {}%", jobId, progress);
         }
     }
 
@@ -132,10 +124,7 @@ public class ImportJobTracker {
      * @param jobId identificador del job
      */
     public void removeJob(String jobId) {
-        ImportJobStatus removed = jobStatusMap.remove(jobId);
-        if (removed != null) {
-            log.info("Job removido del tracker: {}", jobId);
-        }
+        jobStatusMap.remove(jobId);
     }
 
     /**

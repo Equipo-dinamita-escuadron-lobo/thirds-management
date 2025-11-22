@@ -40,7 +40,6 @@ public class ExportJobTracker {
                 .progress(0)
                 .build();
         jobStatuses.put(jobId, jobStatus);
-        log.info("Job de exportación creado: {} para entidad: {} archivo: {}", jobId, entId, fileName);
         return jobId;
     }
 
@@ -64,7 +63,6 @@ public class ExportJobTracker {
             if (status == ImportStatus.COMPLETED || status == ImportStatus.FAILED) {
                 job.setEndTime(LocalDateTime.now());
             }
-            log.debug("JobId {}: Estado actualizado a {}", jobId, status);
         });
     }
 
@@ -76,7 +74,6 @@ public class ExportJobTracker {
     public void updateProgress(String jobId, Integer progress) {
         getJobStatus(jobId).ifPresent(job -> {
             job.setProgress(progress);
-            log.debug("JobId {}: Progreso actualizado a {}%", jobId, progress);
         });
     }
 
@@ -88,7 +85,6 @@ public class ExportJobTracker {
     public void updateTotalRecords(String jobId, Integer totalRecords) {
         getJobStatus(jobId).ifPresent(job -> {
             job.setTotalRecords(totalRecords);
-            log.debug("JobId {}: Total de registros: {}", jobId, totalRecords);
         });
     }
 
@@ -100,7 +96,6 @@ public class ExportJobTracker {
     public void setFileData(String jobId, byte[] fileData) {
         getJobStatus(jobId).ifPresent(job -> {
             job.setFileData(fileData);
-            log.debug("JobId {}: Archivo generado ({} bytes)", jobId, fileData.length);
         });
     }
 
@@ -112,7 +107,6 @@ public class ExportJobTracker {
     public void setErrorMessage(String jobId, String errorMessage) {
         getJobStatus(jobId).ifPresent(job -> {
             job.setErrorMessage(errorMessage);
-            log.debug("JobId {}: Error almacenado", jobId);
         });
     }
 
@@ -122,7 +116,6 @@ public class ExportJobTracker {
      */
     public void removeJob(String jobId) {
         jobStatuses.remove(jobId);
-        log.debug("JobId {}: Trabajo eliminado del tracker", jobId);
     }
 }
 

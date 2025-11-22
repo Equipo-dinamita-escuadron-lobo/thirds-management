@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @brief Servicio especializado en el parseo de archivos Excel para importación de terceros
@@ -323,7 +324,7 @@ public class ExcelParsingService {
      */
     private <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass, String fieldName,
             int rowNumber, List<ImportErrorDetail> errors,
-            java.util.function.Function<String, T> mapper, Map<String, Integer> columnMap) {
+            Function<String, T> mapper, Map<String, Integer> columnMap) {
         if (value == null || value.trim().isEmpty()) {
             return null;
         }

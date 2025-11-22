@@ -46,20 +46,14 @@ public class ImportThirdService implements ImportThirdUseCase {
             // Leer el archivo a bytes ANTES de lanzar el procesamiento asíncrono
             // Esto evita problemas con MultipartFile que solo está disponible durante la petición HTTP
             byte[] fileBytes = importRequest.getExcelFile().getBytes();
-            
-            log.info("Job creado. JobId: {}, Entidad: {}, Archivo: {}, Tamaño: {} bytes", 
-                    jobId, importRequest.getEntId(), importRequest.getFileName(), fileBytes.length);
-            
+
             // Ejecutar importación de forma asíncrona usando servicio separado (evita self-invocation)
-            asyncImportProcessor.processImportAsync(fileBytes, importRequest.getEntId(), 
+            asyncImportProcessor.processImportAsync(fileBytes, importRequest.getEntId(),
                     importRequest.getFileName(), jobId);
-            
-            log.info("Job lanzado de forma asíncrona. JobId: {}", jobId);
-            
+
             return jobId;
-            
+
         } catch (Exception e) {
-            log.error("Error al leer el archivo para importación: {}", e.getMessage(), e);
             throw new ThirdImportException(ThirdsErrorCode.THIRD_EXPORT_ERROR,
                     "Error al leer el archivo: " + e.getMessage(), e);
         }

@@ -76,9 +76,9 @@ public class DataConverter {
                 .address(excelData.getAddress())
                 .phoneNumber(excelData.getPhoneNumber())
                 .email(excelData.getEmail())
-                .country(country)    // ✅ Cargar desde cache
-                .province(state)     // ✅ Cargar desde cache
-                .city(city)          // ✅ Cargar desde cache
+                .country(country)    
+                .province(state)     
+                .city(city)          
                 .build();
     }
 
