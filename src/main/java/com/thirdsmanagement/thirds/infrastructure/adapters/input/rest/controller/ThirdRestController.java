@@ -19,6 +19,8 @@ import com.thirdsmanagement.thirds.application.service.importExport.PdfRUTServic
 import com.thirdsmanagement.thirds.application.service.third.CreateThirdService;
 import com.thirdsmanagement.thirds.application.service.third.UpdateThirdService;
 import com.thirdsmanagement.thirds.domain.enums.ExportableField;
+import com.thirdsmanagement.thirds.domain.enums.ImportStatus;
+import com.thirdsmanagement.thirds.domain.model.ExportJobStatus;
 import com.thirdsmanagement.thirds.domain.model.ImportJobStatus;
 import com.thirdsmanagement.thirds.domain.model.PdfRUTContent;
 import com.thirdsmanagement.thirds.domain.model.Third;
@@ -37,8 +39,6 @@ import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -62,11 +62,11 @@ import org.springframework.http.MediaType;
 /**
  * @brief Controlador REST principal para gestión completa de terceros
  *
- * Adaptador de entrada que expone la API completa para gestión de terceros:
- * CRUD completo, importación/exportación, cambios de estado masivos,
- * validación de RUT, y consultas avanzadas con filtros y paginación.
+ *        Adaptador de entrada que expone la API completa para gestión de
+ *        terceros:
+ *        CRUD completo, importación/exportación, cambios de estado masivos,
+ *        validación de RUT, y consultas avanzadas con filtros y paginación.
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/thirds")
 @RequiredArgsConstructor
@@ -89,8 +89,8 @@ public class ThirdRestController {
     /**
      * @brief Crea un nuevo tercero en el sistema
      *
-     * Endpoint para registrar un nuevo tercero con validación completa
-     * de datos, jerarquía geográfica y reglas de negocio.
+     *        Endpoint para registrar un nuevo tercero con validación completa
+     *        de datos, jerarquía geográfica y reglas de negocio.
      * @param thirdCreateRequest datos completos del tercero a crear
      * @return tercero creado con código HTTP 201
      */
@@ -111,8 +111,8 @@ public class ThirdRestController {
     /**
      * @brief Actualiza datos de un tercero existente
      *
-     * Endpoint para modificar la información de un tercero existente
-     * con validación completa de jerarquía geográfica.
+     *        Endpoint para modificar la información de un tercero existente
+     *        con validación completa de jerarquía geográfica.
      * @param thirdUpdateRequest datos actualizados del tercero
      * @return tercero actualizado
      */
@@ -133,8 +133,9 @@ public class ThirdRestController {
     /**
      * @brief Cambia el estado activo/inactivo de un tercero
      *
-     * Endpoint para alternar el estado de un tercero específico entre activo e inactivo.
-     * @param thId identificador único del tercero
+     *        Endpoint para alternar el estado de un tercero específico entre activo
+     *        e inactivo.
+     * @param thId  identificador único del tercero
      * @param entId identificador de la empresa
      * @return resultado del cambio de estado
      */
@@ -150,9 +151,10 @@ public class ThirdRestController {
     /**
      * @brief Cambia el estado de todos los terceros de una empresa de forma masiva
      *
-     * Endpoint para cambiar el estado (activo/inactivo) de todos los terceros
-     * pertenecientes a una empresa en una sola operación.
-     * @param entId identificador de la empresa
+     *        Endpoint para cambiar el estado (activo/inactivo) de todos los
+     *        terceros
+     *        pertenecientes a una empresa en una sola operación.
+     * @param entId    identificador de la empresa
      * @param newState nuevo estado para aplicar a todos los terceros
      * @return cantidad de terceros actualizados
      */
@@ -178,8 +180,8 @@ public class ThirdRestController {
     /**
      * @brief Obtiene un tercero específico por ID y empresa
      *
-     * Endpoint para consultar los datos completos de un tercero específico.
-     * @param thId identificador único del tercero
+     *        Endpoint para consultar los datos completos de un tercero específico.
+     * @param thId  identificador único del tercero
      * @param entId identificador de la empresa
      * @return datos completos del tercero solicitado
      */
@@ -196,7 +198,7 @@ public class ThirdRestController {
     /**
      * @brief Verifica si existe un tercero.
      * @param idNumber ID del tercero.
-     * @param entId ID de la empresa.
+     * @param entId    ID de la empresa.
      * @return Respuesta con el resultado de la verificación.
      */
     @GetMapping("/existBy")
@@ -210,15 +212,17 @@ public class ThirdRestController {
     }
 
     /**
-     * @brief Obtiene una lista de terceros con paginación flexible, búsqueda y ordenamiento.
-     * Si no se especifican parámetros de paginación, retorna todos los terceros.
+     * @brief Obtiene una lista de terceros con paginación flexible, búsqueda y
+     *        ordenamiento.
+     *        Si no se especifican parámetros de paginación, retorna todos los
+     *        terceros.
      * 
-     * @param entId Id de la empresa
-     * @param numPage Número de página (opcional)
-     * @param size Tamaño de página (opcional)
+     * @param entId     Id de la empresa
+     * @param numPage   Número de página (opcional)
+     * @param size      Tamaño de página (opcional)
      * @param sortField Campo de ordenamiento (opcional, default: "names")
      * @param sortOrder Orden asc/desc (opcional, default: "asc")
-     * @param search Término de búsqueda (opcional)
+     * @param search    Término de búsqueda (opcional)
      * @return Respuesta con la lista de terceros
      */
     @GetMapping("/")
@@ -232,28 +236,29 @@ public class ThirdRestController {
 
         // Contar total de registros (con o sin filtro)
         long totalRecords = (search != null && !search.trim().isEmpty())
-            ? listThirdsUseCase.countByEntIdAndSearch(entId, search)
-            : listThirdsUseCase.countAllThirdsByEntId(entId);
+                ? listThirdsUseCase.countByEntIdAndSearch(entId, search)
+                : listThirdsUseCase.countAllThirdsByEntId(entId);
 
         // Crear Pageable flexible
         Pageable pageable = PaginationHelper.createFlexiblePageable(numPage, size, totalRecords);
 
         // Obtener página de datos (con o sin filtro)
         Page<Third> page = (search != null && !search.trim().isEmpty())
-            ? listThirdsUseCase.findByEntIdAndSearch(entId, search, pageable.getPageNumber(),
-                    pageable.getPageSize(), sortField, sortOrder)
-            : listThirdsUseCase.getAllThirdsByWithSort(entId, pageable.getPageNumber(),
-                    pageable.getPageSize(), sortField, sortOrder);
+                ? listThirdsUseCase.findByEntIdAndSearch(entId, search, pageable.getPageNumber(),
+                        pageable.getPageSize(), sortField, sortOrder)
+                : listThirdsUseCase.getAllThirdsByWithSort(entId, pageable.getPageNumber(),
+                        pageable.getPageSize(), sortField, sortOrder);
 
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
     /**
-     * @brief Obtiene una lista de terceros activos con paginación flexible y ordenamiento.
+     * @brief Obtiene una lista de terceros activos con paginación flexible y
+     *        ordenamiento.
      *
-     * @param entId Id de la empresa
-     * @param numPage Número de página (opcional)
-     * @param size Tamaño de página (opcional)
+     * @param entId     Id de la empresa
+     * @param numPage   Número de página (opcional)
+     * @param size      Tamaño de página (opcional)
      * @param sortField Campo de ordenamiento (opcional, default: "names")
      * @param sortOrder Orden asc/desc (opcional, default: "asc")
      * @return Respuesta con la lista de terceros activos
@@ -295,31 +300,36 @@ public class ThirdRestController {
         return ResponseEntity.ok(response);
     }
 
-
     /**
-     * Exporta una plantilla de terceros.
+     * @brief Exporta una plantilla de terceros.
+     * @param entId identificador de la empresa
+     * @return ResponseEntity con la plantilla de terceros
      */
     @GetMapping("/template/excel")
     public ResponseEntity<Resource> exportThirdTemplate(
             @RequestParam String entId) {
-                
+
         Resource templateFile = exportThirdUseCase.exportThirdTemplateWithValidations(entId);
         String filename = fileNameGenerator.generateTemplateFileName();
-        
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(templateFile);
     }
 
     /**
      * @brief Inicia exportación asíncrona de terceros a formato Excel.
-     * Utiliza configuración flexible de campos opcionales mediante ExportableField.
+     *        Utiliza configuración flexible de campos opcionales mediante
+     *        ExportableField.
      * 
-     * @param entId Identificador de la entidad (requerido)
-     * @param status Estado de los terceros (true=activos, false=inactivos, null=todos)
-     * @param companyName Nombre de la empresa para el nombre del archivo
-     * @param optionalFields Conjunto de campos opcionales a incluir (GENDER, COUNTRY, STATE, CITY)
+     * @param entId          Identificador de la entidad (requerido)
+     * @param status         Estado de los terceros (true=activos, false=inactivos,
+     *                       null=todos)
+     * @param companyName    Nombre de la empresa para el nombre del archivo
+     * @param optionalFields Conjunto de campos opcionales a incluir (GENDER,
+     *                       COUNTRY, STATE, CITY)
      * @return ResponseEntity con jobId y mensaje de confirmación
      */
     @GetMapping("/export/excel")
@@ -328,32 +338,27 @@ public class ThirdRestController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String companyName,
             @RequestParam(required = false) Set<ExportableField> optionalFields) {
-        
-        log.info("Iniciando exportación asíncrona para entidad: {}", entId);
-        
+
         // Convertir status de String a Boolean, manejando strings vacíos
         Boolean statusBoolean = ValidationUtils.parseOptionalBoolean(status);
-        
+
         // Si no se especifican campos opcionales, usar conjunto vacío
         Set<ExportableField> fields = optionalFields != null ? optionalFields : Set.of();
-        
+
         ThirdExportRequest exportRequest = ThirdExportRequest.builder()
                 .entId(entId)
                 .status(statusBoolean)
                 .companyName(companyName)
                 .optionalFields(fields)
                 .build();
-        
+
         String jobId = exportThirdUseCase.exportThirdsAsync(exportRequest);
-        
+
         Map<String, String> response = Map.of(
                 "jobId", jobId,
                 "message", "Exportación iniciada correctamente",
-                "downloadUrl", "/api/thirds/export/download/" + jobId
-        );
-        
-        log.info("Exportación asíncrona iniciada. JobId: {}", jobId);
-        
+                "downloadUrl", "/api/thirds/export/download/" + jobId);
+
         return ResponseEntity.accepted().body(response);
     }
 
@@ -364,8 +369,9 @@ public class ThirdRestController {
      * @return ResponseEntity con el estado del job
      */
     @GetMapping("/export/status/{jobId}")
-    public ResponseEntity<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> getExportStatus(@PathVariable String jobId) {
-        Optional<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> jobStatus = exportThirdUseCase.getExportStatus(jobId);
+    public ResponseEntity<ExportJobStatus> getExportStatus(@PathVariable String jobId) {
+        Optional<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> jobStatus = exportThirdUseCase
+                .getExportStatus(jobId);
         return jobStatus.map(status -> new ResponseEntity<>(status, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
@@ -378,50 +384,50 @@ public class ThirdRestController {
      */
     @GetMapping("/export/download/{jobId}")
     public ResponseEntity<Resource> downloadExportedFile(@PathVariable String jobId) {
-        Optional<com.thirdsmanagement.thirds.domain.model.ExportJobStatus> jobStatusOpt = exportThirdUseCase.getExportStatus(jobId);
-        
+        Optional<ExportJobStatus> jobStatusOpt = exportThirdUseCase.getExportStatus(jobId);
+
         if (jobStatusOpt.isEmpty()) {
-            log.warn("Job de exportación no encontrado: {}", jobId);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        
-        com.thirdsmanagement.thirds.domain.model.ExportJobStatus jobStatus = jobStatusOpt.get();
-        
+
+        ExportJobStatus jobStatus = jobStatusOpt.get();
+
         // Verificar que el job esté completado
-        if (jobStatus.getStatus() != com.thirdsmanagement.thirds.domain.enums.ImportStatus.COMPLETED) {
-            log.warn("Job de exportación {} aún no está completado. Estado: {}", jobId, jobStatus.getStatus());
+        if (jobStatus.getStatus() != ImportStatus.COMPLETED) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(null); // Indicar que aún no está listo
         }
-        
+
         // Verificar que los datos del archivo existan
         if (jobStatus.getFileData() == null || jobStatus.getFileData().length == 0) {
-            log.error("Job de exportación {} completado pero sin datos de archivo", jobId);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         // Crear recurso con los datos del archivo
         ByteArrayResource resource = new ByteArrayResource(jobStatus.getFileData());
-        
-        log.info("Descargando archivo de exportación. JobId: {}, Tamaño: {} bytes", 
-                jobId, jobStatus.getFileData().length);
-        
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + jobStatus.getFileName() + "\"")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(
+                        MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(resource);
     }
 
     /**
-     * @brief Inicia una importación asíncrona de terceros masivamente desde archivo Excel
+     * @brief Inicia una importación asíncrona de terceros masivamente desde archivo
+     *        Excel
      *
-     * Endpoint para carga masiva asíncrona de terceros desde archivo Excel. La importación
-     * se ejecuta en segundo plano y retorna inmediatamente un ID de job para consultar el estado.
-     * Este método retorna de forma inmediata después de crear el job, sin esperar el procesamiento.
+     *        Endpoint para carga masiva asíncrona de terceros desde archivo Excel.
+     *        La importación
+     *        se ejecuta en segundo plano y retorna inmediatamente un ID de job para
+     *        consultar el estado.
+     *        Este método retorna de forma inmediata después de crear el job, sin
+     *        esperar el procesamiento.
      * 
      * @param entId identificador de la empresa
-     * @param file archivo Excel con los datos de terceros a importar
-     * @return ResponseEntity con jobId único para consultar el estado de la importación y mensaje de confirmación
+     * @param file  archivo Excel con los datos de terceros a importar
+     * @return ResponseEntity con jobId único para consultar el estado de la
+     *         importación y mensaje de confirmación
      */
     @PostMapping("/import/excel")
     public ResponseEntity<Map<String, String>> importThirdsFromExcel(
@@ -433,27 +439,27 @@ public class ThirdRestController {
                 .excelFile(file)
                 .fileName(file.getOriginalFilename())
                 .build();
-        
-        log.error("Antes de iniciar la importación");
+
         // Crea el job y lanza el procesamiento asíncrono (retorna inmediatamente)
         String jobId = importThirdUseCase.importThirdsFromExcel(importRequest);
 
         Map<String, String> response = Map.of(
                 "jobId", jobId,
                 "message", "Importación iniciada correctamente",
-                "statusUrl", "/api/thirds/import/status/" + jobId
-        );
-        log.error("Después de iniciar la importación");
+                "statusUrl", "/api/thirds/import/status/" + jobId);
         return ResponseEntity.accepted().body(response);
     }
 
     /**
      * @brief Consulta el estado de una importación asíncrona de terceros
      *
-     * Endpoint para consultar el progreso y resultados de una importación en ejecución o completada.
-     * Incluye métricas detalladas, porcentaje de progreso y errores acumulados.
+     *        Endpoint para consultar el progreso y resultados de una importación en
+     *        ejecución o completada.
+     *        Incluye métricas detalladas, porcentaje de progreso y errores
+     *        acumulados.
      * @param jobId identificador único del job de importación
-     * @return estado completo del job con métricas y errores, o 404 si no se encuentra
+     * @return estado completo del job con métricas y errores, o 404 si no se
+     *         encuentra
      */
     @GetMapping("/import/status/{jobId}")
     public ResponseEntity<ImportJobStatus> getImportStatus(@PathVariable String jobId) {
@@ -465,32 +471,36 @@ public class ThirdRestController {
     /**
      * @brief Elimina un tercero del sistema
      *
-     * Endpoint para eliminación lógica de un tercero, validando que no tenga
-     * dependencias activas antes de proceder con la eliminación.
+     *        Endpoint para eliminación lógica de un tercero, validando que no tenga
+     *        dependencias activas antes de proceder con la eliminación.
      * @param thirdId identificador único del tercero a eliminar
-     * @param entId identificador de la empresa
+     * @param entId   identificador de la empresa
      * @return resultado de la operación de eliminación
      */
     @DeleteMapping("/delete")
     public ResponseEntity<Boolean> deleteThird(
             @NotNull(message = "thirdId es requerido") @RequestParam Long thirdId,
             @NotNull(message = "entId es requerido") @RequestParam String entId) {
-        
+
         boolean deleted = deleteThirdUseCase.deleteThird(thirdId, entId);
-                
+
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
     /**
-     * @brief Obtiene una lista de terceros filtrados por nombre de tipo activo con paginación inteligente.
+     * @brief Obtiene una lista de terceros filtrados por nombre de tipo activo con
+     *        paginación inteligente.
      *
-     * Endpoint que lista terceros filtrados por un tipo específico de tercero activo,
-     * con paginación inteligente, ordenamiento por defecto ASC y búsqueda case insensitive.
+     *        Endpoint que lista terceros filtrados por un tipo específico de
+     *        tercero activo,
+     *        con paginación inteligente, ordenamiento por defecto ASC y búsqueda
+     *        case insensitive.
      *
-     * @param entId Id de la empresa
-     * @param thirdTypeName Nombre del tipo de tercero activo para filtrar (case insensitive)
-     * @param numPage Número de página (opcional)
-     * @param size Tamaño de página (opcional)
+     * @param entId         Id de la empresa
+     * @param thirdTypeName Nombre del tipo de tercero activo para filtrar (case
+     *                      insensitive)
+     * @param numPage       Número de página (opcional)
+     * @param size          Tamaño de página (opcional)
      * @return Respuesta con la lista de terceros filtrados por tipo activo
      */
     @GetMapping("/by-type")
