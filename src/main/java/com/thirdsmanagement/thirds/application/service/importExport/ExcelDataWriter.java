@@ -5,6 +5,8 @@ import com.thirdsmanagement.thirds.domain.model.ExportConfiguration;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdExportRequest;
+import com.thirdsmanagement.thirds.infrastructure.utils.ExcelStyleHelper;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
