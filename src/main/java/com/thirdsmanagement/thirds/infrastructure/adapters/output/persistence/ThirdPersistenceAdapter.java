@@ -27,7 +27,6 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.re
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.TypeIdRepository;
 import com.thirdsmanagement.thirds.infrastructure.multitenancy.utils.TenantContext;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdsAndTypesRepository;
-import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
@@ -678,14 +677,13 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
     /**
      * @brief Actualiza tercero existente con validaciones y manejo de relaciones
-     * @details Actualiza todos los campos del tercero, valida claves foráneas, valida que no tenga
-     * movimientos contables asociados, actualiza las relaciones muchos-a-muchos con tipos de tercero
-     * (eliminando existentes y creando nuevas), y retorna el tercero actualizado con datos geográficos completos.
+     * @details Actualiza todos los campos del tercero, valida claves foráneas, actualiza las relaciones
+     * muchos-a-muchos con tipos de tercero (eliminando existentes y creando nuevas), y retorna el tercero
+     * actualizado con datos geográficos completos.
      * @param third objeto Third con datos actualizados (debe incluir thId)
      * @return Third actualizado con datos geográficos completos
      * @throws IllegalArgumentException si third es null o no tiene ID
      * @throws ThirdNotFound si no existe el tercero con el ID especificado
-     * @throws ThirdInUseException si el tercero tiene movimientos contables asociados
     */
     @Override
     public Third updateThird(Third third) {
@@ -705,13 +703,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
 
         ThirdEntity thirdEntity = existingEntityOpt.get();
 
-        // Convertir a dominio para usar la lógica de negocio
-        Third existingThird = convertToThird(thirdEntity);
-        
-        // Validar que el tercero no tenga movimientos contables asociados usando el método del dominio
-        if (existingThird.isInUse()) {
-            throw new ThirdInUseException("No se puede editar el tercero porque tiene movimientos contables");
-        }
+ 
 
         // Validar que el TypeId existe antes de actualizar
         if (third.getTypeId() != null && third.getTypeId().getId() != null) {
@@ -795,12 +787,11 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
      * @brief Elimina tercero y sus asociaciones con manejo transaccional
      * @details Elimina primero las asociaciones en la tabla intermedia thirds_and_types,
      * luego elimina el tercero principal. Utiliza contexto de tenant para asegurar
-     * aislamiento multi-tenant. Valida que el tercero no tenga movimientos contables antes de eliminarlo.
+     * aislamiento multi-tenant.
      * @param thirdId ID del tercero a eliminar
      * @param entId ID de la empresa para validación de pertenencia
      * @return true si se eliminó correctamente
      * @throws ThirdNotFound si no se encuentra el tercero
-     * @throws ThirdInUseException si el tercero tiene movimientos contables asociados
      * @throws IllegalArgumentException si los parámetros son inválidos
      */
     @Override
@@ -820,13 +811,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
             if (thirdEntity.isPresent()) {
                 ThirdEntity entity = thirdEntity.get();
 
-                // Convertir a dominio para usar la lógica de negocio
-                Third third = convertToThird(entity);
-                
-                // Validar que el tercero no tenga movimientos contables usando el método del dominio
-                if (third.isInUse()) {
-                    throw new ThirdInUseException("No se puede eliminar el tercero porque tiene movimientos contables");
-                }
+
 
                 // Eliminar las asociaciones del tercero
                 List<ThirdsAndTypesEntity> relations = thirdsAndTypesRepository.findByThId(thirdId);
