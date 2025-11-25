@@ -23,65 +23,29 @@ import java.util.List;
 @AllArgsConstructor
 public class ImportJobStatus {
 
-    /**
-     * Identificador único del job de importación (UUID)
-     */
     private String jobId;
 
-    /**
-     * Identificador de la entidad/empresa
-     */
     private String entId;
 
-    /**
-     * Nombre del archivo Excel importado
-     */
     private String fileName;
 
-    /**
-     * Estado actual de la importación
-     */
     private ImportStatus status;
 
-    /**
-     * Fecha y hora de inicio del procesamiento
-     */
     private LocalDateTime startTime;
 
-    /**
-     * Fecha y hora de finalización del procesamiento
-     */
     private LocalDateTime endTime;
 
-    /**
-     * Total de registros encontrados en el archivo
-     */
     private Integer totalRecords;
 
-    /**
-     * Cantidad de registros importados exitosamente
-     */
     private Integer successfulImports;
 
-    /**
-     * Cantidad de registros que fallaron
-     */
     private Integer failedImports;
 
-    /**
-     * Cantidad de registros duplicados omitidos
-     */
     private Integer duplicatesSkipped;
 
-    /**
-     * Lista de errores detallados durante la importación
-     */
     @Builder.Default
     private List<ImportErrorDetail> errors = new ArrayList<>();
 
-    /**
-     * Porcentaje de progreso de la importación (0-100)
-     */
     private Integer progress;
 
     /**
