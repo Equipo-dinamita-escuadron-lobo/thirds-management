@@ -59,13 +59,6 @@ public class ThirdConfigurationRestController {
 
     private final IdRestMapper idRestMapper;
 
-    /**
-     * @brief Crea un nuevo tipo de tercero
-     *
-     * Endpoint para crear un nuevo tipo de tercero en el sistema.
-     * @param thirdTypeCreateRequest datos del tipo de tercero a crear
-     * @return tipo de tercero creado con código HTTP 201
-     */
     @PostMapping("/thirdtype")
     public ResponseEntity<ThirdTypeResponse> createThirdType(
             @RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest) {
@@ -76,18 +69,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(createdThirdType), HttpStatus.CREATED);
     }
 
-    /**
-     * @brief Obtiene lista paginada de tipos de tercero con búsqueda
-     *
-     * Endpoint que retorna tipos de tercero con paginación flexible, búsqueda por nombre
-     * y ordenamiento. Si no se especifican parámetros de paginación, retorna todos los registros.
-     * @param entId identificador de la empresa
-     * @param numPage número de página (opcional)
-     * @param size tamaño de página (opcional)
-     * @param sortOrder orden ascendente/descendente (default: "asc")
-     * @param search término de búsqueda por nombre (opcional)
-     * @return página de tipos de tercero con paginación
-     */
     @GetMapping("/thirdtype")
     public ResponseEntity<Page<ThirdType>> getThirdType(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
@@ -114,13 +95,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    /**
-     * @brief Actualiza un tipo de tercero existente
-     *
-     * Endpoint para modificar los datos de un tipo de tercero existente.
-     * @param thirdTypeUpdateRequest datos actualizados del tipo de tercero
-     * @return tipo de tercero actualizado
-     */
     @PostMapping("/thirdtype/update")
     public ResponseEntity<ThirdTypeResponse> updateThirdType(@RequestBody @Valid ThirdTypeUpdateRequest thirdTypeUpdateRequest) {
         ThirdType thirdType = idRestMapper.toThirdType(thirdTypeUpdateRequest);
@@ -129,13 +103,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(updatedThirdType), HttpStatus.OK);
     }
 
-    /**
-     * @brief Crea un nuevo tipo de identificación
-     *
-     * Endpoint para crear un nuevo tipo de identificación en el sistema.
-     * @param typeIdCreateRequest datos del tipo de identificación a crear
-     * @return tipo de identificación creado con código HTTP 201
-     */
     @PostMapping("/typeid")
     public ResponseEntity<TypeId> createTypeId(@RequestBody @Valid TypeIdCreateRequest typeIdCreateRequest) {
         TypeId typeId = idRestMapper.toTypeId(typeIdCreateRequest);
@@ -144,19 +111,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(typeId, HttpStatus.CREATED);
     }
 
-    /**
-     * @brief Obtiene lista paginada de tipos de identificación con búsqueda
-     *
-     * Endpoint que retorna tipos de identificación con paginación flexible, búsqueda,
-     * ordenamiento por cualquier campo y filtrado por empresa.
-     * @param entId identificador de la empresa
-     * @param numPage número de página (opcional)
-     * @param size tamaño de página (opcional)
-     * @param sortField campo para ordenamiento (default: "tiName")
-     * @param sortOrder orden ascendente/descendente (default: "asc")
-     * @param search término de búsqueda (opcional)
-     * @return página de tipos de identificación con paginación
-     */
     @GetMapping("/typeid")
     public ResponseEntity<Page<TypeId>> ListTypeId(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
@@ -184,13 +138,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    /**
-     * @brief Actualiza un tipo de identificación existente
-     *
-     * Endpoint para modificar los datos de un tipo de identificación existente.
-     * @param typeIdUpdateRequest datos actualizados del tipo de identificación
-     * @return tipo de identificación actualizado
-     */
     @PostMapping("/typeid/update")
     public ResponseEntity<TypeId> updateTypeId(@RequestBody @Valid TypeIdUpdateRequest typeIdUpdateRequest) {
         TypeId typeId = idRestMapper.toTypeId(typeIdUpdateRequest);
@@ -199,14 +146,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(typeId, HttpStatus.OK);
     }
 
-    /**
-     * @brief Elimina un tipo de tercero
-     *
-     * Endpoint para eliminar lógicamente un tipo de tercero del sistema.
-     * @param thirdTypeId identificador del tipo de tercero a eliminar
-     * @param entId identificador de la empresa
-     * @return resultado de la operación de eliminación
-     */
     @DeleteMapping("/thirdtype/delete")
     public ResponseEntity<Boolean> deleteThirdType(
             @NotNull(message = "Third type ID not be empty") @RequestParam("thirdTypeId") Long thirdTypeId,
@@ -217,14 +156,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
-    /**
-     * @brief Elimina un tipo de identificación
-     *
-     * Endpoint para eliminar lógicamente un tipo de identificación del sistema.
-     * @param typeIdId identificador del tipo de identificación a eliminar
-     * @param entId identificador de la empresa
-     * @return resultado de la operación de eliminación
-     */
     @DeleteMapping("/typeid/delete")
     public ResponseEntity<Boolean> deleteTypeId(
             @NotNull(message = "Type ID not be empty") @RequestParam("typeIdId") Long typeIdId,
@@ -235,16 +166,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
-    /**
-     * @brief Obtiene lista paginada de tipos de identificación activos
-     *
-     * Endpoint que retorna únicamente los tipos de identificación marcados como activos
-     * para una empresa específica, ordenados por nombre ascendente.
-     * @param entId identificador de la empresa
-     * @param numPage número de página (opcional)
-     * @param size tamaño de página (opcional)
-     * @return página de tipos de identificación activos
-     */
     @GetMapping("/typeid-active")
     public ResponseEntity<Page<TypeId>> getActiveTypeId(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
@@ -264,16 +185,6 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    /**
-     * @brief Obtiene lista paginada de tipos de tercero activos
-     *
-     * Endpoint que retorna únicamente los tipos de tercero marcados como activos
-     * para una empresa específica, ordenados por nombre ascendente.
-     * @param entId identificador de la empresa
-     * @param numPage número de página (opcional)
-     * @param size tamaño de página (opcional)
-     * @return página de tipos de tercero activos
-     */
     @GetMapping("/thirdtype-active")
     public ResponseEntity<Page<ThirdType>> getActiveThirdType(
             @NotNull(message = "entId es requerido") @RequestParam String entId,

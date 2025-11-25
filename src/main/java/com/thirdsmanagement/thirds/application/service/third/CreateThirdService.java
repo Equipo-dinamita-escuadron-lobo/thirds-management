@@ -93,6 +93,65 @@ public class CreateThirdService implements CreateThirdUseCase {
     }
 
     /**
+     * @brief Prepara un tercero para guardado en lote (sin persistir) - VERSIÓN OPTIMIZADA
+     * @details Solo normaliza datos y valida lógica de negocio. NO consulta BD.
+     * Asume que ya se validaron en fases previas:
+     *  - Fase 2: TypeIds completos, ThirdTypes existentes, compatibilidades
+     *  - Fase 3: Duplicados
+     * @param third El tercero a preparar (ya validado)
+     * @param countryCode Código del país (ya validado)
+     * @param stateCode Código del estado (ya validado)
+     * @param cityCode Código de la ciudad (ya validado)
+     * @return Third normalizado listo para persistir
+     */
+    public Third prepareThirdForBatchSave(Third third, String countryCode, String stateCode, String cityCode) {
+        
+        // Solo validaciones de lógica pura (sin acceso a BD)
+        thirdValidationService.validatePersonTypeConsistency(third);
+        thirdValidationService.validateTypeIdPersonTypeCompatibility(third);
+
+        if (third.getTypeId() != null && !Boolean.TRUE.equals(third.getTypeId().getStatus())) {
+            throw new TypeIdInvalidDataException("El tipo de identificación seleccionado está inactivo");
+        }
+
+        thirdValidationService.validateNitFormat(third);
+        thirdValidationService.validateVerificationDigit(third);
+
+        // NO consultas a BD - todo ya validado en fases previas:
+        // ❌ typeIdLoaderService.loadCompleteTypeId() - ya viene completo de Fase 2
+        // ❌ validateThirdTypesExistAndActive() - ya validado en Fase 2
+        // ❌ validateDuplicateThird() - ya validado en Fase 3
+        // ❌ validateAndGetGeography() - ya validado en Fase 2
+
+        // Reutilizar geografía que ya viene validada en el Third original
+        // (fue cargada en DataConverter usando el cache de BatchValidationService)
+        Third normalizedThird = Third.builder()
+                .entId(third.getEntId())
+                .personType(third.getPersonType())
+                .typeId(third.getTypeId())  // Ya viene completo
+                .thirdTypes(third.getThirdTypes())
+                .names(third.getNames() != null ? StringNormalizer.normalizePreservingCase(third.getNames()) : null)
+                .lastNames(third.getLastNames() != null ? StringNormalizer.normalizePreservingCase(third.getLastNames())
+                        : null)
+                .socialReason(third.getSocialReason() != null
+                        ? StringNormalizer.normalizePreservingCase(third.getSocialReason())
+                        : null)
+                .gender(third.getGender())
+                .idNumber(third.getIdNumber())
+                .verificationNumber(third.getVerificationNumber())
+                .state(third.getState() != null ? third.getState() : true)
+                .address(third.getAddress())
+                .phoneNumber(third.getPhoneNumber())
+                .email(third.getEmail())
+                .country(third.getCountry())    // ✅ Reutilizar (ya validado)
+                .province(third.getProvince())  // ✅ Reutilizar (ya validado)
+                .city(third.getCity())          // ✅ Reutilizar (ya validado)
+                .build();
+
+        return normalizedThird;
+    }
+
+    /**
      * @brief Valida que no exista un tercero duplicado con el mismo número de identificación
      * @param idNumber número de identificación
      * @param entId identificador de la entidad

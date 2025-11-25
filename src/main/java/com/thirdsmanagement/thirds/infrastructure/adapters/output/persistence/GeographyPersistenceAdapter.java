@@ -60,4 +60,14 @@ public class GeographyPersistenceAdapter implements GeographyOutputPort {
     public boolean existsActiveCity(String cityCode, String stateCode, String countryCode) {
         return cityRepository.existsByCityCodeAndStateCodeAndCountryCode(cityCode, stateCode, countryCode);
     }
+
+    @Override
+    public List<State> getAllActiveStates() {
+        return geographyMapper.toStateList(stateRepository.findAllStates());
+    }
+
+    @Override
+    public List<City> getAllActiveCities() {
+        return geographyMapper.toCityList(cityRepository.findAllCities());
+    }
 }

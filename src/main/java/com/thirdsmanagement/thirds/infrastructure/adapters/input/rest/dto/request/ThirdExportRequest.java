@@ -27,6 +27,8 @@ public class ThirdExportRequest {
     private Boolean status;
 
     private List<Long> thirdIds;
+    
+    private String companyName;
 
     @Builder.Default
     private Set<ExportableField> optionalFields = Set.of();

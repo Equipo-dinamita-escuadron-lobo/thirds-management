@@ -15,6 +15,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -485,7 +486,7 @@ public class ExcelValidationService {
      */
     private int processGeographicalEntitiesWithCustomNormalization(Workbook workbook, Sheet referenceSheet,
             List<String> entities, int startColumn, String entityType,
-            String prefix, java.util.function.Function<String, List<String>> dataProvider) {
+            String prefix, Function<String, List<String>> dataProvider) {
         Row headerRow = referenceSheet.getRow(0);
         if (headerRow == null) {
             headerRow = referenceSheet.createRow(0);
@@ -691,7 +692,7 @@ public class ExcelValidationService {
      */
     private int processGeographicalEntities(Workbook workbook, Sheet referenceSheet, List<String> entities,
             int startColumn, String entityType, String prefix,
-            java.util.function.Function<String, List<String>> dataProvider) {
+            Function<String, List<String>> dataProvider) {
         Row headerRow = referenceSheet.getRow(0);
         if (headerRow == null) {
             headerRow = referenceSheet.createRow(0);

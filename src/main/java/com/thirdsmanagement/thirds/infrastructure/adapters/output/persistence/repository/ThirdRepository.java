@@ -115,6 +115,32 @@ public interface ThirdRepository extends JpaRepository<ThirdEntity, Long> {
      * @param thirdTypeName Nombre del tipo de tercero activo (case insensitive)
      * @return Cantidad de terceros que tienen el tipo especificado y activo
      */
+    /**
+     * @brief Obtiene terceros con todas sus relaciones cargadas para exportación
+     * @details Carga todas las relaciones necesarias en una sola consulta usando JOIN FETCH,
+     * eliminando el problema N+1. Específicamente diseñado para operaciones de exportación masiva.
+     * @param entId ID de la empresa
+     * @param pageable paginación
+     * @return Página de terceros con todas sus relaciones cargadas
+     */
+    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+           "LEFT JOIN FETCH t.typeId " +
+           "WHERE t.entId = :entId")
+    Page<ThirdEntity> findAllForExport(@Param("entId") String entId, Pageable pageable);
+
+    /**
+     * @brief Obtiene terceros filtrados por estado con todas sus relaciones para exportación
+     * @details Similar a findAllForExport pero con filtro de estado
+     * @param entId ID de la empresa
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param pageable paginación
+     * @return Página de terceros con todas sus relaciones cargadas
+     */
+    @Query("SELECT DISTINCT t FROM ThirdEntity t " +
+           "LEFT JOIN FETCH t.typeId " +
+           "WHERE t.entId = :entId AND t.state = :state")
+    Page<ThirdEntity> findAllByStateForExport(@Param("entId") String entId, @Param("state") Boolean state, Pageable pageable);
+
     @Query("SELECT COUNT(DISTINCT t) FROM ThirdEntity t " +
            "JOIN ThirdsAndTypesEntity tat ON t.thId = tat.thId " +
            "JOIN ThirdTypeEntity tt ON tat.ttId = tt.ttId " +

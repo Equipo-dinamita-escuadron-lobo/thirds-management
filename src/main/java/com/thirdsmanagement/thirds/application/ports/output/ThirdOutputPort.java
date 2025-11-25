@@ -1,5 +1,6 @@
 package com.thirdsmanagement.thirds.application.ports.output;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,6 +22,13 @@ public interface ThirdOutputPort {
      * @return El tercero guardado
      */
     Third saveThird(Third third);
+
+    /**
+     * @brief Guarda múltiples terceros en lote (optimizado)
+     * @param thirds Lista de terceros a guardar
+     * @return Lista de terceros guardados
+     */
+    List<Third> saveAllThirds(List<Third> thirds);
 
     /**
      * @brief Actualiza un tercero
@@ -93,6 +101,31 @@ public interface ThirdOutputPort {
      */
     Page<Third> getAllThirdsByState(String entId, Boolean state, Pageable page);
 
+    /**
+     * @brief Obtiene terceros con carga optimizada para exportación (elimina N+1 queries)
+     * 
+     * Método específico para exportaciones masivas que carga todas las relaciones
+     * en batch usando JOIN FETCH, reduciendo drasticamente el número de queries a la BD.
+     * Recomendado exclusivamente para operaciones de exportación.
+     *
+     * @param entId El id de la empresa
+     * @param page El objeto pageable para paginación
+     * @return La página de terceros con todas sus relaciones pre-cargadas
+     */
+    Page<Third> getAllThirdsForExport(String entId, Pageable page);
+
+    /**
+     * @brief Obtiene terceros filtrados por estado con carga optimizada para exportación
+     * 
+     * Similar a getAllThirdsForExport pero con filtro de estado.
+     * Optimizado para eliminar el problema N+1 queries en exportaciones masivas.
+     *
+     * @param entId El id de la empresa
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param page El objeto pageable para paginación
+     * @return La página de terceros filtrados con todas sus relaciones pre-cargadas
+     */
+    Page<Third> getAllThirdsByStateForExport(String entId, Boolean state, Pageable page);
 
     /**
      * @brief Elimina un tercero del sistema

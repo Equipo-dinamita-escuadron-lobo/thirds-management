@@ -10,9 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import java.util.Set;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.application.ports.output.GeographyOutputPort;
 import com.thirdsmanagement.thirds.application.service.geography.GeographyLoaderService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.domain.model.Country;
+import com.thirdsmanagement.thirds.domain.model.State;
+import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdTypeEntity;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.TypeIdEntity;
@@ -56,6 +60,7 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
     private final ThirdsAndTypesRepository thirdsAndTypesRepository;
     private final ThirdPersistenceMapper thirdPersistenceMapper;
     private final GeographyLoaderService geographyLoaderService;
+    private final GeographyOutputPort geographyOutputPort;
 
     /**
      * @brief Guarda un tercero con validaciones y relaciones de tipos de tercero
@@ -116,6 +121,127 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         // Convertir de vuelta al dominio
         Third domainThird = thirdPersistenceMapper.toThird(thirdEntity);
         return loadGeographyData(domainThird, thirdEntity);
+    }
+
+    /**
+     * @brief Guarda múltiples terceros en lote usando saveAll (optimizado)
+     * @param thirds Lista de terceros a guardar (asume que ya están validados)
+     * @return Lista de terceros guardados con datos geográficos completos
+     * @details Este método está optimizado para importación masiva y asume que los datos
+     * ya fueron validados previamente. NO realiza validaciones de existencia de TypeIds o ThirdTypes
+     * para evitar redundancia con la fase de validación.
+     */
+    @Override
+    public List<Third> saveAllThirds(List<Third> thirds) {
+        if (thirds == null || thirds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String currentTenant = TenantContext.getTenantId();
+        List<ThirdEntity> entitiesToSave = new ArrayList<>();
+        List<ThirdsAndTypesEntity> relationsToSave = new ArrayList<>();
+
+        // PASO 1: Obtener todos los TypeIds únicos en UN SOLO batch query
+        Set<Long> uniqueTypeIds = new HashSet<>();
+        for (Third third : thirds) {
+            if (third != null && third.getTypeId() != null && third.getTypeId().getId() != null) {
+                uniqueTypeIds.add(third.getTypeId().getId());
+            }
+        }
+        
+        // Consulta batch de todos los TypeIds de una vez
+        List<TypeIdEntity> typeIdEntities = typeIdRepository.findAllById(uniqueTypeIds);
+        Map<Long, TypeIdEntity> typeIdCache = new HashMap<>();
+        for (TypeIdEntity entity : typeIdEntities) {
+            // Usar el ID (PK) de TypeIdEntity, NO el tiId (que es el código como "CC")
+            typeIdCache.put(entity.getId(), entity);
+        }
+
+        // PASO 2: Preparar todas las entidades USANDO EL CACHE (sin más consultas)
+        for (Third third : thirds) {
+            if (third == null) {
+                continue;
+            }
+
+            // Preparar la entidad principal
+            ThirdEntity thirdEntity = thirdPersistenceMapper.toThirdEntity(third);
+            thirdEntity.setTenantId(currentTenant);
+            
+            // Obtener del cache (SIN consulta a BD)
+            TypeIdEntity typeIdEntity = typeIdCache.get(third.getTypeId().getId());
+            if (typeIdEntity != null) {
+                thirdEntity.setTypeId(typeIdEntity);
+            }
+
+            entitiesToSave.add(thirdEntity);
+        }
+
+        // Guardar todas las entidades principales en un solo batch
+        List<ThirdEntity> savedEntities;
+        try {
+            savedEntities = thirdRepository.saveAll(entitiesToSave);
+        } catch (DataIntegrityViolationException e) {
+            throw e;
+        }
+
+        // Crear todas las relaciones con tipos de tercero
+        for (int i = 0; i < savedEntities.size(); i++) {
+            ThirdEntity savedEntity = savedEntities.get(i);
+            Third originalThird = thirds.get(i);
+
+            if (originalThird.getThirdTypes() != null && !originalThird.getThirdTypes().isEmpty()) {
+                for (ThirdType tt : originalThird.getThirdTypes()) {
+                    ThirdsAndTypesEntity relationEntity = ThirdsAndTypesEntity.builder()
+                            .thId(savedEntity.getThId())
+                            .ttId(tt.getThirdTypeId())
+                            .tenantId(currentTenant)
+                            .build();
+                    relationsToSave.add(relationEntity);
+                }
+            }
+        }
+
+        // Guardar todas las relaciones en un solo batch
+        if (!relationsToSave.isEmpty()) {
+            try {
+                thirdsAndTypesRepository.saveAll(relationsToSave);
+            } catch (DataIntegrityViolationException e) {
+                throw e;
+            }
+        }
+
+        // Convertir de vuelta al dominio REUTILIZANDO la geografía original
+        List<Third> result = new ArrayList<>();
+        for (int i = 0; i < savedEntities.size(); i++) {
+            ThirdEntity savedEntity = savedEntities.get(i);
+            Third originalThird = thirds.get(i);
+            
+            // Reutilizar geografía del Third original (ya validada en Fase 2)
+            Third savedThird = Third.builder()
+                    .thId(savedEntity.getThId())
+                    .entId(savedEntity.getEntId())
+                    .typeId(originalThird.getTypeId())
+                    .thirdTypes(originalThird.getThirdTypes())  
+                    .personType(originalThird.getPersonType())
+                    .names(originalThird.getNames())
+                    .lastNames(originalThird.getLastNames())
+                    .socialReason(originalThird.getSocialReason())
+                    .gender(originalThird.getGender())
+                    .idNumber(originalThird.getIdNumber())
+                    .verificationNumber(originalThird.getVerificationNumber())
+                    .state(originalThird.getState())
+                    .country(originalThird.getCountry())
+                    .province(originalThird.getProvince())  
+                    .city(originalThird.getCity())  
+                    .address(originalThird.getAddress())
+                    .phoneNumber(originalThird.getPhoneNumber())
+                    .email(originalThird.getEmail())
+                    .build();
+            
+            result.add(savedThird);
+        }       
+
+        return result;
     }
 
     /**
@@ -279,7 +405,242 @@ public class ThirdPersistenceAdapter implements ThirdOutputPort{
         return pageThirds;
     }
 
+    /**
+     * @brief Obtiene terceros optimizado para exportación (elimina problema N+1)
+     * @details Utiliza consulta optimizada con JOIN FETCH y carga batch de ThirdTypes.
+     * Este método es específicamente diseñado para operaciones de exportación masiva,
+     * reduciendo drasticamente el número de queries a la base de datos.
+     * @param entId El identificador de la entidad
+     * @param page El objeto Pageable que contiene la información de paginación
+     * @return Una página de objetos Third con todas sus relaciones cargadas eficientemente
+     */
+    public Page<Third> getAllThirdsForExport(String entId, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.findAllForExport(entId, page);
+        return convertPageForExport(pageEntities);
+    }
 
+    /**
+     * @brief Obtiene terceros filtrados por estado optimizado para exportación
+     * @details Similar a getAllThirdsForExport pero con filtro de estado.
+     * Optimizado para eliminar el problema N+1 queries.
+     * @param entId El identificador de la entidad
+     * @param state Estado de los terceros (true=activos, false=inactivos)
+     * @param page El objeto Pageable que contiene la información de paginación
+     * @return Una página de objetos Third filtrados por estado con todas sus relaciones cargadas
+     */
+    public Page<Third> getAllThirdsByStateForExport(String entId, Boolean state, Pageable page) {
+        Page<ThirdEntity> pageEntities = thirdRepository.findAllByStateForExport(entId, state, page);
+        return convertPageForExport(pageEntities);
+    }
+
+    /**
+     * @brief Convierte una página de ThirdEntity a Third optimizado para exportación
+     * @details Carga todos los ThirdTypes y datos geográficos en consultas batch para evitar N+1 queries.
+     * Pre-carga TODOS los datos geográficos una sola vez y crea un cache en memoria para acceso O(1).
+     * @param pageEntities página de entidades a convertir
+     * @return página de objetos Third con todas sus relaciones cargadas
+     */
+    private Page<Third> convertPageForExport(Page<ThirdEntity> pageEntities) {
+        if (pageEntities.isEmpty()) {
+            return Page.empty();
+        }
+
+        List<ThirdEntity> entities = pageEntities.getContent();
+        
+        // Extraer todos los IDs de terceros
+        List<Long> thirdIds = entities.stream()
+                .map(ThirdEntity::getThId)
+                .toList();
+
+        // Cargar TODAS las relaciones tercero-tipo en una sola consulta batch
+        List<ThirdsAndTypesEntity> allRelations = thirdsAndTypesRepository.findByThIdInWithThirdType(thirdIds);
+
+        // Agrupar relaciones por thId para acceso rápido O(1)
+        java.util.Map<Long, List<ThirdsAndTypesEntity>> relationsByThirdId = allRelations.stream()
+                .collect(java.util.stream.Collectors.groupingBy(ThirdsAndTypesEntity::getThId));
+
+        // PRE-CARGAR TODOS los datos geográficos en 3 consultas (una sola vez por TODA la exportación)
+        GeographyCache geoCache = loadGeographyCacheForExport();
+
+        // Convertir entidades a modelo de dominio usando relaciones y geografía pre-cargadas
+        List<Third> thirds = entities.stream()
+                .map(entity -> convertToThirdForExport(
+                    entity, 
+                    relationsByThirdId.getOrDefault(entity.getThId(), java.util.Collections.emptyList()),
+                    geoCache
+                ))
+                .toList();
+
+        return new org.springframework.data.domain.PageImpl<>(thirds, pageEntities.getPageable(), pageEntities.getTotalElements());
+    }
+
+    /**
+     * @brief Cache interno para datos geográficos (optimizado para exportación)
+     * @details Almacena mapas en memoria para búsqueda O(1) de países, estados y ciudades
+     */
+    private static class GeographyCache {
+        private final java.util.Map<String, Country> countries = new java.util.HashMap<>();
+        private final java.util.Map<String, State> states = new java.util.HashMap<>(); // Key: stateCode_countryCode
+        private final java.util.Map<String, City> cities = new java.util.HashMap<>(); // Key: cityCode_stateCode_countryCode
+
+        public void putCountry(Country country) {
+            if (country != null && country.getCountryCode() != null) {
+                countries.put(country.getCountryCode().toUpperCase(), country);
+            }
+        }
+
+        public void putState(State state) {
+            if (state != null && state.getStateCode() != null && state.getCountryCode() != null) {
+                String key = state.getStateCode() + "_" + state.getCountryCode().toUpperCase();
+                states.put(key, state);
+            }
+        }
+
+        public void putCity(City city) {
+            if (city != null && city.getCityCode() != null && city.getStateCode() != null && city.getCountryCode() != null) {
+                String key = city.getCityCode() + "_" + city.getStateCode() + "_" + city.getCountryCode().toUpperCase();
+                cities.put(key, city);
+            }
+        }
+
+        public Country getCountry(String countryCode) {
+            return countryCode != null ? countries.get(countryCode.toUpperCase()) : null;
+        }
+
+        public State getState(String stateCode, String countryCode) {
+            if (stateCode == null || countryCode == null) return null;
+            String key = stateCode + "_" + countryCode.toUpperCase();
+            return states.get(key);
+        }
+
+        public City getCity(String cityCode, String stateCode, String countryCode) {
+            if (cityCode == null || stateCode == null || countryCode == null) return null;
+            String key = cityCode + "_" + stateCode + "_" + countryCode.toUpperCase();
+            return cities.get(key);
+        }
+    }
+
+    /**
+     * @brief Carga todos los datos geográficos en memoria para exportación
+     * @details Ejecuta solo 3 queries para cargar TODOS los países, estados y ciudades.
+     * Crea un cache en memoria para búsqueda O(1). Elimina ~54,000+ queries.
+     * @return Cache con todos los datos geográficos indexados
+     */
+    private GeographyCache loadGeographyCacheForExport() {
+        GeographyCache cache = new GeographyCache();
+
+        // Query 1: Cargar TODOS los países activos (1 query)
+        List<Country> countries = geographyOutputPort.getAllActiveCountries();
+        countries.forEach(cache::putCountry);
+
+        // Query 2: Cargar TODOS los estados activos (1 query)
+        List<State> states = geographyOutputPort.getAllActiveStates();
+        states.forEach(state -> {
+            // Asociar país al estado
+            if (state.getCountryCode() != null) {
+                Country country = cache.getCountry(state.getCountryCode());
+                if (country != null) {
+                    state = State.builder()
+                            .stateCode(state.getStateCode())
+                            .stateName(state.getStateName())
+                            .countryCode(state.getCountryCode())
+                            .country(country)
+                            .build();
+                }
+            }
+            cache.putState(state);
+        });
+
+        // Query 3: Cargar TODAS las ciudades activas (1 query)
+        List<City> cities = geographyOutputPort.getAllActiveCities();
+        cities.forEach(city -> {
+            // Asociar estado (que incluye país) a la ciudad
+            if (city.getStateCode() != null && city.getCountryCode() != null) {
+                State state = cache.getState(city.getStateCode(), city.getCountryCode());
+                if (state != null) {
+                    city = City.builder()
+                            .cityCode(city.getCityCode())
+                            .cityName(city.getCityName())
+                            .stateCode(city.getStateCode())
+                            .countryCode(city.getCountryCode())
+                            .state(state)
+                            .build();
+                }
+            }
+            cache.putCity(city);
+        });
+
+        return cache;
+    }
+
+    /**
+     * @brief Convierte ThirdEntity a Third usando relaciones y geografía pre-cargadas (CERO consultas adicionales)
+     * @details Versión ultra-optimizada que usa SOLO datos en memoria. No realiza ninguna consulta a BD.
+     * Elimina completamente el problema N+1 tanto para ThirdTypes como para datos geográficos.
+     * @param thirdEntity entidad JPA con datos básicos del tercero
+     * @param relations relaciones tercero-tipo ya cargadas con sus ThirdTypes
+     * @param geoCache cache con todos los datos geográficos pre-cargados
+     * @return objeto Third completo con datos geográficos y tipos de tercero
+     */
+    private Third convertToThirdForExport(ThirdEntity thirdEntity, List<ThirdsAndTypesEntity> relations, GeographyCache geoCache) {
+        // Convertir entidad base a dominio
+        Third obj = this.thirdPersistenceMapper.toThird(thirdEntity);
+        
+        // Cargar datos geográficos desde CACHE (sin consultas a BD)
+        obj = loadGeographyDataFromCache(obj, thirdEntity, geoCache);
+
+        // Mapear los tipos de tercero desde las relaciones PRE-CARGADAS (sin consultas adicionales)
+        for (ThirdsAndTypesEntity relation : relations) {
+            ThirdTypeEntity tt = relation.getThirdType(); // Ya está cargado por JOIN FETCH
+            if (tt != null) {
+                ThirdType thirdType = ThirdType.builder()
+                        .thirdTypeId(tt.getTtId())
+                        .thirdTypeName(tt.getTtName())
+                        .entId(tt.getTtentId())
+                        .status(tt.getStatus())
+                        .build();
+                obj.getThirdTypes().add(thirdType);
+            }
+        }
+
+        obj.setUsageCount(thirdEntity.getUsageCount());
+        return obj;
+    }
+
+    /**
+     * @brief Carga datos geográficos desde cache en memoria (sin consultas a BD)
+     * @details Búsqueda O(1) en mapas pre-cargados. NO hace ninguna consulta a la base de datos.
+     * @param third objeto Third del dominio con datos básicos
+     * @param thirdEntity entidad JPA con códigos geográficos
+     * @param geoCache cache con datos geográficos pre-cargados
+     * @return nuevo objeto Third con datos geográficos completos desde cache
+     */
+    private Third loadGeographyDataFromCache(Third third, ThirdEntity thirdEntity, GeographyCache geoCache) {
+        Country country = geoCache.getCountry(thirdEntity.getCountry());
+        State state = geoCache.getState(thirdEntity.getProvince(), thirdEntity.getCountry());
+        City city = geoCache.getCity(thirdEntity.getCity(), thirdEntity.getProvince(), thirdEntity.getCountry());
+
+        return Third.builder()
+                .thId(third.getThId())
+                .entId(third.getEntId())
+                .typeId(third.getTypeId())
+                .thirdTypes(third.getThirdTypes())
+                .personType(third.getPersonType())
+                .names(third.getNames())
+                .lastNames(third.getLastNames())
+                .socialReason(third.getSocialReason())
+                .gender(third.getGender())
+                .idNumber(third.getIdNumber())
+                .verificationNumber(third.getVerificationNumber())
+                .state(third.getState())
+                .country(country)
+                .province(state)
+                .city(city)
+                .address(third.getAddress())
+                .phoneNumber(third.getPhoneNumber())
+                .email(third.getEmail())
+                .build();
+    }
 
     /**
      * @brief Convierte ThirdEntity a Third con carga completa de relaciones

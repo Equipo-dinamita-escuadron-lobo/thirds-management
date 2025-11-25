@@ -44,6 +44,23 @@ public class DataConverter {
         // Obtener ThirdTypes desde cache
         Set<ThirdType> thirdTypes = getThirdTypesFromCache(excelData.getThirdTypesNames(), cache);
 
+        // Obtener geografía completa desde cache
+        Country country = null;
+        State state = null;
+        City city = null;
+        
+        if (excelData.getCountryName() != null && !excelData.getCountryName().trim().isEmpty()) {
+            country = cache.getCountry(excelData.getCountryName().trim());
+        }
+        
+        if (excelData.getStateName() != null && !excelData.getStateName().trim().isEmpty()) {
+            state = cache.getState(excelData.getStateName().trim());
+        }
+        
+        if (excelData.getCityName() != null && !excelData.getCityName().trim().isEmpty() && state != null) {
+            city = cache.getCity(excelData.getCityName().trim(), state.getStateCode());
+        }
+
         return Third.builder()
                 .entId(excelData.getEntId())
                 .typeId(typeId)
@@ -59,6 +76,9 @@ public class DataConverter {
                 .address(excelData.getAddress())
                 .phoneNumber(excelData.getPhoneNumber())
                 .email(excelData.getEmail())
+                .country(country)    
+                .province(state)     
+                .city(city)          
                 .build();
     }
 

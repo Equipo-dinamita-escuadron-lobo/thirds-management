@@ -19,7 +19,7 @@ spring:
     properties:
       hibernate:
         jdbc:
-        batch-size: 25
+          batch-size: 1000
         order-inserts: true
         order-updates: true
         batch-versioned-data: true
