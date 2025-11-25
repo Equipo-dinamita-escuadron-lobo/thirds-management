@@ -11,6 +11,7 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdAlreadyExistsException;
+import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdNotFound;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViolationException;
@@ -46,6 +47,13 @@ public class UpdateThirdService implements UpdateThirdUseCase {
 
         if (!thirdOutputPort.existThirdById(third.getThId(), third.getEntId())) {
             throw new ThirdNotFound("El tercero con ID " + third.getThId() + " no existe");
+        }
+
+        // Validar que el tercero no tenga movimientos contables registrados
+        Third existingThird = thirdOutputPort.getThirdById(third.getThId(), third.getEntId())
+                .orElseThrow(() -> new ThirdNotFound("El tercero con ID " + third.getThId() + " no existe"));
+        if (existingThird.isInUse()) {
+            throw new ThirdInUseException(existingThird.getIdNumber().toString(), true); // true indica operación de edición
         }
 
         thirdValidationService.validatePersonTypeConsistency(third);
