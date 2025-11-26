@@ -243,14 +243,14 @@ class ErrorMappingUtilsUnitTest {
     void testCreateMissingCityError_WithValidData() {
         // Arrange
         Map<String, Integer> cityColumnMap = new HashMap<>();
-        cityColumnMap.put("CITY", 3);
+        cityColumnMap.put("Ciudad", 3); // Usar el nombre de columna que espera el método
 
         // Act
         ImportErrorDetail error = ErrorMappingUtils.createMissingCityError(9, cityColumnMap);
 
         // Assert
         assertEquals(9, error.getRowNumber());
-        assertEquals(4, error.getColumnNumber()); // CITY está en columna 3, +1 = 4
+        assertEquals(4, error.getColumnNumber()); // Ciudad está en columna 3, +1 = 4
         assertEquals("Ciudad", error.getColumnName());
         assertNull(error.getFieldValue());
         assertEquals(ImportConstants.ErrorCodes.MISSING_CITY_FOR_COMPLETE_ADDRESS, error.getErrorCode());
