@@ -147,7 +147,7 @@ class ErrorMappingUtilsUnitTest {
 
         // Assert
         assertEquals(4, error.getRowNumber());
-        assertNull(error.getColumnNumber());
+        assertEquals(1, error.getColumnNumber()); // Número Identificación está en columna 0, +1 = 1
         assertEquals("Número Identificación", error.getColumnName());
         assertEquals("12345678", error.getFieldValue());
         assertEquals("INVALID_NIT_LENGTH", error.getErrorCode());
@@ -218,7 +218,7 @@ class ErrorMappingUtilsUnitTest {
         assertNull(error.getColumnName());
         assertNull(error.getFieldValue());
         assertEquals(ImportConstants.ErrorCodes.SYSTEM_ERROR, error.getErrorCode());
-        assertEquals("Error de conexión a base de datos", error.getErrorMessage());
+        assertEquals("Error del sistema durante la importación: Error de conexión a base de datos", error.getErrorMessage());
         assertEquals(ImportErrorType.SYSTEM_ERROR, error.getErrorType());
     }
 
