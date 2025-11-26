@@ -72,14 +72,14 @@ public class ThirdExcelData {
      *
      *        Valida que el registro tenga toda la información requerida para una
      *        persona natural:
-     *        nombres, apellidos, género presente, y razón social ausente.
+     *        nombres, apellidos, razón social ausente.
+     *        El género es opcional.
      * @return true si los datos corresponden a una persona natural válida
      */
     public boolean isValidNaturalPerson() {
         return personType == ePersonType.Natural
                 && names != null && !names.trim().isEmpty()
                 && lastNames != null && !lastNames.trim().isEmpty()
-                && gender != null
                 && (socialReason == null || socialReason.trim().isEmpty());
     }
 
@@ -89,14 +89,14 @@ public class ThirdExcelData {
      *        Valida que el registro tenga toda la información requerida para una
      *        persona jurídica:
      *        razón social presente, campos de persona natural ausentes.
+     *        El género es opcional.
      * @return true si los datos corresponden a una persona jurídica válida
      */
     public boolean isValidLegalEntity() {
         return personType == ePersonType.Juridica
                 && socialReason != null && !socialReason.trim().isEmpty()
                 && (names == null || names.trim().isEmpty())
-                && (lastNames == null || lastNames.trim().isEmpty())
-                && gender == null;
+                && (lastNames == null || lastNames.trim().isEmpty());
     }
 
 }

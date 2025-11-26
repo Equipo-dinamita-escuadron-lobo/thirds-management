@@ -256,7 +256,7 @@ class ThirdExcelDataUnitTest {
     }
 
     @Test
-    @DisplayName("Debe retornar false cuando falta gender")
+    @DisplayName("Debe retornar true cuando falta gender (opcional)")
     void testIsValidNaturalPerson_WithoutGender() {
         // Arrange
         thirdExcelData.setGender(null);
@@ -265,7 +265,7 @@ class ThirdExcelDataUnitTest {
         boolean isValid = thirdExcelData.isValidNaturalPerson();
 
         // Assert
-        assertFalse(isValid);
+        assertTrue(isValid, "El género es opcional para personas naturales");
     }
 
     @Test
@@ -380,7 +380,7 @@ class ThirdExcelDataUnitTest {
     }
 
     @Test
-    @DisplayName("Debe retornar false cuando tiene gender (persona jurídica no debe tenerlo)")
+    @DisplayName("Debe retornar true cuando tiene gender (opcional para persona jurídica)")
     void testIsValidLegalEntity_WithGender() {
         // Arrange
         thirdExcelData.setPersonType(ePersonType.Juridica);
@@ -393,6 +393,35 @@ class ThirdExcelDataUnitTest {
         boolean isValid = thirdExcelData.isValidLegalEntity();
 
         // Assert
-        assertFalse(isValid);
+        assertTrue(isValid, "El género es opcional para personas jurídicas");
+    }
+
+    @Test
+    @DisplayName("Debe validar que datos demográficos son opcionales")
+    void testDemographicDataIsOptional() {
+        // Arrange - Persona natural sin género, país, ciudad, departamento
+        thirdExcelData.setGender(null);
+        thirdExcelData.setCountryName(null);
+        thirdExcelData.setStateName(null);
+        thirdExcelData.setCityName(null);
+
+        // Act
+        boolean isValidNatural = thirdExcelData.isValidNaturalPerson();
+
+        // Assert
+        assertTrue(isValidNatural, "Los datos demográficos son opcionales para personas naturales");
+
+        // Arrange - Persona jurídica con género (también opcional)
+        thirdExcelData.setPersonType(ePersonType.Juridica);
+        thirdExcelData.setSocialReason("Empresa S.A.");
+        thirdExcelData.setNames(null);
+        thirdExcelData.setLastNames(null);
+        thirdExcelData.setGender(eThirdGender.Femenino);
+
+        // Act
+        boolean isValidLegal = thirdExcelData.isValidLegalEntity();
+
+        // Assert
+        assertTrue(isValidLegal, "Los datos demográficos son opcionales para personas jurídicas");
     }
 }
