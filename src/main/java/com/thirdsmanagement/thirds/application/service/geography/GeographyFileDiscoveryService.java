@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.geography;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -24,11 +25,11 @@ public class GeographyFileDiscoveryService {
     private final GeographyDataConfig config;
     private final ResourcePatternResolver resourceResolver;
 
+    @Autowired
     public GeographyFileDiscoveryService(GeographyDataConfig config) {
         this(config, new PathMatchingResourcePatternResolver());
     }
 
-    // Constructor para testing
     public GeographyFileDiscoveryService(GeographyDataConfig config, ResourcePatternResolver resourceResolver) {
         this.config = config;
         this.resourceResolver = resourceResolver != null ? resourceResolver : new PathMatchingResourcePatternResolver();
