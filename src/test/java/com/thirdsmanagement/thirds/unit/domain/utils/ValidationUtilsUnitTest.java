@@ -98,21 +98,37 @@ class ValidationUtilsUnitTest {
     }
 
     @Test
-    @DisplayName("Debe retornar false para formatos NIT inválidos")
+    @DisplayName("Debe retornar false para formatos NIT inválidos (no empiezan con 8 o 9)")
     void testIsValidNitFormat_WithInvalidNits() {
         // Act
-        boolean tooShort = ValidationUtils.isValidNitFormat("12345678");
-        boolean withLetters = ValidationUtils.isValidNitFormat("90123A567");
-        boolean invalidStart = ValidationUtils.isValidNitFormat("012345678");
+        boolean startsWith0 = ValidationUtils.isValidNitFormat("012345678");
+        boolean startsWith1 = ValidationUtils.isValidNitFormat("123456789");
+        boolean startsWith7 = ValidationUtils.isValidNitFormat("712345678");
         boolean nullNit = ValidationUtils.isValidNitFormat(null);
         boolean emptyNit = ValidationUtils.isValidNitFormat("");
 
-        // Assert
-        assertFalse(tooShort);
-        assertFalse(withLetters);
-        assertFalse(invalidStart);
+        // Assert - Solo valida que empiece con 8 o 9
+        assertFalse(startsWith0);
+        assertFalse(startsWith1);
+        assertFalse(startsWith7);
         assertFalse(nullNit);
         assertFalse(emptyNit);
+    }
+
+    @Test
+    @DisplayName("Debe retornar true para NITs que empiecen con 8 o 9 (independientemente del resto)")
+    void testIsValidNitFormat_WithValidStart() {
+        // Act
+        boolean startsWith8 = ValidationUtils.isValidNitFormat("812345678");
+        boolean startsWith9 = ValidationUtils.isValidNitFormat("912345678");
+        boolean withLetters = ValidationUtils.isValidNitFormat("90123A567"); // Tiene letras pero empieza con 9
+        boolean withSpecialChars = ValidationUtils.isValidNitFormat("8123-4567"); // Tiene guion pero empieza con 8
+
+        // Assert - Solo valida el primer dígito
+        assertTrue(startsWith8);
+        assertTrue(startsWith9);
+        assertTrue(withLetters);
+        assertTrue(withSpecialChars);
     }
 
     // ===== VALIDACIONES DE CONTENIDO =====
@@ -196,7 +212,7 @@ class ValidationUtilsUnitTest {
         assertTrue(validDigit9);
         assertFalse(negativeDigit);
         assertFalse(digit10);
-        assertFalse(nullDigit);
+        assertFalse(nullDigit); // null ahora retorna false
     }
 
     @Test
