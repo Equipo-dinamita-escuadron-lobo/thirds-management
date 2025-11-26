@@ -266,6 +266,70 @@ class ValidationUtilsUnitTest {
     }
 
     @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del país'")
+    void testIsGeographyError_WithCountryCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del país");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del estado'")
+    void testIsGeographyError_WithStateCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del estado");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del departamento'")
+    void testIsGeographyError_WithDepartmentCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del departamento");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'país'")
+    void testIsGeographyError_WithRequiredCountry() {
+        boolean result = ValidationUtils.isGeographyError("El país es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'ciudad'")
+    void testIsGeographyError_WithRequiredCity() {
+        boolean result = ValidationUtils.isGeographyError("La ciudad es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'departamento'")
+    void testIsGeographyError_WithRequiredDepartment() {
+        boolean result = ValidationUtils.isGeographyError("El departamento es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("No debe identificar error geográfico cuando contiene 'ciudad' pero no 'obligatorio'")
+    void testIsGeographyError_WithCityButNotRequired() {
+        boolean result = ValidationUtils.isGeographyError("La ciudad tiene un error de formato");
+
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("No debe identificar error geográfico cuando contiene 'departamento' pero no 'obligatorio'")
+    void testIsGeographyError_WithDepartmentButNotRequired() {
+        boolean result = ValidationUtils.isGeographyError("El departamento está incorrecto");
+
+        assertFalse(result);
+    }
+
+    @Test
     @DisplayName("Debe detectar campo desde errores de regla de negocio")
     void testDetectFieldFromBusinessRuleError_WithBusinessRuleMessages() {
         // Act
@@ -283,6 +347,86 @@ class ValidationUtilsUnitTest {
         assertEquals("Nombres", namesField);
         assertEquals("Reglas Negocio", unknownField);
         assertEquals("Reglas Negocio", nullMessage);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Apellidos cuando el mensaje contiene 'no se permite el campo apellidos'")
+    void testDetectFieldFromBusinessRuleError_NotAllowedLastNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("No se permite el campo apellidos para persona jurídica");
+
+        assertEquals("Apellidos", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Nombres cuando el mensaje contiene 'no se permite el campo nombres'")
+    void testDetectFieldFromBusinessRuleError_NotAllowedNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("No se permite el campo nombres para persona jurídica");
+
+        assertEquals("Nombres", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Género cuando el mensaje contiene 'género' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericGender() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El género es obligatorio para persona natural");
+
+        assertEquals("Género", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Apellidos cuando el mensaje contiene 'apellidos' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericLastNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Los apellidos son obligatorios");
+
+        assertEquals("Apellidos", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Razón Social cuando el mensaje contiene 'razón social'")
+    void testDetectFieldFromBusinessRuleError_SocialReason() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("La razón social es obligatoria");
+
+        assertEquals("Razón Social", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'persona natural'")
+    void testDetectFieldFromBusinessRuleError_NaturalPerson() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Debe ser una persona natural");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'persona jurídica'")
+    void testDetectFieldFromBusinessRuleError_LegalPerson() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Debe ser una persona jurídica");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'tipo de persona'")
+    void testDetectFieldFromBusinessRuleError_PersonType() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El tipo de persona es inválido");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Identificación cuando el mensaje contiene 'tipo de identificación'")
+    void testDetectFieldFromBusinessRuleError_IdType() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El tipo de identificación no es válido");
+
+        assertEquals("Tipo Identificación", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Identificación cuando el mensaje contiene 'identificación' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericIdentification() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("La identificación es incorrecta");
+
+        assertEquals("Tipo Identificación", result);
     }
 
     // ===== UTILIDADES DE PROCESAMIENTO =====

@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.unit.domain.utils;
 
 import com.thirdsmanagement.thirds.domain.enums.ImportErrorType;
+import com.thirdsmanagement.thirds.domain.enums.eThirdGender;
 import com.thirdsmanagement.thirds.domain.model.ImportErrorDetail;
 import com.thirdsmanagement.thirds.domain.model.ThirdExcelData;
 import com.thirdsmanagement.thirds.domain.utils.ErrorMappingUtils;
@@ -35,9 +36,16 @@ class ErrorMappingUtilsUnitTest {
                 .entId("TEST001")
                 .typeIdName("CC")
                 .idNumber(123456789L)
-                .names("Juan Pérez")
+                .names("Juan Carlos")
+                .lastNames("Pérez Gómez")
+                .socialReason("Empresa Test S.A.S")
+                .gender(eThirdGender.Masculino)
                 .email("juan@email.com")
                 .phoneNumber("3001234567")
+                .countryName("Colombia")
+                .stateName("Cauca")
+                .cityName("Popayán")
+                .address("Calle 5 # 4-70")
                 .build();
     }
 
@@ -302,5 +310,118 @@ class ErrorMappingUtilsUnitTest {
         assertEquals("123456789", nitValue);
         assertEquals("juan@email.com", emailValue);
         assertNull(unknownField);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Tipo Identificación desde Excel data")
+    void testGetFieldValueFromExcelData_TypeIdName() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Tipo Identificación");
+
+        assertEquals("CC", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Nombres desde Excel data")
+    void testGetFieldValueFromExcelData_Names() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Nombres");
+
+        assertEquals("Juan Carlos", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Apellidos desde Excel data")
+    void testGetFieldValueFromExcelData_LastNames() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Apellidos");
+
+        assertEquals("Pérez Gómez", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Razón Social desde Excel data")
+    void testGetFieldValueFromExcelData_SocialReason() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Razón Social");
+
+        assertEquals("Empresa Test S.A.S", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Género desde Excel data")
+    void testGetFieldValueFromExcelData_Gender() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Género");
+
+        assertNotNull(result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Teléfono desde Excel data")
+    void testGetFieldValueFromExcelData_PhoneNumber() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Teléfono");
+
+        assertEquals("3001234567", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener País desde Excel data")
+    void testGetFieldValueFromExcelData_Country() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "País");
+
+        assertEquals("Colombia", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Departamento desde Excel data")
+    void testGetFieldValueFromExcelData_State() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Departamento");
+
+        assertEquals("Cauca", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Ciudad desde Excel data")
+    void testGetFieldValueFromExcelData_City() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Ciudad");
+
+        assertEquals("Popayán", result);
+    }
+
+    @Test
+    @DisplayName("Debe obtener Dirección desde Excel data")
+    void testGetFieldValueFromExcelData_Address() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Dirección");
+
+        assertEquals("Calle 5 # 4-70", result);
+    }
+
+    @Test
+    @DisplayName("Debe devolver null cuando el campo es desconocido")
+    void testGetFieldValueFromExcelData_WithUnknownField() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Campo Inexistente");
+
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Debe devolver null cuando excelData es null")
+    void testGetFieldValueFromExcelData_WithNullExcelData() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(null, "Email");
+
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Debe devolver null cuando fieldName es null")
+    void testGetFieldValueFromExcelData_WithNullFieldName() {
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, null);
+
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Debe devolver null cuando Género es null en excelData")
+    void testGetFieldValueFromExcelData_WithNullGender() {
+        testExcelData.setGender(null);
+        String result = ErrorMappingUtils.getFieldValueFromExcelData(testExcelData, "Género");
+
+        assertNull(result);
     }
 }
