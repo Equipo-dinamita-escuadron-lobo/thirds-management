@@ -117,14 +117,6 @@ public class CreateThirdService implements CreateThirdUseCase {
         thirdValidationService.validateNitFormat(third);
         thirdValidationService.validateVerificationDigit(third);
 
-        // NO consultas a BD - todo ya validado en fases previas:
-        // ❌ typeIdLoaderService.loadCompleteTypeId() - ya viene completo de Fase 2
-        // ❌ validateThirdTypesExistAndActive() - ya validado en Fase 2
-        // ❌ validateDuplicateThird() - ya validado en Fase 3
-        // ❌ validateAndGetGeography() - ya validado en Fase 2
-
-        // Reutilizar geografía que ya viene validada en el Third original
-        // (fue cargada en DataConverter usando el cache de BatchValidationService)
         Third normalizedThird = Third.builder()
                 .entId(third.getEntId())
                 .personType(third.getPersonType())
@@ -143,9 +135,9 @@ public class CreateThirdService implements CreateThirdUseCase {
                 .address(third.getAddress())
                 .phoneNumber(third.getPhoneNumber())
                 .email(third.getEmail())
-                .country(third.getCountry())    // ✅ Reutilizar (ya validado)
-                .province(third.getProvince())  // ✅ Reutilizar (ya validado)
-                .city(third.getCity())          // ✅ Reutilizar (ya validado)
+                .country(third.getCountry())   
+                .province(third.getProvince()) 
+                .city(third.getCity())          
                 .build();
 
         return normalizedThird;

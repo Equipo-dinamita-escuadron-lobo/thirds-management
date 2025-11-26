@@ -98,8 +98,6 @@ public class BatchProcessor {
         }
         long prepareTime = System.currentTimeMillis() - prepareStartTime;
 
-        log.info("📋 Preparados {} registros para guardar (de {} en el lote)", thirdsToSave.size(), batch.size());
-
         // Fase 4.2: Guardar todos los terceros preparados en una sola operación (saveAll)
         long saveTime = 0;
         if (!thirdsToSave.isEmpty()) {
@@ -114,7 +112,6 @@ public class BatchProcessor {
                         savedThirds.size(), saveTime, String.format("%.2f", recordsPerSec));
             } catch (Exception e) {
                 saveTime = System.currentTimeMillis() - saveStartTime;
-                log.error("❌ ERROR en saveAll() - {} registros - Error: {}", thirdsToSave.size(), e.getMessage(), e);
                 if (continueOnError) {
                     failureCount.addAndGet(thirdsToSave.size());
                     for (int i = 0; i < thirdsToSave.size(); i++) {
@@ -173,7 +170,6 @@ public class BatchProcessor {
             return ProcessingResult.success(preparedThird);
 
         } catch (Exception e) {
-            log.error("❌ Error en prepareRecord fila {}: {}", excelData.getRowNumber(), e.getMessage(), e);
             // Clasificar el tipo de error
             if (ValidationUtils.isDuplicateError(e.getMessage())) {
                 return ProcessingResult.duplicateSkipped();
