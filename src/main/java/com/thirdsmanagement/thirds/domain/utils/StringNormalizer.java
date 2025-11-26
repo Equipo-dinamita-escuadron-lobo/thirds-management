@@ -81,7 +81,7 @@ public final class StringNormalizer {
 
         String normalized = removeAccents(input.trim().toUpperCase());
         // Eliminar caracteres especiales, dejando solo letras y números
-        normalized = normalized.replaceAll("[^A-Z0-9]", "");
+        normalized = normalized.replaceAll("[^A-Z0-9Ñ]", "");
 
         return normalized;
     }
@@ -99,11 +99,17 @@ public final class StringNormalizer {
             return null;
         }
 
+        // Preservar ñ y Ñ antes de normalizar
+        String preserved = input.replace("ñ", "###PRESERVE_ENYE###").replace("Ñ", "###PRESERVE_ENYE_MAYUS###");
+
         // Normaliza a forma NFD (descompone caracteres con acentos)
-        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        String normalized = Normalizer.normalize(preserved, Normalizer.Form.NFD);
 
         // Elimina los caracteres diacríticos (tildes, acentos, etc.)
-        return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String withoutAccents = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        // Restaurar ñ y Ñ
+        return withoutAccents.replace("###PRESERVE_ENYE###", "ñ").replace("###PRESERVE_ENYE_MAYUS###", "Ñ");
     }
 
     // ===== NORMALIZACIONES PARA EXCEL =====

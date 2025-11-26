@@ -147,10 +147,11 @@ class TypeIdUnitTest {
         // Arrange
         typeIdNatural.setTypeId(null);
 
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> {
-            typeIdNatural.getNormalizedTypeId();
-        });
+        // Act
+        String normalized = typeIdNatural.getNormalizedTypeId();
+
+        // Assert
+        assertNull(normalized, "Debe retornar null cuando typeId es null");
     }
 
     @Test
@@ -192,6 +193,6 @@ class TypeIdUnitTest {
         String normalized = typeIdNatural.getNormalizedTypeId();
 
         // Assert
-        assertEquals("CCñ", normalized);
+        assertEquals("CCÑ", normalized);
     }
 }
