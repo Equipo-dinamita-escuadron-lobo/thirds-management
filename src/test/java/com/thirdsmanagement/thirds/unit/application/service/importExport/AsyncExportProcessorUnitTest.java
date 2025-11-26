@@ -75,7 +75,7 @@ class AsyncExportProcessorUnitTest {
     @DisplayName("Debe procesar exportación exitosamente con datos activos")
     void testProcessExportAsync_WithActiveData_Success() throws Exception {
         // Arrange
-        exportRequest.setStatus(true); // Activos
+        exportRequest.setStatus(true);
         Page<Third> page = new PageImpl<>(sampleThirds, PageRequest.of(0, 5000), sampleThirds.size());
 
         when(thirdOutputPort.getAllThirdsByStateForExport("TEST_ENT", true, PageRequest.of(0, 5000)))
@@ -95,6 +95,7 @@ class AsyncExportProcessorUnitTest {
         verify(jobTracker).setFileData(eq(jobId), any(byte[].class));
         verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
         verify(jobTracker).updateProgress(jobId, 100);
+        verify(excelValidationService).createReferenceDataSheet(any(), eq("TEST_ENT"));
     }
 
     @Test
@@ -371,7 +372,6 @@ class AsyncExportProcessorUnitTest {
     // ESCENARIOS DE VALIDACIÓN
     // ===============================
 
-
     @Test
     @DisplayName("Debe validar que se actualiza el progreso correctamente")
     void testProcessExportAsync_ProgressUpdates() throws Exception {
@@ -386,10 +386,48 @@ class AsyncExportProcessorUnitTest {
         // Act
         asyncExportProcessor.processExportAsync(exportRequest, jobId);
 
-        // Assert - Verificar orden de actualizaciones de progreso
+        // Assert
         verify(jobTracker).updateProgress(jobId, 10);
         verify(jobTracker).updateProgress(jobId, 50);
         verify(jobTracker).updateProgress(jobId, 90);
         verify(jobTracker).updateProgress(jobId, 100);
+    }
+
+    @Test
+    @DisplayName("Debe verificar que el archivo generado no esté vacío")
+    void testProcessExportAsync_FileDataNotEmpty() throws Exception {
+        // Arrange
+        Page<Third> page = new PageImpl<>(sampleThirds, PageRequest.of(0, 5000), sampleThirds.size());
+
+        when(thirdOutputPort.getAllThirdsForExport("TEST_ENT", PageRequest.of(0, 5000)))
+            .thenReturn(page);
+        when(thirdOutputPort.getAllThirdsForExport("TEST_ENT", PageRequest.of(1, 5000)))
+            .thenReturn(Page.empty());
+
+        // Act
+        asyncExportProcessor.processExportAsync(exportRequest, jobId);
+
+        // Assert
+        verify(jobTracker).setFileData(eq(jobId), argThat(bytes -> bytes != null && bytes.length > 0));
+        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Debe crear hoja de datos de referencia en el Excel")
+    void testProcessExportAsync_CreatesReferenceDataSheet() throws Exception {
+        // Arrange
+        Page<Third> page = new PageImpl<>(sampleThirds, PageRequest.of(0, 5000), sampleThirds.size());
+
+        when(thirdOutputPort.getAllThirdsForExport("TEST_ENT", PageRequest.of(0, 5000)))
+            .thenReturn(page);
+        when(thirdOutputPort.getAllThirdsForExport("TEST_ENT", PageRequest.of(1, 5000)))
+            .thenReturn(Page.empty());
+
+        // Act
+        asyncExportProcessor.processExportAsync(exportRequest, jobId);
+
+        // Assert
+        verify(excelValidationService).createReferenceDataSheet(any(), eq("TEST_ENT"));
+        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
     }
 }

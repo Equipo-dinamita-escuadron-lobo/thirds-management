@@ -124,25 +124,28 @@ class AsyncImportProcessorUnitTest {
         when(batchResult.getFailureCount()).thenReturn(0);
         when(batchResult.getSkippedCount()).thenReturn(0);
 
+        BatchValidationService.ReferenceDataCache cache = mock(BatchValidationService.ReferenceDataCache.class);
+
         when(excelParsingService.parseExcelFileFromBytes(fileBytes, entId)).thenReturn(parsingResult);
         when(batchValidationService.validateBatch(sampleThirdsData, entId, columnMap)).thenReturn(validationResult);
+        when(batchValidationService.preloadReferenceData(entId)).thenReturn(cache);
         when(duplicateDetectionService.detectDuplicates(sampleThirdsData, entId, true)).thenReturn(duplicateResult);
         when(batchProcessor.processBatch(any(), any(), eq(true))).thenReturn(batchResult);
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.PROCESSING);
-        verify(jobTracker).updateProgress(jobId, 10);
-        verify(jobTracker).updateProgress(jobId, 20);
-        verify(jobTracker).updateProgress(jobId, 40);
-        verify(jobTracker).updateProgress(jobId, 60);
-        verify(jobTracker, times(2)).updateProgress(jobId, 90); // Una del batch + una final
-        verify(jobTracker).updateProgress(jobId, 100);
-        verify(jobTracker).updateJobMetrics(jobId, 2, 2, 0, 0);
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.PROCESSING);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 10);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 20);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 40);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 60);
+        verify(jobTracker, timeout(2000).times(2)).updateProgress(jobId, 90);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 100);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 2, 2, 0, 0);
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.COMPLETED);
+        verify(batchValidationService, timeout(2000)).preloadReferenceData(entId);
     }
 
     @Test
@@ -161,7 +164,7 @@ class AsyncImportProcessorUnitTest {
         when(validationResult.getValidCount()).thenReturn(2);
 
         DuplicateDetectionService.DuplicateDetectionResult duplicateResult = mock(DuplicateDetectionService.DuplicateDetectionResult.class);
-        when(duplicateResult.getUniqueRecords()).thenReturn(Arrays.asList(sampleThirdsData.get(0))); // Solo 1 único
+        when(duplicateResult.getUniqueRecords()).thenReturn(Arrays.asList(sampleThirdsData.get(0)));
         when(duplicateResult.getErrors()).thenReturn(Collections.emptyList());
         when(duplicateResult.getUniqueCount()).thenReturn(1);
 
@@ -170,18 +173,22 @@ class AsyncImportProcessorUnitTest {
         when(batchResult.getFailureCount()).thenReturn(0);
         when(batchResult.getSkippedCount()).thenReturn(0);
 
+        BatchValidationService.ReferenceDataCache cache = mock(BatchValidationService.ReferenceDataCache.class);
+
         when(excelParsingService.parseExcelFileFromBytes(fileBytes, entId)).thenReturn(parsingResult);
         when(batchValidationService.validateBatch(sampleThirdsData, entId, columnMap)).thenReturn(validationResult);
+        when(batchValidationService.preloadReferenceData(entId)).thenReturn(cache);
         when(duplicateDetectionService.detectDuplicates(sampleThirdsData, entId, true)).thenReturn(duplicateResult);
         when(batchProcessor.processBatch(any(), any(), eq(true))).thenReturn(batchResult);
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED_WITH_ERRORS);
-        verify(jobTracker).updateJobMetrics(jobId, 3, 1, 1, 1); // 1 validación + 1 duplicado
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.COMPLETED_WITH_ERRORS);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 3, 1, 1, 1);
+        verify(batchValidationService, timeout(2000)).preloadReferenceData(entId);
     }
 
     @Test
@@ -216,11 +223,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobMetrics(jobId, 2, 1, 0, 1); // 1 duplicado omitido
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 2, 1, 0, 1); // 1 duplicado omitido
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.COMPLETED);
     }
 
     // ===============================
@@ -241,12 +248,12 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).updateJobMetrics(jobId, 0, 0, 0, 0);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 0, 0, 0, 0);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
         verify(jobTracker, never()).updateJobStatus(jobId, ImportStatus.COMPLETED);
     }
 
@@ -282,11 +289,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).updateJobMetrics(jobId, 2, 0, 2, 0);
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 2, 0, 2, 0);
     }
 
     // ===============================
@@ -304,13 +311,13 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.PROCESSING);
-        verify(jobTracker).updateProgress(jobId, 10);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.PROCESSING);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 10);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
     }
 
     @Test
@@ -331,11 +338,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
     }
 
     @Test
@@ -362,11 +369,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
     }
 
     @Test
@@ -398,11 +405,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
     }
 
     @Test
@@ -416,11 +423,11 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
-        verify(jobTracker).addErrors(eq(jobId), anyList());
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).addErrors(eq(jobId), anyList());
     }
 
     // ===============================
@@ -469,12 +476,12 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert - Debería procesar 3 lotes
-        verify(batchProcessor, times(3)).processBatch(any(), any(), eq(true));
-        verify(jobTracker).updateJobMetrics(jobId, 2500, 2499, 0, 0); // 3 * 833 = 2499
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.COMPLETED);
+        verify(batchProcessor, timeout(2000).times(3)).processBatch(any(), any(), eq(true));
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 2500, 2499, 0, 0); // 3 * 833 = 2499
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.COMPLETED);
     }
 
     @Test
@@ -503,12 +510,12 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert
         verify(batchProcessor, never()).processBatch(any(), any(), anyBoolean());
-        verify(jobTracker).updateJobMetrics(jobId, 2, 0, 0, 2); // 2 duplicados
-        verify(jobTracker).updateJobStatus(jobId, ImportStatus.FAILED);
+        verify(jobTracker, timeout(2000)).updateJobMetrics(jobId, 2, 0, 0, 2);
+        verify(jobTracker, timeout(2000)).updateJobStatus(jobId, ImportStatus.FAILED);
     }
 
     // ===============================
@@ -547,15 +554,15 @@ class AsyncImportProcessorUnitTest {
 
         // Act
         asyncImportProcessor.processImportAsync(fileBytes, entId, fileName, jobId);
-        Thread.sleep(500);
+        
 
         // Assert - Verificar orden de actualizaciones de progreso
-        verify(jobTracker).updateProgress(jobId, 10);
-        verify(jobTracker).updateProgress(jobId, 20);
-        verify(jobTracker).updateProgress(jobId, 40);
-        verify(jobTracker).updateProgress(jobId, 60);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 10);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 20);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 40);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 60);
         verify(jobTracker, times(2)).updateProgress(jobId, 90); // Una del batch + una final
-        verify(jobTracker).updateProgress(jobId, 100);
+        verify(jobTracker, timeout(2000)).updateProgress(jobId, 100);
     }
 
     // ===============================
