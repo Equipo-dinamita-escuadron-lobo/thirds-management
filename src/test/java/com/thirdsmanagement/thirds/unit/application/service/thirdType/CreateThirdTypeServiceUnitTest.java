@@ -49,7 +49,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Creación exitosa ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_TipoTerceroValido_CreaCorrectamente")
+    @DisplayName("Debe crear correctamente tipo de tercero válido")
     void testCreateThirdTypeTipoTerceroValidoCreaCorrectamente() {
         // Arrange
         ThirdType savedThirdType = ThirdType.builder()
@@ -76,7 +76,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreConEspacios_NormalizaYCrea")
+    @DisplayName("Debe normalizar y crear nombre con espacios")
     void testCreateThirdTypeNombreConEspaciosNormalizaYCrea() {
         // Arrange
         ThirdType thirdTypeWithSpaces = ThirdType.builder()
@@ -107,7 +107,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_DiferentesNombres_CreaCadaUno")
+    @DisplayName("Debe crear cada uno con diferentes nombres")
     void testCreateThirdTypeDiferentesNombresCreaCadaUno() {
         // Arrange
         ThirdType proveedor = ThirdType.builder()
@@ -136,7 +136,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_StatusTrue_CreaConStatusTrue")
+    @DisplayName("Debe crear con estado activo cuando status es true")
     void testCreateThirdTypeStatusTrueCreaConStatusTrue() {
         // Arrange
         ThirdType savedThirdType = ThirdType.builder()
@@ -158,7 +158,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_StatusFalse_CreaConStatusFalse")
+    @DisplayName("Debe crear con estado inactivo cuando status es false")
     void testCreateThirdTypeStatusFalseCreaConStatusFalse() {
         // Arrange
         ThirdType inactiveThirdType = ThirdType.builder()
@@ -188,7 +188,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Normalización ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreConEspaciosMultiples_NormalizaCorrectamente")
+    @DisplayName("Debe normalizar correctamente nombre con espacios múltiples")
     void testCreateThirdTypeNombreConEspaciosMultiplesNormalizaCorrectamente() {
         // Arrange
         ThirdType thirdTypeWithMultipleSpaces = ThirdType.builder()
@@ -218,7 +218,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreConCaracteresEspeciales_NormalizaPreservandoCase")
+    @DisplayName("Debe normalizar preservando mayúsculas y minúsculas con caracteres especiales")
     void testCreateThirdTypeNombreConCaracteresEspecialesNormalizaPreservandoCase() {
         // Arrange
         ThirdType thirdTypeWithSpecialChars = ThirdType.builder()
@@ -246,7 +246,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreMinusculas_PreservaCase")
+    @DisplayName("Debe preservar minúsculas en nombre")
     void testCreateThirdTypeNombreMinusculasPreservaCase() {
         // Arrange
         ThirdType thirdTypeWithLowerCase = ThirdType.builder()
@@ -276,7 +276,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Validación de duplicados ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreDuplicado_LanzaThirdTypeNameAlreadyExistsException")
+    @DisplayName("Debe lanzar excepción cuando nombre está duplicado")
     void testCreateThirdTypeNombreDuplicadoLanzaThirdTypeNameAlreadyExistsException() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId)).thenReturn(true);
@@ -294,7 +294,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreDuplicadoConDiferenteCase_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando nombre duplicado tiene diferente capitalización")
     void testCreateThirdTypeNombreDuplicadoConDiferenteCaseLanzaExcepcion() {
         // Arrange
         ThirdType thirdTypeUpperCase = ThirdType.builder()
@@ -317,7 +317,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_NombreDuplicadoConEspacios_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando nombre duplicado tiene espacios")
     void testCreateThirdTypeNombreDuplicadoConEspaciosLanzaExcepcion() {
         // Arrange
         ThirdType thirdTypeWithSpaces = ThirdType.builder()
@@ -340,7 +340,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_MismoNombreDiferenteEntId_CreaCorrectamente")
+    @DisplayName("Debe crear correctamente mismo nombre con diferente entidad")
     void testCreateThirdTypeMismoNombreDiferenteEntIdCreaCorrectamente() {
         // Arrange
         String differentEntId = "ENT002";
@@ -373,7 +373,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Diferentes entidades ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_DiferentesEntIds_CreaCadaUno")
+    @DisplayName("Debe crear cada uno con diferentes entidades")
     void testCreateThirdTypeDiferentesEntIdsCreaCadaUno() {
         // Arrange
         String entId1 = "ENT001";
@@ -424,7 +424,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_DiferentesNombresEnMismaEntidad_CreaTodos")
+    @DisplayName("Debe crear todos los tipos con diferentes nombres en misma entidad")
     void testCreateThirdTypeDiferentesNombresEnMismaEntidadCreaTodos() {
         // Arrange
         ThirdType cliente = ThirdType.builder()
@@ -466,7 +466,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Propagación de excepciones ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_ErrorEnRepository_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en repositorio")
     void testCreateThirdTypeErrorEnRepositoryPropagaExcepcion() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId))
@@ -483,7 +483,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_ErrorEnIdOutputPort_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en puerto de salida")
     void testCreateThirdTypeErrorEnIdOutputPortPropagaExcepcion() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId)).thenReturn(false);
@@ -503,7 +503,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Delegación correcta ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_DelegaAlRepositoryParaValidacion_Correctamente")
+    @DisplayName("Debe delegar al repositorio para validación correctamente")
     void testCreateThirdTypeDelegaAlRepositoryParaValidacionCorrectamente() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId)).thenReturn(false);
@@ -518,7 +518,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_DelegaAlPuertoParaGuardar_Correctamente")
+    @DisplayName("Debe delegar al puerto para guardar correctamente")
     void testCreateThirdTypeDelegaAlPuertoParaGuardarCorrectamente() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId)).thenReturn(false);
@@ -532,7 +532,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_PasaDatosNormalizados_AlPuerto")
+    @DisplayName("Debe pasar datos normalizados al puerto")
     void testCreateThirdTypePasaDatosNormalizadosAlPuerto() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId(anyString(), eq(entId))).thenReturn(false);
@@ -552,7 +552,7 @@ class CreateThirdTypeServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_CreateThirdType_ProcesoCompleto_ValidaYGuarda")
+    @DisplayName("Debe validar y guardar en proceso completo")
     void testCreateThirdTypeProcesoCompletoValidaYGuarda() {
         // Arrange
         ThirdType savedThirdType = ThirdType.builder()
@@ -577,7 +577,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_VariosIntentos_CadaUnoValidaIndependientemente")
+    @DisplayName("Debe validar independientemente cada uno en varios intentos")
     void testCreateThirdTypeVariosIntentosCadaUnoValidaIndependientemente() {
         // Arrange
         when(thirdTypeRepository.existsByTtNameIgnoreCaseAndTtentId("Cliente", entId)).thenReturn(false);
@@ -594,7 +594,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_RetornaObjetoGuardado_ConIdAsignado")
+    @DisplayName("Debe retornar objeto guardado con ID asignado")
     void testCreateThirdTypeRetornaObjetoGuardadoConIdAsignado() {
         // Arrange
         ThirdType savedThirdType = ThirdType.builder()
@@ -617,7 +617,7 @@ class CreateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CreateThirdType_ConNombreLargo_CreaCorrectamente")
+    @DisplayName("Debe crear correctamente con nombre largo")
     void testCreateThirdTypeConNombreLargoCreaCorrectamente() {
         // Arrange
         ThirdType thirdTypeWithLongName = ThirdType.builder()

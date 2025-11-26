@@ -63,7 +63,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Validación completa exitosa ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_ConPaisDepartamentoYCiudad_RetornaGeografiaCompleta")
+    @DisplayName("Debe retornar geografía completa con país, departamento y ciudad")
     void testValidateAndGetGeographyConPaisDepartamentoYCiudadRetornaGeografiaCompleta() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -91,7 +91,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_SoloPaisYDepartamento_RetornaGeografiaParcial")
+    @DisplayName("Debe retornar geografía parcial con solo país y departamento")
     void testValidateAndGetGeographySoloPaisYDepartamentoRetornaGeografiaParcial() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -117,7 +117,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_SoloPais_RetornaSoloPais")
+    @DisplayName("Debe retornar solo país cuando no hay departamento ni ciudad")
     void testValidateAndGetGeographySoloPaisRetornaSoloPais() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -139,7 +139,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_TodosNulos_RetornaTodosNulos")
+    @DisplayName("Debe retornar todos nulos cuando no se proporciona geografía")
     void testValidateAndGetGeographyTodosNulosRetornaTodosNulos() {
         // Arrange - No se necesita configurar mocks
 
@@ -160,7 +160,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Normalización de códigos ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CodigosConEspacios_NormalizaCorrectamente")
+    @DisplayName("Debe normalizar correctamente códigos con espacios")
     void testValidateAndGetGeographyCodigosConEspaciosNormalizaCorrectamente() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -180,7 +180,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CodigosPaisMinusculas_ConvierteAMayusculas")
+    @DisplayName("Debe convertir códigos de país en minúsculas a mayúsculas")
     void testValidateAndGetGeographyCodigosPaisMinusculasConvierteAMayusculas() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -196,7 +196,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CodigosVacios_TratadosComoNulos")
+    @DisplayName("Debe tratar códigos vacíos como nulos")
     void testValidateAndGetGeographyCodigosVaciosTratadosComoNulos() {
         // Arrange - No se necesita configurar mocks
 
@@ -214,7 +214,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Excepciones por país no encontrado ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_PaisNoExiste_LanzaCountryNotFoundException")
+    @DisplayName("Debe lanzar CountryNotFoundException cuando el país no existe")
     void testValidateAndGetGeographyPaisNoExisteLanzaCountryNotFoundException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("XX")).thenReturn(false);
@@ -231,7 +231,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_PaisExisteEnExistsPeroNoEnLista_LanzaCountryNotFoundException")
+    @DisplayName("Debe lanzar CountryNotFoundException cuando país existe en exists pero no en lista")
     void testValidateAndGetGeographyPaisExisteEnExistsPeroNoEnListaLanzaCountryNotFoundException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -249,7 +249,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_PaisInactivoNoEncontrado_LanzaCountryNotFoundException")
+    @DisplayName("Debe lanzar CountryNotFoundException cuando país está inactivo")
     void testValidateAndGetGeographyPaisInactivoNoEncontradoLanzaCountryNotFoundException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("VE")).thenReturn(false);
@@ -266,7 +266,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Excepciones por departamento no encontrado ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DepartamentoNoExiste_LanzaStateNotFoundException")
+    @DisplayName("Debe lanzar StateNotFoundException cuando el departamento no existe")
     void testValidateAndGetGeographyDepartamentoNoExisteLanzaStateNotFoundException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -285,7 +285,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DepartamentoExisteEnExistsPeroNoEnLista_LanzaStateNotFoundException")
+    @DisplayName("Debe lanzar StateNotFoundException cuando departamento existe en exists pero no en lista")
     void testValidateAndGetGeographyDepartamentoExisteEnExistsPeroNoEnListaLanzaStateNotFoundException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -304,7 +304,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DepartamentoSinPais_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando se proporciona departamento sin país")
     void testValidateAndGetGeographyDepartamentoSinPaisLanzaGeographyInvalidDataException() {
         // Arrange - No se necesita configurar mocks
 
@@ -322,7 +322,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Excepciones por ciudad no encontrada ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadNoExiste_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando la ciudad no existe")
     void testValidateAndGetGeographyCiudadNoExisteLanzaGeographyInvalidDataException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -344,7 +344,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadExisteEnExistsPeroNoEnLista_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando ciudad existe en exists pero no en lista")
     void testValidateAndGetGeographyCiudadExisteEnExistsPeroNoEnListaLanzaGeographyInvalidDataException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -366,7 +366,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadSinDepartamento_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando se proporciona ciudad sin departamento")
     void testValidateAndGetGeographyCiudadSinDepartamentoLanzaGeographyInvalidDataException() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -384,7 +384,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadSinPais_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando se proporciona ciudad sin país")
     void testValidateAndGetGeographyCiudadSinPaisLanzaGeographyInvalidDataException() {
         // Arrange - No se necesita configurar mocks
 
@@ -402,7 +402,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Validación de jerarquía geográfica ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DepartamentoNoPerteneceAPais_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando departamento no pertenece al país")
     void testValidateAndGetGeographyDepartamentoNoPerteneceAPaisLanzaGeographyInvalidDataException() {
         // Arrange
         State stateVenezuela = State.builder()
@@ -427,7 +427,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadNoPerteneceADepartamento_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando ciudad no pertenece al departamento")
     void testValidateAndGetGeographyCiudadNoPerteneceADepartamentoLanzaGeographyInvalidDataException() {
         // Arrange
         City cityBogota = City.builder()
@@ -455,7 +455,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_CiudadNoPerteneceAPais_LanzaGeographyInvalidDataException")
+    @DisplayName("Debe lanzar GeographyInvalidDataException cuando ciudad no pertenece al país")
     void testValidateAndGetGeographyCiudadNoPerteneceAPaisLanzaGeographyInvalidDataException() {
         // Arrange
         City cityCaracas = City.builder()
@@ -485,7 +485,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Diferentes entidades geográficas ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DiferentesPaises_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente diferentes países")
     void testValidateAndGetGeographyDiferentesPaisesValidaCorrectamente() {
         // Arrange
         Country mexico = Country.builder()
@@ -506,7 +506,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DiferentesDepartamentos_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente diferentes departamentos")
     void testValidateAndGetGeographyDiferentesDepartamentosValidaCorrectamente() {
         // Arrange
         State cundinamarca = State.builder()
@@ -531,7 +531,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_DiferentesCiudades_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente diferentes ciudades")
     void testValidateAndGetGeographyDiferentesCiudadesValidaCorrectamente() {
         // Arrange
         City envigado = City.builder()
@@ -562,7 +562,7 @@ class ThirdGeographyValidationServiceUnitTest {
     // ==================== Casos de integración ====================
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_MultiplesPaises_CadaUnoConSusDatos")
+    @DisplayName("Debe procesar múltiples países cada uno con sus datos")
     void testValidateAndGetGeographyMultiplesPaisesCadaUnoConSusDatos() {
         // Arrange
         Country usa = Country.builder()
@@ -586,7 +586,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_JerarquiaCompleta_TodasLasValidacionesEjecutadas")
+    @DisplayName("Debe ejecutar todas las validaciones con jerarquía completa")
     void testValidateAndGetGeographyJerarquiaCompletaTodasLasValidacionesEjecutadas() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);
@@ -613,7 +613,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_MultiplesCiudadesEnLista_EncuentraLaCorrecta")
+    @DisplayName("Debe encontrar la ciudad correcta cuando hay múltiples ciudades en lista")
     void testValidateAndGetGeographyMultiplesCiudadesEnListaEncuentraLaCorrecta() {
         // Arrange
         City itagui = City.builder()
@@ -647,7 +647,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_PropagaExcepcionDelPuerto_CuandoOcurreError")
+    @DisplayName("Debe propagar excepción del puerto cuando ocurre error")
     void testValidateAndGetGeographyPropagaExcepcionDelPuertoCuandoOcurreError() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenThrow(new RuntimeException("Error de conexión"));
@@ -662,7 +662,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_ValidacionDeOrden_VerificaPaisAntesDeDepartamento")
+    @DisplayName("Debe verificar país antes de departamento en orden de validación")
     void testValidateAndGetGeographyValidacionDeOrdenVerificaPaisAntesDeDepartamento() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(false);
@@ -678,7 +678,7 @@ class ThirdGeographyValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateAndGetGeography_ValidacionDeOrden_VerificaDepartamentoAntesDeCiudad")
+    @DisplayName("Debe verificar departamento antes de ciudad en orden de validación")
     void testValidateAndGetGeographyValidacionDeOrdenVerificaDepartamentoAntesDeCiudad() {
         // Arrange
         when(geographyOutputPort.existsActiveCountry("CO")).thenReturn(true);

@@ -27,7 +27,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Incremento exitoso ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_ConIdValido_IncrementaContador")
+    @DisplayName("Debe incrementar contador con ID válido")
     void testIncrementUsageCountConIdValidoIncrementaContador() {
         // Arrange
         Long thirdId = 1L;
@@ -40,7 +40,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_ConIdGrande_IncrementaContador")
+    @DisplayName("Debe incrementar contador con ID grande")
     void testIncrementUsageCountConIdGrandeIncrementaContador() {
         // Arrange
         Long thirdId = 999999999L;
@@ -53,7 +53,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_ConIdMinimo_IncrementaContador")
+    @DisplayName("Debe incrementar contador con ID mínimo")
     void testIncrementUsageCountConIdMinimoIncrementaContador() {
         // Arrange
         Long thirdId = 1L;
@@ -68,7 +68,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Delegación correcta ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_DelegaAlPuertoSalida_ConIdCorrecto")
+    @DisplayName("Debe delegar al puerto de salida con ID correcto")
     void testIncrementUsageCountDelegaAlPuertoSalidaConIdCorrecto() {
         // Arrange
         Long thirdId = 42L;
@@ -82,7 +82,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_LlamadaUnica_NoMultiplesIncrementos")
+    @DisplayName("Debe ejecutar llamada única sin múltiples incrementos")
     void testIncrementUsageCountLlamadaUnicaNoMultiplesIncrementos() {
         // Arrange
         Long thirdId = 5L;
@@ -95,7 +95,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_PasaParametroExacto_SinModificaciones")
+    @DisplayName("Debe pasar parámetro exacto sin modificaciones")
     void testIncrementUsageCountPasaParametroExactoSinModificaciones() {
         // Arrange
         Long thirdId = 123L;
@@ -110,7 +110,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Diferentes IDs ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_DiferentesIds_CadaUnoSeLlamaCorrectamente")
+    @DisplayName("Debe llamar correctamente cada ID cuando son diferentes")
     void testIncrementUsageCountDiferentesIdsCadaUnoSeLlamaCorrectamente() {
         // Arrange
         Long thirdId1 = 10L;
@@ -130,7 +130,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_MismoIdMultiplesVeces_IncrementaCadaVez")
+    @DisplayName("Debe incrementar cada vez con mismo ID múltiples veces")
     void testIncrementUsageCountMismoIdMultiplesVecesIncrementaCadaVez() {
         // Arrange
         Long thirdId = 7L;
@@ -145,7 +145,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_IdsConsecutivos_IncrementaTodos")
+    @DisplayName("Debe incrementar todos los IDs consecutivos")
     void testIncrementUsageCountIdsConsecutivosIncrementaTodos() {
         // Arrange
         Long thirdId1 = 100L;
@@ -166,7 +166,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Propagación de excepciones ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_PuertoLanzaExcepcion_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando puerto lanza excepción")
     void testIncrementUsageCountPuertoLanzaExcepcionPropagaExcepcion() {
         // Arrange
         Long thirdId = 1L;
@@ -183,7 +183,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_ExcepcionEnPuerto_NoCaptura")
+    @DisplayName("Debe no capturar excepción en puerto")
     void testIncrementUsageCountExcepcionEnPuertoNoCaptura() {
         // Arrange
         Long thirdId = 50L;
@@ -201,7 +201,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_ExcepcionPersistencia_DelegaAlPuerto")
+    @DisplayName("Debe delegar al puerto cuando hay excepción de persistencia")
     void testIncrementUsageCountExcepcionPersistenciaDelegaAlPuerto() {
         // Arrange
         Long thirdId = 99L;
@@ -220,7 +220,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Casos edge ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_IdCero_DelegaAlPuerto")
+    @DisplayName("Debe delegar al puerto con ID cero")
     void testIncrementUsageCountIdCeroDelegaAlPuerto() {
         // Arrange
         Long thirdId = 0L;
@@ -233,7 +233,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_IdNegativo_DelegaAlPuerto")
+    @DisplayName("Debe delegar al puerto con ID negativo")
     void testIncrementUsageCountIdNegativoDelegaAlPuerto() {
         // Arrange
         Long thirdId = -1L;
@@ -246,7 +246,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_IdMaxValue_DelegaAlPuerto")
+    @DisplayName("Debe delegar al puerto con ID max value")
     void testIncrementUsageCountIdMaxValueDelegaAlPuerto() {
         // Arrange
         Long thirdId = Long.MAX_VALUE;
@@ -261,7 +261,7 @@ class ThirdUsageServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_IncrementUsageCount_MultiplesLlamadasDiferentesIds_TodasSeEjecutan")
+    @DisplayName("Debe ejecutar todas las llamadas con múltiples IDs diferentes")
     void testIncrementUsageCountMultiplesLlamadasDiferentesIdsTodasSeEjecutan() {
         // Arrange & Act
         thirdUsageService.incrementUsageCount(1L);
@@ -280,7 +280,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_SecuenciaOperaciones_OrdenCorrecto")
+    @DisplayName("Debe mantener orden correcto en secuencia de operaciones")
     void testIncrementUsageCountSecuenciaOperacionesOrdenCorrecto() {
         // Arrange
         var inOrder = inOrder(thirdOutputPort);
@@ -297,7 +297,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_OperacionesEntrelazadas_CadaIdSeIncrementa")
+    @DisplayName("Debe incrementar cada ID en operaciones entrelazadas")
     void testIncrementUsageCountOperacionesEntrelazadasCadaIdSeIncrementa() {
         // Arrange & Act
         thirdUsageService.incrementUsageCount(100L);
@@ -314,7 +314,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_GranVolumen_TodasLasLlamadasSeDelegaron")
+    @DisplayName("Debe delegar todas las llamadas con gran volumen")
     void testIncrementUsageCountGranVolumenTodasLasLlamadasSeDelegaron() {
         // Arrange & Act
         for (long i = 1; i <= 100; i++) {
@@ -326,7 +326,7 @@ class ThirdUsageServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_IncrementUsageCount_SinLlamadas_NoDelegaNada")
+    @DisplayName("Debe no delegar nada cuando no hay llamadas")
     void testIncrementUsageCountSinLlamadasNoDelegaNada() {
         // Arrange - No se llama al servicio
 

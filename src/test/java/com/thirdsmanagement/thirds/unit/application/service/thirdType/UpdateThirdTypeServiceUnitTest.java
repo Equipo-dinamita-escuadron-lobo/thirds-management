@@ -56,7 +56,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Actualización exitosa ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeValido_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente tipo de tercero válido")
     void testUpdateThirdTypeThirdTypeValidoActualizaCorrectamente() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -75,7 +75,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_CambioDeNombre_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente con cambio de nombre")
     void testUpdateThirdTypeCambioDeNombreActualizaCorrectamente() {
         // Arrange
         ThirdType newNameThirdType = ThirdType.builder()
@@ -99,7 +99,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_CambioDeStatus_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente con cambio de estado")
     void testUpdateThirdTypeCambioDeStatusActualizaCorrectamente() {
         // Arrange
         ThirdType inactiveThirdType = ThirdType.builder()
@@ -123,7 +123,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_CambioDeNombreYStatus_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente con cambio de nombre y estado")
     void testUpdateThirdTypeCambioDeNombreYStatusActualizaCorrectamente() {
         // Arrange
         ThirdType completeUpdateThirdType = ThirdType.builder()
@@ -150,7 +150,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Validación null ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeNulo_LanzaIllegalArgumentException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero es nulo")
     void testUpdateThirdTypeThirdTypeNuloLanzaIllegalArgumentException() {
         // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
@@ -161,7 +161,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeIdNulo_LanzaIllegalArgumentException")
+    @DisplayName("Debe lanzar excepción cuando ID de tipo de tercero es nulo")
     void testUpdateThirdTypeThirdTypeIdNuloLanzaIllegalArgumentException() {
         // Arrange
         ThirdType thirdTypeWithoutId = ThirdType.builder()
@@ -181,7 +181,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Validación de existencia ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeNoExiste_LanzaThirdTypeNotFound")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero no existe")
     void testUpdateThirdTypeThirdTypeNoExisteLanzaThirdTypeNotFound() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(null);
@@ -196,7 +196,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_IdNoExisteEnBaseDatos_LanzaThirdTypeNotFound")
+    @DisplayName("Debe lanzar excepción cuando ID no existe en base de datos")
     void testUpdateThirdTypeIdNoExisteEnBaseDatosLanzaThirdTypeNotFound() {
         // Arrange
         ThirdType nonExistentThirdType = ThirdType.builder()
@@ -218,7 +218,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Validación con movimientos ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeConMovimientos_LanzaThirdTypeInUseException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero tiene movimientos")
     void testUpdateThirdTypeThirdTypeConMovimientosLanzaThirdTypeInUseException() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -235,7 +235,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeTieneMovimientosContables_NoPermiteActualizacion")
+    @DisplayName("Debe no permitir actualización cuando tipo de tercero tiene movimientos contables")
     void testUpdateThirdTypeThirdTypeTieneMovimientosContablesNoPermiteActualizacion() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -249,7 +249,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ThirdTypeInactivoConMovimientos_LanzaThirdTypeInUseException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero inactivo tiene movimientos")
     void testUpdateThirdTypeThirdTypeInactivoConMovimientosLanzaThirdTypeInUseException() {
         // Arrange
         ThirdType inactiveExisting = ThirdType.builder()
@@ -272,7 +272,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Casos especiales ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_IdCero_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente cuando ID es cero")
     void testUpdateThirdTypeIdCeroValidaCorrectamente() {
         // Arrange
         ThirdType zeroIdThirdType = ThirdType.builder()
@@ -292,7 +292,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_IdNegativo_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente cuando ID es negativo")
     void testUpdateThirdTypeIdNegativoValidaCorrectamente() {
         // Arrange
         ThirdType negativeIdThirdType = ThirdType.builder()
@@ -312,7 +312,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_MismosDatos_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente con mismos datos")
     void testUpdateThirdTypeMismosDatosActualizaCorrectamente() {
         // Arrange
         ThirdType sameDataThirdType = ThirdType.builder()
@@ -338,7 +338,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Propagación de excepciones ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ErrorEnGetThirdTypeById_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error al obtener tipo de tercero por ID")
     void testUpdateThirdTypeErrorEnGetThirdTypeByIdPropagaExcepcion() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L))
@@ -352,7 +352,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ErrorEnHasThirdTypeThirdsWithMovements_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error al verificar movimientos")
     void testUpdateThirdTypeErrorEnHasThirdTypeThirdsWithMovementsPropagaExcepcion() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -367,7 +367,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ErrorEnUpdateThirdType_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error al actualizar tipo de tercero")
     void testUpdateThirdTypeErrorEnUpdateThirdTypePropagaExcepcion() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -383,7 +383,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Delegación correcta ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_DelegaAlPuertoParaValidarExistencia_Correctamente")
+    @DisplayName("Debe delegar al puerto para validar existencia correctamente")
     void testUpdateThirdTypeDelegaAlPuertoParaValidarExistenciaCorrectamente() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -398,7 +398,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_DelegaAlPuertoParaValidarMovimientos_Correctamente")
+    @DisplayName("Debe delegar al puerto para validar movimientos correctamente")
     void testUpdateThirdTypeDelegaAlPuertoParaValidarMovimientosCorrectamente() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -413,7 +413,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_DelegaAlPuertoParaActualizar_Correctamente")
+    @DisplayName("Debe delegar al puerto para actualizar correctamente")
     void testUpdateThirdTypeDelegaAlPuertoParaActualizarCorrectamente() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -428,7 +428,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_PasaDatosCompletos_AlPuerto")
+    @DisplayName("Debe pasar datos completos al puerto")
     void testUpdateThirdTypePasaDatosCompletosAlPuerto() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -450,7 +450,7 @@ class UpdateThirdTypeServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_UpdateThirdType_ProcesoCompleto_ValidaYActualiza")
+    @DisplayName("Debe validar y actualizar en proceso completo")
     void testUpdateThirdTypeProcesoCompletoValidaYActualiza() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -469,7 +469,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_VariasActualizaciones_CadaUnaValidaIndependientemente")
+    @DisplayName("Debe validar independientemente cada una en varias actualizaciones")
     void testUpdateThirdTypeVariasActualizacionesCadaUnaValidaIndependientemente() {
         // Arrange
         ThirdType tt1 = ThirdType.builder().thirdTypeId(1L).thirdTypeName("Cliente").entId(entId).status(true).build();
@@ -498,7 +498,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_ValidacionesSecuenciales_SeDetieneSiAlgunaFalla")
+    @DisplayName("Debe detener validaciones secuenciales si alguna falla")
     void testUpdateThirdTypeValidacionesSecuencialesSeDetieneSiAlgunaFalla() {
         // Arrange
         when(idOutputPort.getThirdTypeById(1L)).thenReturn(existingThirdType);
@@ -514,7 +514,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_RetornaResultadoDelPuerto_Correctamente")
+    @DisplayName("Debe retornar resultado del puerto correctamente")
     void testUpdateThirdTypeRetornaResultadoDelPuertoCorrectamente() {
         // Arrange
         ThirdType portResult = ThirdType.builder()
@@ -538,7 +538,7 @@ class UpdateThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdType_DiferentesEntidades_ActualizaIndependientemente")
+    @DisplayName("Debe actualizar independientemente con diferentes entidades")
     void testUpdateThirdTypeDiferentesEntidadesActualizaIndependientemente() {
         // Arrange
         String entId2 = "ENT002";

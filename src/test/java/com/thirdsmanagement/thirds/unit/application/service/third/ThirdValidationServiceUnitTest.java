@@ -33,7 +33,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validatePersonTypeConsistency - Persona Natural ====================
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalCompleta_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona natural completa")
     void testValidatePersonTypeConsistencyPersonaNaturalCompletaValidaCorrectamente() {
         // Arrange
         Third third = Third.builder()
@@ -48,7 +48,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalSinGenero_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona natural sin genero")
     void testValidatePersonTypeConsistencyPersonaNaturalSinGeneroValidaCorrectamente() {
         // Arrange
         Third third = Third.builder()
@@ -62,7 +62,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalSinNombres_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepci�n cuando persona natural no tiene nombres")
     void testValidatePersonTypeConsistencyPersonaNaturalSinNombresLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -78,7 +78,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalSinApellidos_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona natural no tiene apellidos")
     void testValidatePersonTypeConsistencyPersonaNaturalSinApellidosLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -94,7 +94,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalConRazonSocial_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona natural tiene raz�n social")
     void testValidatePersonTypeConsistencyPersonaNaturalConRazonSocialLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -112,7 +112,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalNombresVacios_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona natural tiene nombres vacios")
     void testValidatePersonTypeConsistencyPersonaNaturalNombresVaciosLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -129,7 +129,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaNaturalApellidosVacios_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona natural tiene apellidos vacios")
     void testValidatePersonTypeConsistencyPersonaNaturalApellidosVaciosLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -148,7 +148,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validatePersonTypeConsistency - Persona Jurídica ====================
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaCompleta_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona jur�dica completa")
     void testValidatePersonTypeConsistencyPersonaJuridicaCompletaValidaCorrectamente() {
         // Arrange
         Third third = Third.builder()
@@ -161,7 +161,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaSinRazonSocial_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona juridica no tiene razon social")
     void testValidatePersonTypeConsistencyPersonaJuridicaSinRazonSocialLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -176,7 +176,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaConNombres_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepcion cuando persona juridica tiene nombres")
     void testValidatePersonTypeConsistencyPersonaJuridicaConNombresLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -194,7 +194,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaConApellidos_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepci�n cuando persona jur�dica tiene apellidos")
     void testValidatePersonTypeConsistencyPersonaJuridicaConApellidosLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -212,7 +212,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaConGenero_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona jurídica tiene género")
     void testValidatePersonTypeConsistencyPersonaJuridicaConGeneroLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -230,7 +230,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_PersonaJuridicaRazonSocialVacia_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona jurídica tiene razón social vacía")
     void testValidatePersonTypeConsistencyPersonaJuridicaRazonSocialVaciaLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -248,7 +248,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validatePersonTypeConsistency - Casos especiales ====================
 
     @Test
-    @DisplayName("test_ValidatePersonTypeConsistency_TipoPersonaNull_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando tipo de persona es null")
     void testValidatePersonTypeConsistencyTipoPersonaNullLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -267,7 +267,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateTypeIdPersonTypeCompatibility - Persona Natural ====================
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaNaturalConCedula_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona natural con cédula")
     void testValidateTypeIdPersonTypeCompatibilityPersonaNaturalConCedulaValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -285,7 +285,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaNaturalConNIT_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona natural tiene NIT")
     void testValidateTypeIdPersonTypeCompatibilityPersonaNaturalConNITLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -307,7 +307,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaNaturalSinTypeId_NoValidaNiLanzaExcepcion")
+    @DisplayName("Debe validar correctamente persona natural sin tipo de identificación")
     void testValidateTypeIdPersonTypeCompatibilityPersonaNaturalSinTypeIdNoValidaNiLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -321,7 +321,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateTypeIdPersonTypeCompatibility - Persona Jurídica ====================
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaJuridicaConNIT_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona jurídica con NIT")
     void testValidateTypeIdPersonTypeCompatibilityPersonaJuridicaConNITValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -339,7 +339,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaJuridicaConCedula_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona jurídica tiene cédula")
     void testValidateTypeIdPersonTypeCompatibilityPersonaJuridicaConCedulaLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -361,7 +361,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_PersonaJuridicaSinTypeId_NoValidaNiLanzaExcepcion")
+    @DisplayName("Debe validar correctamente persona jurídica sin tipo de identificación")
     void testValidateTypeIdPersonTypeCompatibilityPersonaJuridicaSinTypeIdNoValidaNiLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -375,7 +375,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateTypeIdPersonTypeCompatibility - Casos especiales ====================
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_TypeIdCodigoNull_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando código de tipo de identificación es nulo")
     void testValidateTypeIdPersonTypeCompatibilityTypeIdCodigoNullLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -396,7 +396,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_TypeIdCodigoVacio_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando código de tipo de identificación está vacío")
     void testValidateTypeIdPersonTypeCompatibilityTypeIdCodigoVacioLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -417,7 +417,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateTypeIdPersonTypeCompatibility_TipoPersonaNull_NoValidaNiLanzaExcepcion")
+    @DisplayName("Debe validar correctamente cuando tipo de persona es nulo")
     void testValidateTypeIdPersonTypeCompatibilityTipoPersonaNullNoValidaNiLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -435,7 +435,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateNitFormat - Validaciones exitosas ====================
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITValido9DigitosEmpiezaCon8_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente NIT válido de 9 dígitos que empieza con 8")
     void testValidateNitFormatNITValido9DigitosEmpiezaCon8ValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -453,7 +453,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITValido9DigitosEmpiezaCon9_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente NIT válido de 9 dígitos que empieza con 9")
     void testValidateNitFormatNITValido9DigitosEmpiezaCon9ValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -471,7 +471,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_PersonaNatural_NoValidaNIT")
+    @DisplayName("Debe validar correctamente sin validar NIT para persona natural")
     void testValidateNitFormatPersonaNaturalNoValidaNIT() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -489,7 +489,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_PersonaJuridicaSinNIT_NoValida")
+    @DisplayName("Debe validar correctamente persona jurídica sin NIT")
     void testValidateNitFormatPersonaJuridicaSinNITNoValida() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -509,7 +509,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateNitFormat - Validaciones con errores ====================
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITMenosDe9Digitos_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando NIT tiene menos de 9 dígitos")
     void testValidateNitFormatNITMenosDe9DigitosLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -531,7 +531,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITMasDe9Digitos_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando NIT tiene más de 9 dígitos")
     void testValidateNitFormatNITMasDe9DigitosLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -553,7 +553,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITNoEmpiezaCon8Ni9_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando NIT no empieza con 8 ni 9")
     void testValidateNitFormatNITNoEmpiezaCon8Ni9LanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -575,7 +575,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_NITSinNumeroIdentificacion_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando NIT no tiene número de identificación")
     void testValidateNitFormatNITSinNumeroIdentificacionLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -598,7 +598,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateNitFormat - Casos especiales ====================
 
     @Test
-    @DisplayName("test_ValidateNitFormat_TipoPersonaNull_NoValida")
+    @DisplayName("Debe validar correctamente cuando tipo de persona es nulo")
     void testValidateNitFormatTipoPersonaNullNoValida() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -615,7 +615,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateNitFormat_TypeIdNull_NoValida")
+    @DisplayName("Debe validar correctamente cuando tipo de identificación es nulo")
     void testValidateNitFormatTypeIdNullNoValida() {
         // Arrange
         Third third = Third.builder()
@@ -630,7 +630,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateVerificationDigit - Persona Natural ====================
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaNaturalSinDigitoVerificacion_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona natural sin dígito de verificación")
     void testValidateVerificationDigitPersonaNaturalSinDigitoVerificacionValidaCorrectamente() {
         // Arrange
         Third third = Third.builder()
@@ -642,7 +642,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaNaturalConDigitoVerificacion_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona natural tiene dígito de verificación")
     void testValidateVerificationDigitPersonaNaturalConDigitoVerificacionLanzaExcepcion() {
         // Arrange
         Third third = Third.builder()
@@ -661,7 +661,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateVerificationDigit - Persona Jurídica con NIT ====================
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaJuridicaConNITYDigitoVerificacion_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona jurídica con NIT y dígito de verificación")
     void testValidateVerificationDigitPersonaJuridicaConNITYDigitoVerificacionValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -679,7 +679,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaJuridicaConNITSinDigitoVerificacion_LanzaExcepcion")
+    @DisplayName("Debe lanzar excepción cuando persona jurídica con NIT no tiene dígito de verificación")
     void testValidateVerificationDigitPersonaJuridicaConNITSinDigitoVerificacionLanzaExcepcion() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -700,7 +700,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaJuridicaSinNITSinDigitoVerificacion_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona jurídica sin NIT y sin dígito de verificación")
     void testValidateVerificationDigitPersonaJuridicaSinNITSinDigitoVerificacionValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -717,7 +717,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaJuridicaSinNITConDigitoVerificacion_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente persona jurídica sin NIT con dígito de verificación")
     void testValidateVerificationDigitPersonaJuridicaSinNITConDigitoVerificacionValidaCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -737,7 +737,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== validateVerificationDigit - Casos especiales ====================
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_TipoPersonaNull_NoValida")
+    @DisplayName("Debe validar correctamente cuando tipo de persona es nulo")
     void testValidateVerificationDigitTipoPersonaNullNoValida() {
         // Arrange
         Third third = Third.builder()
@@ -749,7 +749,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_ValidateVerificationDigit_PersonaJuridicaTypeIdNull_NoValida")
+    @DisplayName("Debe validar correctamente persona jurídica cuando tipo de identificación es nulo")
     void testValidateVerificationDigitPersonaJuridicaTypeIdNullNoValida() {
         // Arrange
         Third third = Third.builder()
@@ -763,7 +763,7 @@ class ThirdValidationServiceUnitTest {
     // ==================== Integración - Múltiples validaciones ====================
 
     @Test
-    @DisplayName("test_TodasLasValidaciones_PersonaNaturalCompleta_ValidanCorrectamente")
+    @DisplayName("Debe validar correctamente todas las validaciones de persona natural completa")
     void testTodasLasValidacionesPersonaNaturalCompletaValidanCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -789,7 +789,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_TodasLasValidaciones_PersonaJuridicaCompleta_ValidanCorrectamente")
+    @DisplayName("Debe validar correctamente todas las validaciones de persona jurídica completa")
     void testTodasLasValidacionesPersonaJuridicaCompletaValidanCorrectamente() {
         // Arrange
         TypeId typeId = TypeId.builder()
@@ -815,7 +815,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_TodasLasValidaciones_PersonaNaturalIncompleta_FallaEnPrimeraValidacion")
+    @DisplayName("Debe fallar en primera validación cuando persona natural está incompleta")
     void testTodasLasValidacionesPersonaNaturalIncompletaFallaEnPrimeraValidacion() {
         // Arrange
         Third third = Third.builder()
@@ -831,7 +831,7 @@ class ThirdValidationServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_TodasLasValidaciones_PersonaJuridicaConNITInvalido_FallaEnValidacionNIT")
+    @DisplayName("Debe fallar en validación de NIT cuando persona jurídica tiene NIT inválido")
     void testTodasLasValidacionesPersonaJuridicaConNITInvalidoFallaEnValidacionNIT() {
         // Arrange
         TypeId typeId = TypeId.builder()

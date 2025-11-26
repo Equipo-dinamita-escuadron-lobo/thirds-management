@@ -141,7 +141,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Actualización exitosa ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroValidoSinCambioIdNumber_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente tercero válido sin cambio de número de identificación")
     void testUpdateThirdWithGeographyTerceroValidoSinCambioIdNumberActualizaCorrectamente() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -171,7 +171,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_SinGeografia_ActualizaSoloTercero")
+    @DisplayName("Debe actualizar solo tercero cuando no tiene geografía")
     void testUpdateThirdWithGeographySinGeografiaActualizaSoloTercero() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -192,7 +192,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ConCambioIdNumberValido_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente con cambio de número de identificación válido")
     void testUpdateThirdWithGeographyConCambioIdNumberValidoActualizaCorrectamente() {
         // Arrange
         Third thirdWithNewIdNumber = Third.builder()
@@ -226,7 +226,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_PersonaJuridica_ActualizaCorrectamente")
+    @DisplayName("Debe actualizar correctamente persona jurídica")
     void testUpdateThirdWithGeographyPersonaJuridicaActualizaCorrectamente() {
         // Arrange
         TypeId nitTypeId = TypeId.builder()
@@ -271,7 +271,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de tercero null ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroNull_LanzaIllegalArgumentException")
+    @DisplayName("Debe lanzar excepción cuando tercero es nulo")
     void testUpdateThirdWithGeographyTerceroNullLanzaIllegalArgumentException() {
         // Arrange - Act & Assert
         IllegalArgumentException exception = assertThrows(
@@ -283,7 +283,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_IdTerceroNull_LanzaIllegalArgumentException")
+    @DisplayName("Debe lanzar excepción cuando ID de tercero es nulo")
     void testUpdateThirdWithGeographyIdTerceroNullLanzaIllegalArgumentException() {
         // Arrange
         Third thirdWithoutId = Third.builder()
@@ -303,7 +303,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de existencia ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroNoExiste_LanzaThirdNotFound")
+    @DisplayName("Debe lanzar excepción cuando tercero no existe")
     void testUpdateThirdWithGeographyTerceroNoExisteLanzaThirdNotFound() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(false);
@@ -320,7 +320,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroExisteEnExistsPeroNoEnGet_LanzaThirdNotFound")
+    @DisplayName("Debe lanzar excepción cuando tercero existe en verificación pero no en obtención")
     void testUpdateThirdWithGeographyTerceroExisteEnExistsPeroNoEnGetLanzaThirdNotFound() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -339,7 +339,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de tercero en uso ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroEnUso_LanzaThirdInUseException")
+    @DisplayName("Debe lanzar excepción cuando tercero está en uso")
     void testUpdateThirdWithGeographyTerceroEnUsoLanzaThirdInUseException() {
         // Arrange
         Third thirdInUse = Third.builder()
@@ -370,7 +370,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TerceroConUsageCountNull_NoLanzaExcepcion")
+    @DisplayName("Debe actualizar correctamente cuando contador de uso es nulo")
     void testUpdateThirdWithGeographyTerceroConUsageCountNullNoLanzaExcepcion() {
         // Arrange
         Third thirdWithNullUsage = Third.builder()
@@ -401,7 +401,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de TypeId ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TypeIdNull_LanzaThirdInvalidDataException")
+    @DisplayName("Debe lanzar excepción cuando tipo de identificación es nulo")
     void testUpdateThirdWithGeographyTypeIdNullLanzaThirdInvalidDataException() {
         // Arrange
         Third thirdWithoutTypeId = Third.builder()
@@ -427,7 +427,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TypeIdNoExiste_LanzaTypeIdForeignKeyViolationException")
+    @DisplayName("Debe lanzar excepción cuando tipo de identificación no existe")
     void testUpdateThirdWithGeographyTypeIdNoExisteLanzaTypeIdForeignKeyViolationException() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -445,7 +445,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TypeIdInactivo_LanzaTypeIdInvalidDataException")
+    @DisplayName("Debe lanzar excepción cuando tipo de identificación está inactivo")
     void testUpdateThirdWithGeographyTypeIdInactivoLanzaTypeIdInvalidDataException() {
         // Arrange
         TypeId inactiveTypeId = TypeId.builder()
@@ -484,7 +484,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de ThirdTypes ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ThirdTypesVacio_LanzaThirdInvalidDataException")
+    @DisplayName("Debe lanzar excepción cuando tipos de tercero está vacío")
     void testUpdateThirdWithGeographyThirdTypesVacioLanzaThirdInvalidDataException() {
         // Arrange
         Third thirdWithoutTypes = Third.builder()
@@ -513,7 +513,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ThirdTypeIdNull_LanzaThirdInvalidDataException")
+    @DisplayName("Debe lanzar excepción cuando ID de tipo de tercero es nulo")
     void testUpdateThirdWithGeographyThirdTypeIdNullLanzaThirdInvalidDataException() {
         // Arrange
         ThirdType thirdTypeWithoutId = ThirdType.builder()
@@ -546,7 +546,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ThirdTypeNoExiste_LanzaThirdTypeForeignKeyViolationException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero no existe")
     void testUpdateThirdWithGeographyThirdTypeNoExisteLanzaThirdTypeForeignKeyViolationException() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -566,7 +566,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ThirdTypeInactivo_LanzaThirdInvalidDataException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero está inactivo")
     void testUpdateThirdWithGeographyThirdTypeInactivoLanzaThirdInvalidDataException() {
         // Arrange
         ThirdType inactiveThirdType = ThirdType.builder()
@@ -594,7 +594,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Validación de duplicados ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_CambioIdNumberADuplicado_LanzaThirdAlreadyExistsException")
+    @DisplayName("Debe lanzar excepción cuando cambio de número de identificación resulta duplicado")
     void testUpdateThirdWithGeographyCambioIdNumberADuplicadoLanzaThirdAlreadyExistsException() {
         // Arrange
         Third thirdWithDuplicateIdNumber = Third.builder()
@@ -629,7 +629,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Propagación de validaciones ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ValidacionPersonTypeConsistencyFalla_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando validación de consistencia de tipo de persona falla")
     void testUpdateThirdWithGeographyValidacionPersonTypeConsistencyFallaPropagaExcepcion() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -648,7 +648,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_ValidacionGeografiaFalla_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando validación de geografía falla")
     void testUpdateThirdWithGeographyValidacionGeografiaFallaPropagaExcepcion() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -672,7 +672,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Normalización de datos ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_NormalizaNombresYApellidos_Correctamente")
+    @DisplayName("Debe normalizar nombres y apellidos correctamente")
     void testUpdateThirdWithGeographyNormalizaNombresYApellidosCorrectamente() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -694,7 +694,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_NormalizaRazonSocial_Correctamente")
+    @DisplayName("Debe normalizar razón social correctamente")
     void testUpdateThirdWithGeographyNormalizaRazonSocialCorrectamente() {
         // Arrange
         TypeId nitTypeId = TypeId.builder()
@@ -738,7 +738,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Estado por defecto ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_StateNull_AsignaTruePorDefecto")
+    @DisplayName("Debe asignar estado true por defecto cuando estado es nulo")
     void testUpdateThirdWithGeographyStateNullAsignaTruePorDefecto() {
         // Arrange
         Third thirdWithNullState = Third.builder()
@@ -770,7 +770,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_StateFalse_MantieneFalse")
+    @DisplayName("Debe mantener estado false cuando se especifica")
     void testUpdateThirdWithGeographyStateFalseMantieneFalse() {
         // Arrange
         Third thirdWithFalseState = Third.builder()
@@ -804,7 +804,7 @@ class UpdateThirdServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_OrdenDeValidaciones_EjecutaEnOrdenCorrecto")
+    @DisplayName("Debe ejecutar validaciones en orden correcto")
     void testUpdateThirdWithGeographyOrdenDeValidacionesEjecutaEnOrdenCorrecto() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -835,7 +835,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_TodasLasValidacionesPasan_ActualizaExitosamente")
+    @DisplayName("Debe actualizar exitosamente cuando todas las validaciones pasan")
     void testUpdateThirdWithGeographyTodasLasValidacionesPasanActualizaExitosamente() {
         // Arrange
         when(thirdOutputPort.existThirdById(1L, entId)).thenReturn(true);
@@ -863,7 +863,7 @@ class UpdateThirdServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_UpdateThirdWithGeography_MultiplesThirdTypes_ValidaTodos")
+    @DisplayName("Debe validar todos los tipos de tercero cuando hay múltiples")
     void testUpdateThirdWithGeographyMultiplesThirdTypesValidaTodos() {
         // Arrange
         ThirdType thirdType2 = ThirdType.builder()

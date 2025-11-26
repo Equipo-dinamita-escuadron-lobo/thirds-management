@@ -48,7 +48,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Eliminación exitosa ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_TipoTerceroValidoYNoEnUso_EliminaCorrectamente")
+    @DisplayName("Debe eliminar correctamente tipo de tercero válido y no en uso")
     void testDeleteThirdTypeTipoTerceroValidoYNoEnUsoEliminaCorrectamente() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -68,7 +68,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_StatusFalse_EliminaCorrectamente")
+    @DisplayName("Debe eliminar correctamente cuando estado es falso")
     void testDeleteThirdTypeStatusFalseEliminaCorrectamente() {
         // Arrange
         ThirdType inactiveThirdType = ThirdType.builder()
@@ -92,7 +92,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_DiferentesNombres_EliminaCadaUno")
+    @DisplayName("Debe eliminar cada uno con diferentes nombres")
     void testDeleteThirdTypeDiferentesNombresEliminaCadaUno() {
         // Arrange
         Long thirdTypeId2 = 2L;
@@ -125,7 +125,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_DiferentesEntIds_EliminaCadaUno")
+    @DisplayName("Debe eliminar cada uno con diferentes entidades")
     void testDeleteThirdTypeDiferentesEntIdsEliminaCadaUno() {
         // Arrange
         String entId2 = "ENT002";
@@ -159,7 +159,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Validación de existencia ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_IdNoExiste_LanzaThirdTypeNotFound")
+    @DisplayName("Debe lanzar excepción cuando ID no existe")
     void testDeleteThirdTypeIdNoExisteLanzaThirdTypeNotFound() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(false);
@@ -174,7 +174,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_ThirdTypeNuloDelRepository_LanzaThirdTypeNotFound")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero es nulo del repositorio")
     void testDeleteThirdTypeThirdTypeNuloDelRepositoryLanzaThirdTypeNotFound() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -190,7 +190,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_EntIdNoCoincide_LanzaThirdTypeNotFound")
+    @DisplayName("Debe lanzar excepción cuando ID de entidad no coincide")
     void testDeleteThirdTypeEntIdNoCoincideLanzaThirdTypeNotFound() {
         // Arrange
         String differentEntId = "ENT002";
@@ -209,7 +209,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Validación en uso ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_TipoTerceroEnUso_LanzaThirdTypeInUseException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero está en uso")
     void testDeleteThirdTypeTipoTerceroEnUsoLanzaThirdTypeInUseException() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -225,7 +225,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_TipoTerceroUsadoPorVariosThirds_LanzaThirdTypeInUseException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero es usado por varios terceros")
     void testDeleteThirdTypeTipoTerceroUsadoPorVariosThirdsLanzaThirdTypeInUseException() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -241,7 +241,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_TipoTerceroInactivoEnUso_LanzaThirdTypeInUseException")
+    @DisplayName("Debe lanzar excepción cuando tipo de tercero inactivo está en uso")
     void testDeleteThirdTypeTipoTerceroInactivoEnUsoLanzaThirdTypeInUseException() {
         // Arrange
         ThirdType inactiveThirdType = ThirdType.builder()
@@ -265,7 +265,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Casos especiales ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_IdCero_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente cuando ID es cero")
     void testDeleteThirdTypeIdCeroValidaCorrectamente() {
         // Arrange
         Long zeroId = 0L;
@@ -280,7 +280,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_IdNegativo_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente cuando ID es negativo")
     void testDeleteThirdTypeIdNegativoValidaCorrectamente() {
         // Arrange
         Long negativeId = -1L;
@@ -295,7 +295,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_EntIdVacio_ValidaCorrectamente")
+    @DisplayName("Debe validar correctamente cuando ID de entidad está vacío")
     void testDeleteThirdTypeEntIdVacioValidaCorrectamente() {
         // Arrange
         String emptyEntId = "";
@@ -313,7 +313,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Propagación de excepciones ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_ErrorEnExistsThirdTypeById_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en verificación de existencia por ID")
     void testDeleteThirdTypeErrorEnExistsThirdTypeByIdPropagaExcepcion() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId))
@@ -327,7 +327,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_ErrorEnGetThirdTypeById_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en obtener tipo de tercero por ID")
     void testDeleteThirdTypeErrorEnGetThirdTypeByIdPropagaExcepcion() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -342,7 +342,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_ErrorEnIsThirdTypeInUse_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en verificar si tipo de tercero está en uso")
     void testDeleteThirdTypeErrorEnIsThirdTypeInUsePropagaExcepcion() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -358,7 +358,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_ErrorEnDeleteThirdType_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en eliminar tipo de tercero")
     void testDeleteThirdTypeErrorEnDeleteThirdTypePropagaExcepcion() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -375,7 +375,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Delegación correcta ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_DelegaAlPuertoParaValidarExistencia_Correctamente")
+    @DisplayName("Debe delegar al puerto para validar existencia correctamente")
     void testDeleteThirdTypeDelegaAlPuertoParaValidarExistenciaCorrectamente() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -392,7 +392,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_DelegaAlPuertoParaValidarUso_Correctamente")
+    @DisplayName("Debe delegar al puerto para validar uso correctamente")
     void testDeleteThirdTypeDelegaAlPuertoParaValidarUsoCorrectamente() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -408,7 +408,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_DelegaAlPuertoParaEliminar_Correctamente")
+    @DisplayName("Debe delegar al puerto para eliminar correctamente")
     void testDeleteThirdTypeDelegaAlPuertoParaEliminarCorrectamente() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -426,7 +426,7 @@ class DeleteThirdTypeServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_DeleteThirdType_ProcesoCompleto_ValidaYElimina")
+    @DisplayName("Debe validar y eliminar en proceso completo")
     void testDeleteThirdTypeProcesoCompletoValidaYElimina() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -447,7 +447,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_VariosIntentosEliminacion_CadaUnoValidaIndependientemente")
+    @DisplayName("Debe validar independientemente cada uno en varios intentos de eliminación")
     void testDeleteThirdTypeVariosIntentosEliminacionCadaUnoValidaIndependientemente() {
         // Arrange
         Long id1 = 1L;
@@ -480,7 +480,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_ValidacionesSecuenciales_SeDetieneSiAlgunaFalla")
+    @DisplayName("Debe detener validaciones secuenciales si alguna falla")
     void testDeleteThirdTypeValidacionesSecuencialesSeDetieneSiAlgunaFalla() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);
@@ -498,7 +498,7 @@ class DeleteThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_DeleteThirdType_RetornaResultadoDelPuerto_Correctamente")
+    @DisplayName("Debe retornar resultado del puerto correctamente")
     void testDeleteThirdTypeRetornaResultadoDelPuertoCorrectamente() {
         // Arrange
         when(idOutputPort.existsThirdTypeById(thirdTypeId)).thenReturn(true);

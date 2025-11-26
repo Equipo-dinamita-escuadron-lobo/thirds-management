@@ -68,7 +68,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== getAllThirdTypes ====================
 
     @Test
-    @DisplayName("test_GetAllThirdTypes_ConDatos_RetornaLista")
+    @DisplayName("Debe retornar lista cuando hay datos")
     void testGetAllThirdTypesConDatosRetornaLista() {
         // Arrange
         List<ThirdType> expectedList = Arrays.asList(thirdType1, thirdType2, thirdType3);
@@ -87,7 +87,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypes_SinDatos_RetornaListaVacia")
+    @DisplayName("Debe retornar lista vacía cuando no hay datos")
     void testGetAllThirdTypesSinDatosRetornaListaVacia() {
         // Arrange
         when(idOutputPort.getALLThirdTypes(entId)).thenReturn(Collections.emptyList());
@@ -102,7 +102,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypes_DiferentesEntIds_RetornaListasPorEntidad")
+    @DisplayName("Debe retornar listas por entidad con diferentes IDs de entidad")
     void testGetAllThirdTypesDiferentesEntIdsRetornaListasPorEntidad() {
         // Arrange
         String entId2 = "ENT002";
@@ -126,7 +126,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== getAllThirdTypesWithSort ====================
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_ConPaginacion_RetornaPaginaOrdenada")
+    @DisplayName("Debe retornar página ordenada con paginación")
     void testGetAllThirdTypesWithSortConPaginacionRetornaPaginaOrdenada() {
         // Arrange
         Page<ThirdType> expectedPage = new PageImpl<>(Arrays.asList(thirdType1, thirdType2), 
@@ -145,7 +145,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_OrdenDescendente_RetornaPaginaOrdenada")
+    @DisplayName("Debe retornar página ordenada en orden descendente")
     void testGetAllThirdTypesWithSortOrdenDescendenteRetornaPaginaOrdenada() {
         // Arrange
         Page<ThirdType> expectedPage = new PageImpl<>(Arrays.asList(thirdType2, thirdType1), 
@@ -164,7 +164,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_DiferentesCamposOrdenamiento_DelegaCorrectamente")
+    @DisplayName("Debe delegar correctamente con diferentes campos de ordenamiento")
     void testGetAllThirdTypesWithSortDiferentesCamposOrdenamientoDelegaCorrectamente() {
         // Arrange
         Page<ThirdType> page1 = new PageImpl<>(Arrays.asList(thirdType1));
@@ -183,7 +183,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_PaginaVacia_RetornaPaginaVacia")
+    @DisplayName("Debe retornar página vacía cuando página está vacía")
     void testGetAllThirdTypesWithSortPaginaVaciaRetornaPaginaVacia() {
         // Arrange
         Page<ThirdType> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
@@ -203,7 +203,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== findThirdTypesByEntIdAndSearch ====================
 
     @Test
-    @DisplayName("test_FindThirdTypesByEntIdAndSearch_ConTerminoBusqueda_RetornaCoincidencias")
+    @DisplayName("Debe retornar coincidencias con término de búsqueda")
     void testFindThirdTypesByEntIdAndSearchConTerminoBusquedaRetornaCoincidencias() {
         // Arrange
         Page<ThirdType> expectedPage = new PageImpl<>(Arrays.asList(thirdType1), 
@@ -222,7 +222,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_FindThirdTypesByEntIdAndSearch_SinCoincidencias_RetornaPaginaVacia")
+    @DisplayName("Debe retornar página vacía sin coincidencias")
     void testFindThirdTypesByEntIdAndSearchSinCoincidenciasRetornaPaginaVacia() {
         // Arrange
         Page<ThirdType> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
@@ -239,7 +239,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_FindThirdTypesByEntIdAndSearch_VariasCoincidencias_RetornaPaginaConResultados")
+    @DisplayName("Debe retornar página con resultados cuando hay varias coincidencias")
     void testFindThirdTypesByEntIdAndSearchVariasCoincidenciasRetornaPaginaConResultados() {
         // Arrange
         Page<ThirdType> expectedPage = new PageImpl<>(Arrays.asList(thirdType1, thirdType2), 
@@ -259,7 +259,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== countThirdTypesByEntId ====================
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntId_ConDatos_RetornaCantidad")
+    @DisplayName("Debe retornar cantidad cuando hay datos")
     void testCountThirdTypesByEntIdConDatosRetornaCantidad() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntId(entId)).thenReturn(3L);
@@ -273,7 +273,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntId_SinDatos_RetornaCero")
+    @DisplayName("Debe retornar cero cuando no hay datos")
     void testCountThirdTypesByEntIdSinDatosRetornaCero() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntId(entId)).thenReturn(0L);
@@ -287,7 +287,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntId_DiferentesEntidades_RetornaCantidadesIndependientes")
+    @DisplayName("Debe retornar cantidades independientes con diferentes entidades")
     void testCountThirdTypesByEntIdDiferentesEntidadesRetornaCantidadesIndependientes() {
         // Arrange
         String entId2 = "ENT002";
@@ -308,7 +308,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== countThirdTypesByEntIdAndSearch ====================
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntIdAndSearch_ConCoincidencias_RetornaCantidad")
+    @DisplayName("Debe retornar cantidad con coincidencias")
     void testCountThirdTypesByEntIdAndSearchConCoincidenciasRetornaCantidad() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntIdAndSearch(entId, "Cliente")).thenReturn(1L);
@@ -322,7 +322,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntIdAndSearch_SinCoincidencias_RetornaCero")
+    @DisplayName("Debe retornar cero sin coincidencias")
     void testCountThirdTypesByEntIdAndSearchSinCoincidenciasRetornaCero() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntIdAndSearch(entId, "NoExiste")).thenReturn(0L);
@@ -336,7 +336,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntIdAndSearch_VariasCoincidencias_RetornaCantidadTotal")
+    @DisplayName("Debe retornar cantidad total con varias coincidencias")
     void testCountThirdTypesByEntIdAndSearchVariasCoincidenciasRetornaCantidadTotal() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntIdAndSearch(entId, "e")).thenReturn(3L);
@@ -352,7 +352,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== countActiveThirdTypesByEntId ====================
 
     @Test
-    @DisplayName("test_CountActiveThirdTypesByEntId_ConDatosActivos_RetornaCantidad")
+    @DisplayName("Debe retornar cantidad con datos activos")
     void testCountActiveThirdTypesByEntIdConDatosActivosRetornaCantidad() {
         // Arrange
         when(idOutputPort.countActiveThirdTypesByEntId(entId)).thenReturn(2L);
@@ -366,7 +366,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountActiveThirdTypesByEntId_SinDatosActivos_RetornaCero")
+    @DisplayName("Debe retornar cero sin datos activos")
     void testCountActiveThirdTypesByEntIdSinDatosActivosRetornaCero() {
         // Arrange
         when(idOutputPort.countActiveThirdTypesByEntId(entId)).thenReturn(0L);
@@ -380,7 +380,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountActiveThirdTypesByEntId_DiferentesEntidades_RetornaCantidadesIndependientes")
+    @DisplayName("Debe retornar cantidades independientes con diferentes entidades")
     void testCountActiveThirdTypesByEntIdDiferentesEntidadesRetornaCantidadesIndependientes() {
         // Arrange
         String entId2 = "ENT002";
@@ -401,7 +401,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== getAllActiveThirdTypes ====================
 
     @Test
-    @DisplayName("test_GetAllActiveThirdTypes_ConDatosActivos_RetornaPagina")
+    @DisplayName("Debe retornar página con datos activos")
     void testGetAllActiveThirdTypesConDatosActivosRetornaPagina() {
         // Arrange
         Page<ThirdType> expectedPage = new PageImpl<>(Arrays.asList(thirdType1, thirdType2), 
@@ -420,7 +420,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllActiveThirdTypes_SinDatosActivos_RetornaPaginaVacia")
+    @DisplayName("Debe retornar página vacía sin datos activos")
     void testGetAllActiveThirdTypesSinDatosActivosRetornaPaginaVacia() {
         // Arrange
         Page<ThirdType> emptyPage = new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0);
@@ -436,7 +436,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllActiveThirdTypes_DiferentesPaginas_RetornaPaginasCorrectamente")
+    @DisplayName("Debe retornar páginas correctamente con diferentes páginas")
     void testGetAllActiveThirdTypesDiferentesPaginasRetornaPaginasCorrectamente() {
         // Arrange
         Page<ThirdType> page1 = new PageImpl<>(Arrays.asList(thirdType1), PageRequest.of(0, 1), 2);
@@ -461,7 +461,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== Propagación de excepciones ====================
 
     @Test
-    @DisplayName("test_GetAllThirdTypes_ErrorEnPuerto_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en puerto")
     void testGetAllThirdTypesErrorEnPuertoPropagaExcepcion() {
         // Arrange
         when(idOutputPort.getALLThirdTypes(entId))
@@ -473,7 +473,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_ErrorEnPuerto_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en puerto con ordenamiento")
     void testGetAllThirdTypesWithSortErrorEnPuertoPropagaExcepcion() {
         // Arrange
         when(idOutputPort.getAllThirdTypesWithSort(entId, 0, 10, "thirdTypeName", "asc"))
@@ -485,7 +485,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_FindThirdTypesByEntIdAndSearch_ErrorEnPuerto_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en puerto con búsqueda")
     void testFindThirdTypesByEntIdAndSearchErrorEnPuertoPropagaExcepcion() {
         // Arrange
         when(idOutputPort.findThirdTypesByEntIdAndSearch(entId, "Cliente", 0, 10, "thirdTypeName", "asc"))
@@ -497,7 +497,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntId_ErrorEnPuerto_PropagaExcepcion")
+    @DisplayName("Debe propagar excepción cuando hay error en puerto al contar")
     void testCountThirdTypesByEntIdErrorEnPuertoPropagaExcepcion() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntId(entId))
@@ -511,7 +511,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== Delegación correcta ====================
 
     @Test
-    @DisplayName("test_GetAllThirdTypes_DelegaAlPuerto_Correctamente")
+    @DisplayName("Debe delegar al puerto correctamente")
     void testGetAllThirdTypesDelegaAlPuertoCorrectamente() {
         // Arrange
         when(idOutputPort.getALLThirdTypes(entId)).thenReturn(Arrays.asList(thirdType1));
@@ -525,7 +525,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllThirdTypesWithSort_DelegaAlPuerto_ConParametrosCorrectos")
+    @DisplayName("Debe delegar al puerto con parámetros correctos con ordenamiento")
     void testGetAllThirdTypesWithSortDelegaAlPuertoConParametrosCorrectos() {
         // Arrange
         Page<ThirdType> page = new PageImpl<>(Arrays.asList(thirdType1));
@@ -541,7 +541,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_FindThirdTypesByEntIdAndSearch_DelegaAlPuerto_ConParametrosCorrectos")
+    @DisplayName("Debe delegar al puerto con parámetros correctos con búsqueda")
     void testFindThirdTypesByEntIdAndSearchDelegaAlPuertoConParametrosCorrectos() {
         // Arrange
         Page<ThirdType> page = new PageImpl<>(Arrays.asList(thirdType1));
@@ -557,7 +557,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntId_DelegaAlPuerto_Correctamente")
+    @DisplayName("Debe delegar al puerto correctamente al contar")
     void testCountThirdTypesByEntIdDelegaAlPuertoCorrectamente() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntId(entId)).thenReturn(5L);
@@ -571,7 +571,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountThirdTypesByEntIdAndSearch_DelegaAlPuerto_Correctamente")
+    @DisplayName("Debe delegar al puerto correctamente al contar con búsqueda")
     void testCountThirdTypesByEntIdAndSearchDelegaAlPuertoCorrectamente() {
         // Arrange
         when(idOutputPort.countThirdTypesByEntIdAndSearch(entId, "Cliente")).thenReturn(1L);
@@ -585,7 +585,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_CountActiveThirdTypesByEntId_DelegaAlPuerto_Correctamente")
+    @DisplayName("Debe delegar al puerto correctamente al contar activos")
     void testCountActiveThirdTypesByEntIdDelegaAlPuertoCorrectamente() {
         // Arrange
         when(idOutputPort.countActiveThirdTypesByEntId(entId)).thenReturn(2L);
@@ -599,7 +599,7 @@ class ListThirdTypeServiceUnitTest {
     }
 
     @Test
-    @DisplayName("test_GetAllActiveThirdTypes_DelegaAlPuerto_ConParametrosCorrectos")
+    @DisplayName("Debe delegar al puerto con parámetros correctos para obtener activos")
     void testGetAllActiveThirdTypesDelegaAlPuertoConParametrosCorrectos() {
         // Arrange
         Page<ThirdType> page = new PageImpl<>(Arrays.asList(thirdType1));
@@ -616,7 +616,7 @@ class ListThirdTypeServiceUnitTest {
     // ==================== Integración ====================
 
     @Test
-    @DisplayName("test_ListThirdTypeService_TodasLasOperaciones_DeleganCorrectamente")
+    @DisplayName("Debe delegar correctamente todas las operaciones")
     void testListThirdTypeServiceTodasLasOperacionesDeleganCorrectamente() {
         // Arrange
         List<ThirdType> list = Arrays.asList(thirdType1);
