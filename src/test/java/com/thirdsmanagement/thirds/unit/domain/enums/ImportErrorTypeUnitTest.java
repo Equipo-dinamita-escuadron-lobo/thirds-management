@@ -116,12 +116,12 @@ class ImportErrorTypeUnitTest {
 
         // Assert
         assertEquals(6, values.length);
-        assertEquals(ImportErrorType.VALIDATION_ERROR, values[0]);
-        assertEquals(ImportErrorType.FORMAT_ERROR, values[1]);
+        assertEquals(ImportErrorType.SYSTEM_ERROR, values[0]);
+        assertEquals(ImportErrorType.BUSINESS_RULE_ERROR, values[1]);
         assertEquals(ImportErrorType.REFERENCE_ERROR, values[2]);
-        assertEquals(ImportErrorType.BUSINESS_RULE_ERROR, values[3]);
-        assertEquals(ImportErrorType.DUPLICATE_ERROR, values[4]);
-        assertEquals(ImportErrorType.SYSTEM_ERROR, values[5]);
+        assertEquals(ImportErrorType.VALIDATION_ERROR, values[3]);
+        assertEquals(ImportErrorType.FORMAT_ERROR, values[4]);
+        assertEquals(ImportErrorType.DUPLICATE_ERROR, values[5]);
     }
 
     @Test
@@ -204,11 +204,7 @@ class ImportErrorTypeUnitTest {
 
         // Assert - Verificar que SYSTEM_ERROR tiene la prioridad más alta (1)
         assertEquals(1, systemPriority);
-
-        // Verificar que DUPLICATE_ERROR tiene la prioridad más baja (6)
         assertEquals(6, duplicatePriority);
-
-        // Verificar orden descendente de prioridad
         for (int i = 0; i < errorTypes.length - 1; i++) {
             assertTrue(errorTypes[i].getPriority() <= errorTypes[i + 1].getPriority(),
                 "Prioridades deben estar en orden ascendente");
