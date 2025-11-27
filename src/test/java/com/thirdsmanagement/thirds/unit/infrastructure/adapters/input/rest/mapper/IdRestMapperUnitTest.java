@@ -8,8 +8,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.thirdsmanagement.thirds.domain.model.PersonClassification;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
@@ -19,18 +17,17 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.reques
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.TypeIdCreateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.TypeIdUpdateRequest;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdTypeResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapper;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdRestMapperImpl;
 
-@SpringBootTest
 class IdRestMapperUnitTest {
 
-    @Autowired
-    private IdRestMapper mapper;
+    private IdRestMapperImpl mapper;
 
     private String entId;
 
     @BeforeEach
     void setUp() {
+        mapper = new IdRestMapperImpl();
         entId = "ENT001";
     }
 
