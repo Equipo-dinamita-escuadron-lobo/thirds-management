@@ -7,7 +7,6 @@ on:
       - '.postman/**'
       - '**.java'
       - 'pom.xml'
-      - 'Dockerfile'
       - 'src/**'
       - 'mvnw'
       - '.mvn/**'
