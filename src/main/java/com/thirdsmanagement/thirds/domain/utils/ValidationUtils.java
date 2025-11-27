@@ -123,7 +123,7 @@ public final class ValidationUtils {
      */
     public static boolean isValidVerificationDigit(Long verificationNumber) {
         if (verificationNumber == null) {
-            return true; // null es válido (opcional)
+            return false; // null no es válido
         }
 
         // Debe ser un número entre 0 y 9 (un solo dígito)

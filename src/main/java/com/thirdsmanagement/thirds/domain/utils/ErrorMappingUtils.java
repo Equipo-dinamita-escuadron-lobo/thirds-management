@@ -311,7 +311,7 @@ public final class ErrorMappingUtils {
      * @return código de error con sufijo "_PARSING_ERROR"
      */
     public static String generateParsingErrorCode(String fieldName) {
-        return generateErrorCode(fieldName, "PARSING_ERROR");
+        return generateErrorCode("PARSING_ERROR", fieldName);
     }
 
     // ===== UTILIDADES DE MAPEO =====

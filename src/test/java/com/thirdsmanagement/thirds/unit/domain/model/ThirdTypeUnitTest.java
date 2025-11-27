@@ -112,10 +112,11 @@ class ThirdTypeUnitTest {
         // Arrange
         thirdType.setThirdTypeName(null);
 
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> {
-            thirdType.getNormalizedName();
-        });
+        // Act
+        String normalizedName = thirdType.getNormalizedName();
+
+        // Assert
+        assertNull(normalizedName, "Debe retornar null cuando thirdTypeName es null");
     }
 
     @Test

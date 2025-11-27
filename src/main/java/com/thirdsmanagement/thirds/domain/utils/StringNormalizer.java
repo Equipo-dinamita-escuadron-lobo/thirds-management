@@ -69,7 +69,7 @@ public final class StringNormalizer {
     /**
      * @brief Normaliza un código/referencia manteniendo el formato en mayúsculas
      *
-     * Elimina tildes/acentos y espacios extra, pero mantiene todo en mayúsculas.
+     * Elimina tildes/acentos, espacios extra y caracteres especiales, manteniendo solo letras y números.
      * Ideal para códigos, referencias y valores que deben ser únicos e insensibles a formato.
      * @param input el código/referencia a normalizar
      * @return el código normalizado en mayúsculas, o null si el input es null
@@ -79,7 +79,11 @@ public final class StringNormalizer {
             return input;
         }
 
-        return removeAccents(input.trim().toUpperCase());
+        String normalized = removeAccents(input.trim().toUpperCase());
+        // Eliminar caracteres especiales, dejando solo letras y números
+        normalized = normalized.replaceAll("[^A-Z0-9Ñ]", "");
+
+        return normalized;
     }
 
     /**
@@ -95,11 +99,17 @@ public final class StringNormalizer {
             return null;
         }
 
+        // Preservar ñ y Ñ antes de normalizar
+        String preserved = input.replace("ñ", "###PRESERVE_ENYE###").replace("Ñ", "###PRESERVE_ENYE_MAYUS###");
+
         // Normaliza a forma NFD (descompone caracteres con acentos)
-        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        String normalized = Normalizer.normalize(preserved, Normalizer.Form.NFD);
 
         // Elimina los caracteres diacríticos (tildes, acentos, etc.)
-        return normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        String withoutAccents = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        // Restaurar ñ y Ñ
+        return withoutAccents.replace("###PRESERVE_ENYE###", "ñ").replace("###PRESERVE_ENYE_MAYUS###", "Ñ");
     }
 
     // ===== NORMALIZACIONES PARA EXCEL =====

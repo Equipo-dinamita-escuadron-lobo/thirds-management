@@ -11,17 +11,17 @@ import lombok.Getter;
 @Getter
 public enum ImportErrorType {
 
+    SYSTEM_ERROR("Error del Sistema"),
+
+    BUSINESS_RULE_ERROR("Error de Regla de Negocio"),
+
+    REFERENCE_ERROR("Error de Referencia"),
+
     VALIDATION_ERROR("Error de Validación"),
 
     FORMAT_ERROR("Error de Formato"),
 
-    REFERENCE_ERROR("Error de Referencia"),
-
-    BUSINESS_RULE_ERROR("Error de Regla de Negocio"),
-
-    DUPLICATE_ERROR("Error de Duplicado"),
-
-    SYSTEM_ERROR("Error del Sistema");
+    DUPLICATE_ERROR("Error de Duplicado");
 
     private final String description;
 

@@ -130,22 +130,18 @@ public class AsyncExportProcessor {
 
             Sheet sheet = workbook.createSheet("Terceros");
 
-            // Importar métodos de estilo y creación desde ExportThirdService
-            // (estos métodos deberían estar en una clase utilitaria, pero por ahora
-            // los replicamos aquí para mantener la lógica contenida)
-
             ExcelStyleHelper styleHelper = new ExcelStyleHelper(workbook);
-            ExcelDataWriter dataWriter = new ExcelDataWriter(styleHelper);
+            ExcelDataWriter excelDataWriter = new ExcelDataWriter(styleHelper);
 
-            dataWriter.createHeaders(sheet, request);
+            excelDataWriter.createHeaders(sheet, request);
 
-            dataWriter.fillData(sheet, thirds, request);
+            excelDataWriter.fillData(sheet, thirds, request);
 
             excelValidationService.createReferenceDataSheet(workbook, request.getEntId());
 
-            dataWriter.applyValidations(sheet, request, thirds.size(), excelValidationService);
+            excelDataWriter.applyValidations(sheet, request, thirds.size(), excelValidationService);
 
-            dataWriter.autoSizeColumns(sheet, request);
+            excelDataWriter.autoSizeColumns(sheet, request);
 
             workbook.write(outputStream);
 

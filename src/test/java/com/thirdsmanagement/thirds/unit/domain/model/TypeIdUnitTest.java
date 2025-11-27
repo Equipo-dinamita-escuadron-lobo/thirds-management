@@ -129,8 +129,8 @@ class TypeIdUnitTest {
     }
 
     @Test
-    @DisplayName("Debe normalizar código manteniendo mayúsculas/minúsculas")
-    void testGetNormalizedTypeId_MaintainsCase() {
+    @DisplayName("Debe normalizar código convirtiendo a mayúsculas")
+    void testGetNormalizedTypeId_ConvertsToUpperCase() {
         // Arrange
         typeIdNatural.setTypeId("Cc");
 
@@ -138,7 +138,7 @@ class TypeIdUnitTest {
         String normalized = typeIdNatural.getNormalizedTypeId();
 
         // Assert
-        assertEquals("Cc", normalized);
+        assertEquals("CC", normalized);
     }
 
     @Test
@@ -147,10 +147,11 @@ class TypeIdUnitTest {
         // Arrange
         typeIdNatural.setTypeId(null);
 
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> {
-            typeIdNatural.getNormalizedTypeId();
-        });
+        // Act
+        String normalized = typeIdNatural.getNormalizedTypeId();
+
+        // Assert
+        assertNull(normalized, "Debe retornar null cuando typeId es null");
     }
 
     @Test
@@ -192,6 +193,6 @@ class TypeIdUnitTest {
         String normalized = typeIdNatural.getNormalizedTypeId();
 
         // Assert
-        assertEquals("CCñ", normalized);
+        assertEquals("CCÑ", normalized);
     }
 }

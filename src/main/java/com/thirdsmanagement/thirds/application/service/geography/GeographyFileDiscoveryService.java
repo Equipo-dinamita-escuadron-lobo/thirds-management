@@ -1,7 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.geography;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -19,12 +19,21 @@ import java.util.*;
  * automáticamente archivos SQL de datos geográficos.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class GeographyFileDiscoveryService {
 
     private final GeographyDataConfig config;
-    private final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
+    private final ResourcePatternResolver resourceResolver;
+
+    @Autowired
+    public GeographyFileDiscoveryService(GeographyDataConfig config) {
+        this(config, new PathMatchingResourcePatternResolver());
+    }
+
+    public GeographyFileDiscoveryService(GeographyDataConfig config, ResourcePatternResolver resourceResolver) {
+        this.config = config;
+        this.resourceResolver = resourceResolver != null ? resourceResolver : new PathMatchingResourcePatternResolver();
+    }
 
     /**
      * @brief Descubre y ordena todos los archivos SQL de geografía automáticamente

@@ -71,7 +71,9 @@ public class ImportJobStatus {
         if (this.errors == null) {
             this.errors = new ArrayList<>();
         }
-        this.errors.addAll(newErrors);
+        if (newErrors != null) {
+            this.errors.addAll(newErrors);
+        }
     }
 }
 
