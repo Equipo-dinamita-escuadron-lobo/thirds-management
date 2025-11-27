@@ -10,8 +10,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,13 +29,11 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.respon
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.GetThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdResponse;
 import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdsEnterpriseListResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapper;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.ThirdRestMapperImpl;
 
-@SpringBootTest
 class ThirdRestMapperUnitTest {
 
-    @Autowired
-    private ThirdRestMapper mapper;
+    private ThirdRestMapperImpl mapper;
 
     private String entId;
     private TypeId typeId;
@@ -48,6 +44,7 @@ class ThirdRestMapperUnitTest {
 
     @BeforeEach
     void setUp() {
+        mapper = new ThirdRestMapperImpl();
         entId = "ENT001";
 
         typeId = TypeId.builder()
