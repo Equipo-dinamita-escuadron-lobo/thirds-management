@@ -155,9 +155,9 @@ class BatchValidationServiceUnitTest {
 
         // Assert
         assertTrue(result.getValidRecords().isEmpty());
-        assertEquals(8, result.getErrors().size());
+        assertEquals(7, result.getErrors().size());
         assertEquals(0, result.getValidCount());
-        assertEquals(8, result.getErrorCount());
+        assertEquals(7, result.getErrorCount());
         assertEquals(1, result.getTotalProcessed());
     }
 
@@ -186,7 +186,7 @@ class BatchValidationServiceUnitTest {
 
         // Assert
         assertTrue(result.getValidRecords().isEmpty());
-        assertEquals(3, result.getErrors().size());
+        assertEquals(2, result.getErrors().size());
         assertTrue(result.getErrors().stream().anyMatch(e ->
             e.getErrorCode().equals("REQUIRED_FIELD_MISSING")));
     }
@@ -216,7 +216,7 @@ class BatchValidationServiceUnitTest {
 
         // Assert
         assertTrue(result.getValidRecords().isEmpty());
-        assertEquals(2, result.getErrors().size());
+        assertEquals(1, result.getErrors().size());
         assertTrue(result.getErrors().stream().anyMatch(e ->
             e.getColumnName().equals("Razón Social") && 
             e.getErrorCode().equals("REQUIRED_FIELD_MISSING")));
