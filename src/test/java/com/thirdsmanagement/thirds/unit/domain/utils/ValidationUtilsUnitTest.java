@@ -212,7 +212,7 @@ class ValidationUtilsUnitTest {
         assertTrue(validDigit9);
         assertFalse(negativeDigit);
         assertFalse(digit10);
-        assertFalse(nullDigit); // null ahora retorna false
+        assertTrue(nullDigit); // null es válido (campo opcional)
     }
 
     @Test
