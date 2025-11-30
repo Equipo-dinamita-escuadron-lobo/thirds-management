@@ -5,10 +5,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
@@ -97,6 +102,150 @@ public class GlobalExceptionHandler {
                 .error("Bad Request")
                 .message(message)
                 .code(code)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores cuando un parámetro requerido no está presente en la solicitud
+     *
+     * Procesa excepciones de parámetros faltantes en endpoints REST,
+     * proporcionando mensajes claros sobre qué parámetro falta.
+     * @param ex excepción de parámetro de solicitud faltante
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con detalle del parámetro faltante
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, WebRequest request) {
+
+        String parameterName = ex.getParameterName();
+        String parameterType = ex.getParameterType();
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message("El parámetro requerido '" + parameterName + "' de tipo " + parameterType + " no está presente")
+                .code("MISSING_REQUIRED_PARAMETER")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores cuando una parte requerida del multipart no está presente
+     *
+     * Procesa excepciones cuando falta un archivo requerido en solicitudes multipart,
+     * proporcionando mensajes claros sobre qué parte del request falta.
+     * @param ex excepción de parte de solicitud faltante
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con detalle de la parte faltante
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestPart(
+            MissingServletRequestPartException ex, WebRequest request) {
+
+        String partName = ex.getRequestPartName();
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message("El archivo requerido '" + partName + "' no está presente en la solicitud")
+                .code("MISSING_REQUIRED_FILE")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores cuando la solicitud no es multipart
+     *
+     * Procesa errores cuando se espera una solicitud multipart pero no se recibe,
+     * o cuando hay problemas con el procesamiento de archivos multipart.
+     * @param ex excepción de multipart
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP indicando que se requiere un archivo
+     */
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ErrorResponse> handleMultipartException(
+            MultipartException ex, WebRequest request) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message("La solicitud debe incluir un archivo. Asegúrese de enviar el archivo en formato multipart/form-data")
+                .code("MISSING_REQUIRED_FILE")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores de validación de parámetros de método (Spring 6+)
+     *
+     * Procesa errores de validación de parámetros en métodos de controlador,
+     * como @NotBlank, @NotNull en @RequestParam o @PathVariable.
+     * @param ex excepción de validación de método
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con información de los errores de validación
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidation(
+            HandlerMethodValidationException ex, WebRequest request) {
+
+        StringBuilder messageBuilder = new StringBuilder("Error de validación: ");
+        ex.getAllErrors().forEach(error -> {
+            messageBuilder.append(error.getDefaultMessage()).append(". ");
+        });
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(messageBuilder.toString().trim())
+                .code("VALIDATION_ERROR")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores de conversión de tipos en parámetros de solicitud
+     *
+     * Procesa errores cuando un parámetro de solicitud no puede ser convertido
+     * al tipo esperado (e.g., String a Boolean, String a Integer).
+     * @param ex excepción de desajuste de tipo de argumento
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con información del error de conversión
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex, WebRequest request) {
+
+        String paramName = ex.getName();
+        String requiredType = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "desconocido";
+        Object value = ex.getValue();
+
+        String message = String.format(
+            "El parámetro '%s' tiene un valor inválido '%s'. Se esperaba un valor de tipo %s",
+            paramName, value, requiredType
+        );
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(message)
+                .code("INVALID_PARAMETER_TYPE")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 
@@ -324,6 +473,31 @@ public class GlobalExceptionHandler {
             return HttpStatus.PAYLOAD_TOO_LARGE;
         }
         return HttpStatus.BAD_REQUEST;
+    }
+
+    /**
+     * @brief Maneja excepciones de argumentos inválidos
+     *
+     * Procesa excepciones cuando se reciben parámetros con valores no válidos,
+     * como números de página negativos o tamaños de página inválidos.
+     * @param ex excepción de argumento ilegal
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con error de validación
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .code("INVALID_PARAMETER_VALUE")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**

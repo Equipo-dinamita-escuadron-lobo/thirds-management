@@ -27,12 +27,24 @@ public class PaginationHelper {
     public static Pageable createFlexiblePageable(Optional<Integer> numPage,
                                                    Optional<Integer> size,
                                                    long totalRecords) {
+        // Validar parámetros individualmente cuando están presentes
+        numPage.ifPresent(page -> {
+            if (page < 0) {
+                throw new IllegalArgumentException("El número de página no puede ser negativo. Valor recibido: " + page);
+            }
+        });
+        size.ifPresent(s -> {
+            if (s < 1) {
+                throw new IllegalArgumentException("El tamaño de página debe ser mayor a 0. Valor recibido: " + s);
+            }
+        });
+
         if (numPage.isEmpty() || size.isEmpty()) {
             // Si no se especifican parámetros de paginación, traer todos los registros
             int safeSize = safeIntCast(totalRecords);
             return PageRequest.of(0, Math.max(1, safeSize));
         } else {
-            // Usar los parámetros especificados
+            // Usar los parámetros especificados (ya validados)
             return PageRequest.of(numPage.get(), size.get());
         }
     }

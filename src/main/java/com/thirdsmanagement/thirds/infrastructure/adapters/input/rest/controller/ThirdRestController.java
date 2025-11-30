@@ -37,8 +37,11 @@ import com.thirdsmanagement.thirds.infrastructure.utils.ExcelFileNameGenerator;
 import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.validation.annotation.Validated;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,6 +72,7 @@ import org.springframework.http.MediaType;
  */
 @RestController
 @RequestMapping("/api/thirds")
+@Validated
 @RequiredArgsConstructor
 // @PreAuthorize("hasRole('admin_client') or hasRole('super_client')")
 public class ThirdRestController {
@@ -125,7 +129,7 @@ public class ThirdRestController {
 
     @PatchMapping("/allState")
     public ResponseEntity<BulkStateChangeResponse> changeAllThirdsState(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotBlank(message = "entId es requerido y no puede estar vacío") @RequestParam String entId,
             @NotNull(message = "newState es requerido") @RequestParam Boolean newState) {
 
         int updatedCount = bulkChangeThirdStateUseCase.changeAllThirdsState(entId, newState);
