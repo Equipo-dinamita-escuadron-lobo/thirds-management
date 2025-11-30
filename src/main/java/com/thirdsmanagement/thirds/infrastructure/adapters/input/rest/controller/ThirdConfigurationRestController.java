@@ -33,8 +33,10 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.IdR
 import com.thirdsmanagement.thirds.infrastructure.utils.PaginationHelper;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @brief Controlador REST para configuración de maestros de terceros
@@ -46,6 +48,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/thirds/configuration")
 @RequiredArgsConstructor
+@Validated
 public class ThirdConfigurationRestController {
 
     private final CreateThirdTypeUseCase createThirdTypeUseCase;
@@ -71,7 +74,7 @@ public class ThirdConfigurationRestController {
 
     @GetMapping("/thirdtype")
     public ResponseEntity<Page<ThirdType>> getThirdType(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotBlank(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) Optional<Integer> numPage,
             @RequestParam(required = false) Optional<Integer> size,
             @RequestParam(defaultValue = "asc") String sortOrder,
@@ -113,7 +116,7 @@ public class ThirdConfigurationRestController {
 
     @GetMapping("/typeid")
     public ResponseEntity<Page<TypeId>> ListTypeId(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotBlank(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) Optional<Integer> numPage,
             @RequestParam(required = false) Optional<Integer> size,
             @RequestParam(defaultValue = "tiName") String sortField,
@@ -168,7 +171,7 @@ public class ThirdConfigurationRestController {
 
     @GetMapping("/typeid-active")
     public ResponseEntity<Page<TypeId>> getActiveTypeId(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotBlank(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) Optional<Integer> numPage,
             @RequestParam(required = false) Optional<Integer> size) {
 
@@ -187,7 +190,7 @@ public class ThirdConfigurationRestController {
 
     @GetMapping("/thirdtype-active")
     public ResponseEntity<Page<ThirdType>> getActiveThirdType(
-            @NotNull(message = "entId es requerido") @RequestParam String entId,
+            @NotBlank(message = "entId es requerido") @RequestParam String entId,
             @RequestParam(required = false) Optional<Integer> numPage,
             @RequestParam(required = false) Optional<Integer> size) {
 

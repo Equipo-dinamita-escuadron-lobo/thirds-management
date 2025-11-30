@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -97,6 +98,34 @@ public class GlobalExceptionHandler {
                 .error("Bad Request")
                 .message(message)
                 .code(code)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * @brief Maneja errores cuando un parámetro requerido no está presente en la solicitud
+     *
+     * Procesa excepciones de parámetros faltantes en endpoints REST,
+     * proporcionando mensajes claros sobre qué parámetro falta.
+     * @param ex excepción de parámetro de solicitud faltante
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con detalle del parámetro faltante
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException ex, WebRequest request) {
+
+        String parameterName = ex.getParameterName();
+        String parameterType = ex.getParameterType();
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message("El parámetro requerido '" + parameterName + "' de tipo " + parameterType + " no está presente")
+                .code("MISSING_REQUIRED_PARAMETER")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 
@@ -324,6 +353,31 @@ public class GlobalExceptionHandler {
             return HttpStatus.PAYLOAD_TOO_LARGE;
         }
         return HttpStatus.BAD_REQUEST;
+    }
+
+    /**
+     * @brief Maneja excepciones de argumentos inválidos
+     *
+     * Procesa excepciones cuando se reciben parámetros con valores no válidos,
+     * como números de página negativos o tamaños de página inválidos.
+     * @param ex excepción de argumento ilegal
+     * @param request solicitud web que causó el error
+     * @return respuesta HTTP con error de validación
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Bad Request")
+                .message(ex.getMessage())
+                .code("INVALID_PARAMETER_VALUE")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     /**
