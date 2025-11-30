@@ -27,30 +27,25 @@ public class PaginationHelper {
     public static Pageable createFlexiblePageable(Optional<Integer> numPage,
                                                    Optional<Integer> size,
                                                    long totalRecords) {
+        // Validar parámetros individualmente cuando están presentes
+        numPage.ifPresent(page -> {
+            if (page < 0) {
+                throw new IllegalArgumentException("El número de página no puede ser negativo. Valor recibido: " + page);
+            }
+        });
+        size.ifPresent(s -> {
+            if (s < 1) {
+                throw new IllegalArgumentException("El tamaño de página debe ser mayor a 0. Valor recibido: " + s);
+            }
+        });
+
         if (numPage.isEmpty() || size.isEmpty()) {
             // Si no se especifican parámetros de paginación, traer todos los registros
             int safeSize = safeIntCast(totalRecords);
             return PageRequest.of(0, Math.max(1, safeSize));
         } else {
-            // Validar que los valores sean válidos
-            validatePaginationParams(numPage.get(), size.get());
-            // Usar los parámetros especificados
+            // Usar los parámetros especificados (ya validados)
             return PageRequest.of(numPage.get(), size.get());
-        }
-    }
-
-    /**
-     * @brief Valida que los parámetros de paginación sean válidos
-     * @param numPage número de página (debe ser >= 0)
-     * @param size tamaño de página (debe ser >= 1)
-     * @throws IllegalArgumentException si los parámetros son inválidos
-     */
-    private static void validatePaginationParams(int numPage, int size) {
-        if (numPage < 0) {
-            throw new IllegalArgumentException("El número de página no puede ser negativo. Valor recibido: " + numPage);
-        }
-        if (size < 1) {
-            throw new IllegalArgumentException("El tamaño de página debe ser mayor a 0. Valor recibido: " + size);
         }
     }
 

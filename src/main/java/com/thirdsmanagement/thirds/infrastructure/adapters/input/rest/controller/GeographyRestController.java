@@ -20,6 +20,7 @@ import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper.Geo
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @brief Controlador REST para consultas de información geográfica
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/thirds/geography")
 @RequiredArgsConstructor
+@Validated
 public class GeographyRestController {
 
     private final ListGeographyUseCase listGeographyUseCase;
