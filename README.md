@@ -71,7 +71,7 @@ El proyecto implementa **Arquitectura Hexagonal** (Ports & Adapters) de manera e
 domain/
 ├── model/                    # Entidades del dominio (Third, ThirdType, TypeId, Geography)
 ├── enums/                    # Enumeraciones (ePersonType, eThirdGender, ImportStatus)
-├── exceptions/               # Excepciones específicas de negocio (25+ excepciones)
+├── exceptions/               # Excepciones específicas de negocio (35+ excepciones)
 ├── utils/                    # Utilidades de dominio (ValidationUtils, StringNormalizer)
 ```
 
@@ -120,7 +120,7 @@ infrastructure/
 
 ### Persistencia y Base de Datos
 - **Spring Data JPA**: Abstracción de datos con Hibernate
-- **PostgreSQL**: Base de datos relacional principal
+- **PostgreSQL**: Base de datos principal para desarrollo
 - **H2 Database**: Base de datos en memoria para testing
 
 ### Mensajería y Comunicación
@@ -264,8 +264,7 @@ src/main/resources/data/geography/
 thirds.exchange
 
 // Queues operativas
-thirds.import.queue       // Procesamiento de importación
-thirds.export.queue       // Procesamiento de exportación
+third.used.queue          // Tracking de uso de terceros
 ```
 
 #### Configuración de Listener
@@ -448,11 +447,7 @@ GET /api/thirds/rut/pdf/{thirdId}/{entId}
 #### RabbitMQ Integration
 ```javascript
 // Eventos publicados
-third.created      // Tercero creado
-third.updated      // Tercero actualizado
-third.deleted      // Tercero eliminado
-third.imported     // Importación completada
-third.exported     // Exportación completada
+third.used         // Uso de tercero registrado
 ```
 
 ## 🧪 Testing
@@ -526,7 +521,7 @@ main (producción)
 ### Estándares de Desarrollo
 1. **Arquitectura Hexagonal**: Mantener separación estricta de capas
 2. **TDD**: Tests antes del código de producción
-3. **Code Coverage**: Mínimo 80% en nuevas funcionalidades
+3. **Code Coverage**: Configurado con JaCoCo (mínimo 0% para desarrollo)
 4. **Commits**: Mensajes en español, convenciones semánticas
 
 ### Proceso de Desarrollo
