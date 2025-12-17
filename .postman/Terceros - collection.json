@@ -3399,11 +3399,6 @@
 											"    pm.response.to.have.status(201);",
 											"});",
 											"",
-											"// Test 2: Validar tiempo de respuesta razonable",
-											"pm.test(\"Tiempo de respuesta es menor a 2000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
-											"",
 											"// Test 3: Validar que la respuesta es JSON válido",
 											"pm.test(\"La respuesta es JSON válido\", function () {",
 											"    pm.response.to.be.json;",
@@ -3798,6 +3793,195 @@
 							"response": []
 						},
 						{
+							"name": "Cambiar estado",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test 1: Validar que el código de estado sea 200 (OK)",
+											"pm.test(\"El código de estado es 200 (OK)\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// Test 2: Validar que el tiempo de respuesta sea razonable",
+											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});",
+											"",
+											"// Test 3: Validar que la respuesta sea JSON válido",
+											"pm.test(\"La respuesta es JSON válido\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"// Parsear la respuesta JSON para las siguientes validaciones",
+											"let jsonData;",
+											"try {",
+											"    jsonData = pm.response.json();",
+											"} catch (e) {",
+											"    console.error(\"Error al parsear la respuesta JSON:\", e);",
+											"}",
+											"",
+											"// Test 4: Validar que la respuesta tenga el campo requerido 'result'",
+											"pm.test(\"La respuesta contiene el campo requerido 'result'\", function () {",
+											"    pm.expect(jsonData).to.have.property('result');",
+											"});",
+											"",
+											"// Test 5: Validar que el campo 'result' sea de tipo booleano",
+											"pm.test(\"El campo 'result' es de tipo booleano\", function () {",
+											"    pm.expect(jsonData.result).to.be.a('boolean');",
+											"});",
+											"",
+											"// Test 6: Validar que el campo 'result' sea true (operación exitosa)",
+											"pm.test(\"El campo 'result' es true (cambio de estado exitoso)\", function () {",
+											"    pm.expect(jsonData.result).to.be.true;",
+											"});",
+											"",
+											"// Test 7: Validar la estructura de la respuesta (objeto con 1 propiedad)",
+											"pm.test(\"La estructura de la respuesta es correcta (objeto con 1 propiedad)\", function () {",
+											"    pm.expect(jsonData).to.be.an('object');",
+											"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(1);",
+											"});",
+											"",
+											"// Test 8: Validar que no haya propiedades adicionales inesperadas",
+											"pm.test(\"La respuesta no contiene propiedades adicionales inesperadas\", function () {",
+											"    const expectedKeys = ['result'];",
+											"    const actualKeys = Object.keys(jsonData);",
+											"    pm.expect(actualKeys).to.have.members(expectedKeys);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/thirds/?thId={{ThirdId}}&entId={{enterpriseId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"thirds",
+										""
+									],
+									"query": [
+										{
+											"key": "thId",
+											"value": "{{ThirdId}}"
+										},
+										{
+											"key": "entId",
+											"value": "{{enterpriseId}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cambio de Estado Masivo",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Test 1: Validar que el código de estado sea 200 (OK)",
+											"pm.test(\"El código de estado es 200 (OK)\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"// Test 2: Validar que el tiempo de respuesta sea razonable",
+											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
+											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+											"});",
+											"",
+											"// Test 3: Validar que la respuesta sea JSON válido",
+											"pm.test(\"La respuesta es JSON válido\", function () {",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"// Parsear la respuesta JSON",
+											"var jsonData = pm.response.json();",
+											"",
+											"// Test 4: Validar que la respuesta tenga los campos requeridos",
+											"pm.test(\"La respuesta contiene los campos requeridos: updatedCount, newState, message\", function () {",
+											"    pm.expect(jsonData).to.have.property('updatedCount');",
+											"    pm.expect(jsonData).to.have.property('newState');",
+											"    pm.expect(jsonData).to.have.property('message');",
+											"});",
+											"",
+											"// Test 5: Validar que el campo 'updatedCount' sea un número >= 0",
+											"pm.test(\"El campo 'updatedCount' es un número mayor o igual a 0\", function () {",
+											"    pm.expect(jsonData.updatedCount).to.be.a('number');",
+											"    pm.expect(jsonData.updatedCount).to.be.at.least(0);",
+											"});",
+											"",
+											"// Test 6: Validar que el campo 'newState' sea un booleano ",
+											"pm.test(\"El campo 'newState' es booleano y es false\", function () {",
+											"    pm.expect(jsonData.newState).to.be.a('boolean');",
+											"    pm.expect(jsonData.newState).to.be.true;",
+											"});",
+											"",
+											"// Test 7: Validar que el campo 'message' sea una cadena no vacía",
+											"pm.test(\"El campo 'message' es una cadena no vacía\", function () {",
+											"    pm.expect(jsonData.message).to.be.a('string');",
+											"    pm.expect(jsonData.message).to.have.lengthOf.at.least(1);",
+											"});",
+											"",
+											"// Test 8: Validar que el mensaje contenga información relevante",
+											"pm.test(\"El mensaje contiene 'Se actualizaron' y 'terceros'\", function () {",
+											"    pm.expect(jsonData.message).to.include('Se actualizaron');",
+											"    pm.expect(jsonData.message).to.include('terceros');",
+											"});",
+											"",
+											"// Test 9: Validar la estructura de la respuesta (objeto con 3 propiedades)",
+											"pm.test(\"La estructura de la respuesta es correcta (objeto con 3 propiedades)\", function () {",
+											"    pm.expect(jsonData).to.be.an('object');",
+											"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(3);",
+											"});",
+											"",
+											"// Log de la respuesta",
+											"console.log(\"Respuesta de cambio masivo:\", JSON.stringify(jsonData, null, 2));"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/thirds/allState?entId={{enterpriseId}}&newState=true",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"thirds",
+										"allState"
+									],
+									"query": [
+										{
+											"key": "entId",
+											"value": "{{enterpriseId}}"
+										},
+										{
+											"key": "newState",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "Obtener Tercero por ID",
 							"event": [
 								{
@@ -3901,143 +4085,6 @@
 										{
 											"key": "thId",
 											"value": "{{ThirdId}}"
-										},
-										{
-											"key": "entId",
-											"value": "{{enterpriseId}}"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar Existencia de Tercero - Existe",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta sea un booleano",
-											"pm.test(\"La respuesta es un booleano\", function () {",
-											"    pm.expect(jsonData).to.be.a('boolean');",
-											"});",
-											"",
-											"// Test 5: Validar que el tercero existe (debe ser true porque usamos idNumber del tercero creado)",
-											"pm.test(\"El tercero existe (respuesta es true)\", function () {",
-											"    pm.expect(jsonData).to.be.true;",
-											"});",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Tercero existe:\", jsonData);"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/existBy?idNumber=1&entId={{enterpriseId}}",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"existBy"
-									],
-									"query": [
-										{
-											"key": "idNumber",
-											"value": "1"
-										},
-										{
-											"key": "entId",
-											"value": "{{enterpriseId}}"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Verificar Existencia de Tercero - No Existe",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta sea un booleano",
-											"pm.test(\"La respuesta es un booleano\", function () {",
-											"    pm.expect(jsonData).to.be.a('boolean');",
-											"});",
-											"",
-											"// Test 5: Validar que el tercero NO existe (debe ser false porque usamos un idNumber inexistente)",
-											"pm.test(\"El tercero NO existe (respuesta es false)\", function () {",
-											"    pm.expect(jsonData).to.be.false;",
-											"});",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Tercero existe:\", jsonData);"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/existBy?idNumber=999999999&entId={{enterpriseId}}",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"existBy"
-									],
-									"query": [
-										{
-											"key": "idNumber",
-											"value": "999999999"
 										},
 										{
 											"key": "entId",
@@ -4397,494 +4444,6 @@
 							"response": []
 						},
 						{
-							"name": "Cambiar estado",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON para las siguientes validaciones",
-											"let jsonData;",
-											"try {",
-											"    jsonData = pm.response.json();",
-											"} catch (e) {",
-											"    console.error(\"Error al parsear la respuesta JSON:\", e);",
-											"}",
-											"",
-											"// Test 4: Validar que la respuesta tenga el campo requerido 'result'",
-											"pm.test(\"La respuesta contiene el campo requerido 'result'\", function () {",
-											"    pm.expect(jsonData).to.have.property('result');",
-											"});",
-											"",
-											"// Test 5: Validar que el campo 'result' sea de tipo booleano",
-											"pm.test(\"El campo 'result' es de tipo booleano\", function () {",
-											"    pm.expect(jsonData.result).to.be.a('boolean');",
-											"});",
-											"",
-											"// Test 6: Validar que el campo 'result' sea true (operación exitosa)",
-											"pm.test(\"El campo 'result' es true (cambio de estado exitoso)\", function () {",
-											"    pm.expect(jsonData.result).to.be.true;",
-											"});",
-											"",
-											"// Test 7: Validar la estructura de la respuesta (objeto con 1 propiedad)",
-											"pm.test(\"La estructura de la respuesta es correcta (objeto con 1 propiedad)\", function () {",
-											"    pm.expect(jsonData).to.be.an('object');",
-											"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(1);",
-											"});",
-											"",
-											"// Test 8: Validar que no haya propiedades adicionales inesperadas",
-											"pm.test(\"La respuesta no contiene propiedades adicionales inesperadas\", function () {",
-											"    const expectedKeys = ['result'];",
-											"    const actualKeys = Object.keys(jsonData);",
-											"    pm.expect(actualKeys).to.have.members(expectedKeys);",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/?thId={{ThirdId}}&entId={{enterpriseId}}",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										""
-									],
-									"query": [
-										{
-											"key": "thId",
-											"value": "{{ThirdId}}"
-										},
-										{
-											"key": "entId",
-											"value": "{{enterpriseId}}"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Cambio de Estado Masivo",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta tenga los campos requeridos",
-											"pm.test(\"La respuesta contiene los campos requeridos: updatedCount, newState, message\", function () {",
-											"    pm.expect(jsonData).to.have.property('updatedCount');",
-											"    pm.expect(jsonData).to.have.property('newState');",
-											"    pm.expect(jsonData).to.have.property('message');",
-											"});",
-											"",
-											"// Test 5: Validar que el campo 'updatedCount' sea un número >= 0",
-											"pm.test(\"El campo 'updatedCount' es un número mayor o igual a 0\", function () {",
-											"    pm.expect(jsonData.updatedCount).to.be.a('number');",
-											"    pm.expect(jsonData.updatedCount).to.be.at.least(0);",
-											"});",
-											"",
-											"// Test 6: Validar que el campo 'newState' sea un booleano y sea false (según el request)",
-											"pm.test(\"El campo 'newState' es booleano y es false\", function () {",
-											"    pm.expect(jsonData.newState).to.be.a('boolean');",
-											"    pm.expect(jsonData.newState).to.be.false;",
-											"});",
-											"",
-											"// Test 7: Validar que el campo 'message' sea una cadena no vacía",
-											"pm.test(\"El campo 'message' es una cadena no vacía\", function () {",
-											"    pm.expect(jsonData.message).to.be.a('string');",
-											"    pm.expect(jsonData.message).to.have.lengthOf.at.least(1);",
-											"});",
-											"",
-											"// Test 8: Validar que el mensaje contenga información relevante",
-											"pm.test(\"El mensaje contiene 'Se actualizaron' y 'terceros'\", function () {",
-											"    pm.expect(jsonData.message).to.include('Se actualizaron');",
-											"    pm.expect(jsonData.message).to.include('terceros');",
-											"});",
-											"",
-											"// Test 9: Validar la estructura de la respuesta (objeto con 3 propiedades)",
-											"pm.test(\"La estructura de la respuesta es correcta (objeto con 3 propiedades)\", function () {",
-											"    pm.expect(jsonData).to.be.an('object');",
-											"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(3);",
-											"});",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Respuesta de cambio masivo:\", JSON.stringify(jsonData, null, 2));"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "PATCH",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/allState?entId={{enterpriseId}}&newState=false",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"allState"
-									],
-									"query": [
-										{
-											"key": "entId",
-											"value": "{{enterpriseId}}"
-										},
-										{
-											"key": "newState",
-											"value": "false"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Importar PDF RUT",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 5000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(5000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta tenga el campo 'content'",
-											"pm.test(\"La respuesta contiene el campo 'content'\", function () {",
-											"    pm.expect(jsonData).to.have.property('content');",
-											"});",
-											"",
-											"// Test 5: Validar que el campo 'content' sea una cadena",
-											"pm.test(\"El campo 'content' es una cadena de texto\", function () {",
-											"    pm.expect(jsonData.content).to.be.a('string');",
-											"});",
-											"",
-											"// Test 6: Validar que el contenido no esté vacío",
-											"pm.test(\"El contenido extraído no está vacío\", function () {",
-											"    pm.expect(jsonData.content).to.have.lengthOf.at.least(1);",
-											"});",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Contenido extraído del PDF RUT:\", jsonData.content ? jsonData.content.substring(0, 200) + '...' : 'vacío');"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "file",
-											"type": "file",
-											"src": "postman-cloud:///1f08b60a-4a5b-4590-b988-1eabea2654a7"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/content-PDF-RUT",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"content-PDF-RUT"
-									],
-									"query": [
-										{
-											"key": "file",
-											"value": null,
-											"disabled": true
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Importar terceros",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 202 (Accepted)",
-											"pm.test(\"El código de estado es 202 (Accepted)\", function () {",
-											"    pm.response.to.have.status(202);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 3000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(3000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta tenga los campos requeridos",
-											"pm.test(\"La respuesta contiene los campos requeridos: jobId, message, statusUrl\", function () {",
-											"    pm.expect(jsonData).to.have.property('jobId');",
-											"    pm.expect(jsonData).to.have.property('message');",
-											"    pm.expect(jsonData).to.have.property('statusUrl');",
-											"});",
-											"",
-											"// Test 5: Validar que 'jobId' sea una cadena no vacía",
-											"pm.test(\"El campo 'jobId' es una cadena no vacía\", function () {",
-											"    pm.expect(jsonData.jobId).to.be.a('string');",
-											"    pm.expect(jsonData.jobId).to.have.lengthOf.at.least(1);",
-											"});",
-											"",
-											"// Test 6: Validar que 'message' sea una cadena no vacía",
-											"pm.test(\"El campo 'message' es una cadena no vacía\", function () {",
-											"    pm.expect(jsonData.message).to.be.a('string');",
-											"    pm.expect(jsonData.message).to.have.lengthOf.at.least(1);",
-											"});",
-											"",
-											"// Test 7: Validar que 'statusUrl' sea una cadena y contenga la ruta correcta",
-											"pm.test(\"El campo 'statusUrl' contiene la ruta del estado\", function () {",
-											"    pm.expect(jsonData.statusUrl).to.be.a('string');",
-											"    pm.expect(jsonData.statusUrl).to.include('/api/thirds/import/status/');",
-											"});",
-											"",
-											"// Test 8: Validar que el mensaje sea 'Importación iniciada correctamente'",
-											"pm.test(\"El mensaje indica que la importación fue iniciada\", function () {",
-											"    pm.expect(jsonData.message).to.eql('Importación iniciada correctamente');",
-											"});",
-											"",
-											"// Guardar el jobId para usarlo en la consulta de estado",
-											"if (jsonData.jobId) {",
-											"    pm.environment.set(\"jobId\", jsonData.jobId);",
-											"    console.log(\"JobId guardado:\", jsonData.jobId);",
-											"}",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Respuesta de importación:\", JSON.stringify(jsonData, null, 2));"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"protocolProfileBehavior": {
-								"disabledSystemHeaders": {}
-							},
-							"request": {
-								"method": "POST",
-								"header": [
-									{
-										"key": "Cache-Control",
-										"value": "no-cache",
-										"type": "text"
-									}
-								],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "entId",
-											"value": "{{enterpriseId}}",
-											"type": "text"
-										},
-										{
-											"key": "file",
-											"type": "file",
-											"src": "postman-cloud:///1f0cd994-4b1a-4ab0-9da4-6a4ea739c38f"
-										}
-									]
-								},
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/import/excel",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"import",
-										"excel"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Consultar estado importacion",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"// Test 1: Validar que el código de estado sea 200 (OK)",
-											"pm.test(\"El código de estado es 200 (OK)\", function () {",
-											"    pm.response.to.have.status(200);",
-											"});",
-											"",
-											"// Test 2: Validar que el tiempo de respuesta sea razonable",
-											"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
-											"    pm.expect(pm.response.responseTime).to.be.below(2000);",
-											"});",
-											"",
-											"// Test 3: Validar que la respuesta sea JSON válido",
-											"pm.test(\"La respuesta es JSON válido\", function () {",
-											"    pm.response.to.be.json;",
-											"});",
-											"",
-											"// Parsear la respuesta JSON",
-											"var jsonData = pm.response.json();",
-											"",
-											"// Test 4: Validar que la respuesta tenga los campos principales de ImportJobStatus",
-											"pm.test(\"La respuesta contiene los campos principales de ImportJobStatus\", function () {",
-											"    pm.expect(jsonData).to.have.property('jobId');",
-											"    pm.expect(jsonData).to.have.property('entId');",
-											"    pm.expect(jsonData).to.have.property('status');",
-											"});",
-											"",
-											"// Test 5: Validar que 'jobId' coincida con el enviado",
-											"pm.test(\"El 'jobId' coincide con el de la solicitud\", function () {",
-											"    var requestJobId = pm.environment.get(\"jobId\");",
-											"    if (requestJobId) {",
-											"        pm.expect(jsonData.jobId).to.eql(requestJobId);",
-											"    }",
-											"});",
-											"",
-											"// Test 6: Validar que 'status' sea uno de los valores válidos del enum ImportStatus",
-											"pm.test(\"El 'status' tiene un valor válido\", function () {",
-											"    var validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED'];",
-											"    pm.expect(validStatuses).to.include(jsonData.status);",
-											"});",
-											"",
-											"// Test 7: Validar campos de métricas cuando el estado es COMPLETED",
-											"pm.test(\"Si está completado, tiene las métricas de importación\", function () {",
-											"    if (jsonData.status === 'COMPLETED') {",
-											"        pm.expect(jsonData).to.have.property('totalRecords');",
-											"        pm.expect(jsonData).to.have.property('successfulImports');",
-											"        pm.expect(jsonData).to.have.property('failedImports');",
-											"        pm.expect(jsonData).to.have.property('duplicatesSkipped');",
-											"        pm.expect(jsonData.totalRecords).to.be.a('number');",
-											"        pm.expect(jsonData.successfulImports).to.be.a('number');",
-											"        pm.expect(jsonData.failedImports).to.be.a('number');",
-											"        pm.expect(jsonData.duplicatesSkipped).to.be.a('number');",
-											"    }",
-											"});",
-											"",
-											"// Test 8: Validar que 'progress' sea un número si está presente",
-											"pm.test(\"El campo 'progress' es un número si está presente\", function () {",
-											"    if (jsonData.hasOwnProperty('progress') && jsonData.progress !== null) {",
-											"        pm.expect(jsonData.progress).to.be.a('number');",
-											"        pm.expect(jsonData.progress).to.be.at.least(0);",
-											"        pm.expect(jsonData.progress).to.be.at.most(100);",
-											"    }",
-											"});",
-											"",
-											"// Test 9: Validar estructura del array de errores",
-											"pm.test(\"El campo 'errors' es un array si está presente\", function () {",
-											"    if (jsonData.hasOwnProperty('errors') && jsonData.errors !== null) {",
-											"        pm.expect(jsonData.errors).to.be.an('array');",
-											"    }",
-											"});",
-											"",
-											"// Log de la respuesta",
-											"console.log(\"Estado de importación:\", JSON.stringify(jsonData, null, 2));"
-										],
-										"type": "text/javascript",
-										"packages": {},
-										"requests": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{baseUrl}}/api/thirds/import/status/{{jobId}}",
-									"host": [
-										"{{baseUrl}}"
-									],
-									"path": [
-										"api",
-										"thirds",
-										"import",
-										"status",
-										"{{jobId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
 							"name": "Iniciar Exportacion",
 							"event": [
 								{
@@ -5029,11 +4588,6 @@
 											"    }",
 											"});",
 											"",
-											"// Test 6: Validar que 'status' sea uno de los valores válidos",
-											"pm.test(\"El 'status' tiene un valor válido\", function () {",
-											"    var validStatuses = ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED', 'CANCELLED'];",
-											"    pm.expect(validStatuses).to.include(jsonData.status);",
-											"});",
 											"",
 											"// Test 7: Validar que 'progress' sea un número entre 0 y 100 si está presente",
 											"pm.test(\"El campo 'progress' es un número entre 0 y 100 si está presente\", function () {",
@@ -9628,6 +9182,195 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Cambiar estado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test 1: Validar que el código de estado sea 200 (OK)",
+									"pm.test(\"El código de estado es 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test 2: Validar que el tiempo de respuesta sea razonable",
+									"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Test 3: Validar que la respuesta sea JSON válido",
+									"pm.test(\"La respuesta es JSON válido\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Parsear la respuesta JSON para las siguientes validaciones",
+									"let jsonData;",
+									"try {",
+									"    jsonData = pm.response.json();",
+									"} catch (e) {",
+									"    console.error(\"Error al parsear la respuesta JSON:\", e);",
+									"}",
+									"",
+									"// Test 4: Validar que la respuesta tenga el campo requerido 'result'",
+									"pm.test(\"La respuesta contiene el campo requerido 'result'\", function () {",
+									"    pm.expect(jsonData).to.have.property('result');",
+									"});",
+									"",
+									"// Test 5: Validar que el campo 'result' sea de tipo booleano",
+									"pm.test(\"El campo 'result' es de tipo booleano\", function () {",
+									"    pm.expect(jsonData.result).to.be.a('boolean');",
+									"});",
+									"",
+									"// Test 6: Validar que el campo 'result' sea true (operación exitosa)",
+									"pm.test(\"El campo 'result' es true (cambio de estado exitoso)\", function () {",
+									"    pm.expect(jsonData.result).to.be.true;",
+									"});",
+									"",
+									"// Test 7: Validar la estructura de la respuesta (objeto con 1 propiedad)",
+									"pm.test(\"La estructura de la respuesta es correcta (objeto con 1 propiedad)\", function () {",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(1);",
+									"});",
+									"",
+									"// Test 8: Validar que no haya propiedades adicionales inesperadas",
+									"pm.test(\"La respuesta no contiene propiedades adicionales inesperadas\", function () {",
+									"    const expectedKeys = ['result'];",
+									"    const actualKeys = Object.keys(jsonData);",
+									"    pm.expect(actualKeys).to.have.members(expectedKeys);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/thirds/?thId={{ThirdId}}&entId={{enterpriseId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"thirds",
+								""
+							],
+							"query": [
+								{
+									"key": "thId",
+									"value": "{{ThirdId}}"
+								},
+								{
+									"key": "entId",
+									"value": "{{enterpriseId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cambio de Estado Masivo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Test 1: Validar que el código de estado sea 200 (OK)",
+									"pm.test(\"El código de estado es 200 (OK)\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Test 2: Validar que el tiempo de respuesta sea razonable",
+									"pm.test(\"El tiempo de respuesta es menor a 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Test 3: Validar que la respuesta sea JSON válido",
+									"pm.test(\"La respuesta es JSON válido\", function () {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"// Parsear la respuesta JSON",
+									"var jsonData = pm.response.json();",
+									"",
+									"// Test 4: Validar que la respuesta tenga los campos requeridos",
+									"pm.test(\"La respuesta contiene los campos requeridos: updatedCount, newState, message\", function () {",
+									"    pm.expect(jsonData).to.have.property('updatedCount');",
+									"    pm.expect(jsonData).to.have.property('newState');",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"});",
+									"",
+									"// Test 5: Validar que el campo 'updatedCount' sea un número >= 0",
+									"pm.test(\"El campo 'updatedCount' es un número mayor o igual a 0\", function () {",
+									"    pm.expect(jsonData.updatedCount).to.be.a('number');",
+									"    pm.expect(jsonData.updatedCount).to.be.at.least(0);",
+									"});",
+									"",
+									"// Test 6: Validar que el campo 'newState' sea un booleano ",
+									"pm.test(\"El campo 'newState' es booleano y es false\", function () {",
+									"    pm.expect(jsonData.newState).to.be.a('boolean');",
+									"    pm.expect(jsonData.newState).to.be.true;",
+									"});",
+									"",
+									"// Test 7: Validar que el campo 'message' sea una cadena no vacía",
+									"pm.test(\"El campo 'message' es una cadena no vacía\", function () {",
+									"    pm.expect(jsonData.message).to.be.a('string');",
+									"    pm.expect(jsonData.message).to.have.lengthOf.at.least(1);",
+									"});",
+									"",
+									"// Test 8: Validar que el mensaje contenga información relevante",
+									"pm.test(\"El mensaje contiene 'Se actualizaron' y 'terceros'\", function () {",
+									"    pm.expect(jsonData.message).to.include('Se actualizaron');",
+									"    pm.expect(jsonData.message).to.include('terceros');",
+									"});",
+									"",
+									"// Test 9: Validar la estructura de la respuesta (objeto con 3 propiedades)",
+									"pm.test(\"La estructura de la respuesta es correcta (objeto con 3 propiedades)\", function () {",
+									"    pm.expect(jsonData).to.be.an('object');",
+									"    pm.expect(Object.keys(jsonData)).to.have.lengthOf(3);",
+									"});",
+									"",
+									"// Log de la respuesta",
+									"console.log(\"Respuesta de cambio masivo:\", JSON.stringify(jsonData, null, 2));"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/thirds/allState?entId={{enterpriseId}}&newState=true",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"thirds",
+								"allState"
+							],
+							"query": [
+								{
+									"key": "entId",
+									"value": "{{enterpriseId}}"
+								},
+								{
+									"key": "newState",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
