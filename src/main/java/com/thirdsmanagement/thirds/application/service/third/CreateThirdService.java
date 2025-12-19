@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.application.service.third;
 
 import com.thirdsmanagement.thirds.application.ports.input.CreateThirdUseCase;
+import com.thirdsmanagement.thirds.application.ports.output.IThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.typeId.TypeIdLoaderService;
@@ -30,7 +31,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final ThirdValidationService thirdValidationService;
     private final TypeIdLoaderService typeIdLoaderService;
     private final IdOutputPort idOutputPort;
-
+    private final IThirdEventPublisher thirdEventPublisher;
     
     @Override
     @Transactional
@@ -88,6 +89,9 @@ public class CreateThirdService implements CreateThirdUseCase {
         validateDuplicateThird(normalizedThird.getIdNumber(), normalizedThird.getEntId());
 
         Third createdThird = thirdOutputPort.saveThird(normalizedThird);
+
+        //Publicacion de tercero creado para notificaciones
+        thirdEventPublisher.publishThirdUpdatedEvent(createdThird);
 
         return createdThird;
     }

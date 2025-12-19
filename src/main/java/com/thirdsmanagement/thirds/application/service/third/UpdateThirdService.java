@@ -3,6 +3,7 @@ package com.thirdsmanagement.thirds.application.service.third;
 import com.thirdsmanagement.thirds.application.ports.input.UpdateThirdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.application.service.typeId.TypeIdLoaderService;
+import com.thirdsmanagement.thirds.application.ports.output.IThirdEventPublisher;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.City;
 import com.thirdsmanagement.thirds.domain.model.Country;
@@ -33,6 +34,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final TypeIdLoaderService typeIdLoaderService;
     private final IdOutputPort idOutputPort;
     private final ThirdRepository thirdRepository;
+    private final IThirdEventPublisher thirdEventPublisher;
 
     @Override
     @Transactional
@@ -112,6 +114,9 @@ public class UpdateThirdService implements UpdateThirdUseCase {
                 .build();
 
         Third updatedThird = thirdOutputPort.updateThird(normalizedThird);
+
+        //Publicacion de tercero actualizado para notificaciones
+        thirdEventPublisher.publishThirdUpdatedEvent(updatedThird);
 
         return updatedThird;
     }
