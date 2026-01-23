@@ -26,6 +26,7 @@ public class ExcelFileValidator implements FileValidator {
         validateNotEmpty(file);
         validateSize(file);
         validateExtension(file);
+        validateMimeType(file);
     }
 
     /**
@@ -80,6 +81,35 @@ public class ExcelFileValidator implements FileValidator {
 
         if (!validExtension) {
             throw FileValidationException.forInvalidExtension(filename, getSupportedExtensions());
+        }
+    }
+
+    /**
+     * @brief Valida que el tipo MIME del archivo sea válido para Excel
+     * @param file archivo a validar
+     */
+    private void validateMimeType(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null) {
+            throw FileValidationException.forInvalidMimeType(
+                    file.getOriginalFilename(),
+                    "null",
+                    getSupportedMimeTypes());
+        }
+
+        boolean validMimeType = false;
+        for (String mimeType : getSupportedMimeTypes()) {
+            if (contentType.equals(mimeType)) {
+                validMimeType = true;
+                break;
+            }
+        }
+
+        if (!validMimeType) {
+            throw FileValidationException.forInvalidMimeType(
+                    file.getOriginalFilename(),
+                    contentType,
+                    getSupportedMimeTypes());
         }
     }
 
