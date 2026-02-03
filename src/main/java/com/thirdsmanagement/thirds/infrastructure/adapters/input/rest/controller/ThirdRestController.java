@@ -91,7 +91,7 @@ public class ThirdRestController {
     private final UpdateThirdService updateThirdService;
     private final ExcelFileNameGenerator fileNameGenerator;
 
-    @PreAuthorize("hasAuthority('Create_Third')")
+    @PreAuthorize("hasAuthority('TD#C')")
     @PostMapping("/")
     public ResponseEntity<ThirdResponse> createThird(@RequestBody @Valid ThirdCreateRequest thirdCreateRequest) {
 
@@ -106,7 +106,7 @@ public class ThirdRestController {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasAuthority('Update_Third')")
+    @PreAuthorize("hasAuthority('TD#U')")
     @PostMapping("/update")
     public ResponseEntity<ThirdResponse> updateThird(@RequestBody @Valid ThirdUpdateRequest thirdUpdateRequest) {
 
@@ -121,7 +121,7 @@ public class ThirdRestController {
         return new ResponseEntity<>(thirdRestMapper.toThirdCreateResponse(third), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Change_State_Third')")
+    @PreAuthorize("hasAuthority('TD#CS')")
     @PutMapping("/")
     public ResponseEntity<ChangeThirdStateResponse> changeThirdState(
             @NotNull(message = "thId es requerido") @RequestParam Long thId,
@@ -131,7 +131,7 @@ public class ThirdRestController {
         return new ResponseEntity<>(thirdRestMapper.toChangeThirdStateResponse(result), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Change_State_All_Third')")
+    @PreAuthorize("hasAuthority('TD#CSA')")
     @PatchMapping("/allState")
     public ResponseEntity<BulkStateChangeResponse> changeAllThirdsState(
             @NotBlank(message = "entId es requerido y no puede estar vacío") @RequestParam String entId,
@@ -219,7 +219,7 @@ public class ThirdRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Import_PDF_RUT_Third')")
+    @PreAuthorize("hasAuthority('TD#IPR')")
     @PostMapping("/content-PDF-RUT")
     public ResponseEntity<PdfRUTContentOutput> uploadPdf(@RequestParam MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -230,7 +230,7 @@ public class ThirdRestController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasAuthority('Export_Template_Third')")
+    @PreAuthorize("hasAuthority('TD#ET')")
     @GetMapping("/template/excel")
     public ResponseEntity<Resource> exportThirdTemplate(
             @RequestParam String entId) {
@@ -283,7 +283,7 @@ public class ThirdRestController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PreAuthorize("hasAuthority('Export_Third')")
+    @PreAuthorize("hasAuthority('TD#E')")
     @GetMapping("/export/download/{jobId}")
     public ResponseEntity<Resource> downloadExportedFile(@PathVariable String jobId) {
         Optional<ExportJobStatus> jobStatusOpt = exportThirdUseCase.getExportStatus(jobId);
@@ -315,7 +315,7 @@ public class ThirdRestController {
                 .body(resource);
     }
 
-    @PreAuthorize("hasAuthority('Import_Third')")
+    @PreAuthorize("hasAuthority('TD#I')")
     @PostMapping("/import/excel")
     public ResponseEntity<Map<String, String>> importThirdsFromExcel(
             @NotNull(message = "entId es requerido") @RequestParam String entId,
@@ -344,7 +344,7 @@ public class ThirdRestController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasAuthority('Delete_Third')")
+    @PreAuthorize("hasAuthority('TD#D')")
     @DeleteMapping("/delete")
     public ResponseEntity<Boolean> deleteThird(
             @NotNull(message = "thirdId es requerido") @RequestParam Long thirdId,
