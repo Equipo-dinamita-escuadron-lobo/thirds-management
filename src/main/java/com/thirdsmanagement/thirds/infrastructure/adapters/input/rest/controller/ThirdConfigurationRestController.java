@@ -63,7 +63,7 @@ public class ThirdConfigurationRestController {
 
     private final IdRestMapper idRestMapper;
 
-    @PreAuthorize("hasAuthority('Create_Third_Type')")
+    @PreAuthorize("hasAuthority('TT#C')")
     @PostMapping("/thirdtype")
     public ResponseEntity<ThirdTypeResponse> createThirdType(
             @RequestBody @Valid ThirdTypeCreateRequest thirdTypeCreateRequest) {
@@ -100,7 +100,7 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Update_Third_Type') or hasAuthority('Change_State_Third_Type')")
+    @PreAuthorize("hasAuthority('TT#U') or hasAuthority('TT#CS')")
     @PostMapping("/thirdtype/update")
     public ResponseEntity<ThirdTypeResponse> updateThirdType(@RequestBody @Valid ThirdTypeUpdateRequest thirdTypeUpdateRequest) {
         ThirdType thirdType = idRestMapper.toThirdType(thirdTypeUpdateRequest);
@@ -109,7 +109,7 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(idRestMapper.toThirdTypeResponse(updatedThirdType), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Create_Type_Id')")
+    @PreAuthorize("hasAuthority('TI#C')")
     @PostMapping("/typeid")
     public ResponseEntity<TypeId> createTypeId(@RequestBody @Valid TypeIdCreateRequest typeIdCreateRequest) {
         TypeId typeId = idRestMapper.toTypeId(typeIdCreateRequest);
@@ -145,7 +145,7 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Update_Type_Id') or hasAuthority('Change_State_Type_Id')")
+    @PreAuthorize("hasAuthority('TI#U') or hasAuthority('TI#CS')")
     @PostMapping("/typeid/update")
     public ResponseEntity<TypeId> updateTypeId(@RequestBody @Valid TypeIdUpdateRequest typeIdUpdateRequest) {
         TypeId typeId = idRestMapper.toTypeId(typeIdUpdateRequest);
@@ -154,7 +154,7 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(typeId, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Delete_Third_Type')")
+    @PreAuthorize("hasAuthority('TT#D')")
     @DeleteMapping("/thirdtype/delete")
     public ResponseEntity<Boolean> deleteThirdType(
             @NotNull(message = "Third type ID not be empty") @RequestParam("thirdTypeId") Long thirdTypeId,
@@ -165,7 +165,7 @@ public class ThirdConfigurationRestController {
         return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('Delete_Type_Id')")
+    @PreAuthorize("hasAuthority('TI#D')")
     @DeleteMapping("/typeid/delete")
     public ResponseEntity<Boolean> deleteTypeId(
             @NotNull(message = "Type ID not be empty") @RequestParam("typeIdId") Long typeIdId,
