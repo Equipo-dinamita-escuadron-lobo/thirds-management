@@ -73,22 +73,22 @@ public class JwtDecoder {
         try {
             // Remover el prefijo "Bearer " si existe
             String token = jwtToken.startsWith("Bearer ") ? jwtToken.substring(7) : jwtToken;
-            
+
             // Un JWT tiene 3 partes separadas por puntos: header.payload.signature
             String[] chunks = token.split("\\.");
-            
+
             if (chunks.length != 3) {
                 log.error("Token JWT inválido: no tiene el formato correcto");
                 return null;
             }
-            
+
             // Decodificar el payload (segunda parte)
             Base64.Decoder decoder = Base64.getUrlDecoder();
             String payload = new String(decoder.decode(chunks[1]));
-            
+
             // Parsear el JSON del payload
             JsonNode jsonNode = objectMapper.readTree(payload);
-            
+
             // Extraer el claim solicitado
             JsonNode claimNode = jsonNode.get(claimName);
             if (claimNode != null) {
@@ -99,9 +99,30 @@ public class JwtDecoder {
                 log.warn("No se encontró el claim '{}' en el token JWT", claimName);
                 return null;
             }
-            
+
         } catch (Exception e) {
             log.error("Error al extraer el claim '{}' del token JWT: {}", claimName, e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public String extractPrimaryRole(String jwtToken) {
+        try {
+            String token = jwtToken.startsWith("Bearer ") ? jwtToken.substring(7) : jwtToken;
+            String[] chunks = token.split("\\.");
+            if (chunks.length != 3)
+                return null;
+
+            String payload = new String(Base64.getUrlDecoder().decode(chunks[1]));
+            JsonNode root = objectMapper.readTree(payload);
+
+            JsonNode roles = root.path("realm_access").path("roles");
+            if (roles.isArray() && roles.size() > 0) {
+                return roles.get(0).asText();
+            }
+            return null;
+        } catch (Exception e) {
+            log.error("Error extrayendo rol del JWT: {}", e.getMessage());
             return null;
         }
     }

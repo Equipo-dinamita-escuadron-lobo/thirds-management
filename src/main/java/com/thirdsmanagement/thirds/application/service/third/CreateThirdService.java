@@ -16,6 +16,8 @@ import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class CreateThirdService implements CreateThirdUseCase {
     private final IdOutputPort idOutputPort;
     private final IThirdEventPublisher thirdEventPublisher;
     
+    @Auditable(operationType = OperationType.CREATE, affectedTable = "THIRD")
     @Override
     @Transactional
     public Third createThird(Third third, String countryCode, String stateCode, String cityCode) {

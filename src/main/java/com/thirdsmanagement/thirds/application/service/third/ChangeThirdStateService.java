@@ -3,6 +3,8 @@ package com.thirdsmanagement.thirds.application.service.third;
 import com.thirdsmanagement.thirds.application.ports.input.ChangeThirdStateUseCase; 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.third.ThirdStateNotChanged;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ public class ChangeThirdStateService implements ChangeThirdStateUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
 
+    @Auditable(operationType = OperationType.INACTIVATE, affectedTable = "THIRD", idArgIndex = 0, enterpriseIdArgIndex = 1)
     @Override
     public boolean changeThirdState(Long thId, String entId) {
         boolean result = thirdOutputPort.changeThirdState(thId, entId);
