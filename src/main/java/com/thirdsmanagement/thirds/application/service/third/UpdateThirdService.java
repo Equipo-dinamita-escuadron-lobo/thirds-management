@@ -19,6 +19,8 @@ import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdForeignKeyViol
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInvalidDataException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeForeignKeyViolationException;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdRepository;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class UpdateThirdService implements UpdateThirdUseCase {
     private final ThirdRepository thirdRepository;
     private final IThirdEventPublisher thirdEventPublisher;
 
+    @Auditable(operationType = OperationType.UPDATE, affectedTable = "THIRD")
     @Override
     @Transactional
     public Third updateThirdWithGeography(Third third, String countryCode, String stateCode, String cityCode) {

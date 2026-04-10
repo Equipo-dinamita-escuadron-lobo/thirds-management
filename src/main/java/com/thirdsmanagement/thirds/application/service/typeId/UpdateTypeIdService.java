@@ -5,6 +5,8 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNotFound;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ public class UpdateTypeIdService implements UpdateTypeIdUseCase {
      * @throws TypeIdNotFound si el tipo de identificación no existe
      * @throws TypeIdInUseException si el tipo de identificación tiene terceros con movimientos contables
      */
+    @Auditable(operationType = OperationType.UPDATE, affectedTable = "TYPE_ID")
     @Override
     public TypeId updateTypeId(TypeId typeId) {
         if (typeId == null || typeId.getId() == null) {

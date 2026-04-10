@@ -5,6 +5,8 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNotFound;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,7 @@ public class DeleteThirdTypeService implements DeleteThirdTypeUseCase {
 
     private final IdOutputPort idOutputPort;
 
- 
+    @Auditable(operationType = OperationType.DELETE, affectedTable = "THIRD_TYPE")
     @Override
     @Transactional
     public boolean deleteThirdType(Long thirdTypeId, String entId) {

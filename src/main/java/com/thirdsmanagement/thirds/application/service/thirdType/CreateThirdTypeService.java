@@ -5,6 +5,8 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNameAlreadyExistsException;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.repository.ThirdTypeRepository;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 import com.thirdsmanagement.thirds.domain.utils.StringNormalizer;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ public class CreateThirdTypeService implements CreateThirdTypeUseCase {
     private final IdOutputPort idOutputPort;
     private final ThirdTypeRepository thirdTypeRepository;
 
-   
+    @Auditable(operationType = OperationType.CREATE, affectedTable = "THIRD_TYPE")
     @Override
     @Transactional
     public ThirdType createThirdType(ThirdType thirdType) {

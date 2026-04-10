@@ -5,6 +5,9 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNotFound;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,7 @@ public class UpdateThirdTypeService implements UpdateThirdTypeUseCase {
      * @throws ThirdTypeNotFound si el tipo de tercero no existe
      * @throws ThirdTypeInUseException si el tipo de tercero tiene terceros con movimientos contables
      */
+    @Auditable(operationType = OperationType.UPDATE, affectedTable = "THIRD_TYPE")
     @Override
     public ThirdType updateThirdType(ThirdType thirdType) {
         if (thirdType == null || thirdType.getThirdTypeId() == null) {

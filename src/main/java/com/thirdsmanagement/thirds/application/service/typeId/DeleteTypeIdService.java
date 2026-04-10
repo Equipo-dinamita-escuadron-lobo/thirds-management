@@ -5,6 +5,8 @@ import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdInUseException;
 import com.thirdsmanagement.thirds.domain.exceptions.typeId.TypeIdNotFound;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ public class DeleteTypeIdService implements DeleteTypeIdUseCase {
      * @throws TypeIdNotFound si el tipo de identificación no existe
      * @throws TypeIdInUseException si el tipo de identificación está siendo utilizado
      */
+    @Auditable(operationType = OperationType.DELETE, affectedTable = "TYPE_ID", idArgIndex = 0, enterpriseIdArgIndex = 1)
     @Override
     @Transactional
     public boolean deleteTypeId(Long typeIdId, String entId) {

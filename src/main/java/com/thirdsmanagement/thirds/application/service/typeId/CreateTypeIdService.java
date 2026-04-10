@@ -3,6 +3,8 @@ package com.thirdsmanagement.thirds.application.service.typeId;
 import com.thirdsmanagement.thirds.application.ports.input.CreateTypeIdUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.Auditable;
+import com.thirdsmanagement.thirds.infrastructure.audit.annotation.OperationType;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class CreateTypeIdService implements CreateTypeIdUseCase {
      * @param typeId tipo de identificación a crear
      * @return tipo de identificación creado con su ID asignado
      */
+    @Auditable(operationType = OperationType.CREATE, affectedTable = "TYPE_ID")
     @Override
     public TypeId createTypeId(TypeId typeId) {
         TypeId createdTypeId = idOutputPort.saveTypeId(typeId);
