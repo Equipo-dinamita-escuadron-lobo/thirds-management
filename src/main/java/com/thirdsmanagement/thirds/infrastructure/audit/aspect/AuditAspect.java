@@ -1,8 +1,10 @@
 package com.thirdsmanagement.thirds.infrastructure.audit.aspect;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -34,6 +36,16 @@ public class AuditAspect {
     private final ThirdOutputPort thirdOutputPort;
     @Lazy
     private final IdOutputPort idOutputPort;
+
+    private static final Map<Class<?>, List<String>> CONTEXT_FIELDS = Map.of(
+            Third.class, List.of("idNumber", "socialReason", "names", "lastNames"),
+            TypeId.class, List.of("typeId", "typeIdname"),
+            ThirdType.class, List.of("thirdTypeName"));
+
+    private static final Map<String, Class<?>> TABLE_TO_CLASS = Map.of(
+            "THIRD", Third.class,
+            "TYPE_ID", TypeId.class,
+            "THIRD_TYPE", ThirdType.class);
 
     public AuditAspect(AuditEventBuilder auditEventBuilder, AuditEventPublisher auditEventPublisher,
             @Lazy ThirdOutputPort thirdOutputPort, @Lazy IdOutputPort idOutputPort) {
@@ -69,7 +81,18 @@ public class AuditAspect {
             OperationType resolvedType = resolveFinalOperationType(auditable, beforeData, diff);
             String enterpriseId = resolveEnterpriseId(auditable, args, result, beforeData);
             String registerId = resolveRegisterId(auditable, args, result, beforeData);
-            Map<String, Object> dataObject = buildDataObject(resolvedType, args, result, beforeData, diff);
+            Map<String, Object> dataObject = buildDataObject(resolvedType, args, result, auditable, beforeData, diff);
+
+            if (dataObject == null || dataObject.isEmpty()) {
+                return result;
+            }
+
+            if (dataObject.containsKey("changes")) {
+                Map<?, ?> changes = (Map<?, ?>) dataObject.get("changes");
+                if (changes == null || changes.isEmpty()) {
+                    return result;
+                }
+            }
 
             OperationEventDto dto = auditEventBuilder.build(
                     auditable,
@@ -129,7 +152,11 @@ public class AuditAspect {
                 && diff != null && diff.size() == 1 && diff.containsKey("state")) {
             Object stateObj = diff.get("state");
             if (stateObj instanceof Map<?, ?> stateMap) {
+                Object before = stateMap.get("before");
                 Object after = stateMap.get("after");
+                if (Objects.equals(before, after)) {
+                    return null;
+                }
                 if (after instanceof Boolean afterState) {
                     return afterState ? OperationType.ACTIVATE : OperationType.INACTIVATE;
                 }
@@ -144,7 +171,9 @@ public class AuditAspect {
 
     private Map<String, Object> buildDataObject(OperationType resolvedType,
             Object[] args, Object result,
+            Auditable auditable,
             Map<String, Object> beforeData, Map<String, Object> diff) {
+        Class<?> entityClass = TABLE_TO_CLASS.get(auditable.affectedTable());
         return switch (resolvedType) {
             case CREATE -> {
                 Map<String, Object> data = new LinkedHashMap<>();
@@ -156,12 +185,31 @@ public class AuditAspect {
                     data.put("entity", thirdTypeToMap(tt));
                 yield data;
             }
-            case UPDATE -> Map.of("changes", diff);
+            case UPDATE -> {
+                Map<String, Object> data = new LinkedHashMap<>();
+                Map<String, Object> context = buildContext(entityClass, beforeData);
+                if (!context.isEmpty())
+                    data.put("context", context);
+                data.put("changes", diff);
+                yield data;
+            }
             case ACTIVATE, INACTIVATE -> {
                 if (beforeData != null) {
-                    Map<String, Object> beforeState = Map.of("state", beforeData.get("state"));
-                    Map<String, Object> afterState = Map.of("state", !((Boolean) beforeData.get("state")));
-                    yield Map.of("changes", buildDiff(beforeState, afterState));
+                    Boolean stateBefore = (Boolean) beforeData.get("state");
+                    Boolean stateAfter = diff != null && diff.containsKey("state")
+                            ? (Boolean) ((Map<?, ?>) diff.get("state")).get("after")
+                            : !stateBefore;
+                    if (Objects.equals(stateBefore, stateAfter)) {
+                        yield Map.of();
+                    }
+                    Map<String, Object> data = new LinkedHashMap<>();
+                    Map<String, Object> context = buildContext(entityClass, beforeData);
+                    if (!context.isEmpty())
+                        data.put("context", context);
+                    data.put("changes", buildDiff(
+                            Map.of("state", beforeData.get("state")),
+                            Map.of("state", !((Boolean) beforeData.get("state")))));
+                    yield data;
                 }
                 yield Map.of();
             }
@@ -184,6 +232,20 @@ public class AuditAspect {
             }
         });
         return diff;
+    }
+
+    private Map<String, Object> buildContext(Class<?> entityClass, Map<String, Object> data) {
+        if (data == null || entityClass == null)
+            return Map.of();
+
+        return CONTEXT_FIELDS.getOrDefault(entityClass, List.of())
+                .stream()
+                .filter(field -> data.get(field) != null)
+                .collect(Collectors.toMap(
+                        field -> field,
+                        data::get,
+                        (a, b) -> a,
+                        LinkedHashMap::new));
     }
 
     private String resolveEnterpriseId(Auditable auditable, Object[] args, Object result,
@@ -233,12 +295,12 @@ public class AuditAspect {
         map.put("phoneNumber", t.getPhoneNumber());
         map.put("address", t.getAddress());
         map.put("typeIdId", t.getTypeId() != null ? t.getTypeId().getId() : null);
+        map.put("typeId", t.getTypeId() != null ? t.getTypeId().getTypeId() : null);
         map.put("country", t.getCountry().getCountryName() != null ? t.getCountry().getCountryName() : null);
         map.put("province", t.getProvince().getStateName() != null ? t.getProvince().getStateName() : null);
         map.put("city", t.getCity().getCityName() != null ? t.getCity().getCityName() : null);
         map.put("state", t.getState());
 
-        // Elimina cualquier entrada con valor null antes de retornar
         map.entrySet().removeIf(entry -> entry.getValue() == null);
         return map;
     }
