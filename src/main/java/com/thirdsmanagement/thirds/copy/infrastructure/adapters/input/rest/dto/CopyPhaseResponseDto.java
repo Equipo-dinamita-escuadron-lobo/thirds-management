@@ -24,9 +24,6 @@ public class CopyPhaseResponseDto {
     /** Cantidad total de registros procesados */
     private int registrosProcesados;
 
-    /** Cantidad de equivalencias de IDs generadas */
-    private int equivalenciasGeneradas;
-
     /** Mensaje descriptivo del resultado */
     private String mensaje;
 
@@ -34,5 +31,9 @@ public class CopyPhaseResponseDto {
     private List<String> advertencias;
 
     /** Equivalencias generadas para que el orquestador las propague a fases siguientes */
-    private List<CopyEquivalenciaDto> equivalencias;
+    private List<CopyEquivalenciaDto> equivalenciasGeneradas;
+
+    /** Snapshot de datos exportados; presente solo en modo BACKUP */
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private Object datosExportados;
 }

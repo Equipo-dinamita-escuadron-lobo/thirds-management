@@ -7,6 +7,7 @@ import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.dto.C
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,7 @@ public class CopyThirdsPhaseController {
      * @return resultado de la ejecución con HTTP status acorde al estado
      */
     @PostMapping("/phase")
-    public ResponseEntity<CopyPhaseResponseDto> ejecutarFase(@RequestBody CopyPhaseRequestDto request) {
+    public ResponseEntity<CopyPhaseResponseDto> ejecutarFase(@Valid @RequestBody CopyPhaseRequestDto request) {
         CopyPhaseResponseDto response = executePort.ejecutar(request);
         HttpStatus status = determinarHttpStatus(response.getEstado());
         return ResponseEntity.status(status).body(response);

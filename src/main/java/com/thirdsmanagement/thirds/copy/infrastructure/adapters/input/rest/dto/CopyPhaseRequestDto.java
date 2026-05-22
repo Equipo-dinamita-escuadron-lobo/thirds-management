@@ -37,4 +37,8 @@ public class CopyPhaseRequestDto {
 
     /** Equivalencias de IDs de fases anteriores (puede ser vacío para THIRDS) */
     private List<CopyEquivalenciaDto> equivalenciasPrev;
+
+    /** Datos exportados por la fase BACKUP; presente solo en modo RESTORE */
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private Object datosImportados;
 }

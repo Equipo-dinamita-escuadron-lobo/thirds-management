@@ -5,10 +5,8 @@ import com.thirdsmanagement.thirds.copy.application.input.ICancelThirdsCopyPort;
 import com.thirdsmanagement.thirds.copy.application.input.ICleanupThirdsCopyPort;
 import com.thirdsmanagement.thirds.copy.application.input.IExecuteThirdsCopyPhasePort;
 import com.thirdsmanagement.thirds.copy.application.input.IGetThirdsCopyStatusPort;
-import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.controller.CopyThirdsCancelController;
-import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.controller.CopyThirdsCleanupController;
+import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.controller.CopyThirdsContractController;
 import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.controller.CopyThirdsPhaseController;
-import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.controller.CopyThirdsStatusController;
 import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.dto.CopyCancelResponseDto;
 import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.dto.CopyPhaseRequestDto;
 import com.thirdsmanagement.thirds.copy.infrastructure.adapters.input.rest.dto.CopyPhaseResponseDto;
@@ -39,12 +37,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Tests de la capa REST del bounded context copy de thirds-management.
+ * Cubre: CopyThirdsPhaseController (POST /phase)
+ *        CopyThirdsContractController (GET /{id}/status, POST /{id}/cancel, DELETE /{id}/cleanup)
  */
 @WebMvcTest(controllers = {
         CopyThirdsPhaseController.class,
-        CopyThirdsStatusController.class,
-        CopyThirdsCancelController.class,
-        CopyThirdsCleanupController.class
+        CopyThirdsContractController.class
 })
 @ActiveProfiles("test")
 class CopyThirdsPhaseControllerTest {
@@ -67,11 +65,9 @@ class CopyThirdsPhaseControllerTest {
     @MockBean
     private ICleanupThirdsCopyPort cleanupPort;
 
-    /** Mock del TenantInterceptor para evitar error de bean faltante en @WebMvcTest */
     @MockBean
     private TenantInterceptor tenantInterceptor;
 
-    /** Mock del JwtDecoder de Spring Security para evitar llamada remota a Keycloak en @WebMvcTest */
     @MockBean
     private JwtDecoder jwtDecoder;
 
@@ -89,10 +85,9 @@ class CopyThirdsPhaseControllerTest {
         CopyPhaseResponseDto respuesta = CopyPhaseResponseDto.builder()
                 .estado("COMPLETADO")
                 .registrosProcesados(3)
-                .equivalenciasGeneradas(3)
+                .equivalenciasGeneradas(Collections.emptyList())
                 .mensaje("Copia de terceros completada")
                 .advertencias(Collections.emptyList())
-                .equivalencias(Collections.emptyList())
                 .build();
 
         when(executePort.ejecutar(any())).thenReturn(respuesta);
@@ -120,10 +115,9 @@ class CopyThirdsPhaseControllerTest {
         CopyPhaseResponseDto respuesta = CopyPhaseResponseDto.builder()
                 .estado("COMPLETADO")
                 .registrosProcesados(3)
-                .equivalenciasGeneradas(3)
+                .equivalenciasGeneradas(Collections.emptyList())
                 .mensaje("Resultado previo reutilizado")
                 .advertencias(Collections.emptyList())
-                .equivalencias(Collections.emptyList())
                 .build();
 
         when(executePort.ejecutar(any())).thenReturn(respuesta);
@@ -150,7 +144,7 @@ class CopyThirdsPhaseControllerTest {
 
         when(statusPort.obtenerEstado(anyString())).thenReturn(respuesta);
 
-        mockMvc.perform(get("/api/thirds/copy/status/" + idProceso).with(jwt()))
+        mockMvc.perform(get("/api/thirds/copy/" + idProceso + "/status").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("COMPLETADO"))
                 .andExpect(jsonPath("$.modulo").value("thirds"));
@@ -168,7 +162,7 @@ class CopyThirdsPhaseControllerTest {
 
         when(cancelPort.cancelar(anyString())).thenReturn(respuesta);
 
-        mockMvc.perform(post("/api/thirds/copy/cancel/" + idProceso).with(jwt()))
+        mockMvc.perform(post("/api/thirds/copy/" + idProceso + "/cancel").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("CANCELADO"));
     }
@@ -177,7 +171,7 @@ class CopyThirdsPhaseControllerTest {
     void deleteCleanupDebeRetornar204() throws Exception {
         String idProceso = UUID.randomUUID().toString();
 
-        mockMvc.perform(delete("/api/thirds/copy/cleanup/" + idProceso).with(jwt()))
+        mockMvc.perform(delete("/api/thirds/copy/" + idProceso + "/cleanup").with(jwt()))
                 .andExpect(status().isNoContent());
     }
 
@@ -189,16 +183,15 @@ class CopyThirdsPhaseControllerTest {
                 .entOrigen("emp-A")
                 .entDestino("emp-B")
                 .snapshotCorte(Instant.now())
-                .equivalenciasPrev(null) // null explícito
+                .equivalenciasPrev(null)
                 .build();
 
         CopyPhaseResponseDto respuesta = CopyPhaseResponseDto.builder()
                 .estado("COMPLETADO")
                 .registrosProcesados(0)
-                .equivalenciasGeneradas(0)
+                .equivalenciasGeneradas(Collections.emptyList())
                 .mensaje("Sin datos para copiar")
                 .advertencias(Collections.emptyList())
-                .equivalencias(Collections.emptyList())
                 .build();
 
         when(executePort.ejecutar(any())).thenReturn(respuesta);
