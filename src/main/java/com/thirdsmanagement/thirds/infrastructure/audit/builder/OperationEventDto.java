@@ -1,6 +1,7 @@
 package com.thirdsmanagement.thirds.infrastructure.audit.builder;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +29,7 @@ public class OperationEventDto {
     private String userName;
 
     @JsonProperty("user_role")
-    private String userRole;
+    private List<String> userRole;
 
     @JsonProperty("operation_type")
     private String operationType;

@@ -110,7 +110,7 @@ public class AuditAspect {
         return result;
     }
 
-    private Map<String, Object> captureBeforeData(Auditable auditable, Object[] args) {
+    protected Map<String, Object> captureBeforeData(Auditable auditable, Object[] args) {
         try {
             return switch (auditable.operationType()) {
                 case UPDATE, INACTIVATE, DELETE -> fetchCurrentState(auditable, args);
@@ -121,7 +121,7 @@ public class AuditAspect {
         }
     }
 
-    private Map<String, Object> fetchCurrentState(Auditable auditable, Object[] args) {
+    protected Map<String, Object> fetchCurrentState(Auditable auditable, Object[] args) {
         return switch (auditable.affectedTable()) {
             case "THIRD" -> {
                 Long id = (args[0] instanceof Long) ? (Long) args[0] : ((Third) args[0]).getThId();
@@ -144,7 +144,7 @@ public class AuditAspect {
         };
     }
 
-    private OperationType resolveFinalOperationType(
+    protected OperationType resolveFinalOperationType(
             Auditable auditable,
             Map<String, Object> beforeData,
             Map<String, Object> diff) {
@@ -169,7 +169,7 @@ public class AuditAspect {
         return auditable.operationType();
     }
 
-    private Map<String, Object> buildDataObject(OperationType resolvedType,
+    protected Map<String, Object> buildDataObject(OperationType resolvedType,
             Object[] args, Object result,
             Auditable auditable,
             Map<String, Object> beforeData, Map<String, Object> diff) {
@@ -217,7 +217,7 @@ public class AuditAspect {
         };
     }
 
-    private Map<String, Object> buildDiff(Map<String, Object> before, Map<String, Object> after) {
+    protected Map<String, Object> buildDiff(Map<String, Object> before, Map<String, Object> after) {
         Map<String, Object> diff = new LinkedHashMap<>();
         if (before == null || after == null)
             return diff;
@@ -234,7 +234,7 @@ public class AuditAspect {
         return diff;
     }
 
-    private Map<String, Object> buildContext(Class<?> entityClass, Map<String, Object> data) {
+    protected Map<String, Object> buildContext(Class<?> entityClass, Map<String, Object> data) {
         if (data == null || entityClass == null)
             return Map.of();
 
@@ -248,7 +248,7 @@ public class AuditAspect {
                         LinkedHashMap::new));
     }
 
-    private String resolveEnterpriseId(Auditable auditable, Object[] args, Object result,
+    protected String resolveEnterpriseId(Auditable auditable, Object[] args, Object result,
             Map<String, Object> beforeData) {
         return switch (auditable.operationType()) {
             case CREATE -> {
@@ -264,7 +264,7 @@ public class AuditAspect {
         };
     }
 
-    private String resolveRegisterId(Auditable auditable, Object[] args, Object result,
+    protected String resolveRegisterId(Auditable auditable, Object[] args, Object result,
             Map<String, Object> beforeData) {
         return switch (auditable.operationType()) {
             case CREATE -> {
@@ -280,7 +280,7 @@ public class AuditAspect {
         };
     }
 
-    private Map<String, Object> thirdToMap(Third t) {
+    protected Map<String, Object> thirdToMap(Third t) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", t.getThId());
         map.put("entId", t.getEntId());
@@ -305,7 +305,7 @@ public class AuditAspect {
         return map;
     }
 
-    private Map<String, Object> typeIdToMap(TypeId ti) {
+    protected Map<String, Object> typeIdToMap(TypeId ti) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", ti.getId());
         map.put("entId", ti.getEntId());
@@ -318,7 +318,7 @@ public class AuditAspect {
         return map;
     }
 
-    private Map<String, Object> thirdTypeToMap(ThirdType tt) {
+    protected Map<String, Object> thirdTypeToMap(ThirdType tt) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", tt.getThirdTypeId());
         map.put("entId", tt.getEntId());
