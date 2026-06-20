@@ -1,0 +1,487 @@
+package com.thirdsmanagement.thirds.unit.domain.utils;
+
+import com.thirdsmanagement.thirds.domain.utils.ValidationUtils;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Tests unitarios para ValidationUtils
+ */
+class ValidationUtilsUnitTest {
+
+    // ===== VALIDACIONES DE FORMATO =====
+
+    @Test
+    @DisplayName("Debe retornar true para emails válidos")
+    void testIsValidEmail_WithValidEmails() {
+        // Act
+        boolean gmailValid = ValidationUtils.isValidEmail("usuario@gmail.com");
+        boolean outlookValid = ValidationUtils.isValidEmail("test@outlook.com");
+        boolean subdomainValid = ValidationUtils.isValidEmail("user@sub.dominio.com");
+
+        // Assert
+        assertTrue(gmailValid);
+        assertTrue(outlookValid);
+        assertTrue(subdomainValid);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false para emails inválidos")
+    void testIsValidEmail_WithInvalidEmails() {
+        // Act
+        boolean noAt = ValidationUtils.isValidEmail("usuariogmail.com");
+        boolean noDomain = ValidationUtils.isValidEmail("usuario@");
+        boolean noUser = ValidationUtils.isValidEmail("@gmail.com");
+        boolean spaces = ValidationUtils.isValidEmail("user @ gmail.com");
+        boolean nullEmail = ValidationUtils.isValidEmail(null);
+        boolean emptyEmail = ValidationUtils.isValidEmail("");
+
+        // Assert
+        assertFalse(noAt);
+        assertFalse(noDomain);
+        assertFalse(noUser);
+        assertFalse(spaces);
+        assertFalse(nullEmail);
+        assertFalse(emptyEmail);
+    }
+
+    @Test
+    @DisplayName("Debe retornar true para números de teléfono válidos")
+    void testIsValidPhoneNumber_WithValidPhones() {
+        // Act
+        boolean withPlus = ValidationUtils.isValidPhoneNumber("+573001234567");
+        boolean withoutPlus = ValidationUtils.isValidPhoneNumber("3001234567");
+        boolean minLength = ValidationUtils.isValidPhoneNumber("1234567");
+        boolean maxLength = ValidationUtils.isValidPhoneNumber("123456789012345");
+
+        // Assert
+        assertTrue(withPlus);
+        assertTrue(withoutPlus);
+        assertTrue(minLength);
+        assertTrue(maxLength);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false para números de teléfono inválidos")
+    void testIsValidPhoneNumber_WithInvalidPhones() {
+        // Act
+        boolean tooShort = ValidationUtils.isValidPhoneNumber("123456");
+        boolean tooLong = ValidationUtils.isValidPhoneNumber("1234567890123456");
+        boolean withLetters = ValidationUtils.isValidPhoneNumber("300ABC4567");
+        boolean withSpaces = ValidationUtils.isValidPhoneNumber("300 123 4567");
+        boolean nullPhone = ValidationUtils.isValidPhoneNumber(null);
+        boolean emptyPhone = ValidationUtils.isValidPhoneNumber("");
+
+        // Assert
+        assertFalse(tooShort);
+        assertFalse(tooLong);
+        assertFalse(withLetters);
+        assertFalse(withSpaces);
+        assertFalse(nullPhone);
+        assertFalse(emptyPhone);
+    }
+
+    @Test
+    @DisplayName("Debe retornar true para formatos NIT válidos")
+    void testIsValidNitFormat_WithValidNits() {
+        // Act
+        boolean basicNit = ValidationUtils.isValidNitFormat("901234567");
+        boolean nitWithDash = ValidationUtils.isValidNitFormat("901234567-8");
+        boolean nitWithVerification = ValidationUtils.isValidNitFormat("9012345678");
+
+        // Assert
+        assertTrue(basicNit);
+        assertTrue(nitWithDash);
+        assertTrue(nitWithVerification);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false para formatos NIT inválidos (no empiezan con 8 o 9)")
+    void testIsValidNitFormat_WithInvalidNits() {
+        // Act
+        boolean startsWith0 = ValidationUtils.isValidNitFormat("012345678");
+        boolean startsWith1 = ValidationUtils.isValidNitFormat("123456789");
+        boolean startsWith7 = ValidationUtils.isValidNitFormat("712345678");
+        boolean nullNit = ValidationUtils.isValidNitFormat(null);
+        boolean emptyNit = ValidationUtils.isValidNitFormat("");
+
+        // Assert - Solo valida que empiece con 8 o 9
+        assertFalse(startsWith0);
+        assertFalse(startsWith1);
+        assertFalse(startsWith7);
+        assertFalse(nullNit);
+        assertFalse(emptyNit);
+    }
+
+    @Test
+    @DisplayName("Debe retornar true para NITs que empiecen con 8 o 9 (independientemente del resto)")
+    void testIsValidNitFormat_WithValidStart() {
+        // Act
+        boolean startsWith8 = ValidationUtils.isValidNitFormat("812345678");
+        boolean startsWith9 = ValidationUtils.isValidNitFormat("912345678");
+        boolean withLetters = ValidationUtils.isValidNitFormat("90123A567"); // Tiene letras pero empieza con 9
+        boolean withSpecialChars = ValidationUtils.isValidNitFormat("8123-4567"); // Tiene guion pero empieza con 8
+
+        // Assert - Solo valida el primer dígito
+        assertTrue(startsWith8);
+        assertTrue(startsWith9);
+        assertTrue(withLetters);
+        assertTrue(withSpecialChars);
+    }
+
+    // ===== VALIDACIONES DE CONTENIDO =====
+
+    @Test
+    @DisplayName("Debe retornar true cuando el valor tiene contenido")
+    void testHasContent_WithContent() {
+        // Act
+        boolean hasContent = ValidationUtils.hasContent("test value");
+        boolean hasContentWithSpaces = ValidationUtils.hasContent("  test  ");
+
+        // Assert
+        assertTrue(hasContent);
+        assertTrue(hasContentWithSpaces);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false cuando el valor no tiene contenido")
+    void testHasContent_WithoutContent() {
+        // Act
+        boolean nullValue = ValidationUtils.hasContent(null);
+        boolean emptyValue = ValidationUtils.hasContent("");
+        boolean onlySpaces = ValidationUtils.hasContent("   ");
+        boolean onlyTabs = ValidationUtils.hasContent("\t\t");
+
+        // Assert
+        assertFalse(nullValue);
+        assertFalse(emptyValue);
+        assertFalse(onlySpaces);
+        assertFalse(onlyTabs);
+    }
+
+    @Test
+    @DisplayName("Debe validar longitud exacta correctamente")
+    void testHasLength_WithExactLength() {
+        // Act
+        boolean exactLength = ValidationUtils.hasLength("12345", 5);
+        boolean wrongLength = ValidationUtils.hasLength("1234", 5);
+        boolean nullValue = ValidationUtils.hasLength(null, 5);
+
+        // Assert
+        assertTrue(exactLength);
+        assertFalse(wrongLength);
+        assertFalse(nullValue);
+    }
+
+    @Test
+    @DisplayName("Debe validar rango de longitud correctamente")
+    void testIsValidLength_WithValidRange() {
+        // Act
+        boolean withinRange = ValidationUtils.isValidLength("12345", 3, 10);
+        boolean atMinLength = ValidationUtils.isValidLength("123", 3, 10);
+        boolean atMaxLength = ValidationUtils.isValidLength("1234567890", 3, 10);
+        boolean belowMin = ValidationUtils.isValidLength("12", 3, 10);
+        boolean aboveMax = ValidationUtils.isValidLength("12345678901", 3, 10);
+        boolean nullValue = ValidationUtils.isValidLength(null, 3, 10);
+
+        // Assert
+        assertTrue(withinRange);
+        assertTrue(atMinLength);
+        assertTrue(atMaxLength);
+        assertFalse(belowMin);
+        assertFalse(aboveMax);
+        assertFalse(nullValue);
+    }
+
+    @Test
+    @DisplayName("Debe validar dígito de verificación correctamente")
+    void testIsValidVerificationDigit_WithValidDigits() {
+        // Act
+        boolean validDigit1 = ValidationUtils.isValidVerificationDigit(1L);
+        boolean validDigit0 = ValidationUtils.isValidVerificationDigit(0L);
+        boolean validDigit9 = ValidationUtils.isValidVerificationDigit(9L);
+        boolean negativeDigit = ValidationUtils.isValidVerificationDigit(-1L);
+        boolean digit10 = ValidationUtils.isValidVerificationDigit(10L);
+        boolean nullDigit = ValidationUtils.isValidVerificationDigit(null);
+
+        // Assert
+        assertTrue(validDigit1);
+        assertTrue(validDigit0);
+        assertTrue(validDigit9);
+        assertFalse(negativeDigit);
+        assertFalse(digit10);
+        assertTrue(nullDigit); // null es válido (campo opcional)
+    }
+
+    @Test
+    @DisplayName("Debe validar longitud NIT correctamente (exactamente 9 dígitos)")
+    void testIsValidNitLength_WithValidLengths() {
+        // Act
+        boolean valid9Digits = ValidationUtils.isValidNitLength(123456789L);
+        boolean invalid10Digits = ValidationUtils.isValidNitLength(1234567890L);
+        boolean tooShort = ValidationUtils.isValidNitLength(12345678L);
+        boolean tooLong = ValidationUtils.isValidNitLength(12345678901L);
+        boolean nullValue = ValidationUtils.isValidNitLength(null);
+
+        // Assert 
+        assertTrue(valid9Digits);
+        assertFalse(invalid10Digits);
+        assertFalse(tooShort);
+        assertFalse(tooLong);
+        assertFalse(nullValue);
+    }
+
+    // ===== VALIDACIONES DE ERRORES =====
+
+    @Test
+    @DisplayName("Debe identificar errores de duplicado correctamente")
+    void testIsDuplicateError_WithDuplicateMessages() {
+        // Act
+        boolean duplicateError = ValidationUtils.isDuplicateError("Ya existe un tercero con el NIT 123456789");
+        boolean notDuplicateError = ValidationUtils.isDuplicateError("Error de validación en el email");
+        boolean nullMessage = ValidationUtils.isDuplicateError(null);
+
+        // Assert
+        assertTrue(duplicateError);
+        assertFalse(notDuplicateError);
+        assertFalse(nullMessage);
+    }
+
+    @Test
+    @DisplayName("Debe identificar errores geográficos correctamente")
+    void testIsGeographyError_WithGeographyMessages() {
+        // Act
+        boolean geographyErrorWithCode = ValidationUtils.isGeographyError("Error en código de la ciudad");
+        boolean geographyErrorRequired = ValidationUtils.isGeographyError("El estado es obligatorio");
+        boolean notGeographyError = ValidationUtils.isGeographyError("Error de validación en el NIT");
+        boolean nullMessage = ValidationUtils.isGeographyError(null);
+
+        // Assert
+        assertTrue(geographyErrorWithCode); 
+        assertTrue(geographyErrorRequired); 
+        assertFalse(notGeographyError);
+        assertFalse(nullMessage);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del país'")
+    void testIsGeographyError_WithCountryCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del país");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del estado'")
+    void testIsGeographyError_WithStateCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del estado");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'código del departamento'")
+    void testIsGeographyError_WithDepartmentCode() {
+        boolean result = ValidationUtils.isGeographyError("Error en código del departamento");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'país'")
+    void testIsGeographyError_WithRequiredCountry() {
+        boolean result = ValidationUtils.isGeographyError("El país es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'ciudad'")
+    void testIsGeographyError_WithRequiredCity() {
+        boolean result = ValidationUtils.isGeographyError("La ciudad es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("Debe identificar error geográfico cuando contiene 'obligatorio' y 'departamento'")
+    void testIsGeographyError_WithRequiredDepartment() {
+        boolean result = ValidationUtils.isGeographyError("El departamento es obligatorio");
+
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("No debe identificar error geográfico cuando contiene 'ciudad' pero no 'obligatorio'")
+    void testIsGeographyError_WithCityButNotRequired() {
+        boolean result = ValidationUtils.isGeographyError("La ciudad tiene un error de formato");
+
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("No debe identificar error geográfico cuando contiene 'departamento' pero no 'obligatorio'")
+    void testIsGeographyError_WithDepartmentButNotRequired() {
+        boolean result = ValidationUtils.isGeographyError("El departamento está incorrecto");
+
+        assertFalse(result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo desde errores de regla de negocio")
+    void testDetectFieldFromBusinessRuleError_WithBusinessRuleMessages() {
+        // Act
+        String nitField = ValidationUtils.detectFieldFromBusinessRuleError("NIT: El número de verificación no es válido");
+        String digitField = ValidationUtils.detectFieldFromBusinessRuleError("Dígito de verificación inválido");
+        String genderField = ValidationUtils.detectFieldFromBusinessRuleError("No se permite el campo género");
+        String namesField = ValidationUtils.detectFieldFromBusinessRuleError("Nombres son requeridos");
+        String unknownField = ValidationUtils.detectFieldFromBusinessRuleError("Error desconocido");
+        String nullMessage = ValidationUtils.detectFieldFromBusinessRuleError(null);
+
+        // Assert
+        assertEquals("Número Identificación", nitField);
+        assertEquals("Dígito Verificación", digitField);
+        assertEquals("Género", genderField);
+        assertEquals("Nombres", namesField);
+        assertEquals("Reglas Negocio", unknownField);
+        assertEquals("Reglas Negocio", nullMessage);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Apellidos cuando el mensaje contiene 'no se permite el campo apellidos'")
+    void testDetectFieldFromBusinessRuleError_NotAllowedLastNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("No se permite el campo apellidos para persona jurídica");
+
+        assertEquals("Apellidos", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Nombres cuando el mensaje contiene 'no se permite el campo nombres'")
+    void testDetectFieldFromBusinessRuleError_NotAllowedNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("No se permite el campo nombres para persona jurídica");
+
+        assertEquals("Nombres", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Género cuando el mensaje contiene 'género' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericGender() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El género es obligatorio para persona natural");
+
+        assertEquals("Género", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Apellidos cuando el mensaje contiene 'apellidos' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericLastNames() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Los apellidos son obligatorios");
+
+        assertEquals("Apellidos", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Razón Social cuando el mensaje contiene 'razón social'")
+    void testDetectFieldFromBusinessRuleError_SocialReason() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("La razón social es obligatoria");
+
+        assertEquals("Razón Social", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'persona natural'")
+    void testDetectFieldFromBusinessRuleError_NaturalPerson() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Debe ser una persona natural");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'persona jurídica'")
+    void testDetectFieldFromBusinessRuleError_LegalPerson() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("Debe ser una persona jurídica");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Persona cuando el mensaje contiene 'tipo de persona'")
+    void testDetectFieldFromBusinessRuleError_PersonType() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El tipo de persona es inválido");
+
+        assertEquals("Tipo Persona", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Identificación cuando el mensaje contiene 'tipo de identificación'")
+    void testDetectFieldFromBusinessRuleError_IdType() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("El tipo de identificación no es válido");
+
+        assertEquals("Tipo Identificación", result);
+    }
+
+    @Test
+    @DisplayName("Debe detectar campo Tipo Identificación cuando el mensaje contiene 'identificación' genérico")
+    void testDetectFieldFromBusinessRuleError_GenericIdentification() {
+        String result = ValidationUtils.detectFieldFromBusinessRuleError("La identificación es incorrecta");
+
+        assertEquals("Tipo Identificación", result);
+    }
+
+    // ===== UTILIDADES DE PROCESAMIENTO =====
+
+    @Test
+    @DisplayName("Debe normalizar texto para comparación (convierte a mayúsculas)")
+    void testNormalizeForComparison_WithDifferentCases() {
+        // Act
+        String normalized1 = ValidationUtils.normalizeForComparison("HOLA Mundo");
+        String normalized2 = ValidationUtils.normalizeForComparison("hola mundo");
+        String nullText = ValidationUtils.normalizeForComparison(null);
+
+        // Assert
+        assertEquals("HOLA MUNDO", normalized1);  // Convierte a mayúsculas
+        assertEquals("HOLA MUNDO", normalized2);  // Convierte a mayúsculas
+        assertNull(nullText);
+    }
+
+    @Test
+    @DisplayName("Debe limpiar números de teléfono correctamente")
+    void testCleanPhoneNumber_WithVariousFormats() {
+        // Act
+        String cleaned1 = ValidationUtils.cleanPhoneNumber("+57 300 123 4567");
+        String cleaned2 = ValidationUtils.cleanPhoneNumber("(300) 123-4567");
+        String cleaned3 = ValidationUtils.cleanPhoneNumber("300.123.4567");
+        String nullPhone = ValidationUtils.cleanPhoneNumber(null);
+
+        // Assert
+        assertEquals("+573001234567", cleaned1);
+        assertEquals("3001234567", cleaned2);
+        assertEquals("3001234567", cleaned3);
+        assertNull(nullPhone);
+    }
+
+    @Test
+    @DisplayName("Debe parsear boolean opcional correctamente (solo true/false)")
+    void testParseOptionalBoolean_WithVariousValues() {
+        // Act
+        Boolean trueValue = ValidationUtils.parseOptionalBoolean("true");
+        Boolean falseValue = ValidationUtils.parseOptionalBoolean("false");
+        Boolean trueCaseInsensitive = ValidationUtils.parseOptionalBoolean("TRUE");
+        Boolean falseCaseInsensitive = ValidationUtils.parseOptionalBoolean("FALSE");
+        Boolean otherValue = ValidationUtils.parseOptionalBoolean("yes");  // No es "true"
+        Boolean invalidValue = ValidationUtils.parseOptionalBoolean("invalid");
+        Boolean nullValue = ValidationUtils.parseOptionalBoolean(null);
+        Boolean emptyValue = ValidationUtils.parseOptionalBoolean("");
+
+        // Assert - Solo "true" (case insensitive) retorna true, resto false o null
+        assertTrue(trueValue);
+        assertFalse(falseValue);
+        assertTrue(trueCaseInsensitive);    // Case insensitive
+        assertFalse(falseCaseInsensitive);  // "FALSE" no es "true"
+        assertFalse(otherValue);            // "yes" no es "true"
+        assertFalse(invalidValue);          // Cualquier string que no sea "true" es false
+        assertNull(nullValue);
+        assertNull(emptyValue);
+    }
+}

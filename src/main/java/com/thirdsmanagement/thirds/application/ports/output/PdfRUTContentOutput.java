@@ -7,20 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Representa la salida que contiene el contenido extraído de un archivo PDF
+ * @brief Salida de contenido extraído de PDF de RUT
+ *
+ * Encapsula el contenido textual extraído de un archivo PDF
  * correspondiente a un RUT (Registro Único Tributario).
- * 
- * <p>Esta clase se utiliza para encapsular el contenido textual extraído 
- * de un archivo PDF después de ser procesado. Incluye anotaciones de Lombok 
- * para reducir el código repetitivo.</p>
- * 
- * <ul>
- * <li>{@code @Builder} - Permite utilizar el patrón builder para crear instancias de esta clase.</li>
- * <li>{@code @Getter} - Genera los métodos getter para todos los campos.</li>
- * <li>{@code @Setter} - Genera los métodos setter para todos los campos.</li>
- * <li>{@code @AllArgsConstructor} - Genera un constructor con parámetros para todos los campos.</li>
- * <li>{@code @NoArgsConstructor} - Genera un constructor sin argumentos.</li>
- * </ul>
+ *
+ * Utiliza anotaciones Lombok para reducir código repetitivo:
+ * - @Builder: Patrón builder para creación de instancias
+ * - @Getter: Genera métodos getter para todos los campos
+ * - @Setter: Genera métodos setter para todos los campos
+ * - @AllArgsConstructor: Constructor con todos los parámetros
+ * - @NoArgsConstructor: Constructor sin argumentos
  */
 @Builder
 @Getter
@@ -29,11 +26,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PdfRUTContentOutput {
     /**
-     * El contenido textual extraído del archivo PDF.
-     * 
-     * Este campo contiene el texto en bruto extraído del PDF, que puede incluir 
-     * información como el RUT, el nombre de la empresa, la dirección u otros datos 
-     * relevantes, dependiendo de la estructura del PDF.
+     * @brief Contenido textual extraído del archivo PDF
+     *
+     * Contiene el texto en bruto extraído del PDF, que puede incluir
+     * información como el RUT, nombre de empresa, dirección u otros datos
+     * relevantes dependiendo de la estructura del documento PDF.
      */
     private String content;
 }

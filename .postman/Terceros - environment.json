@@ -1,0 +1,100 @@
+{
+	"id": "848e28c0-4d73-492e-8114-32bb7501a9c7",
+	"name": "environment - Thirds-management",
+	"values": [
+		{
+			"key": "baseUrlRabbit",
+			"value": "localhost:15672",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "enterpriseId",
+			"value": "d9a1a122-662e-47b4-852e-2769b124e025",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "Username",
+			"value": "guest",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "Password",
+			"value": "guest",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "keycloakUser",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "keycloakPassword",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "TypeIdIdNatural",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "TypeIdIdJuridica",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ThirdTypeId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "ThirdId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "jobId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "thirdId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "ThirdIdJuridico",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "exportJobId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"color": null,
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-12-01T21:42:48.412Z",
+	"_postman_exported_using": "Postman/11.73.5"
+}

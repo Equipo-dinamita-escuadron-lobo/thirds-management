@@ -1,57 +1,113 @@
 package com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 
+import com.thirdsmanagement.thirds.domain.model.City;
+import com.thirdsmanagement.thirds.domain.model.Country;
+import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.request.ThirdCreateRequest;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ChangeThirdStateResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.GetThirdResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdResponse;
-import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.data.response.ThirdsEnterpriseListResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdCreateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.request.ThirdUpdateRequest;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ChangeThirdStateResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.GetThirdResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdResponse;
+import com.thirdsmanagement.thirds.infrastructure.adapters.input.rest.dto.response.ThirdsEnterpriseListResponse;
 
 /**
- * Interfaz Mapper para mapear los objetos de entrada y salida de los terceros.
+ * @brief Mapper para conversión entre DTOs de terceros y entidades del dominio
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ThirdRestMapper {
-    /**
-     * Método para mapear un objeto de tipo {@link ThirdCreateRequest} a un objeto de tipo {@link Third}.
-     * @param thirdCreateRequest
-     * @return Objeto de tipo {@link Third}.
-     */
+
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "province", ignore = true)
+    @Mapping(target = "city", ignore = true)
     Third toThird(ThirdCreateRequest thirdCreateRequest);
-    
-    /**
-     * Método para mapear un objeto de tipo {@link Third} a un objeto de tipo {@link ThirdResponse}.
-     * @param third
-     * @return Objeto de tipo {@link ThirdResponse}.
-     */
-    @Mapping(source = "idNumber",target = "id")
-    @Mapping(source = "names",target = "name")
-    @Mapping(source = "state",target = "description")
+
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "province", ignore = true)
+    @Mapping(target = "city", ignore = true)
+    Third toThird(ThirdUpdateRequest thirdUpdateRequest);
+
+    @Mapping(source = "thId", target = "id")
+    @Mapping(target = "name", expression = "java(getThirdName(third))")
+    @Mapping(target = "description", expression = "java(getThirdDescription(third))")
     ThirdResponse toThirdCreateResponse(Third third);
 
-    /**
-     * Método para mapear un objeto de tipo {@link Boolean} a un objeto de tipo {@link ChangeThirdStateResponse}.
-     * @param result
-     * @return Objeto de tipo {@link ChangeThirdStateResponse}.
-     */
+    default String getThirdName(Third third) {
+        if (third == null) {
+            return null;
+        }
+
+        if (third.isLegalEntity()) {
+            return third.getSocialReason();
+        } else {
+            StringBuilder name = new StringBuilder();
+            if (third.getNames() != null && !third.getNames().trim().isEmpty()) {
+                name.append(third.getNames());
+            }
+            if (third.getLastNames() != null && !third.getLastNames().trim().isEmpty()) {
+                if (name.length() > 0) {
+                    name.append(" ");
+                }
+                name.append(third.getLastNames());
+            }
+            return name.length() > 0 ? name.toString() : null;
+        }
+    }
+
+    default String getThirdDescription(Third third) {
+        if (third == null) {
+            return null;
+        }
+
+        StringBuilder description = new StringBuilder();
+
+        if (third.getPersonType() != null) {
+            description.append("Persona ").append(third.getPersonType().name());
+        }
+
+        if (third.getTypeId() != null && third.getTypeId().getTypeIdname() != null) {
+            if (description.length() > 0) {
+                description.append(" - ");
+            }
+            description.append(third.getTypeId().getTypeIdname())
+                      .append(": ").append(third.getIdNumber());
+        }
+
+        if (description.length() > 0) {
+            description.append(" - ");
+        }
+        description.append("Estado: ").append(third.isActive() ? "Activo" : "Inactivo");
+
+        return description.toString();
+    }
+
     ChangeThirdStateResponse toChangeThirdStateResponse(Boolean result);
 
-    /**
-     * Método para mapear un objeto de tipo {@link Page<Third>} a un objeto de tipo {@link ThirdsEnterpriseListResponse}.
-     * @param page
-     * @return Objeto de tipo {@link ThirdsEnterpriseListResponse}.
-     */
     @Mapping(source = "page", target = "results")
     ThirdsEnterpriseListResponse toListThirdsResponse(Page<Third> page);
 
-    /**
-     * Método para mapear un objeto de tipo {@link Third} a un objeto de tipo {@link GetThirdResponse}.
-     * @param third
-     * @return Objeto de tipo {@link GetThirdResponse}.
-     */
+    @Mapping(target = "country", expression = "java(mapCountryToString(third.getCountry()))")
+    @Mapping(target = "province", expression = "java(mapStateToString(third.getProvince()))")
+    @Mapping(target = "city", expression = "java(mapCityToString(third.getCity()))")
     GetThirdResponse toGetThirdResponse(Third third);
+
+    List<GetThirdResponse> toGetThirdResponseList(List<Third> thirdList);
+
+    default String mapCountryToString(Country country) {
+        return country != null ? country.getCountryCode() : null;
+    }
+
+    default String mapStateToString(State state) {
+        return state != null ? state.getStateCode() : null;
+    }
+
+    default String mapCityToString(City city) {
+        return city != null ? city.getCityCode() : null;
+    }
 }

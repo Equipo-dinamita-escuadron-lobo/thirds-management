@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: thirds
+
+  profiles:
+    active:
+    - ${PROFILE:dev}

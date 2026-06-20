@@ -3,21 +3,25 @@ package com.thirdsmanagement.thirds.application.ports.input;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 /**
- * Interfaz que representa el caso de uso para la obtención de un tercero.
+ * @brief Caso de uso para consulta individual de terceros
+ *
+ * Proporciona operaciones para obtener terceros específicos
+ * y verificar su existencia en el sistema.
  */
 public interface GetThirdUseCase {
     /**
-     * Obtiene un tercero por su id.
+     * @brief Obtiene un tercero por su id y empresa
      * @param id El id del tercero a obtener
+     * @param entId El id de la empresa
      * @return El tercero obtenido
      */
-    Third getThirdById(Long id);
-    
+    Third getThirdById(Long id, String entId);
+
     /**
-     * Verifica si un tercero existe por su id.
+     * @brief Verifica si un tercero existe por su id
      * @param id El id del tercero a verificar
-     * @param entId
+     * @param entId El id de la empresa
      * @return true si el tercero existe, false en caso contrario
      */
-    boolean existThirdById(long  id,  String entId);
+    boolean existThirdById(long id, String entId);
 }

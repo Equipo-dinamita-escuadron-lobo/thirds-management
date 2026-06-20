@@ -1,15 +1,24 @@
 package com.thirdsmanagement.thirds.application.ports.input;
 
-import org.springframework.http.ResponseEntity;
-
 /**
- * Interfaz que define el método para eliminar un tipo de tercero.
+ * @brief Caso de uso para eliminación de tipos de tercero
+ *
+ * Permite eliminar tipos de tercero del sistema con validación
+ * de integridad referencial para evitar eliminación de tipos en uso.
  */
 public interface DeleteThirdTypeUseCase {
     /**
-     * Elimina un tipo de tercero.
-     * @param entId El id del tipo de tercero a eliminar
-     * @return ResponseEntity<String> Mensaje de confirmación
+     * @brief Elimina un tipo de tercero del sistema
+     *
+     * Valida que el tipo de tercero no esté siendo utilizado por terceros existentes
+     * antes de proceder con la eliminación.
+     * 
+     * @param thirdTypeId el ID del tipo de tercero a eliminar
+     * @param entId el ID de la empresa
+     * @return true si se eliminó correctamente, false en caso contrario
+     * @throws com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeNotFound si el tipo de tercero no existe
+     * @throws com.thirdsmanagement.thirds.domain.exceptions.thirdType.ThirdTypeInUseException si el tipo de tercero está siendo utilizado
+     * @throws IllegalArgumentException si los parámetros son inválidos
      */
-    ResponseEntity<String> deleteThirdTypeUseCase(Long entId);
+    boolean deleteThirdType(Long thirdTypeId, String entId);
 }

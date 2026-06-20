@@ -3,36 +3,41 @@ package com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.m
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import com.thirdsmanagement.thirds.domain.model.City;
+import com.thirdsmanagement.thirds.domain.model.Country;
+import com.thirdsmanagement.thirds.domain.model.State;
 import com.thirdsmanagement.thirds.domain.model.Third;
 import com.thirdsmanagement.thirds.infrastructure.adapters.output.persistence.entity.ThirdEntity;
 
 /**
- * Clase que representa el mapeo de los objetos de la capa de persistencia.
- * Contiene los métodos para mapear los objetos de la capa de persistencia.
- * Se utiliza la anotación @Mapper para indicar que es una clase de mapeo.
- * Se utiliza la anotación @ComponentModel para indicar que es un componente de spring.
- * Se utiliza la anotación @Mapping para indicar el mapeo de los atributos de los objetos.
- * Se utiliza la anotación @InheritInverseConfiguration para indicar el mapeo inverso de los atributos de los objetos.
+ * @brief Mapper para conversión entre ThirdEntity JPA y modelo de dominio Third
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {IdPersistenceMapper.class})
 public interface ThirdPersistenceMapper {
 
-    /**
-     * Método para mapear un objeto de la entidad de tercero a un objeto de tercero.
-     * @param third Objeto de la entidad de tercero.
-     * @return Objeto de tercero.
-     */
-    @Mapping(source = "typeId.typeId", target = "typeId.tiId")
-    @Mapping(target = "thirdTypes", ignore = true)
-    @Mapping(target = "thId", ignore = true)
+    @Mapping(target = "typeId", ignore = true)
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "country", expression = "java(mapCountryToString(third.getCountry()))")
+    @Mapping(target = "province", expression = "java(mapStateToString(third.getProvince()))")
+    @Mapping(target = "city", expression = "java(mapCityToString(third.getCity()))")
     ThirdEntity toThirdEntity(Third third);
 
-    /**
-     * Método para mapear un objeto de tercero a un objeto de la entidad de tercero.
-     * @param thirdEntity Objeto de tercero.
-     * @return Objeto de la entidad de tercero.
-     */
-    @Mapping(source = "typeId.tiId", target = "typeId.typeId")
+    @Mapping(target = "typeId", source = "typeId")
     @Mapping(target = "thirdTypes", ignore = true)
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "province", ignore = true)
+    @Mapping(target = "city", ignore = true)
     Third toThird(ThirdEntity thirdEntity);
+
+    default String mapCountryToString(Country country) {
+        return country != null ? country.getCountryCode() : null;
+    }
+
+    default String mapStateToString(State state) {
+        return state != null ? state.getStateCode() : null;
+    }
+
+    default String mapCityToString(City city) {
+        return city != null ? city.getCityCode() : null;
+    }
 }

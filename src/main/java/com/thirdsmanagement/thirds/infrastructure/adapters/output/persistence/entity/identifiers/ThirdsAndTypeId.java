@@ -6,8 +6,7 @@ import jakarta.persistence.Embeddable;
 import lombok.Data;
 
 /**
- * Clase que representa la clave primaria compuesta de la tabla thirds_and_type.
- * Contiene el identificador de un tercero y el identificador de un tipo de tercero.
+ * @brief Clave primaria compuesta @Embeddable para thirds_and_types
  */
 @Data
 @Embeddable
