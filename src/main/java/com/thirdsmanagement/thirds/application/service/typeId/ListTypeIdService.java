@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class ListTypeIdService implements ListTypeIdUseCase {
 
     private final IdOutputPort idOutputPort;
+    private final DefaultTypeIdsService defaultTypeIdsService;
 
     /**
      * @brief Obtiene todos los tipos de identificación para una empresa específica
@@ -24,6 +25,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
      */
     @Override
     public List<TypeId> getAllTypeId(String entId) {
+        defaultTypeIdsService.ensureForEnterprise(entId);
         return idOutputPort.getAllTypeIds(entId);
     }
 
@@ -38,6 +40,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
      */
     @Override
     public Page<TypeId> getAllTypeIdsWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        defaultTypeIdsService.ensureForEnterprise(entId);
         return idOutputPort.getAllTypeIdsWithSort(entId, page, size, sortField, sortOrder);
     }
 
@@ -50,6 +53,7 @@ public class ListTypeIdService implements ListTypeIdUseCase {
      */
     @Override
     public Page<TypeId> getAllActiveTypeIds(String entId, int page, int size) {
+        defaultTypeIdsService.ensureForEnterprise(entId);
         return idOutputPort.getAllActiveTypeIds(entId, page, size);
     }
 

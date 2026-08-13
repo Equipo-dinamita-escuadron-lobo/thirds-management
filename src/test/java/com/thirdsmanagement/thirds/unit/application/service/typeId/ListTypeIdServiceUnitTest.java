@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
+import com.thirdsmanagement.thirds.application.service.typeId.DefaultTypeIdsService;
 import com.thirdsmanagement.thirds.application.service.typeId.ListTypeIdService;
 import com.thirdsmanagement.thirds.domain.model.PersonClassification;
 import com.thirdsmanagement.thirds.domain.model.TypeId;
@@ -30,6 +31,9 @@ class ListTypeIdServiceUnitTest {
 
     @Mock
     private IdOutputPort idOutputPort;
+
+    @Mock
+    private DefaultTypeIdsService defaultTypeIdsService;
 
     @InjectMocks
     private ListTypeIdService listTypeIdService;
