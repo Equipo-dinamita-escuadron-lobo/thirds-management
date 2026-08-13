@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.application.service.thirdType.DefaultThirdTypesService;
 import com.thirdsmanagement.thirds.application.service.third.ListThirdsService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
@@ -34,6 +35,9 @@ class ListThirdsServiceUnitTest {
 
     @Mock
     private ThirdOutputPort thirdOutputPort;
+
+    @Mock
+    private DefaultThirdTypesService defaultThirdTypesService;
 
     @InjectMocks
     private ListThirdsService listThirdsService;

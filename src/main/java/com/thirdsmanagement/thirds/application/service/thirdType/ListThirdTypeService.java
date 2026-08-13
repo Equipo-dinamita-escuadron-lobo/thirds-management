@@ -16,15 +16,18 @@ import lombok.RequiredArgsConstructor;
 public class ListThirdTypeService implements ListThirdTypeUseCase {
 
     private final IdOutputPort idOutputPort;
+    private final DefaultThirdTypesService defaultThirdTypesService;
 
     @Override
     public List<ThirdType> getAllThirdTypes(String entId) {
+        defaultThirdTypesService.ensureForEnterprise(entId);
         return idOutputPort.getALLThirdTypes(entId);
     }
 
   
     @Override
     public Page<ThirdType> getAllThirdTypesWithSort(String entId, int page, int size, String sortField, String sortOrder) {
+        defaultThirdTypesService.ensureForEnterprise(entId);
         return idOutputPort.getAllThirdTypesWithSort(entId, page, size, sortField, sortOrder);
     }
   
@@ -50,6 +53,7 @@ public class ListThirdTypeService implements ListThirdTypeUseCase {
    
     @Override
     public Page<ThirdType> getAllActiveThirdTypes(String entId, int page, int size) {
+        defaultThirdTypesService.ensureForEnterprise(entId);
         return idOutputPort.getAllActiveThirdTypes(entId, page, size);
     }
 

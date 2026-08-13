@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 
 import com.thirdsmanagement.thirds.application.ports.input.ListThirdsUseCase;
 import com.thirdsmanagement.thirds.application.ports.output.ThirdOutputPort;
+import com.thirdsmanagement.thirds.application.service.thirdType.DefaultThirdTypesService;
 import com.thirdsmanagement.thirds.domain.model.Third;
 
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class ListThirdsService implements ListThirdsUseCase {
 
     private final ThirdOutputPort thirdOutputPort;
+    private final DefaultThirdTypesService defaultThirdTypesService;
     
     @Override
     public Page<Third> getAllThirdsBy(String entId, Pageable pageable) {
@@ -58,6 +60,7 @@ public class ListThirdsService implements ListThirdsUseCase {
 
     @Override
     public Page<Third> getThirdsByEntIdAndThirdTypeName(String entId, String thirdTypeName, int page, int size) {
+        defaultThirdTypesService.ensureForEnterprise(entId);
         return thirdOutputPort.getThirdsByEntIdAndThirdTypeName(entId, thirdTypeName, PageRequest.of(page, size,
             Sort.by("names").ascending()));
     }

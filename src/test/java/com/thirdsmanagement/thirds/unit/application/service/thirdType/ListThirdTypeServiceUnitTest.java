@@ -21,6 +21,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.thirdsmanagement.thirds.application.ports.output.IdOutputPort;
+import com.thirdsmanagement.thirds.application.service.thirdType.DefaultThirdTypesService;
 import com.thirdsmanagement.thirds.application.service.thirdType.ListThirdTypeService;
 import com.thirdsmanagement.thirds.domain.model.ThirdType;
 
@@ -30,6 +31,9 @@ class ListThirdTypeServiceUnitTest {
 
     @Mock
     private IdOutputPort idOutputPort;
+
+    @Mock
+    private DefaultThirdTypesService defaultThirdTypesService;
 
     @InjectMocks
     private ListThirdTypeService listThirdTypeService;
